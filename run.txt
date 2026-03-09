@@ -1,0 +1,65 @@
+========================================
+ FinanceIQ – How to Run
+========================================
+
+OPTION 1: Docker (Recommended)
+---------------------------------------
+Requirements: Docker Desktop installed and running
+
+  cd Capstone_Code
+  docker compose up --build
+
+  Services:
+    Frontend  → http://localhost:3000
+    Backend   → http://localhost:8000
+    API Docs  → http://localhost:8000/docs
+
+The backend automatically seeds the database on first startup:
+  - Creates all tables
+  - Inserts 50 BIST companies (with 4 quarters of financial data each)
+  - Creates the default rule-based scoring model
+
+To stop:
+  docker compose down
+
+To stop and delete all data (reset database):
+  docker compose down -v
+
+
+OPTION 2: Local Development
+---------------------------------------
+Requirements: Python 3.12, Node.js 20, PostgreSQL 16
+
+--- Backend ---
+  cd backend
+  python -m venv .venv
+  source .venv/bin/activate          # Windows: .venv\Scripts\activate
+  pip install -r requirements.txt
+
+  # Create environment file
+  echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/capstone_db" > .env
+  echo "SECRET_KEY=your-secret-key-here" >> .env
+
+  # Seed the database (PostgreSQL must be running)
+  python seed.py
+
+  # Start backend
+  uvicorn app.main:app --reload --port 8000
+
+--- Frontend ---
+  cd frontend
+  npm install
+  npm run dev          # http://localhost:5173
+
+
+FIRST USE
+---------------------------------------
+1. Open http://localhost:3000 (Docker) or http://localhost:5173 (local dev)
+2. Click "Kayıt Ol" (Register) to create an account
+3. Log in with your credentials
+4. Use the search bar to find a company (e.g. ASELS, THYAO, TUPRS)
+5. Open a company profile and click "Skor Çalıştır" to score it
+6. Use the Compare page to score and compare 2–8 companies side-by-side
+
+
+
