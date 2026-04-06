@@ -4,7 +4,7 @@ import {
   Building2, TrendingUp, Activity, Zap, GitCompare,
   FileText, ChevronRight, ArrowUpRight, ArrowDownRight, Minus,
   Clock, AlertTriangle, CheckCircle2, BarChart3, Search,
-  Trophy, Target,
+  Trophy, Target, BrainCircuit,
 } from 'lucide-react'
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import api from '../api/client'
@@ -377,10 +377,10 @@ export default function DashboardPage() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
           <QuickActionCard
-            icon={Search}
-            label="AI Search"
-            sub="Natural language company search"
-            onClick={() => navigate('/ai-search')}
+            icon={BrainCircuit}
+            label="Forecasting"
+            sub="Winner-only sector forecasting"
+            onClick={() => navigate('/forecasting')}
             accent="var(--primary)"
           />
           <QuickActionCard

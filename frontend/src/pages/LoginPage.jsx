@@ -13,6 +13,25 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [focusField, setFocusField] = useState(null)
 
+  const getErrorMessage = (err) => {
+    const detail = err?.response?.data?.detail
+    if (!detail) return 'An error occurred.'
+    if (typeof detail === 'string') return detail
+    if (Array.isArray(detail)) {
+      const parts = detail
+        .map((item) => {
+          if (typeof item === 'string') return item
+          if (item?.msg) return item.msg
+          return null
+        })
+        .filter(Boolean)
+      if (parts.length > 0) return parts.join(' | ')
+      return 'Invalid input. Please check your email and password.'
+    }
+    if (typeof detail === 'object' && detail.msg) return detail.msg
+    return 'An error occurred.'
+  }
+
   const handle = async (e) => {
     e.preventDefault()
     setError('')
@@ -27,7 +46,7 @@ export default function LoginPage() {
         navigate('/dashboard')
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'An error occurred.')
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -136,8 +155,8 @@ export default function LoginPage() {
             {mode === 'login' ? 'Sign Up' : 'Sign In'}
           </span>
         </div>
+
       </div>
     </div>
   )
 }
-

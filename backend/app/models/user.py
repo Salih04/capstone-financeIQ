@@ -15,6 +15,10 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     failed_login_count: Mapped[int] = mapped_column(Integer, default=0)
     locked_until: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    user_type: Mapped[str] = mapped_column(String(50), default="individual")
+    risk_level: Mapped[str] = mapped_column(String(20), default="medium")
+    investment_scope: Mapped[float | None] = mapped_column(nullable=True)
+    sector_focus: Mapped[str | None] = mapped_column(String(200), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     score_runs: Mapped[list["ScoreRun"]] = relationship("ScoreRun", back_populates="user")

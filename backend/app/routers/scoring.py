@@ -155,112 +155,6 @@ def score_company(
     db.refresh(score_run)
     return score_run
 
-# Full 12-metric key list (must match scoring_service.py FEATURES)
-_METRIC_KEYS = [
-    "roa", "roe", "operating_margin", "net_margin",
-    "current_ratio", "quick_ratio", "cash_ratio",
-    "debt_to_equity", "debt_to_assets",
-    "ocf_to_debt", "ocf_to_assets", "cash_flow_margin",
-]
-
-
-def _to_dict(m: ComputedMetric) -> dict:
-    return {k: getattr(m, k, None) for k in _METRIC_KEYS}
-
-
-@router.post("/companies/{company_id}/score", response_model=ScoreRunOut)
-def score_company(
-    company_id: int,
-    body: ScoreRequest,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    company = db.get(Company, company_id)
-    if not company:
-        raise HTTPException(status_code=404, detail="Company not found.")
-
-    all_metrics = (
-        db.query(ComputedMetric)
-        .filter(ComputedMetric.company_id == company_id)
-        .order_by(ComputedMetric.period.desc())
-        .all()
-    )
-    if not all_metrics:
-        raise HTTPException(
-            status_code=422,
-            detail="No computed metrics found. Please import financial data first.",
-        )
-
-    if body.period:
-        current_metric = next((m for m in all_metrics if m.period == body.period), None)
-        if not current_metric:
-            raise HTTPException(status_code=404, detail=f"No metrics for period '{body.period}'.")
-    else:
-        current_metric = all_metrics[0]
-
-    previous_metric = all_metrics[1] if len(all_metrics) > 1 else None
-
-    current_dict = _to_dict(current_metric)
-    previous_dict = _to_dict(previous_metric) if previous_metric else None
-
-    # Optional: load custom weights from a stored ScoringModel
-    custom_weights: dict | None = None
-    scoring_model: ScoringModel | None = None
-    if body.scoring_model_id:
-        scoring_model = db.get(ScoringModel, body.scoring_model_id)
-        if scoring_model:
-            custom_weights = {
-                m.feature_name: m.weight for m in (scoring_model.metrics or [])
-            }
-    # Direct custom_weights from request body take priority
-    if body.custom_weights:
-        custom_weights = body.custom_weights
-
-    result = run_score(
-        current_dict,
-        previous_dict,
-        mode=body.mode,
-        custom_weights=custom_weights,
-        db=db,
-    )
-
-    model_name = (
-        (scoring_model.model_name if scoring_model else None)
-        or f"{body.mode}_v2"
-    )
-
-    score_run = ScoreRun(
-        user_id=current_user.id,
-        company_id=company_id,
-        period=current_metric.period,
-        model_name=model_name,
-        scoring_model_id=body.scoring_model_id,
-        total_score=result["total_score"],
-        success_probability=result["success_probability"],
-        label_used=result.get("label_used"),
-        explanation_summary=result.get("explanation_summary"),
-    )
-    db.add(score_run)
-    db.flush()
-
-    for d in result["details"]:
-        db.add(
-            ScoreDetail(
-                score_run_id=score_run.id,
-                metric_name=d["metric_name"],
-                metric_value=d["metric_value"],
-                normalized_value=d.get("normalized_value"),
-                weight=d["weight"],
-                contribution=d["contribution"],
-                comment=d["comment"],
-            )
-        )
-
-    db.commit()
-    db.refresh(score_run)
-    return score_run
-
-
 @router.post("/scoring/compare", response_model=CompareResult)
 def compare_stocks(
     body: CompareRequest,
@@ -320,6 +214,5 @@ def my_score_runs(
             "created_at": run.created_at.isoformat() if run.created_at else None,
         })
     return result
-
 
 

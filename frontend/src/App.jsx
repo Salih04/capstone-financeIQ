@@ -11,6 +11,9 @@ import ValidationLabPage from './pages/ValidationLabPage'
 import AISearchPage from './pages/AISearchPage'
 import DataHealthPage from './pages/DataHealthPage'
 import LabelingLabPage from './pages/LabelingLabPage'
+import ForecastingPage from './pages/ForecastingPage'
+import ForecastingDetailPage from './pages/ForecastingDetailPage'
+import NewsUpdatesPage from './pages/NewsUpdatesPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppShell from './components/layout/AppShell'
 
@@ -25,8 +28,8 @@ function Protected({ children }) {
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={<Protected><DashboardPage /></Protected>} />
       <Route path="/companies" element={<Protected><SearchPage /></Protected>} />
       <Route path="/search" element={<Navigate to="/companies" replace />} />
@@ -39,6 +42,9 @@ export default function App() {
       <Route path="/validation" element={<Protected><ValidationLabPage /></Protected>} />
       <Route path="/data-health" element={<Protected><DataHealthPage /></Protected>} />
       <Route path="/labeling" element={<Protected><LabelingLabPage /></Protected>} />
+      <Route path="/forecasting" element={<Protected><ForecastingPage /></Protected>} />
+      <Route path="/forecasting/detail" element={<Protected><ForecastingDetailPage /></Protected>} />
+      <Route path="/news" element={<Protected><NewsUpdatesPage /></Protected>} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )

@@ -1,0 +1,117 @@
+import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar, Cell } from 'recharts'
+import api from '../api/client'
+import { Card, EmptyState, SectionHeader } from '../components/ui'
+
+function HeatColor({ value }) {
+  const v = Math.max(-1, Math.min(1, value / 100))
+  const pos = v >= 0
+  const alpha = Math.min(0.9, Math.abs(v))
+  return <span style={{ color: pos ? '#22c55e' : '#ef4444', opacity: 0.35 + alpha }}>{value.toFixed(2)}</span>
+}
+
+export default function ForecastingDetailPage() {
+  const [params] = useSearchParams()
+  const stockCode = (params.get('stock') || '').toUpperCase()
+  const sector = params.get('sector') || undefined
+  const year = params.get('year') ? parseInt(params.get('year'), 10) : undefined
+
+  const [trend, setTrend] = useState({ series: [] })
+  const [heatmap, setHeatmap] = useState({ heatmap: [] })
+  const [paramRanks, setParamRanks] = useState([])
+
+  useEffect(() => {
+    if (!stockCode) return
+    api.get('/predict/trends', { params: { stock_code: stockCode, sector } }).then(({ data }) => setTrend(data)).catch(() => setTrend({ series: [] }))
+  }, [stockCode, sector])
+
+  useEffect(() => {
+    if (!year) return
+    api.get('/predict/heatmap', { params: { year } }).then(({ data }) => setHeatmap(data)).catch(() => setHeatmap({ heatmap: [] }))
+  }, [year])
+
+  useEffect(() => {
+    if (!year || !sector) return
+    api.get('/get-parameters', { params: { year, sector } }).then(({ data }) => setParamRanks(data.parameters || [])).catch(() => setParamRanks([]))
+  }, [year, sector])
+
+  const heatBySector = useMemo(() => {
+    const map = {}
+    for (const c of heatmap.heatmap || []) {
+      map[c.sector] ||= []
+      map[c.sector].push(c)
+    }
+    return map
+  }, [heatmap])
+
+  return (
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem 1.5rem' }}>
+      <SectionHeader title="Forecasting Detail" subtitle="Trend, parameter importance, and sector heatmap" />
+
+      {!stockCode ? (
+        <EmptyState title="No stock selected" description="Open this page with query params: ?stock=ASELS&sector=...&year=2025" />
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 16 }}>
+          <Card style={{ padding: '1rem' }}>
+            <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 10 }}>Historical Trend • {stockCode}</div>
+            <ResponsiveContainer width="100%" height={260}>
+              <LineChart data={trend.series || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="year" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="period_return" stroke="var(--primary)" strokeWidth={2} />
+                <Line type="monotone" dataKey="return_1y" stroke="#22c55e" strokeWidth={1.5} />
+              </LineChart>
+            </ResponsiveContainer>
+          </Card>
+
+          <Card style={{ padding: '1rem' }}>
+            <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 10 }}>Parameter Importance</div>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={(paramRanks || []).slice(0, 10)} layout="vertical" margin={{ left: 10, right: 10 }}>
+                <XAxis type="number" />
+                <YAxis dataKey="parameter_name" type="category" width={110} />
+                <Tooltip />
+                <Bar dataKey="score">
+                  {(paramRanks || []).slice(0, 10).map((_, i) => (
+                    <Cell key={i} fill={i < 3 ? '#22c55e' : 'var(--primary)'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+        </div>
+      )}
+
+      <Card style={{ padding: '1rem', marginTop: 16 }}>
+        <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 10 }}>Sector Heatmap ({year || 'n/a'})</div>
+        {Object.keys(heatBySector).length === 0 ? (
+          <EmptyState title="No heatmap data" description="Run forecast and ensure year data exists." />
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: 12 }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Sector</th>
+                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Feature</th>
+                  <th style={{ textAlign: 'right', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(heatmap.heatmap || []).slice(0, 120).map((c, idx) => (
+                  <tr key={`${c.sector}-${c.feature}-${idx}`}>
+                    <td style={{ borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>{c.sector}</td>
+                    <td style={{ borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>{c.feature}</td>
+                    <td style={{ borderBottom: '1px solid var(--border)', padding: '8px 10px', textAlign: 'right' }}><HeatColor value={c.value} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+    </div>
+  )
+}
