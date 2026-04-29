@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinanceIQ – Financial Analysis Platform</title>
+    <script>(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --bg-deep:      #06060C;
+        --bg:           #09090F;
+        --surface-1:    #111827;
+        --surface-2:    #141D2B;
+        --surface-3:    #1F2937;
+        --surface-hover:#243347;
+
+        --border:        #1A2535;
+        --border-strong: #25334A;
+        --border-bright: #2E4058;
+
+        --primary:        #00F5D4;
+        --primary-hover:  #33F7DC;
+        --primary-muted:  rgba(0,245,212,0.18);
+        --primary-glow:   rgba(0,245,212,0.20);
+        --primary-subtle: rgba(0,245,212,0.07);
+
+        --secondary:        #FF4D9D;
+        --secondary-hover:  #FF70B2;
+        --secondary-subtle: rgba(255,77,157,0.1);
+
+        --success:        #2BD97F;
+        --success-light:  #52E596;
+        --success-muted:  rgba(43,217,127,0.18);
+        --success-subtle: rgba(43,217,127,0.09);
+
+        --warning:        #FFC857;
+        --warning-light:  #FFD57A;
+        --warning-muted:  rgba(255,200,87,0.18);
+        --warning-subtle: rgba(255,200,87,0.09);
+
+        --danger:         #FF5C5C;
+        --danger-light:   #FF7E7E;
+        --danger-muted:   rgba(255,92,92,0.18);
+        --danger-subtle:  rgba(255,92,92,0.09);
+
+        --info:           #FF4D9D;
+        --info-subtle:    rgba(255,77,157,0.1);
+
+        --text-1: #FFFFFF;
+        --text-2: #C7D2FE;
+        --text-3: #6B7EA8;
+        --text-4: #374563;
+
+        --font:      'Inter', -apple-system, system-ui, sans-serif;
+        --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+        --radius-sm:  5px;
+        --radius-md:  10px;
+        --radius-lg:  14px;
+        --radius-xl:  20px;
+        --radius-2xl: 28px;
+
+        --shadow-sm:   0 1px 4px rgba(0,0,0,0.5);
+        --shadow-md:   0 4px 20px rgba(0,0,0,0.5);
+        --shadow-lg:   0 8px 40px rgba(0,0,0,0.6);
+        --shadow-glow: 0 0 28px rgba(0,245,212,0.18);
+
+        --sidebar-w:    244px;
+        --sidebar-coll: 68px;
+        --topbar-h:     58px;
+      }
+
+      [data-theme="light"] {
+        --bg-deep:      #F0F4F8;
+        --bg:           #F8FAFC;
+        --surface-1:    #FFFFFF;
+        --surface-2:    #F0F4F8;
+        --surface-3:    #E2E8F0;
+        --surface-hover:#EBF2F9;
+
+        --border:        #CBD5E1;
+        --border-strong: #B0C4D4;
+        --border-bright: #8FA4BE;
+
+        --primary:        #00A693;
+        --primary-hover:  #008F7E;
+        --primary-muted:  rgba(0,166,147,0.12);
+        --primary-glow:   rgba(0,166,147,0.12);
+        --primary-subtle: rgba(0,166,147,0.06);
+
+        --secondary:        #C4306C;
+        --secondary-hover:  #A02256;
+        --secondary-subtle: rgba(196,48,108,0.08);
+
+        --success:        #1DB764;
+        --success-light:  #2BD97F;
+        --success-muted:  rgba(29,183,100,0.12);
+        --success-subtle: rgba(29,183,100,0.07);
+
+        --warning:        #D4973A;
+        --warning-light:  #FFC857;
+        --warning-muted:  rgba(212,151,58,0.12);
+        --warning-subtle: rgba(212,151,58,0.07);
+
+        --danger:         #E04444;
+        --danger-light:   #FF5C5C;
+        --danger-muted:   rgba(224,68,68,0.12);
+        --danger-subtle:  rgba(224,68,68,0.07);
+
+        --info:           #C4306C;
+        --info-subtle:    rgba(196,48,108,0.1);
+
+        --text-1: #09090F;
+        --text-2: #374151;
+        --text-3: #6B7280;
+        --text-4: #9CA3AF;
+
+        --shadow-sm:   0 1px 4px rgba(0,0,0,0.08);
+        --shadow-md:   0 4px 20px rgba(0,0,0,0.10);
+        --shadow-lg:   0 8px 40px rgba(0,0,0,0.14);
+        --shadow-glow: 0 0 28px rgba(0,166,147,0.14);
+      }
+
+      html, body, #root { height: 100%; }
+
+      body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text-1);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-strong) transparent;
+      }
+      *::-webkit-scrollbar { width: 5px; height: 5px; }
+      *::-webkit-scrollbar-track { background: transparent; }
+      *::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+      input, button, select, textarea { font-family: var(--font); }
+
+      button { cursor: pointer; }
+
+      a { text-decoration: none; color: inherit; }
+    </style>
+    <script type="module" crossorigin src="/assets/index-DPmppKRp.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
