@@ -18,7 +18,7 @@ services:
       retries: 10
 
   backend:
-    build: ./backend
+    build: ./2.backend
     restart: unless-stopped
     ports:
       - "8000:8000"
@@ -31,10 +31,11 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./backend:/app
+    - ./2.backend:/app
+    - ./CLEANED_Financial:/CLEANED_Financial
 
   frontend:
-    build: ./frontend
+    build: ./1.frontend
     restart: unless-stopped
     ports:
       - "3000:80"

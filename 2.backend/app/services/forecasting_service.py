@@ -48,29 +48,25 @@ _PARAMETER_CATALOG: list[dict[str, str]] = [
     {"category": "Karlilik", "ratio": "ROE", "formula": "Net Kar / Ozsermaye", "purpose": "Sermaye verimliligi"},
     {"category": "Karlilik", "ratio": "ROA", "formula": "Net Kar / Toplam Varlik", "purpose": "Varlik verimliligi"},
     {"category": "Karlilik", "ratio": "Brut Kar Marji", "formula": "Brut Kar / Ciro", "purpose": "Urun karliligi"},
-    {"category": "Karlilik", "ratio": "FAVOK Marji", "formula": "FAVOK / Ciro", "purpose": "Operasyonel guc"},
+    {"category": "Karlilik", "ratio": "Faaliyet Kar Marji", "formula": "Faaliyet Kari / Ciro", "purpose": "Operasyonel karlilik"},
     {"category": "Karlilik", "ratio": "Net Kar Marji", "formula": "Net Kar / Ciro", "purpose": "Nihai karlilik"},
-    {"category": "Nakit Akisi", "ratio": "FCF", "formula": "OCF - CapEx", "purpose": "Gercek nakit uretimi"},
+
     {"category": "Nakit Akisi", "ratio": "OCF", "formula": "Operasyonel Nakit Akisi", "purpose": "Operasyondan gelen para"},
-    {"category": "Buyume", "ratio": "Net Kar Buyumesi", "formula": "(Kar_t / Kar_t-1) - 1", "purpose": "En kritik buyume"},
-    {"category": "Buyume", "ratio": "FAVOK Buyumesi", "formula": "Ayni mantik", "purpose": "Operasyon buyumesi"},
-    {"category": "Buyume", "ratio": "FCF Buyumesi", "formula": "Ayni mantik", "purpose": "Nakit buyumesi"},
-    {"category": "Borc/Risk", "ratio": "Net Borc / FAVOK", "formula": "(Borc - Nakit) / FAVOK", "purpose": "Borc odeme gucu"},
-    {"category": "Borc/Risk", "ratio": "Borc / Ozsermaye", "formula": "Toplam Borc / Equity", "purpose": "Finansal kaldirac"},
-    {"category": "Borc/Risk", "ratio": "Faiz Karsilama", "formula": "EBIT / Faiz Gideri", "purpose": "Faiz odeme gucu"},
-    {"category": "Borc/Risk", "ratio": "Net Borc / Equity", "formula": "Net Borc / Ozsermaye", "purpose": "Risk seviyesi"},
-    {"category": "Verimlilik", "ratio": "Asset Turnover", "formula": "Ciro / Varlik", "purpose": "Varlik kullanimi"},
-    {"category": "Verimlilik", "ratio": "Inventory Turnover", "formula": "Satis / Stok", "purpose": "Stok yonetimi"},
-    {"category": "Verimlilik", "ratio": "Receivables Turnover", "formula": "Satis / Alacak", "purpose": "Tahsilat hizi"},
-    {"category": "Verimlilik", "ratio": "Working Capital Turnover", "formula": "Ciro / Net Isletme Sermayesi", "purpose": "Sermaye verimi"},
-    {"category": "Degerleme", "ratio": "F/K (P/E)", "formula": "Fiyat / EPS", "purpose": "Kac yilda geri odeme"},
-    {"category": "Degerleme", "ratio": "PD/DD (P/B)", "formula": "Piyasa Degeri / Defter Degeri", "purpose": "Ozsermaye degeri"},
-    {"category": "Degerleme", "ratio": "FD/FAVOK", "formula": "Firma Degeri / FAVOK", "purpose": "Saglikli carpan"},
-    {"category": "Degerleme", "ratio": "PEG", "formula": "(F/K) / Buyume", "purpose": "Buyume bazli degerleme"},
-    {"category": "Likidite", "ratio": "Current Ratio", "formula": "Donen Varlik / KV Borc", "purpose": "Kisa vadeli guc"},
-    {"category": "Likidite", "ratio": "Quick Ratio", "formula": "(Donen - Stok) / KV Borc", "purpose": "Siki likidite"},
-    {"category": "Likidite", "ratio": "Cash Ratio", "formula": "Nakit / KV Borc", "purpose": "Anlik odeme gucu"},
-    {"category": "Temettu", "ratio": "Temettu Verimi", "formula": "Temettu / Fiyat", "purpose": "Getiri orani"},
+    {"category": "Nakit Akisi", "ratio": "OCF Marji", "formula": "Operasyonel Nakit Akisi / Ciro", "purpose": "Cirodan nakit yaratma gucu"},
+
+    {"category": "Buyume", "ratio": "Net Kar Buyumesi", "formula": "(Kar_t / Kar_t-1) - 1", "purpose": "Kar buyumesi"},
+    {"category": "Buyume", "ratio": "Ciro Buyumesi", "formula": "(Ciro_t / Ciro_t-1) - 1", "purpose": "Gelir buyumesi"},
+
+    {"category": "Borc/Risk", "ratio": "Borc / Ozsermaye", "formula": "Toplam Yukumluluk / Ozsermaye", "purpose": "Finansal kaldirac"},
+    {"category": "Borc/Risk", "ratio": "Borc / Varlik", "formula": "Toplam Yukumluluk / Toplam Varlik", "purpose": "Borc seviyesi"},
+    {"category": "Borc/Risk", "ratio": "Net Borc / Equity", "formula": "(Toplam Yukumluluk - Nakit) / Ozsermaye", "purpose": "Net risk seviyesi"},
+
+    {"category": "Verimlilik", "ratio": "Asset Turnover", "formula": "Ciro / Toplam Varlik", "purpose": "Varlik kullanimi"},
+    {"category": "Verimlilik", "ratio": "Inventory Turnover", "formula": "Ciro / Stok", "purpose": "Stok yonetimi"},
+
+    {"category": "Likidite", "ratio": "Current Ratio", "formula": "Donen Varlik / Kisa Vadeli Yukumluluk", "purpose": "Kisa vadeli odeme gucu"},
+    {"category": "Likidite", "ratio": "Quick Ratio", "formula": "(Donen Varlik - Stok) / Kisa Vadeli Yukumluluk", "purpose": "Siki likidite"},
+    {"category": "Likidite", "ratio": "Cash Ratio", "formula": "Nakit / Kisa Vadeli Yukumluluk", "purpose": "Anlik odeme gucu"},
 ]
 
 
@@ -290,48 +286,37 @@ def _safe_div(a: pd.Series, b: pd.Series) -> pd.Series:
     b2 = b.replace(0, np.nan)
     return a / b2
 
-
 def _fundamentals_to_exact_ratios(fdf: pd.DataFrame) -> pd.DataFrame:
     df = fdf.copy()
     if df.empty:
         return df
+
     df = df.sort_values(["stock_code", "period"]).reset_index(drop=True)
 
     df["ROE"] = _safe_div(df["net_income"], df["equity"])
     df["ROA"] = _safe_div(df["net_income"], df["total_assets"])
     df["Brut Kar Marji"] = _safe_div(df["gross_profit"], df["revenue"])
-    df["FAVOK Marji"] = _safe_div(df["ebitda"], df["revenue"])
+    df["Faaliyet Kar Marji"] = _safe_div(df["ebit"], df["revenue"])
     df["Net Kar Marji"] = _safe_div(df["net_income"], df["revenue"])
 
-    df["FCF"] = df["ocf"] - df["capex"]
     df["OCF"] = df["ocf"]
+    df["OCF Marji"] = _safe_div(df["ocf"], df["revenue"])
 
     df["Net Kar Buyumesi"] = df.groupby("stock_code")["net_income"].pct_change()
-    df["FAVOK Buyumesi"] = df.groupby("stock_code")["ebitda"].pct_change()
-    df["FCF Buyumesi"] = df.groupby("stock_code")["FCF"].pct_change()
+    df["Ciro Buyumesi"] = df.groupby("stock_code")["revenue"].pct_change()
 
-    df["Net Borc / FAVOK"] = _safe_div(df["total_debt"] - df["cash"], df["ebitda"])
     df["Borc / Ozsermaye"] = _safe_div(df["total_debt"], df["equity"])
-    df["Faiz Karsilama"] = _safe_div(df["ebit"], df["interest_expense"])
+    df["Borc / Varlik"] = _safe_div(df["total_debt"], df["total_assets"])
     df["Net Borc / Equity"] = _safe_div(df["total_debt"] - df["cash"], df["equity"])
 
     df["Asset Turnover"] = _safe_div(df["revenue"], df["total_assets"])
     df["Inventory Turnover"] = _safe_div(df["revenue"], df["inventory"])
-    df["Receivables Turnover"] = _safe_div(df["revenue"], df["receivables"])
-    df["Working Capital Turnover"] = _safe_div(df["revenue"], df["net_working_capital"])
-
-    df["F/K (P/E)"] = _safe_div(df["price"], df["eps"])
-    df["PD/DD (P/B)"] = _safe_div(df["market_cap"], df["book_value"])
-    df["FD/FAVOK"] = _safe_div(df["enterprise_value"], df["ebitda"])
-    df["PEG"] = _safe_div(df["F/K (P/E)"], df["growth_rate"])
 
     df["Current Ratio"] = _safe_div(df["current_assets"], df["current_liabilities"])
     df["Quick Ratio"] = _safe_div(df["current_assets"] - df["inventory"], df["current_liabilities"])
     df["Cash Ratio"] = _safe_div(df["cash"], df["current_liabilities"])
 
-    df["Temettu Verimi"] = _safe_div(df["dividend_per_share"], df["price"])
     return df
-
 
 def _fundamentals_df_for_sector(db: Session, sector: str, year: int | None = None) -> pd.DataFrame:
     q = db.query(QuarterlyFundamental).filter(QuarterlyFundamental.sector == sector)
@@ -559,7 +544,7 @@ def _parameter_scores(db: Session, year: int, sector: str) -> list[dict[str, Any
     for _, r in _fundamentals_to_exact_ratios(fdf).iterrows():
         by_stock.setdefault(str(r["stock_code"]).upper(), []).append(r)
 
-    features = [p["ratio"] for p in _PARAMETER_CATALOG]
+    features = [p["ratio"] for p in _PARAMETER_CATALOG if p["ratio"] in df_year.columns]
     ml_scores = _compute_ml_method_scores(df_year, features)
 
     scores: list[dict[str, Any]] = []
@@ -799,7 +784,7 @@ def run_forecast_for_sector(
                 mom = 0.0
                 if rr2 is not None:
                     m3 = rr2.get("Net Kar Buyumesi")
-                    m1 = rr2.get("FAVOK Buyumesi")
+                    m1 = rr2.get("Ciro Buyumesi")
                     if m3 is not None and not pd.isna(m3) and m1 is not None and not pd.isna(m1):
                         mom = float(m3) - float(m1)
                 raw = max(0.0, min(1.0, (val * 0.7) + (0.3 * (0.5 + np.tanh(mom / 100.0) / 2.0))))
@@ -826,7 +811,7 @@ def run_forecast_for_sector(
         rr4 = row_by_stock.get(r.stock_code.upper())
         if rr4 is not None:
             g1 = rr4.get("Net Kar Buyumesi")
-            g2 = rr4.get("FAVOK Buyumesi")
+            g2 = rr4.get("Ciro Buyumesi")
             if g1 is not None and g2 is not None and not pd.isna(g1) and not pd.isna(g2):
                 delta = float(g1) - float(g2)
                 if delta > 0:

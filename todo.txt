@@ -1,0 +1,7 @@
+TODO:
+1. CLEANED_Financial currently does not include operating cash flow.
+2. Cash-flow ratios are temporarily set to 0.
+3. When OCF data is available, calculate:
+4. ocf_to_debt = operating_cash_flow / total_debt
+5.  ocf_to_assets = operating_cash_flow / total_assets
+6. cash_flow_margin = operating_cash_flow / revenue

@@ -150,16 +150,35 @@ def _rule_based_score(
 ) -> dict[str, Any]:
     prev = previous or {}
     w_map = weights or _RULE_WEIGHTS
+
     details = []
-    total = 0.0
+    raw_total = 0.0
+    available_weight = 0.0
 
     for metric, weight in w_map.items():
         scorer = _SCORERS.get(metric)
         if scorer is None:
             continue
+
         curr_val = current.get(metric)
         prev_val = prev.get(metric)
+
+        # IMPORTANT:
+        # Missing data should not be treated as 0 performance.
+        # It is excluded from the available weight and does not penalize the company.
+        if curr_val is None:
+            details.append({
+                "metric_name": _METRIC_LABELS.get(metric, metric),
+                "metric_value": None,
+                "normalized_value": None,
+                "weight": float(weight),
+                "contribution": None,
+                "comment": f"{_METRIC_LABELS.get(metric, metric)} data is not available and was excluded from scoring.",
+            })
+            continue
+
         pts, comment = scorer(curr_val, prev_val, weight)
+
         details.append({
             "metric_name": _METRIC_LABELS.get(metric, metric),
             "metric_value": curr_val,
@@ -168,20 +187,49 @@ def _rule_based_score(
             "contribution": round(pts, 2),
             "comment": comment,
         })
-        total += pts
 
-    total_score = round(total, 2)
+        raw_total += pts
+        available_weight += float(weight)
+
+    if available_weight <= 0:
+        total_score = 0.0
+    else:
+        total_score = round((raw_total / available_weight) * 100, 2)
+
     prob = round(total_score / 100, 4)
 
-    top_pos = sorted([d for d in details if d["contribution"] >= d["weight"] * 0.6],
-                     key=lambda x: -x["contribution"])
-    top_neg = sorted([d for d in details if d["contribution"] < d["weight"] * 0.3],
-                     key=lambda x: x["contribution"])
-    summary = (
-        f"Strongest drivers: {', '.join(d['metric_name'] for d in top_pos[:3])}. "
-        f"Weak Spots: {', '.join(d['metric_name'] for d in top_neg[:2])}."
-        if top_pos or top_neg else "Scoring Calculated."
+    valid_details = [d for d in details if d["contribution"] is not None]
+
+    top_pos = sorted(
+        [d for d in valid_details if d["contribution"] >= d["weight"] * 0.6],
+        key=lambda x: -x["contribution"],
     )
+
+    top_neg = sorted(
+        [d for d in valid_details if d["contribution"] < d["weight"] * 0.3],
+        key=lambda x: x["contribution"],
+    )
+
+    excluded = [d["metric_name"] for d in details if d["contribution"] is None]
+
+    summary_parts = []
+
+    if top_pos:
+        summary_parts.append(
+            f"Strongest drivers: {', '.join(d['metric_name'] for d in top_pos[:3])}."
+        )
+
+    if top_neg:
+        summary_parts.append(
+            f"Weak spots: {', '.join(d['metric_name'] for d in top_neg[:2])}."
+        )
+
+    if excluded:
+        summary_parts.append(
+            f"Excluded missing metrics: {', '.join(excluded[:3])}."
+        )
+
+    summary = " ".join(summary_parts) if summary_parts else "Scoring calculated."
 
     return {
         "total_score": total_score,
@@ -302,12 +350,86 @@ def _logistic_score(
 def run_score(
     current_metrics: dict[str, float | None],
     previous_metrics: dict[str, float | None] | None = None,
-    mode: str = "rule_based",        # "rule_based" | "logistic"
+    mode: str = "rule_based",
     custom_weights: dict | None = None,
     db=None,
+    company_id: int | None = None,
+    period: str | None = None,
 ) -> dict[str, Any]:
-    if mode == "logistic":
-        return _logistic_score(current_metrics, previous_metrics, db=db)
-    return _rule_based_score(current_metrics, previous_metrics, weights=custom_weights)
+    result = _logistic_score(current_metrics, previous_metrics, db=db) if mode == "logistic" else _rule_based_score(
+        current_metrics,
+        previous_metrics,
+        weights=custom_weights,
+    )
+
+    if db is None or company_id is None or period is None:
+        return result
+
+    try:
+        from app.models.analytics import SectorNormalizedFeature
+
+        norm_rows = (
+            db.query(SectorNormalizedFeature)
+            .filter(
+                SectorNormalizedFeature.company_id == company_id,
+                SectorNormalizedFeature.period == period,
+            )
+            .all()
+        )
+
+        norm_by_metric = {r.feature_name: r for r in norm_rows}
+
+        total = 0.0
+        available_weight = 0.0
+
+        for d in result["details"]:
+            metric_key = None
+            for k, label in _METRIC_LABELS.items():
+                if label == d["metric_name"]:
+                    metric_key = k
+                    break
+
+            if metric_key is None:
+                continue
+
+            norm = norm_by_metric.get(metric_key)
+
+            if norm is None or norm.percentile_rank is None or d["contribution"] is None:
+                continue
+
+            percentile = float(norm.percentile_rank)
+
+            # Defensive normalization:
+            # percentile_rank should be 0–1. If stored as 0–100, convert it.
+            if percentile > 1:
+                percentile = percentile / 100
+            # Clamp to valid range
+            percentile = max(0.0, min(1.0, percentile))
+            d["normalized_value"] = round(percentile, 4)
+            weight = float(d["weight"])
+            original_points = float(d["contribution"])
+            # Original contribution also must not exceed its own weight
+            original_points = max(0.0, min(weight, original_points))
+            sector_points = percentile * weight
+            blended = (0.70 * original_points) + (0.30 * sector_points)
+            # Final contribution must stay inside 0–weight
+            blended = max(0.0, min(weight, blended))
+            d["contribution"] = round(blended, 2)
+            d["comment"] += f" Sector percentile: {percentile:.0%}."
+
+            total += blended
+            available_weight += weight
+
+        if available_weight > 0:
+            result["total_score"] = round((total / available_weight) * 100, 2)
+            result["success_probability"] = round(result["total_score"] / 100, 4)
+
+        result["label_used"] = f"{result['label_used']}_sector_adjusted"
+        result["explanation_summary"] += " Sector percentile adjustment applied."
+
+    except Exception as exc:
+        result["explanation_summary"] += f" Sector adjustment skipped: {exc}"
+
+    return result
 
 

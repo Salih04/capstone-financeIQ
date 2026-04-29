@@ -37,7 +37,7 @@ alembic upgrade head
 ### Backend
 
 ```bash
-cd backend
+cd 2.backend
 source .venv/bin/activate
 pip install -r requirements.txt
 echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/capstone_db" > .env
@@ -47,7 +47,7 @@ uvicorn app.main:app --reload --port 8000
 ### Frontend
 
 ```bash
-cd frontend
+cd 1.frontend
 npm install
 npm run dev
 ```

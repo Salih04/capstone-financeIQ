@@ -76,6 +76,8 @@ def compare_companies(
             mode=mode,
             custom_weights=custom_weights,
             db=db,
+            company_id=company.id,
+            period=current.period,
         )
 
         results.append(

@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
@@ -30,12 +29,7 @@ def search_companies(
 ):
     kap_tickers = sorted(get_kap_company_tickers(db))
 
-    db_rows = (
-        db.query(Company)
-        .filter(Company.ticker.in_(kap_tickers))
-        .all()
-    )
-
+    db_rows = db.query(Company).filter(Company.ticker.in_(kap_tickers)).all()
     row_by_ticker = {company.ticker: company for company in db_rows}
 
     q_lower = q.strip().lower()
@@ -43,14 +37,10 @@ def search_companies(
 
     for ticker in kap_tickers:
         company = row_by_ticker.get(ticker)
-
         company_name = company.company_name if company else ticker
 
         if q_lower:
-            if (
-                q_lower not in ticker.lower()
-                and q_lower not in company_name.lower()
-            ):
+            if q_lower not in ticker.lower() and q_lower not in company_name.lower():
                 continue
 
         if company:

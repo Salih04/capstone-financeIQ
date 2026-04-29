@@ -99,6 +99,8 @@ def score_company(
         mode=body.mode,
         custom_weights=custom_weights,
         db=db,
+        company_id=company_id,
+        period=current_metric.period,
     )
 
     # ── V3: Enrich with 3-level explanations + sector z-scores ──

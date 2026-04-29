@@ -184,7 +184,7 @@ def build_rich_explanations(
         prev_val = prev.get(key) if key else None
         z_val = zs.get(key) if key else None
         transition_val = (curr_val - prev_val) if (curr_val is not None and prev_val is not None) else None
-        contribution = detail.get("contribution", 0)
+        contribution = detail.get("contribution", 0) or 0.0
         weight = detail.get("weight", 0)
 
         # Level 2: human-readable sentence
@@ -200,8 +200,12 @@ def build_rich_explanations(
             fam = _METRIC_FAMILIES[key]["family"]
             if fam not in family_summary:
                 family_summary[fam] = {"total_weight": 0, "total_contribution": 0, "metrics": []}
-            family_summary[fam]["total_weight"] += weight
-            family_summary[fam]["total_contribution"] += contribution
+            family_summary[fam]["total_weight"] += weight or 0.0
+            
+            if contribution is None:
+                contribution = 0.0
+                
+            family_summary[fam]["total_contribution"] += contribution or 0.0
             family_summary[fam]["metrics"].append(mname)
 
         enhanced_details.append({
@@ -224,10 +228,14 @@ def build_rich_explanations(
     family_perf.sort(key=lambda x: -x["score_pct"])
 
     # Strongest & weakest drivers at family level
-    drivers_pos = [d for d in enhanced_details if d["contribution"] >= d["weight"] * 0.6]
-    drivers_neg = [d for d in enhanced_details if d["contribution"] < d["weight"] * 0.3]
-    drivers_pos.sort(key=lambda x: -x["contribution"])
-    drivers_neg.sort(key=lambda x: x["contribution"])
+    drivers_pos = [
+        d for d in enhanced_details
+        if (d.get("contribution") or 0.0) >= (d.get("weight") or 0.0) * 0.6]
+    drivers_neg = [
+        d for d in enhanced_details
+        if (d.get("contribution") or 0.0) < (d.get("weight") or 0.0) * 0.3]
+    drivers_pos.sort(key=lambda x: -(x.get("contribution") or 0.0))
+    drivers_neg.sort(key=lambda x: (x.get("contribution") or 0.0))
 
     rich = {
         "family_performance": family_perf,
@@ -235,8 +243,7 @@ def build_rich_explanations(
         "weakest_drivers": [d["metric_name"] for d in drivers_neg[:3]],
         "counterfactuals": counterfactuals[:3],
         "data_completeness": round(
-            sum(1 for d in enhanced_details if d.get("metric_value") is not None) / max(len(enhanced_details), 1),
-            2
+            sum(1 for d in enhanced_details if d.get("metric_value") is not None) / max(len(enhanced_details), 1) or 0.0, 2
         ),
     }
 

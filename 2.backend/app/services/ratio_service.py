@@ -28,9 +28,9 @@ def compute_ratios(stmt: FinancialStatement) -> dict:
         "debt_to_equity": _safe_div(stmt.total_liabilities, stmt.total_equity),
         "debt_to_assets": _safe_div(stmt.total_liabilities, stmt.total_assets),
         # Cash-flow strength
-        "ocf_to_debt": _safe_div(stmt.operating_cash_flow, stmt.total_liabilities),
-        "ocf_to_assets": _safe_div(stmt.operating_cash_flow, stmt.total_assets),
-        "cash_flow_margin": _safe_div(stmt.operating_cash_flow, stmt.revenue),
+        "ocf_to_debt": _safe_div(stmt.operating_cash_flow, stmt.total_liabilities) or 0,
+        "ocf_to_assets": _safe_div(stmt.operating_cash_flow, stmt.total_assets) or 0,
+        "cash_flow_margin": _safe_div(stmt.operating_cash_flow, stmt.revenue) or 0,
     }
 
 
