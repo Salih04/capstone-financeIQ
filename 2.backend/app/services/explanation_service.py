@@ -184,8 +184,8 @@ def build_rich_explanations(
         prev_val = prev.get(key) if key else None
         z_val = zs.get(key) if key else None
         transition_val = (curr_val - prev_val) if (curr_val is not None and prev_val is not None) else None
-        contribution = detail.get("contribution", 0) or 0.0
-        weight = detail.get("weight", 0)
+        contribution = float(detail.get("contribution") or 0.0)
+        weight = float(detail.get("weight") or 0.0)
 
         # Level 2: human-readable sentence
         l2 = _l2_sentence(key or mname, curr_val, prev_val, z_val, transition_val) if key else detail.get("comment", "")
@@ -200,12 +200,8 @@ def build_rich_explanations(
             fam = _METRIC_FAMILIES[key]["family"]
             if fam not in family_summary:
                 family_summary[fam] = {"total_weight": 0, "total_contribution": 0, "metrics": []}
-            family_summary[fam]["total_weight"] += weight or 0.0
-            
-            if contribution is None:
-                contribution = 0.0
-                
-            family_summary[fam]["total_contribution"] += contribution or 0.0
+            family_summary[fam]["total_weight"] += weight
+            family_summary[fam]["total_contribution"] += contribution
             family_summary[fam]["metrics"].append(mname)
 
         enhanced_details.append({
@@ -237,14 +233,25 @@ def build_rich_explanations(
     drivers_pos.sort(key=lambda x: -(x.get("contribution") or 0.0))
     drivers_neg.sort(key=lambda x: (x.get("contribution") or 0.0))
 
+    total_metrics = len(enhanced_details)
+    available_metrics = sum(1 for d in enhanced_details if d.get("metric_value") is not None)
+    excluded_metrics = [d["metric_name"] for d in enhanced_details if d.get("metric_value") is None]
+
+    score_mode = score_result.get("label_used", "rule_based")
+    if "logistic" in score_mode:
+        method_note = "This probability is generated using a logistic regression model."
+    else:
+        method_note = "This score is a rule-based financial health indicator."
+
     rich = {
         "family_performance": family_perf,
         "strongest_drivers": [d["metric_name"] for d in drivers_pos[:3]],
         "weakest_drivers": [d["metric_name"] for d in drivers_neg[:3]],
         "counterfactuals": counterfactuals[:3],
-        "data_completeness": round(
-            sum(1 for d in enhanced_details if d.get("metric_value") is not None) / max(len(enhanced_details), 1) or 0.0, 2
-        ),
+        "data_completeness": round(available_metrics / max(total_metrics, 1), 2),
+        "data_completeness_label": f"{available_metrics} / {total_metrics} metrics",
+        "excluded_metrics": excluded_metrics,
+        "method_note": method_note,
     }
 
     return {

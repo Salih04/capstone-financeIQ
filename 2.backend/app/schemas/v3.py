@@ -3,7 +3,7 @@ V3 Governance, Validation, Labeling, Ingestion & Audit Schemas
 """
 from __future__ import annotations
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 # ── Label Definition ──────────────────────────────────────────────────────────
@@ -135,6 +135,8 @@ class ModelRegistryCreate(BaseModel):
     evaluation_horizon: str | None = None
     metrics: list[dict] = []   # [{feature_name, weight, direction, threshold_min, threshold_max}]
 
+    model_config = ConfigDict(protected_namespaces=())
+
 
 class ModelRegistryUpdate(BaseModel):
     model_name: str | None = None
@@ -143,6 +145,8 @@ class ModelRegistryUpdate(BaseModel):
     label_strategy: str | None = None
     evaluation_horizon: str | None = None
     status: str | None = None
+
+    model_config = ConfigDict(protected_namespaces=())
 
 
 class ModelFeatureImportanceOut(BaseModel):
@@ -171,4 +175,4 @@ class ModelRegistryOut(BaseModel):
     created_at: datetime
     feature_importances: list[ModelFeatureImportanceOut] = []
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True, protected_namespaces=())

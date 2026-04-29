@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ScoreDetailOut(BaseModel):
@@ -35,7 +35,7 @@ class ScoreRunOut(BaseModel):
     created_at: datetime
     details: list[ScoreDetailOut] = []
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True, protected_namespaces=())
 
 
 class ScoreRunSummary(BaseModel):
@@ -51,7 +51,7 @@ class ScoreRunSummary(BaseModel):
     confidence_flag: str | None = None
     created_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True, protected_namespaces=())
 
 
 class ScoreRequest(BaseModel):
@@ -60,6 +60,16 @@ class ScoreRequest(BaseModel):
     mode: str = "rule_based"            # "rule_based" | "logistic"
     scoring_model_id: int | None = None # if set, use custom weights from DB
     custom_weights: dict | None = None  # optional direct weight override
+
+
+class CommonPeriodsRequest(BaseModel):
+    company_ids: list[int]
+
+
+class CommonPeriodsResult(BaseModel):
+    common_periods: list[str]
+    total_companies: int
+    excluded_companies: list[str] = []
 
 
 class CompareRequest(BaseModel):
@@ -81,6 +91,7 @@ class CompareItem(BaseModel):
 
 class CompareResult(BaseModel):
     items: list[CompareItem]
+    warnings: list[str] = []
 
 
 # ── Admin: scoring models ───────────────────────────────────────────────────
@@ -98,6 +109,8 @@ class ScoringModelCreate(BaseModel):
     model_type: str = "rule_based"      # "rule_based" | "logistic"
     version: str = "1.0"
     metrics: list[ScoringModelMetricCreate] = []
+
+    model_config = ConfigDict(protected_namespaces=())
 
 
 class ScoringModelMetricOut(BaseModel):
@@ -125,7 +138,7 @@ class ScoringModelOut(BaseModel):
     created_at: datetime
     metrics: list[ScoringModelMetricOut] = []
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True, protected_namespaces=())
 
 
 # ── Reports ─────────────────────────────────────────────────────────────────

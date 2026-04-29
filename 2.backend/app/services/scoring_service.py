@@ -250,16 +250,24 @@ def _logistic_score(
     db=None,
 ) -> dict[str, Any]:
     """
-    Train a LogisticRegression on all in-DB computed metrics,
-    using rule-based score ≥ 60 as synthetic success label,
-    then predict probability for the given company.
-    Falls back to rule-based if not enough data.
+    Train a LogisticRegression on historical computed metrics using real labels:
+        label = 1  if next_period_net_income > current_period_net_income  (growth > 0)
+        label = 0  otherwise
+
+    Uses a time-based split: oldest 80% of periods for training, newest 20% for
+    validation. Prints validation metrics (accuracy, precision, recall, F1, AUC)
+    so quality is visible in server logs.
+
+    Falls back to rule-based if real labels cannot be derived or data is too sparse.
     """
     try:
         import numpy as np
         from sklearn.linear_model import LogisticRegression
+        from sklearn.metrics import (
+            accuracy_score, precision_score, recall_score,
+            f1_score, roc_auc_score, confusion_matrix,
+        )
         from sklearn.preprocessing import StandardScaler
-        from sklearn.exceptions import NotFittedError
     except ImportError:
         return _rule_based_score(current, previous)
 
@@ -268,51 +276,115 @@ def _logistic_score(
     if db is None:
         return _rule_based_score(current, previous)
 
-    # Gather training samples from DB
+    from app.models.company import Company
     from app.models.financial import ComputedMetric
-    rows = db.query(ComputedMetric).all()
-    X_rows, y_rows = [], []
+    from app.models.forecasting import QuarterlyFundamental
+
+    # Build labelled dataset using next-period net income growth
+    rows = (
+        db.query(ComputedMetric)
+        .order_by(ComputedMetric.company_id, ComputedMetric.period)
+        .all()
+    )
+
+    # Index QuarterlyFundamental by (stock_code, period) for fast lookup
+    qf_index: dict[tuple[str, str], float | None] = {}
+    for qf in db.query(QuarterlyFundamental).all():
+        qf_index[(qf.stock_code, qf.period)] = qf.net_income
+
+    # Group rows by company so we can find the next period per company
+    from collections import defaultdict
+    company_rows: dict[int, list[ComputedMetric]] = defaultdict(list)
     for row in rows:
-        feat = [getattr(row, f, None) for f in FEATURES]
-        if any(v is None for v in feat):
+        company_rows[row.company_id].append(row)
+
+    # Build ticker lookup
+    ticker_by_id: dict[int, str] = {
+        c.id: c.ticker for c in db.query(Company).all()
+    }
+
+    X_rows, y_rows, period_tags = [], [], []
+    for cid, crows in company_rows.items():
+        ticker = ticker_by_id.get(cid)
+        if not ticker:
             continue
-        # Synthetic label from rule-based score
-        metrics_dict = {f: getattr(row, f, None) for f in FEATURES}
-        rb = _rule_based_score(metrics_dict)
-        label = 1 if rb["total_score"] >= 55 else 0
-        X_rows.append(feat)
-        y_rows.append(label)
+        for i, row in enumerate(crows):
+            feat = [getattr(row, f, None) for f in FEATURES]
+            if any(v is None for v in feat):
+                continue
+            # Real label: did net income grow in the NEXT period?
+            if i + 1 >= len(crows):
+                continue  # no next period available
+            next_row = crows[i + 1]
+            curr_ni = qf_index.get((ticker, row.period))
+            next_ni = qf_index.get((ticker, next_row.period))
+            if curr_ni is None or next_ni is None:
+                continue
+            label = 1 if next_ni > curr_ni else 0
+            X_rows.append(feat)
+            y_rows.append(label)
+            period_tags.append(row.period)
 
     if len(X_rows) < 4 or len(set(y_rows)) < 2:
-        # Not enough diverse training data – fall back
         return _rule_based_score(current, previous)
 
-    X = np.array(X_rows, dtype=float)
-    y = np.array(y_rows, dtype=int)
+    # Time-based split: train on oldest 80%, validate on newest 20%
+    sorted_periods = sorted(set(period_tags))
+    cutoff_idx = max(1, int(len(sorted_periods) * 0.8))
+    cutoff_period = sorted_periods[cutoff_idx - 1]
+
+    X_train, y_train, X_test, y_test = [], [], [], []
+    for feat, label, period in zip(X_rows, y_rows, period_tags):
+        if period <= cutoff_period:
+            X_train.append(feat)
+            y_train.append(label)
+        else:
+            X_test.append(feat)
+            y_test.append(label)
+
+    if len(X_train) < 4 or len(set(y_train)) < 2:
+        return _rule_based_score(current, previous)
+
+    X_tr = np.array(X_train, dtype=float)
+    y_tr = np.array(y_train, dtype=int)
 
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
+    X_tr_scaled = scaler.fit_transform(X_tr)
 
     clf = LogisticRegression(max_iter=500, C=1.0, solver="lbfgs")
-    clf.fit(X_scaled, y)
+    clf.fit(X_tr_scaled, y_tr)
+
+    # Print validation metrics when test set is large enough
+    if len(X_test) >= 4 and len(set(y_test)) >= 2:
+        X_te = scaler.transform(np.array(X_test, dtype=float))
+        y_te = np.array(y_test, dtype=int)
+        y_pred = clf.predict(X_te)
+        y_prob = clf.predict_proba(X_te)[:, 1]
+        cm = confusion_matrix(y_te, y_pred)
+        print(
+            f"[ML] train={len(X_train)} test={len(X_test)} cutoff={cutoff_period} | "
+            f"acc={accuracy_score(y_te, y_pred):.3f} "
+            f"prec={precision_score(y_te, y_pred, zero_division=0):.3f} "
+            f"rec={recall_score(y_te, y_pred, zero_division=0):.3f} "
+            f"f1={f1_score(y_te, y_pred, zero_division=0):.3f} "
+            f"auc={roc_auc_score(y_te, y_prob):.3f} "
+            f"cm={cm.tolist()}"
+        )
 
     # Predict for the input company
     curr_feat = [current.get(f) for f in FEATURES]
-    has_null = any(v is None for v in curr_feat)
-    if has_null:
+    if any(v is None for v in curr_feat):
         return _rule_based_score(current, previous)
 
     X_pred = scaler.transform([curr_feat])
     prob = float(clf.predict_proba(X_pred)[0][1])
     total_score = round(prob * 100, 2)
 
-    # Build breakdown using coefficients as weights
     coefs = clf.coef_[0]
     details = []
     for i, metric in enumerate(FEATURES):
         val = current.get(metric)
         coef = float(coefs[i])
-        # Normalised contribution = coef * scaled_feature_value
         scaled_val = float(X_pred[0][i])
         contribution = round(coef * scaled_val, 4)
         details.append({
@@ -323,21 +395,23 @@ def _logistic_score(
             "contribution": contribution,
             "comment": (
                 f"Coefficient: {coef:+.3f}. "
-                + ("Positive contribution" if contribution > 0 else "Negative contribution.")
+                + ("Positive contribution." if contribution > 0 else "Negative contribution.")
             ),
         })
 
     top_pos = sorted([d for d in details if d["contribution"] > 0], key=lambda x: -x["contribution"])
     top_neg = sorted([d for d in details if d["contribution"] < 0], key=lambda x: x["contribution"])
     summary = (
-        f"LR model. Strong: {', '.join(d['metric_name'] for d in top_pos[:3])}. "
+        "This probability is generated using a logistic regression model trained on "
+        "real next-period net income growth labels. "
+        f"Strong: {', '.join(d['metric_name'] for d in top_pos[:3])}. "
         f"Weak: {', '.join(d['metric_name'] for d in top_neg[:2])}."
     )
 
     return {
         "total_score": total_score,
         "success_probability": round(prob, 4),
-        "label_used": "logistic",
+        "label_used": "logistic_real_label",
         "explanation_summary": summary,
         "details": details,
     }

@@ -13,6 +13,7 @@ from app.models.user import User
 from app.schemas.scoring import (
     ScoreRunOut, ScoreRunSummary, ScoreRequest,
     CompareRequest, CompareResult,
+    CommonPeriodsRequest, CommonPeriodsResult,
 )
 from app.services.comparison_service import compare_companies
 from app.services.scoring_service import run_score
@@ -157,6 +158,60 @@ def score_company(
     db.refresh(score_run)
     return score_run
 
+@router.post("/scoring/common-periods", response_model=CommonPeriodsResult)
+def common_periods(
+    body: CommonPeriodsRequest,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    """
+    Returns the intersection of available periods for the given company IDs.
+    Use this to populate the period dropdown before running a compare.
+    """
+    if not body.company_ids:
+        raise HTTPException(status_code=422, detail="Provide at least one company_id.")
+
+    period_sets: list[set[str]] = []
+    excluded: list[str] = []
+
+    companies = (
+        db.query(Company)
+        .filter(Company.id.in_(body.company_ids))
+        .all()
+    )
+    company_map = {c.id: c for c in companies}
+
+    for cid in body.company_ids:
+        company = company_map.get(cid)
+        if not company:
+            excluded.append(f"ID {cid}")
+            continue
+        periods = {
+            r[0]
+            for r in db.query(ComputedMetric.period)
+            .filter(ComputedMetric.company_id == cid)
+            .all()
+        }
+        if not periods:
+            excluded.append(company.ticker)
+            continue
+        period_sets.append(periods)
+
+    if not period_sets:
+        return CommonPeriodsResult(
+            common_periods=[],
+            total_companies=len(body.company_ids),
+            excluded_companies=excluded,
+        )
+
+    common = sorted(period_sets[0].intersection(*period_sets[1:]), reverse=True)
+    return CommonPeriodsResult(
+        common_periods=common,
+        total_companies=len(body.company_ids),
+        excluded_companies=excluded,
+    )
+
+
 @router.post("/scoring/compare", response_model=CompareResult)
 def compare_stocks(
     body: CompareRequest,
@@ -166,13 +221,25 @@ def compare_stocks(
     """Score multiple companies with the same model and return ranked results."""
     if not body.company_ids:
         raise HTTPException(status_code=422, detail="Provide at least one company_id.")
-    results = compare_companies(
-        db=db,
-        company_ids=body.company_ids,
-        period=body.period,
-        mode=body.mode,
-    )
-    return CompareResult(items=results)
+    try:
+        comparison = compare_companies(
+            db=db,
+            company_ids=body.company_ids,
+            period=body.period,
+            mode=body.mode,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Scoring failed: {exc}")
+
+    if not comparison["items"] and comparison["warnings"]:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "message": "No companies could be scored for the requested parameters.",
+                "warnings": comparison["warnings"],
+            },
+        )
+    return CompareResult(items=comparison["items"], warnings=comparison["warnings"])
 
 
 @router.get("/score-runs/{run_id}", response_model=ScoreRunOut)

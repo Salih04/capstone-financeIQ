@@ -52,6 +52,74 @@ npm install
 npm run dev
 ```
 
+## Financial Health Scoring System
+
+### Data Flow (Single Source of Truth)
+
+```
+CLEANED_Financial/ (.xlsx per company)
+        ↓
+QuarterlyFundamental  (imported via scripts/rebuild_financial_pipeline.py)
+        ↓
+ComputedMetric        (12 ratios: ROA, ROE, margins, liquidity, leverage, OCF)
+        ↓
+MetricTransition      (period-over-period changes)
+        ↓
+SectorBenchmark       (mean, std, median, p25, p75 per sector per period)
+        ↓
+SectorNormalizedFeature  (z-score + percentile rank per company per period)
+        ↓
+Scoring / Analysis    (rule_based or logistic_real_label mode)
+```
+
+### Rebuild the Full Pipeline
+
+After importing or updating `CLEANED_Financial/` data, run:
+
+```bash
+cd 2.backend
+python -m scripts.rebuild_financial_pipeline
+```
+
+This clears and regenerates all computed tables in the correct order, then prints a validation summary (company count, period count, missing field counts, duplicate check).
+
+### Scoring Modes
+
+| Mode | Description |
+|---|---|
+| `rule_based` | Weighted rule scoring (0–100). Missing metrics are excluded from available weight — never zeroed. |
+| `logistic` | Logistic regression trained on real next-period net income growth labels. Uses time-based 80/20 train/test split by period. Prints accuracy, precision, recall, F1, AUC, and confusion matrix to server logs. |
+
+### Explanation Output (`rich_explanation`)
+
+Every score response includes a `rich_explanation` block with:
+- `data_completeness_label` — e.g. `"9 / 12 metrics"` (human-readable)
+- `excluded_metrics` — list of metric names excluded due to missing data
+- `method_note` — `"This score is a rule-based financial health indicator."` or `"This probability is generated using a logistic regression model."`
+- `family_performance` — grouped by Kârlılık, Likidite, Kaldıraç, Nakit Akışı
+- `strongest_drivers` / `weakest_drivers` — top/bottom 3 metric names
+- `counterfactuals` — "if X had been Y, the score would reach Strong band" hints
+
+### Compare Endpoint
+
+`POST /scoring/compare` returns both `items` (ranked results) and `warnings` (companies excluded due to missing data for the requested period), e.g.:
+
+```json
+{
+  "items": [...],
+  "warnings": ["AKSEN has no data for 2022Q2 and was excluded."]
+}
+```
+
+### Key API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/companies/{id}/score` | Score a company (rule_based or logistic) |
+| POST | `/scoring/compare` | Compare multiple companies, returns ranked items + warnings |
+| GET | `/score-runs/{run_id}` | Retrieve a stored score run with full detail |
+| GET | `/users/me/score-runs` | List my recent score runs |
+
 ## Core Forecasting Flow
 
 1. Login/Register from `/login`
@@ -109,10 +177,11 @@ Note: The `@CLEANED_Financial/` directory contains the main and correct data for
 
 ## Continuous Learning Ops
 
-Scripts are under `backend/scripts/`:
-- `retrain_forecasting.py` (batch retrain)
-- `incremental_retrain.py` (retrain only on new year)
-- `pipeline_runner.py` (incremental + evaluation)
+Scripts are under `2.backend/scripts/`:
+- `rebuild_financial_pipeline.py` — **full financial data rebuild** (clear → import → metrics → transitions → sector → normalize → validate)
+- `retrain_forecasting.py` — batch forecasting model retrain
+- `incremental_retrain.py` — retrain only on new year data
+- `pipeline_runner.py` — incremental retrain + time-CV evaluation
 
 Airflow DAG template:
 - `backend/airflow/dags/forecasting_retrain_dag.py`

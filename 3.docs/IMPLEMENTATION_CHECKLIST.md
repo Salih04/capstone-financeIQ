@@ -119,4 +119,61 @@ This document tracks what has been implemented in the project up to now.
 - [x] Add strict API contract tests for forecasting endpoints
 - [x] Add E2E tests for login -> upload -> train -> predict -> detail flow
 - [x] Add CI workflow for migration + backend + frontend checks
+
+## Financial Health Scoring – Reliability & Quality Fixes
+
+### Critical Bug Fixes
+
+- [x] Fixed NoneType crash in `explanation_service.py`: `weight` and `contribution` now cast with `float(... or 0.0)` before any arithmetic
+- [x] Removed redundant dead-code `if contribution is None` guard that followed
+
+### Cash Flow Data Integrity
+
+- [x] Removed `or 0` fallback on `ocf_to_debt`, `ocf_to_assets`, `cash_flow_margin` in `ratio_service.py`
+- [x] Missing OCF now correctly returns `None` (excluded from scoring) instead of fake `0`
+- [x] Added TODO comment in `ratio_service.py` explaining OCF is absent from CLEANED_Financial and documenting future formulas
+
+### Data Pipeline
+
+- [x] Created `scripts/rebuild_financial_pipeline.py` — 8-step full rebuild:
+  1. Clear `computed_metrics`
+  2. Import `CLEANED_Financial` → `QuarterlyFundamental`
+  3. Generate `ComputedMetric` from `QuarterlyFundamental`
+  4. Generate `MetricTransition` per company
+  5. Generate `SectorBenchmark` per period
+  6. Generate `SectorNormalizedFeature` per company per period
+  7. Clear `sector_parameter_rankings`
+  8. Print validation summary (companies, periods, missing fields, duplicates)
+
+### Scoring Reliability
+
+- [x] Confirmed: missing metrics are excluded from `available_weight`, never zeroed — score is `raw_total / available_weight * 100`
+- [x] Sector normalization clamps already in place: `percentile = max(0, min(1, percentile))`, `blended = max(0, min(weight, blended))`
+
+### Machine Learning
+
+- [x] Replaced fake circular label (`score >= 55`) with real label: `next_period_net_income > current_period_net_income`
+- [x] Implemented time-based 80/20 train/test split by period (oldest 80% train, newest 20% validate)
+- [x] Validation metrics printed to server logs on each prediction: accuracy, precision, recall, F1, AUC, confusion matrix
+- [x] `label_used` field now reports `"logistic_real_label"` to distinguish from the old fake-label mode
+
+### Compare Page
+
+- [x] `compare_companies` now returns `{"items": [...], "warnings": [...]}` instead of a bare list
+- [x] Companies missing data for a requested period emit a human-readable warning (e.g. `"AKSEN has no data for 2022Q2 and was excluded."`) instead of silently dropping
+- [x] `CompareResult` schema extended with `warnings: list[str] = []`
+- [x] Router updated to unpack and forward warnings to the response
+
+### UI Trust & Transparency
+
+- [x] `rich_explanation.data_completeness_label` added — human-readable `"9 / 12 metrics"` string
+- [x] `rich_explanation.excluded_metrics` added — list of metric names missing data
+- [x] `rich_explanation.method_note` added — auto-selected based on mode:
+  - Rule-based: `"This score is a rule-based financial health indicator."`
+  - Logistic: `"This probability is generated using a logistic regression model."`
+
+### Documentation
+
+- [x] `README.md` updated with financial health scoring data flow, pipeline script usage, scoring modes, explanation output structure, and compare endpoint behaviour
+- [x] `IMPLEMENTATION_CHECKLIST.md` updated with all reliability/quality fixes
 <!-- LLM_IGNORE_END -->

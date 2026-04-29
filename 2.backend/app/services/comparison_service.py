@@ -32,20 +32,25 @@ def compare_companies(
     period: str | None = None,
     mode: str = "rule_based",
     custom_weights: dict | None = None,
-) -> list[dict]:
+) -> dict:
     """
-    Score each company in *company_ids* and return a list of result dicts
-    sorted by total_score descending.
-
-    Each dict contains:
-        company_id, ticker, company_name, period,
-        total_score, success_probability, label_used, explanation_summary
+    Score each company in *company_ids* and return a dict with:
+        items    – list of scored companies sorted by total_score descending
+        warnings – list of human-readable messages for companies that were excluded
     """
     results: list[dict] = []
+    warnings: list[str] = []
+
+    # Fetch all requested companies in ONE query to avoid N+1
+    company_map: dict[int, Company] = {
+        c.id: c
+        for c in db.query(Company).filter(Company.id.in_(company_ids)).all()
+    }
 
     for cid in company_ids:
-        company = db.get(Company, cid)
+        company = company_map.get(cid)
         if not company:
+            warnings.append(f"Company ID {cid} not found and was excluded.")
             continue
 
         # Fetch metrics ordered by period desc
@@ -56,12 +61,18 @@ def compare_companies(
             .all()
         )
         if not metrics_qs:
+            warnings.append(
+                f"{company.ticker} has no computed metrics and was excluded."
+            )
             continue
 
         if period:
             current = next((m for m in metrics_qs if m.period == period), None)
             if not current:
-                continue  # this company has no data for that period – skip silently
+                warnings.append(
+                    f"{company.ticker} has no data for {period} and was excluded."
+                )
+                continue
         else:
             current = metrics_qs[0]
 
@@ -93,6 +104,5 @@ def compare_companies(
             }
         )
 
-    # Sort best score first
     results.sort(key=lambda x: (x["total_score"] or 0), reverse=True)
-    return results
+    return {"items": results, "warnings": warnings}

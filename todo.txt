@@ -1,7 +1,284 @@
-TODO:
-1. CLEANED_Financial currently does not include operating cash flow.
-2. Cash-flow ratios are temporarily set to 0.
-3. When OCF data is available, calculate:
-4. ocf_to_debt = operating_cash_flow / total_debt
-5.  ocf_to_assets = operating_cash_flow / total_assets
-6. cash_flow_margin = operating_cash_flow / revenue
+FINANCE PLATFORM – RELIABILITY & QUALITY TODO LIST
+=================================================
+
+GOAL:
+Make the system reliable, trustworthy, efficient, and production-ready.
+
+
+--------------------------------------------------
+1. CRITICAL BUG FIXES
+--------------------------------------------------
+
+[ ] Fix NoneType crashes in explanation_service.py
+
+Replace ALL unsafe usages of contribution/weight with safe versions:
+
+    contribution = float(detail.get("contribution") or 0.0)
+    weight = float(detail.get("weight") or 0.0)
+
+Replace sorting logic:
+
+    drivers_pos = [
+        d for d in enhanced_details
+        if (d.get("contribution") or 0.0) >= (d.get("weight") or 0.0) * 0.6
+    ]
+
+    drivers_neg = [
+        d for d in enhanced_details
+        if (d.get("contribution") or 0.0) < (d.get("weight") or 0.0) * 0.3
+    ]
+
+    drivers_pos.sort(key=lambda x: -(x.get("contribution") or 0.0))
+    drivers_neg.sort(key=lambda x: (x.get("contribution") or 0.0))
+
+
+--------------------------------------------------
+2. DATA PIPELINE (VERY IMPORTANT)
+--------------------------------------------------
+
+[ ] Define SINGLE SOURCE OF TRUTH:
+
+    CLEANED_Financial
+        ↓
+    QuarterlyFundamental
+        ↓
+    ComputedMetric
+        ↓
+    Scoring / Analysis
+
+[ ] Create automated pipeline script:
+
+    scripts/rebuild_financial_pipeline.py
+
+Pipeline steps:
+
+    1. Clear computed_metrics
+    2. Import CLEANED_Financial
+    3. Generate ComputedMetric
+    4. Generate MetricTransition
+    5. Generate SectorBenchmark
+    6. Generate SectorNormalizedFeature
+    7. Clear sector_parameter_rankings
+    8. Print validation summary
+
+[ ] Add validation report after import:
+
+    - total companies
+    - total periods
+    - missing revenue count
+    - missing net_income count
+    - missing equity count
+    - missing total_assets count
+    - missing operating_cash_flow count
+    - duplicate stock_code-period rows
+
+
+--------------------------------------------------
+3. SCORING RELIABILITY
+--------------------------------------------------
+
+[ ] Missing metrics MUST be excluded (NOT zero)
+
+Correct behavior:
+
+    metric missing → contribution = None
+    weight excluded from denominator
+
+Final score:
+
+    total_score = raw_total / available_weight * 100
+
+WRONG behavior:
+
+    metric missing → 0 contribution
+
+
+--------------------------------------------------
+4. CASH FLOW (TEMPORARY FIX)
+--------------------------------------------------
+
+[ ] Replace fake 0 values with None:
+
+    "ocf_to_debt": None
+    "ocf_to_assets": None
+    "cash_flow_margin": None
+
+[ ] Add TODO in code:
+
+    # TODO:
+    # CLEANED_Financial currently does not include operating cash flow.
+    # Cash flow ratios are excluded from scoring until OCF data is added.
+    # Future formulas:
+    # ocf_to_debt = operating_cash_flow / total_debt
+    # ocf_to_assets = operating_cash_flow / total_assets
+    # cash_flow_margin = operating_cash_flow / revenue
+
+
+--------------------------------------------------
+5. SECTOR NORMALIZATION
+--------------------------------------------------
+
+[ ] Ensure SectorNormalizedFeature is used in scoring
+
+[ ] Validate normalization:
+
+    - Score ALWAYS between 0–100
+    - Contribution NEVER exceeds weight
+    - Percentile ALWAYS between 0–1
+
+[ ] Add safety clamps:
+
+    percentile = max(0.0, min(1.0, percentile))
+    blended = max(0.0, min(weight, blended))
+
+[ ] Validate sector data:
+
+    SELECT sector_code, COUNT(*)
+    FROM companies
+    GROUP BY sector_code;
+
+Sector must NOT be empty.
+
+
+--------------------------------------------------
+6. MACHINE LEARNING (IMPORTANT IMPROVEMENT)
+--------------------------------------------------
+
+[ ] Current ML is FAKE (uses rule-based as label)
+
+Current:
+
+    label = 1 if score >= 55 else 0
+
+[ ] Replace with REAL label:
+
+Option 1:
+
+    label = 1 if next_period_net_income_growth > 0 else 0
+
+Option 2 (better):
+
+    label = 1 if next_year_return > sector_median else 0
+
+[ ] Add ML validation metrics:
+
+    - accuracy
+    - precision
+    - recall
+    - F1 score
+    - ROC AUC
+    - confusion matrix
+
+[ ] Use time-based split (NOT random split)
+
+
+--------------------------------------------------
+7. COMPARE PAGE FIXES
+--------------------------------------------------
+
+[ ] Period dropdown MUST be intersection of companies:
+
+    selected companies → common periods → dropdown
+
+[ ] If company missing in period:
+
+Show warning:
+
+    "AKSEN has no data for 2022Q2 and was excluded."
+
+[ ] NEVER show "0 companies" silently
+
+
+--------------------------------------------------
+8. UI TRUST & TRANSPARENCY
+--------------------------------------------------
+
+[ ] Fix misleading explanation text:
+
+Rule-based:
+
+    "This score is a rule-based financial health indicator."
+
+ML:
+
+    "This probability is generated using a logistic regression model."
+
+[ ] Show data completeness:
+
+    Data completeness: 9 / 12 metrics
+
+[ ] Show excluded metrics:
+
+    Excluded: OCF/Debt, OCF/Assets, Cash Flow Margin
+
+
+--------------------------------------------------
+9. BACKEND STABILITY
+--------------------------------------------------
+
+[ ] Replace 500 errors with meaningful responses:
+
+Example:
+
+    "No computed metrics found for BTCIM in 2025Q4."
+
+[ ] Fix Pydantic warnings:
+
+Add:
+
+    model_config = ConfigDict(protected_namespaces=())
+
+
+--------------------------------------------------
+10. PERFORMANCE OPTIMIZATION
+--------------------------------------------------
+
+[ ] Add DB indexes:
+
+    CREATE INDEX ix_computed_metrics_company_period
+    ON computed_metrics(company_id, period);
+
+    CREATE INDEX ix_quarterly_fundamentals_stock_period
+    ON quarterly_fundamentals(stock_code, period);
+
+    CREATE INDEX ix_sector_normalized_company_period
+    ON sector_normalized_features(company_id, period);
+
+[ ] Reduce N+1 queries in compare endpoint
+
+    Fetch all companies in ONE query
+
+
+--------------------------------------------------
+11. FINAL POLISH
+--------------------------------------------------
+
+[ ] Update README with real data flow:
+
+    CLEANED_Financial → Metrics → Transitions → Sector → Scoring
+
+[ ] Prepare demo flow:
+
+    1. Open company (AEFES)
+    2. Metrics tab
+    3. Sector Z-score
+    4. Run Analysis
+    5. Compare AKSA vs AKSEN
+    6. Show explanations
+
+
+--------------------------------------------------
+PRIORITY ORDER
+--------------------------------------------------
+
+1. Fix explanation_service crashes
+2. Remove fake cash flow (set to None)
+3. Build pipeline script
+4. Fix compare period logic
+5. Stabilize sector normalization
+6. Improve ML labeling
+7. Add transparency UI
+
+
+END
+=================================================
