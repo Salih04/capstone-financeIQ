@@ -70,11 +70,10 @@ const METRIC_GROUPS = [
 ]
 
 const SCORING_PRESETS = [
-  { key: 'balanced',     label: 'Balanced',     desc: 'Equal weight across all metrics',       mode: 'rule_based', weights: null },
-  { key: 'conservative', label: 'Conservative',  desc: 'Liquidity-first, low leverage focus',   mode: 'rule_based', weights: { roa:5, roe:5, operating_margin:5, net_margin:5, current_ratio:15, quick_ratio:10, cash_ratio:10, debt_to_equity:20, debt_to_assets:15, ocf_to_debt:5, ocf_to_assets:3, cash_flow_margin:2 } },
-  { key: 'growth',       label: 'Growth',       desc: 'Emphasizes profitability & returns',     mode: 'rule_based', weights: { roa:20, roe:20, operating_margin:15, net_margin:15, current_ratio:5, quick_ratio:3, cash_ratio:2, debt_to_equity:5, debt_to_assets:5, ocf_to_debt:5, ocf_to_assets:3, cash_flow_margin:2 } },
-  { key: 'cashflow',     label: 'Cash Flow',    desc: 'Cash generation & OCF coverage',        mode: 'rule_based', weights: { roa:5, roe:5, operating_margin:5, net_margin:5, current_ratio:5, quick_ratio:5, cash_ratio:5, debt_to_equity:5, debt_to_assets:5, ocf_to_debt:25, ocf_to_assets:20, cash_flow_margin:10 } },
-  { key: 'ml',           label: 'ML Model',     desc: 'Logistic regression trained on data',   mode: 'logistic',   weights: null },
+  { key: 'all',          label: '5-Model Ensemble', desc: 'ElasticNet + RF + XGBoost + SARIMAX + LSTM', selected_models: ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'lstm'] },
+  { key: 'stable',       label: 'Stability Focus',  desc: 'ElasticNet + RF + SARIMAX', selected_models: ['elasticnet', 'random_forest', 'sarimax'] },
+  { key: 'growth',       label: 'Growth Focus',     desc: 'RF + XGBoost + LSTM', selected_models: ['random_forest', 'xgboost', 'lstm'] },
+  { key: 'interpretable',label: 'Interpretable',    desc: 'ElasticNet + RF', selected_models: ['elasticnet', 'random_forest'] },
 ]
 
 const TABS = [
@@ -157,7 +156,7 @@ export default function CompanyPage() {
   const [scoreStep, setScoreStep] = useState(0)
   const [error, setError] = useState('')
   const [selectedPeriod, setSelectedPeriod] = useState('')
-  const [selectedPreset, setSelectedPreset] = useState('balanced')
+  const [selectedPreset, setSelectedPreset] = useState('all')
   const [selectedYear, setSelectedYear] = useState(2025)
   const [activeTab, setActiveTab] = useState('overview')
 
@@ -203,8 +202,8 @@ export default function CompanyPage() {
     const apiPromise = api.post(`/companies/${id}/score`, {
       period: selectedPeriod || null,
       year: selectedYear,
-      mode: preset?.mode || 'rule_based',
-      custom_weights: preset?.weights || null,
+      ensemble: true,
+      selected_models: preset?.selected_models || ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'lstm'],
     }).then(r => r.data).catch(e => ({ error: e }))
 
     // Animate progress over ~12 seconds regardless of API speed
@@ -227,7 +226,15 @@ export default function CompanyPage() {
     setScoreProgress(100)
 
     if (result?.error) {
-      setError(result.error.response?.data?.detail || 'Scoring failed. Please try again.')
+      const detail = result.error.response?.data?.detail
+      if (typeof detail === 'string') setError(detail)
+      else if (detail && typeof detail === 'object') {
+        const msg = typeof detail.message === 'string' ? detail.message : 'Scoring failed. Please try again.'
+        const warnings = Array.isArray(detail.warnings) ? detail.warnings : []
+        setError(warnings.length ? `${msg} (${warnings.join(' | ')})` : msg)
+      } else {
+        setError('Scoring failed. Please try again.')
+      }
       setScoring(false)
       return
     }

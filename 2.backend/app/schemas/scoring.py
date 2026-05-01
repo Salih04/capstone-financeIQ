@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ScoreDetailOut(BaseModel):
@@ -57,7 +57,9 @@ class ScoreRunSummary(BaseModel):
 class ScoreRequest(BaseModel):
     period: str | None = None           # if None uses latest
     year: int | None = None             # if None uses latest year
-    mode: str = "rule_based"            # "rule_based" | "logistic"
+    mode: str = "rule_based"            # legacy + new family ids
+    selected_models: list[str] | None = None
+    ensemble: bool = False
     scoring_model_id: int | None = None # if set, use custom weights from DB
     custom_weights: dict | None = None  # optional direct weight override
 
@@ -76,6 +78,7 @@ class CompareRequest(BaseModel):
     company_ids: list[int]
     period: str | None = None
     mode: str = "rule_based"
+    selected_models: list[str] | None = None
 
 
 class CompareItem(BaseModel):
@@ -87,11 +90,14 @@ class CompareItem(BaseModel):
     success_probability: float | None
     label_used: str | None
     explanation_summary: str | None
+    per_model_scores: dict[str, float] | None = None
 
 
 class CompareResult(BaseModel):
     items: list[CompareItem]
-    warnings: list[str] = []
+    warnings: list[str] = Field(default_factory=list)
+    model_outputs: dict[str, list[CompareItem]] = Field(default_factory=dict)
+    ensemble_weights: dict[str, float] = Field(default_factory=dict)
 
 
 # ── Admin: scoring models ───────────────────────────────────────────────────

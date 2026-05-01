@@ -24,14 +24,27 @@ function generateQuarters() {
   return quarters
 }
 const ALL_QUARTERS = generateQuarters()
+const FIVE_MODELS = ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'lstm']
+
+function formatApiError(err, fallback = 'Request failed.') {
+  const detail = err?.response?.data?.detail
+  if (typeof detail === 'string') return detail
+  if (detail && typeof detail === 'object') {
+    const msg = typeof detail.message === 'string' ? detail.message : fallback
+    const warnings = Array.isArray(detail.warnings) ? detail.warnings : []
+    return warnings.length ? `${msg} (${warnings.join(' | ')})` : msg
+  }
+  return fallback
+}
 
 export default function ComparePage() {
   const navigate = useNavigate()
   const [companies, setCompanies] = useState([])
   const [selected, setSelected] = useState(new Set())
-  const [mode, setMode] = useState('rule_based')
   const [period, setPeriod] = useState('')
   const [results, setResults] = useState(null)
+  const [modelOutputs, setModelOutputs] = useState({})
+  const [ensembleWeights, setEnsembleWeights] = useState({})
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [progressStep, setProgressStep] = useState('')
@@ -105,14 +118,16 @@ export default function ComparePage() {
     try {
       const { data } = await api.post('/scoring/compare', {
         company_ids: Array.from(selected),
-        mode,
         period: period || null,
+        selected_models: FIVE_MODELS,
       })
       finishProgress()
       await new Promise(r => setTimeout(r, 1200))
-      setResults(data.items)
+      setResults(data.items || [])
+      setModelOutputs(data.model_outputs || {})
+      setEnsembleWeights(data.ensemble_weights || {})
     } catch (e) {
-      setError(e.response?.data?.detail || 'Comparison failed.')
+      setError(formatApiError(e, 'Comparison failed.'))
     } finally {
       clearInterval(progressTimer.current)
       setLoading(false)
@@ -371,18 +386,14 @@ export default function ComparePage() {
               Analysis Settings
             </div>
 
-            <label style={{ display: 'block', fontSize: 12, color: 'var(--text-2)', marginBottom: 6 }}>Model</label>
-            <select
-              value={mode} onChange={e => setMode(e.target.value)}
-              style={{
-                width: '100%', background: 'var(--surface-1)', border: '1px solid var(--border-strong)',
-                borderRadius: 'var(--radius-md)', color: 'var(--text-1)', padding: '8px 12px',
-                fontSize: 13, outline: 'none', marginBottom: 12,
-              }}
-            >
-              <option value="rule_based">Rule-Based</option>
-              <option value="logistic">Logistic Regression</option>
-            </select>
+            <div style={{
+              marginBottom: 12, fontSize: 12, color: 'var(--text-2)',
+              background: 'var(--surface-1)', border: '1px solid var(--border-strong)',
+              borderRadius: 'var(--radius-md)', padding: '8px 10px',
+            }}>
+              <div style={{ fontWeight: 700, color: 'var(--primary)', marginBottom: 4 }}>Ensemble v1 (always-on)</div>
+              <div>ElasticNet + RandomForest + XGBoost + SARIMAX + LSTM</div>
+            </div>
 
             <label style={{ display: 'block', fontSize: 12, color: 'var(--text-2)', marginBottom: 6 }}>Period</label>
             <select
@@ -567,6 +578,43 @@ export default function ComparePage() {
             </table>
           </Card>
 
+          {Object.keys(modelOutputs || {}).length > 0 && (
+            <Card style={{ marginTop: 16, padding: '1rem' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>
+                Per-Model Leaderboards
+              </div>
+              {Object.entries(modelOutputs).map(([modelName, rows]) => {
+                const top = (rows || []).slice(0, 3)
+                return (
+                  <div key={modelName} style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-2)', marginBottom: 6 }}>
+                      {modelName}
+                      {ensembleWeights?.[modelName] != null && (
+                        <span style={{ marginLeft: 8, color: 'var(--text-3)', fontWeight: 500 }}>
+                          w={(ensembleWeights[modelName] * 100).toFixed(0)}%
+                        </span>
+                      )}
+                    </div>
+                    {top.length === 0 ? (
+                      <div style={{ fontSize: 12, color: 'var(--text-3)' }}>No output</div>
+                    ) : (
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        {top.map((r, i) => (
+                          <div key={`${modelName}-${r.company_id}`} style={{
+                            border: '1px solid var(--border)', borderRadius: 8, padding: '6px 10px',
+                            fontSize: 12, color: 'var(--text-2)', background: 'var(--surface-1)',
+                          }}>
+                            {i + 1}. <strong>{r.ticker}</strong> ({(r.total_score ?? 0).toFixed(1)})
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </Card>
+          )}
+
           {results.length > 0 && (
             <div style={{ marginTop: 14, fontSize: 13, color: 'var(--text-3)' }}>
               <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{results[0].ticker}</span>
@@ -579,4 +627,3 @@ export default function ComparePage() {
     </div>
   )
 }
-

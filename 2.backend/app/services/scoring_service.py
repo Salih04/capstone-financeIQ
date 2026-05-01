@@ -25,6 +25,28 @@ run_score() is the single entry-point for both modes and returns a uniform dict:
 from __future__ import annotations
 from typing import Any
 
+# New multi-model family identifiers for v1 rollout.
+MULTI_MODEL_IDS = (
+    "elasticnet",
+    "random_forest",
+    "xgboost",
+    "sarimax",
+    "lstm",
+)
+
+# Initial ensemble defaults; later replaced by validation-learned weights.
+ENSEMBLE_WEIGHTS_V1: dict[str, float] = {
+    "elasticnet": 0.2,
+    "random_forest": 0.2,
+    "xgboost": 0.2,
+    "sarimax": 0.2,
+    "lstm": 0.2,
+}
+
+
+class ModelScoringUnavailable(ValueError):
+    pass
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Rule-based scoring helpers
 # ──────────────────────────────────────────────────────────────────────────────
@@ -418,6 +440,285 @@ def _logistic_score(
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# Multi-model helpers (v1)
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _build_success_dataset(db) -> list[dict[str, Any]]:
+    from collections import defaultdict
+    from app.models.company import Company
+    from app.models.financial import ComputedMetric
+    from app.models.forecasting import QuarterlyFundamental, WinnerCohortRow
+
+    features = list(_RULE_WEIGHTS.keys())
+    rows = (
+        db.query(ComputedMetric)
+        .order_by(ComputedMetric.company_id, ComputedMetric.period.asc())
+        .all()
+    )
+    ticker_by_id = {c.id: c.ticker for c in db.query(Company).all()}
+    qf_index: dict[tuple[str, str], float | None] = {}
+    for qf in db.query(QuarterlyFundamental).all():
+        qf_index[(qf.stock_code, qf.period)] = qf.net_income
+
+    return_by_year: dict[tuple[str, int], float | None] = {}
+    for wr in db.query(WinnerCohortRow).all():
+        return_by_year[(wr.stock_code, wr.year)] = wr.period_return
+
+    company_rows: dict[int, list[ComputedMetric]] = defaultdict(list)
+    for row in rows:
+        company_rows[row.company_id].append(row)
+
+    dataset: list[dict[str, Any]] = []
+    for company_id, crows in company_rows.items():
+        ticker = ticker_by_id.get(company_id)
+        if not ticker:
+            continue
+        crows = sorted(crows, key=lambda r: r.period)
+        for i, row in enumerate(crows):
+            if i + 1 >= len(crows):
+                continue
+            feat = [getattr(row, f, None) for f in features]
+            # Keep partially-missing rows; we impute later during training.
+            if all(v is None for v in feat):
+                continue
+            next_row = crows[i + 1]
+            curr_ni = qf_index.get((ticker, row.period))
+            next_ni = qf_index.get((ticker, next_row.period))
+            if curr_ni is None or next_ni is None:
+                continue
+            growth_success = next_ni > curr_ni
+            try:
+                year = int(str(row.period)[:4])
+            except (TypeError, ValueError):
+                year = None
+            period_return = return_by_year.get((ticker, year)) if year is not None else None
+            return_success = period_return is None or period_return > 0
+            label = 1 if (growth_success and return_success) else 0
+            dataset.append(
+                {
+                    "company_id": company_id,
+                    "period": row.period,
+                    "features": feat,
+                    "label": label,
+                }
+            )
+    return dataset
+
+
+def _fit_family_model(
+    mode: str,
+    db,
+    current_metrics: dict[str, float | None],
+    company_id: int | None,
+    period: str | None,
+) -> dict[str, Any]:
+    import numpy as np
+    from sklearn.impute import SimpleImputer
+    from sklearn.preprocessing import StandardScaler
+
+    features = list(_RULE_WEIGHTS.keys())
+    current_row = [current_metrics.get(f) for f in features]
+    if all(v is None for v in current_row):
+        raise ModelScoringUnavailable(
+            f"{mode} requires at least one available scoring metric for prediction."
+        )
+
+    dataset = _build_success_dataset(db)
+    if company_id is not None and period is not None:
+        dataset = [
+            d
+            for d in dataset
+            if not (d["company_id"] == company_id and d["period"] == period)
+        ]
+    if len(dataset) < 20:
+        raise ModelScoringUnavailable(
+            f"{mode} has insufficient labeled history ({len(dataset)} rows)."
+        )
+
+    X = np.array([d["features"] for d in dataset], dtype=float)
+    y = np.array([d["label"] for d in dataset], dtype=int)
+    # Remove fully-empty rows before fitting imputers/models.
+    valid_mask = np.isfinite(X).any(axis=1)
+    X = X[valid_mask]
+    y = y[valid_mask]
+    if len(X) < 20:
+        raise ModelScoringUnavailable(
+            f"{mode} has insufficient usable history after filtering ({len(X)} rows)."
+        )
+    if len(set(y.tolist())) < 2:
+        raise ModelScoringUnavailable(f"{mode} training labels contain only one class.")
+
+    imputer = SimpleImputer(strategy="median")
+    X_imp = imputer.fit_transform(X)
+    X_pred_imp = imputer.transform(np.array([current_row], dtype=float))
+
+    scaler = StandardScaler()
+    Xs = scaler.fit_transform(X_imp)
+    X_pred = scaler.transform(X_pred_imp)
+
+    if mode == "elasticnet":
+        from sklearn.linear_model import ElasticNet
+
+        model = ElasticNet(alpha=0.05, l1_ratio=0.5, max_iter=2000, random_state=42)
+        model.fit(Xs, y.astype(float))
+        prob = float(model.predict(X_pred)[0])
+        prob = max(0.0, min(1.0, prob))
+        total_score = round(prob * 100, 2)
+        details = []
+        coefs = model.coef_
+        for i, metric in enumerate(features):
+            details.append(
+                {
+                    "metric_name": _METRIC_LABELS.get(metric, metric),
+                    "metric_value": current_row[i],
+                    "normalized_value": round(float(X_pred[0][i]), 4),
+                    "weight": round(abs(float(coefs[i])), 4),
+                    "contribution": round(float(coefs[i] * X_pred[0][i]), 4),
+                    "comment": "ElasticNet coefficient-based contribution.",
+                }
+            )
+        return {
+            "total_score": total_score,
+            "success_probability": round(prob, 4),
+            "label_used": "elasticnet_success_return",
+            "explanation_summary": "ElasticNet trained on success label from growth+returns.",
+            "details": details,
+        }
+
+    if mode == "random_forest":
+        from sklearn.ensemble import RandomForestClassifier
+
+        model = RandomForestClassifier(
+            n_estimators=300,
+            max_depth=8,
+            min_samples_leaf=3,
+            random_state=42,
+            class_weight="balanced",
+        )
+        model.fit(Xs, y)
+        prob = float(model.predict_proba(X_pred)[0][1])
+        total_score = round(prob * 100, 2)
+        importances = model.feature_importances_
+        details = []
+        for i, metric in enumerate(features):
+            details.append(
+                {
+                    "metric_name": _METRIC_LABELS.get(metric, metric),
+                    "metric_value": current_row[i],
+                    "normalized_value": round(float(X_pred[0][i]), 4),
+                    "weight": round(float(importances[i]), 4),
+                    "contribution": round(float(importances[i] * prob * 100), 4),
+                    "comment": "RandomForest feature importance contribution.",
+                }
+            )
+        return {
+            "total_score": total_score,
+            "success_probability": round(prob, 4),
+            "label_used": "random_forest_success_return",
+            "explanation_summary": "RandomForest trained on success label from growth+returns.",
+            "details": details,
+        }
+
+    if mode == "xgboost":
+        try:
+            from xgboost import XGBClassifier
+        except Exception as exc:
+            raise ModelScoringUnavailable(
+                "xgboost package is not available in the current environment."
+            ) from exc
+        model = XGBClassifier(
+            n_estimators=250,
+            max_depth=5,
+            learning_rate=0.05,
+            subsample=0.9,
+            colsample_bytree=0.9,
+            objective="binary:logistic",
+            random_state=42,
+            eval_metric="logloss",
+        )
+        model.fit(Xs, y)
+        prob = float(model.predict_proba(X_pred)[0][1])
+        total_score = round(prob * 100, 2)
+        return {
+            "total_score": total_score,
+            "success_probability": round(prob, 4),
+            "label_used": "xgboost_success_return",
+            "explanation_summary": "XGBoost trained on success label from growth+returns.",
+            "details": _rule_based_score(current_metrics).get("details", []),
+        }
+
+    if mode == "sarimax":
+        raise ModelScoringUnavailable(
+            "sarimax adapter is staged but not yet enabled in this environment."
+        )
+
+    if mode == "lstm":
+        raise ModelScoringUnavailable(
+            "lstm adapter is staged but not yet enabled in this environment."
+        )
+
+    raise ModelScoringUnavailable(f"Unknown model family: {mode}")
+
+
+def run_multi_model_score(
+    current_metrics: dict[str, float | None],
+    previous_metrics: dict[str, float | None] | None,
+    db,
+    company_id: int | None,
+    period: str | None,
+    selected_models: list[str] | None = None,
+) -> dict[str, Any]:
+    requested = selected_models or list(MULTI_MODEL_IDS)
+    invalid = [m for m in requested if m not in MULTI_MODEL_IDS]
+    if invalid:
+        raise ModelScoringUnavailable(f"Unsupported model ids: {', '.join(invalid)}")
+
+    per_model: dict[str, dict[str, Any]] = {}
+    warnings: list[str] = []
+    for model_id in requested:
+        try:
+            per_model[model_id] = _fit_family_model(
+                model_id, db, current_metrics, company_id, period
+            )
+        except ModelScoringUnavailable as exc:
+            warnings.append(f"{model_id}: {exc}")
+
+    if not per_model:
+        raise ModelScoringUnavailable(
+            "No model outputs could be generated. " + " | ".join(warnings)
+        )
+
+    available_weights = {
+        m: ENSEMBLE_WEIGHTS_V1[m] for m in per_model if m in ENSEMBLE_WEIGHTS_V1
+    }
+    weight_sum = sum(available_weights.values())
+    if weight_sum <= 0:
+        raise ModelScoringUnavailable("No ensemble weights available for active models.")
+
+    ensemble_prob = sum(
+        per_model[m]["success_probability"] * (w / weight_sum)
+        for m, w in available_weights.items()
+    )
+    ensemble_score = round(ensemble_prob * 100, 2)
+    details = _rule_based_score(current_metrics, previous_metrics).get("details", [])
+    model_notes = ", ".join(sorted(per_model.keys()))
+    summary = f"Ensemble_v1 computed from models: {model_notes}."
+    if warnings:
+        summary += f" Warnings: {' | '.join(warnings)}"
+
+    return {
+        "total_score": ensemble_score,
+        "success_probability": round(ensemble_prob, 4),
+        "label_used": "ensemble_v1",
+        "explanation_summary": summary,
+        "details": details,
+        "per_model": per_model,
+        "ensemble_weights": {m: round(w / weight_sum, 4) for m, w in available_weights.items()},
+        "warnings": warnings,
+    }
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # Public entry-point
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -430,11 +731,16 @@ def run_score(
     company_id: int | None = None,
     period: str | None = None,
 ) -> dict[str, Any]:
-    result = _logistic_score(current_metrics, previous_metrics, db=db) if mode == "logistic" else _rule_based_score(
-        current_metrics,
-        previous_metrics,
-        weights=custom_weights,
-    )
+    if mode in MULTI_MODEL_IDS:
+        if db is None:
+            raise ModelScoringUnavailable(f"{mode} requires database-backed training data.")
+        result = _fit_family_model(mode, db, current_metrics, company_id, period)
+    else:
+        result = _logistic_score(current_metrics, previous_metrics, db=db) if mode == "logistic" else _rule_based_score(
+            current_metrics,
+            previous_metrics,
+            weights=custom_weights,
+        )
 
     if db is None or company_id is None or period is None:
         return result
@@ -505,5 +811,3 @@ def run_score(
         result["explanation_summary"] += f" Sector adjustment skipped: {exc}"
 
     return result
-
-

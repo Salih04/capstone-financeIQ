@@ -16,7 +16,7 @@ from app.schemas.scoring import (
     CommonPeriodsRequest, CommonPeriodsResult,
 )
 from app.services.comparison_service import compare_companies
-from app.services.scoring_service import run_score
+from app.services.scoring_service import ModelScoringUnavailable, run_multi_model_score, run_score
 from app.services.explanation_service import build_rich_explanations
 
 router = APIRouter(tags=["scoring"])
@@ -94,15 +94,28 @@ def score_company(
     if body.custom_weights:
         custom_weights = body.custom_weights
 
-    result = run_score(
-        current_dict,
-        previous_dict,
-        mode=body.mode,
-        custom_weights=custom_weights,
-        db=db,
-        company_id=company_id,
-        period=current_metric.period,
-    )
+    try:
+        if body.ensemble or body.selected_models:
+            result = run_multi_model_score(
+                current_dict,
+                previous_dict,
+                db=db,
+                company_id=company_id,
+                period=current_metric.period,
+                selected_models=body.selected_models,
+            )
+        else:
+            result = run_score(
+                current_dict,
+                previous_dict,
+                mode=body.mode,
+                custom_weights=custom_weights,
+                db=db,
+                company_id=company_id,
+                period=current_metric.period,
+            )
+    except ModelScoringUnavailable as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
 
     # ── V3: Enrich with 3-level explanations + sector z-scores ──
     sector_z = _get_sector_z_scores(db, company_id, current_metric.period)
@@ -110,7 +123,7 @@ def score_company(
 
     model_name = (
         (scoring_model.model_name if scoring_model else None)
-        or f"{body.mode}_v3"
+        or ("ensemble_v1_v3" if (body.ensemble or body.selected_models) else f"{body.mode}_v3")
     )
 
     rich = v3_result.get("rich_explanation", {})
@@ -218,7 +231,7 @@ def compare_stocks(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
-    """Score multiple companies with the same model and return ranked results."""
+    """Run five model families, then return per-model + ensemble ranked results."""
     if not body.company_ids:
         raise HTTPException(status_code=422, detail="Provide at least one company_id.")
     try:
@@ -231,15 +244,12 @@ def compare_stocks(
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Scoring failed: {exc}")
 
-    if not comparison["items"] and comparison["warnings"]:
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "message": "No companies could be scored for the requested parameters.",
-                "warnings": comparison["warnings"],
-            },
-        )
-    return CompareResult(items=comparison["items"], warnings=comparison["warnings"])
+    return CompareResult(
+        items=comparison.get("items", []),
+        warnings=comparison.get("warnings", []),
+        model_outputs=comparison.get("model_outputs", {}),
+        ensemble_weights=comparison.get("ensemble_weights", {}),
+    )
 
 
 @router.get("/score-runs/{run_id}", response_model=ScoreRunOut)
@@ -283,5 +293,3 @@ def my_score_runs(
             "created_at": run.created_at.isoformat() if run.created_at else None,
         })
     return result
-
-

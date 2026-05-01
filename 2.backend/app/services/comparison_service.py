@@ -1,9 +1,9 @@
 """
 comparison_service.py
 ─────────────────────
-Run the same scoring model on multiple companies and return ranked results.
-All companies are scored for the same period (or their individual latest period
-if no explicit period is given) so the results are comparable.
+Run five model families on multiple companies and return:
+- per-model rankings
+- final weighted ensemble ranking
 """
 from __future__ import annotations
 
@@ -11,7 +11,12 @@ from sqlalchemy.orm import Session
 
 from app.models.company import Company
 from app.models.financial import ComputedMetric
-from app.services.scoring_service import run_score
+from app.services.scoring_service import (
+    ENSEMBLE_WEIGHTS_V1,
+    MULTI_MODEL_IDS,
+    ModelScoringUnavailable,
+    run_score,
+)
 
 # Full 12-feature list mirroring scoring_service.py FEATURES
 _METRIC_KEYS = [
@@ -33,13 +38,9 @@ def compare_companies(
     mode: str = "rule_based",
     custom_weights: dict | None = None,
 ) -> dict:
-    """
-    Score each company in *company_ids* and return a dict with:
-        items    – list of scored companies sorted by total_score descending
-        warnings – list of human-readable messages for companies that were excluded
-    """
     results: list[dict] = []
     warnings: list[str] = []
+    model_outputs: dict[str, list[dict]] = {m: [] for m in MULTI_MODEL_IDS}
 
     # Fetch all requested companies in ONE query to avoid N+1
     company_map: dict[int, Company] = {
@@ -81,14 +82,61 @@ def compare_companies(
         current_dict = _metrics_to_dict(current)
         previous_dict = _metrics_to_dict(previous) if previous else None
 
-        score_result = run_score(
-            current_dict,
-            previous_dict,
-            mode=mode,
-            custom_weights=custom_weights,
-            db=db,
-            company_id=company.id,
-            period=current.period,
+        per_model_scores: dict[str, float] = {}
+        per_model_probs: dict[str, float] = {}
+        model_warnings: list[str] = []
+
+        for model_id in MULTI_MODEL_IDS:
+            try:
+                score_result = run_score(
+                    current_dict,
+                    previous_dict,
+                    mode=model_id,
+                    custom_weights=custom_weights,
+                    db=db,
+                    company_id=company.id,
+                    period=current.period,
+                )
+                per_model_scores[model_id] = float(score_result.get("total_score") or 0.0)
+                per_model_probs[model_id] = float(score_result.get("success_probability") or 0.0)
+                model_outputs[model_id].append(
+                    {
+                        "company_id": cid,
+                        "ticker": company.ticker,
+                        "company_name": company.company_name,
+                        "period": current.period,
+                        "total_score": score_result.get("total_score"),
+                        "success_probability": score_result.get("success_probability"),
+                        "label_used": score_result.get("label_used"),
+                        "explanation_summary": score_result.get("explanation_summary"),
+                    }
+                )
+            except ModelScoringUnavailable as exc:
+                model_warnings.append(f"{model_id}: {exc}")
+
+        if not per_model_scores:
+            warnings.append(
+                f"{company.ticker} had no available model outputs and was excluded. "
+                + " | ".join(model_warnings)
+            )
+            continue
+
+        available_weights = {
+            model_id: ENSEMBLE_WEIGHTS_V1[model_id]
+            for model_id in per_model_scores
+            if model_id in ENSEMBLE_WEIGHTS_V1
+        }
+        weight_sum = sum(available_weights.values())
+        if weight_sum <= 0:
+            warnings.append(f"{company.ticker} had invalid ensemble weights and was excluded.")
+            continue
+        ensemble_prob = sum(
+            per_model_probs[m] * (w / weight_sum) for m, w in available_weights.items()
+        )
+        ensemble_score = round(ensemble_prob * 100, 2)
+        explanation = (
+            f"Ensemble_v1 over: {', '.join(sorted(per_model_scores.keys()))}."
+            + (f" Warnings: {' | '.join(model_warnings)}" if model_warnings else "")
         )
 
         results.append(
@@ -97,12 +145,22 @@ def compare_companies(
                 "ticker": company.ticker,
                 "company_name": company.company_name,
                 "period": current.period,
-                "total_score": score_result.get("total_score"),
-                "success_probability": score_result.get("success_probability"),
-                "label_used": score_result.get("label_used"),
-                "explanation_summary": score_result.get("explanation_summary"),
+                "total_score": ensemble_score,
+                "success_probability": round(ensemble_prob, 4),
+                "label_used": "ensemble_v1",
+                "explanation_summary": explanation,
+                "per_model_scores": per_model_scores,
             }
         )
+        for w in model_warnings:
+            warnings.append(f"{company.ticker}: {w}")
 
     results.sort(key=lambda x: (x["total_score"] or 0), reverse=True)
-    return {"items": results, "warnings": warnings}
+    for model_id, rows in model_outputs.items():
+        rows.sort(key=lambda x: (x["total_score"] or 0), reverse=True)
+    return {
+        "items": results,
+        "warnings": warnings,
+        "model_outputs": model_outputs,
+        "ensemble_weights": ENSEMBLE_WEIGHTS_V1,
+    }
