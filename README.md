@@ -1,5 +1,4 @@
-# FinanceIQ – Success DNA Forecasting Platform
-
+# FinanceIQ 
 Forecasting and comparison platform for BIST stocks using 2020–2025 datasets and multi-model scoring.
 
 ## Quick Start
