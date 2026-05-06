@@ -70,9 +70,9 @@ const METRIC_GROUPS = [
 ]
 
 const SCORING_PRESETS = [
-  { key: 'all',          label: '5-Model Ensemble', desc: 'ElasticNet + RF + XGBoost + SARIMAX + LSTM', selected_models: ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'lstm'] },
+  { key: 'all',          label: '5-Model Ensemble', desc: 'ElasticNet + RF + XGBoost + SARIMAX + TFT', selected_models: ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'tft'] },
   { key: 'stable',       label: 'Stability Focus',  desc: 'ElasticNet + RF + SARIMAX', selected_models: ['elasticnet', 'random_forest', 'sarimax'] },
-  { key: 'growth',       label: 'Growth Focus',     desc: 'RF + XGBoost + LSTM', selected_models: ['random_forest', 'xgboost', 'lstm'] },
+  { key: 'growth',       label: 'Growth Focus',     desc: 'RF + XGBoost + TFT', selected_models: ['random_forest', 'xgboost', 'tft'] },
   { key: 'interpretable',label: 'Interpretable',    desc: 'ElasticNet + RF', selected_models: ['elasticnet', 'random_forest'] },
 ]
 
@@ -85,25 +85,15 @@ const TABS = [
   { value: 'score', label: 'Run Analysis', icon: Play },
 ]
 
-// Generate all quarters from 2022Q1 to current quarter
-function generateQuarters() {
-  const quarters = []
-  const now = new Date()
-  const endYear = now.getFullYear()
-  const endQ = Math.ceil((now.getMonth() + 1) / 3)
-  for (let y = 2022; y <= endYear; y++) {
-    for (let q = 1; q <= 4; q++) {
-      if (y === endYear && q > endQ) break
-      quarters.push(`${y}Q${q}`)
-    }
-  }
-  return quarters.reverse() // most recent first
-}
-
-const ALL_QUARTERS = generateQuarters()
-
-// Define years for historical data
-const HISTORICAL_YEARS = [2023, 2024, 2025]
+// Q4-only periods for available datasets
+const ALL_QUARTERS = [
+  '2025Q4',
+  '2024Q4',
+  '2023Q4',
+  '2022Q4',
+  '2021Q4',
+  '2020Q4',
+]
 
 function MetricCardGroup({ group, metric }) {
   return (
@@ -180,14 +170,22 @@ export default function CompanyPage() {
       api.get(`/companies/${id}/transitions`).catch(() => ({ data: [] })),
       api.get(`/companies/${id}/sector-scores`).catch(() => ({ data: [] })),
     ]).then(([c, f, m, t, sc]) => {
-      setCompany(c.data)
-      setFinancials(f.data)
-      setMetrics(m.data)
-      setTransitions(t.data)
-      setSectorScores(sc.data)
-      if (m.data.length > 0) setSelectedPeriod(m.data[0].period)
-      else setSelectedPeriod(ALL_QUARTERS[0])
-    }).catch(() => navigate('/companies'))
+  const filteredFinancials = (f.data || [])
+    .filter((item) => ALL_QUARTERS.includes(item?.period))
+
+  const filteredMetrics = (m.data || [])
+    .filter((item) => ALL_QUARTERS.includes(item?.period))
+    .sort((a, b) => String(b.period).localeCompare(String(a.period)))
+
+  setCompany(c.data)
+  setFinancials(filteredFinancials)
+  setMetrics(filteredMetrics)
+  setTransitions(t.data)
+  setSectorScores(sc.data)
+
+  if (filteredMetrics.length > 0) setSelectedPeriod(filteredMetrics[0].period)
+  else setSelectedPeriod(ALL_QUARTERS[0])
+}).catch(() => navigate('/companies'))
       .finally(() => setLoading(false))
   }, [id])
 
@@ -202,8 +200,8 @@ export default function CompanyPage() {
     const apiPromise = api.post(`/companies/${id}/score`, {
       period: selectedPeriod || null,
       year: selectedYear,
-      ensemble: true,
-      selected_models: preset?.selected_models || ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'lstm'],
+       ensemble: true,
+       selected_models: preset?.selected_models || ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'tft'],
     }).then(r => r.data).catch(e => ({ error: e }))
 
     // Animate progress over ~12 seconds regardless of API speed
@@ -245,7 +243,7 @@ export default function CompanyPage() {
 
   if (loading) {
     return (
-      <div style={{ maxWidth: 1100 }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0.5rem 0.5rem 2rem' }}>
         <Skeleton width={140} height={14} style={{ marginBottom: 24 }} />
         <div style={{ display: 'flex', gap: 14, marginBottom: 24 }}>
           <Skeleton width={64} height={64} radius={16} />
@@ -367,8 +365,12 @@ export default function CompanyPage() {
       </div>
     )
   }
-  const financialByPeriod = Object.fromEntries(financials.map(f => [f.period, f]))
-  const periods = financials.map(f => f.period)
+  const sortedFinancials = [...financials]
+    .filter(f => ALL_QUARTERS.includes(f?.period))
+    .sort((a, b) => String(b.period).localeCompare(String(a.period)))
+
+  const financialByPeriod = Object.fromEntries(sortedFinancials.map(f => [f.period, f]))
+  const periods = sortedFinancials.map(f => f.period)
   const latestMetric = metrics.find(m => m.period === selectedPeriod) || metrics[0]
   const latestTransPeriod = transitions.length ? transitions[0].to_period : null
   const latestTrans = latestTransPeriod ? transitions.filter(t => t.to_period === latestTransPeriod) : []
@@ -400,21 +402,21 @@ export default function CompanyPage() {
 
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, var(--surface-2), rgba(0,245,212,0.04))',
+        background: 'linear-gradient(135deg, var(--surface-2), rgba(244,176,74,0.1))',
         border: '1px solid var(--border-strong)',
         borderRadius: 'var(--radius-xl)', padding: '28px 32px', marginBottom: 24,
         position: 'relative', overflow: 'hidden',
       }}>
         {/* Decorative gradient orb */}
-        <div style={{ position: 'absolute', top: -60, right: -60, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,245,212,0.08), transparent)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -60, right: -60, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(85,194,195,0.12), transparent)', pointerEvents: 'none' }} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, position: 'relative' }}>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
             <div style={{
               width: 64, height: 64, borderRadius: 18,
-              background: 'linear-gradient(135deg, rgba(0,245,212,0.15), rgba(99,102,241,0.1))',
+              background: 'linear-gradient(135deg, rgba(244,176,74,0.2), rgba(85,194,195,0.12))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: 'var(--primary-hover)', fontWeight: 800, fontSize: 20, flexShrink: 0,
-              border: '1px solid rgba(0,245,212,0.2)',
+              border: '1px solid rgba(244,176,74,0.25)',
             }}>
               {company.ticker?.substring(0, 2)}
             </div>
@@ -461,11 +463,11 @@ export default function CompanyPage() {
       {metrics.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
           {[
-            { label: 'ROA', value: fmt(latestMetric?.roa, true), color: 'var(--success)', icon: TrendingUp, raw: latestMetric?.roa },
-            { label: 'ROE', value: fmt(latestMetric?.roe, true), color: 'var(--primary)', icon: Activity, raw: latestMetric?.roe },
-            { label: 'Net Margin', value: fmt(latestMetric?.net_margin, true), color: 'var(--warning)', icon: Zap, raw: latestMetric?.net_margin },
-            { label: 'Current Ratio', value: fmt(latestMetric?.current_ratio), color: 'var(--info)', icon: Shield, raw: latestMetric?.current_ratio },
-          ].map(m => {
+              { label: 'ROA', value: fmt(latestMetric?.roa, true), color: 'var(--success)', icon: TrendingUp, raw: latestMetric?.roa },
+              { label: 'ROE', value: fmt(latestMetric?.roe, true), color: 'var(--primary)', icon: Activity, raw: latestMetric?.roe },
+              { label: 'Net Margin', value: fmt(latestMetric?.net_margin, true), color: 'var(--warning)', icon: Zap, raw: latestMetric?.net_margin },
+              { label: 'Current Ratio', value: fmt(latestMetric?.current_ratio), color: 'var(--secondary)', icon: Shield, raw: latestMetric?.current_ratio },
+            ].map(m => {
             const Icon = m.icon
             return (
               <div key={m.label} style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: '16px 18px', position: 'relative', overflow: 'hidden' }}>
@@ -616,7 +618,7 @@ export default function CompanyPage() {
                   borderRadius: 'var(--radius-md)', color: 'var(--text-1)', padding: '7px 12px', fontSize: 13, outline: 'none',
                 }}
               >
-                {metrics.map(m => <option key={m.period} value={m.period}>{m.period}</option>)}
+                {ALL_QUARTERS.map(q => <option key={q} value={q}>{q}</option>)}
               </select>
             </div>
             {METRIC_GROUPS.map(g => <MetricCardGroup key={g.label} group={g} metric={latestMetric} />)}
@@ -723,13 +725,10 @@ export default function CompanyPage() {
                     onChange={e => setSelectedPeriod(e.target.value)}
                     style={{ width: '100%', background: 'var(--surface-3)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-md)', color: 'var(--text-1)', padding: '9px 12px', fontSize: 13.5, outline: 'none' }}
                   >
-                    {metrics.map(m => (
-                        <option key={m.period} value={m.period}>{m.period}</option>
+                    {ALL_QUARTERS.map(q => (
+                        <option key={q} value={q}>{q}</option>
                       ))}
                   </select>
-                  <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>
-                    Only periods with available data are shown
-                  </div>
                 </div>
                 <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)', display: 'block', marginBottom: 8 }}>Scoring Preset</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 8 }}>

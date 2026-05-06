@@ -24,6 +24,8 @@ run_score() is the single entry-point for both modes and returns a uniform dict:
 """
 from __future__ import annotations
 from typing import Any
+from sqlalchemy import func
+from app.models.financial import ComputedMetric
 
 # New multi-model family identifiers for v1 rollout.
 MULTI_MODEL_IDS = (
@@ -31,7 +33,7 @@ MULTI_MODEL_IDS = (
     "random_forest",
     "xgboost",
     "sarimax",
-    "lstm",
+    "tft",
 )
 
 # Initial ensemble defaults; later replaced by validation-learned weights.
@@ -40,7 +42,7 @@ ENSEMBLE_WEIGHTS_V1: dict[str, float] = {
     "random_forest": 0.2,
     "xgboost": 0.2,
     "sarimax": 0.2,
-    "lstm": 0.2,
+    "tft": 0.2,
 }
 
 
@@ -289,6 +291,7 @@ def _logistic_score(
             accuracy_score, precision_score, recall_score,
             f1_score, roc_auc_score, confusion_matrix,
         )
+        from sklearn.impute import SimpleImputer
         from sklearn.preprocessing import StandardScaler
     except ImportError:
         return _rule_based_score(current, previous)
@@ -332,7 +335,7 @@ def _logistic_score(
             continue
         for i, row in enumerate(crows):
             feat = [getattr(row, f, None) for f in FEATURES]
-            if any(v is None for v in feat):
+            if all(v is None for v in feat):
                 continue
             # Real label: did net income grow in the NEXT period?
             if i + 1 >= len(crows):
@@ -370,15 +373,19 @@ def _logistic_score(
     X_tr = np.array(X_train, dtype=float)
     y_tr = np.array(y_train, dtype=int)
 
+    imputer = SimpleImputer(strategy="mean")
+    X_tr_imp = imputer.fit_transform(X_tr)
+
     scaler = StandardScaler()
-    X_tr_scaled = scaler.fit_transform(X_tr)
+    X_tr_scaled = scaler.fit_transform(X_tr_imp)
 
     clf = LogisticRegression(max_iter=500, C=1.0, solver="lbfgs")
     clf.fit(X_tr_scaled, y_tr)
 
     # Print validation metrics when test set is large enough
     if len(X_test) >= 4 and len(set(y_test)) >= 2:
-        X_te = scaler.transform(np.array(X_test, dtype=float))
+        X_te_raw = np.array(X_test, dtype=float)
+        X_te = scaler.transform(imputer.transform(X_te_raw))
         y_te = np.array(y_test, dtype=int)
         y_pred = clf.predict(X_te)
         y_prob = clf.predict_proba(X_te)[:, 1]
@@ -395,10 +402,10 @@ def _logistic_score(
 
     # Predict for the input company
     curr_feat = [current.get(f) for f in FEATURES]
-    if any(v is None for v in curr_feat):
+    if all(v is None for v in curr_feat):
         return _rule_based_score(current, previous)
 
-    X_pred = scaler.transform([curr_feat])
+    X_pred = scaler.transform(imputer.transform([curr_feat]))
     prob = float(clf.predict_proba(X_pred)[0][1])
     total_score = round(prob * 100, 2)
 
@@ -436,6 +443,34 @@ def _logistic_score(
         "label_used": "logistic_real_label",
         "explanation_summary": summary,
         "details": details,
+    }
+
+
+def _mean_impute_metrics(
+    db,
+    period: str | None,
+    metrics: dict[str, float | None],
+) -> dict[str, float | None]:
+    if db is None or not metrics:
+        return metrics
+
+    keys = list(_RULE_WEIGHTS.keys())
+    avg_cols = [func.avg(getattr(ComputedMetric, k)).label(k) for k in keys]
+    query = db.query(*avg_cols)
+    if period:
+        query = query.filter(ComputedMetric.period == period)
+    row = query.first()
+    if not row:
+        return metrics
+
+    means: dict[str, float | None] = {}
+    for k in keys:
+        val = getattr(row, k, None)
+        means[k] = float(val) if val is not None else None
+
+    return {
+        k: (means.get(k) if metrics.get(k) is None else metrics.get(k))
+        for k in keys
     }
 
 
@@ -548,7 +583,7 @@ def _fit_family_model(
     if len(set(y.tolist())) < 2:
         raise ModelScoringUnavailable(f"{mode} training labels contain only one class.")
 
-    imputer = SimpleImputer(strategy="median")
+    imputer = SimpleImputer(strategy="mean")
     X_imp = imputer.fit_transform(X)
     X_pred_imp = imputer.transform(np.array([current_row], dtype=float))
 
@@ -652,9 +687,9 @@ def _fit_family_model(
             "sarimax adapter is staged but not yet enabled in this environment."
         )
 
-    if mode == "lstm":
+    if mode == "tft":
         raise ModelScoringUnavailable(
-            "lstm adapter is staged but not yet enabled in this environment."
+            "tft adapter is staged but not yet enabled in this environment."
         )
 
     raise ModelScoringUnavailable(f"Unknown model family: {mode}")
@@ -700,7 +735,9 @@ def run_multi_model_score(
         for m, w in available_weights.items()
     )
     ensemble_score = round(ensemble_prob * 100, 2)
-    details = _rule_based_score(current_metrics, previous_metrics).get("details", [])
+    imputed_current = _mean_impute_metrics(db, period, current_metrics)
+    imputed_previous = _mean_impute_metrics(db, period, previous_metrics or {}) if previous_metrics else None
+    details = _rule_based_score(imputed_current, imputed_previous).get("details", [])
     model_notes = ", ".join(sorted(per_model.keys()))
     summary = f"Ensemble_v1 computed from models: {model_notes}."
     if warnings:
@@ -736,9 +773,13 @@ def run_score(
             raise ModelScoringUnavailable(f"{mode} requires database-backed training data.")
         result = _fit_family_model(mode, db, current_metrics, company_id, period)
     else:
-        result = _logistic_score(current_metrics, previous_metrics, db=db) if mode == "logistic" else _rule_based_score(
-            current_metrics,
-            previous_metrics,
+        imputed_current = _mean_impute_metrics(db, period, current_metrics) if db else current_metrics
+        imputed_previous = (
+            _mean_impute_metrics(db, period, previous_metrics) if (db and previous_metrics) else previous_metrics
+        )
+        result = _logistic_score(imputed_current, imputed_previous, db=db) if mode == "logistic" else _rule_based_score(
+            imputed_current,
+            imputed_previous,
             weights=custom_weights,
         )
 

@@ -214,16 +214,24 @@ class KapRatiosResponse(BaseModel):
 
 
 class NewsItemOut(BaseModel):
+    id: str
     title: str
     source: str
     published_at: str
     summary: str
+    url: str | None = None
+    sentiment: str | None = None
+    ai_insight: str | None = None
 
 
 class NewsOut(BaseModel):
-    sector: str
-    updates: list[NewsItemOut]
-    ai_insight: str
+    date: str
+    page: int
+    limit: int
+    max_pages: int
+    max_articles_per_day: int
+    message: str | None = None
+    articles: list[NewsItemOut]
 
 
 class AvailableFiltersResponse(BaseModel):

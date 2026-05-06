@@ -5,9 +5,12 @@ import api from '../api/client'
 import { Card, EmptyState, SectionHeader } from '../components/ui'
 
 const PRESET_FILES = [
-  '2023 HİSSELER.xlsx',
-  '2024 HİSSELER.xlsx',
-  '2025 HİSSELER.xlsx',
+  '2020stocks.xlsx',
+  '2021stocks.xlsx',
+  '2022stocks.xlsx',
+  '2023stocks.xlsx',
+  '2024stocks.xlsx',
+  '2025stocks.xlsx',
 ]
 
 const inputS = {
@@ -208,7 +211,7 @@ export default function ForecastingPage() {
       <SectionHeader
         icon={<BrainCircuit size={20} />}
         title="Success DNA Forecasting"
-        subtitle="Winner-only forecasting for your provided 2023/2024/2025 stock lists"
+        subtitle="Winner-only forecasting for your provided 2020-2025 stock lists"
       />
 
       {msg && (

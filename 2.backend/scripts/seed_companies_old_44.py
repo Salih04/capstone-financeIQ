@@ -52,6 +52,7 @@ def main():
 
         for ticker, name, sector, sector_code in COMPANIES:
             c = db.query(Company).filter(Company.ticker == ticker).first()
+
             if not c:
                 c = Company(ticker=ticker)
                 db.add(c)

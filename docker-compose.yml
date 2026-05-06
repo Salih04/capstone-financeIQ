@@ -32,7 +32,7 @@ services:
         condition: service_healthy
     volumes:
     - ./2.backend:/app
-    - ./CLEANED_Financial:/CLEANED_Financial
+    - ./3.Datasets:/app/3.Datasets
 
   frontend:
     build: ./1.frontend

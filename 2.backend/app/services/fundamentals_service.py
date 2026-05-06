@@ -66,9 +66,9 @@ REQUIRED_COLUMNS = {
 
 
 def _parse_period(period: str) -> tuple[int, int]:
-    m = re.fullmatch(r"(202[3-5])Q([1-4])", str(period).strip().upper())
+    m = re.fullmatch(r"(202[0-5])Q([1-4])", str(period).strip().upper())
     if not m:
-        raise ValueError("period must be in 2023Q1..2025Q4 format")
+        raise ValueError("period must be in 2020Q1..2025Q4 format")
     return int(m.group(1)), int(m.group(2))
 
 

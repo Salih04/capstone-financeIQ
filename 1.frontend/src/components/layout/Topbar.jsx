@@ -232,11 +232,11 @@ export default function Topbar({ sidebarCollapsed }) {
                 padding: '9px 14px', cursor: 'pointer',
                 borderTop: '1px solid var(--border)',
                 fontSize: 12, fontWeight: 600, color: 'var(--primary)',
-                background: 'rgba(0,245,212,0.04)',
+        background: 'rgba(244,176,74,0.04)',
                 transition: 'background 0.12s',
               }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,245,212,0.1)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,245,212,0.04)'}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(244,176,74,0.1)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(244,176,74,0.04)'}
               onClick={() => {
                 navigate(`/ai-search?q=${encodeURIComponent(searchQuery)}`)
                 setSearchOpen(false)
@@ -253,10 +253,10 @@ export default function Topbar({ sidebarCollapsed }) {
       {/* Quick actions */}
       <div style={s.quickActions}>
         <button
-          style={{ ...s.qaBtn, background: 'rgba(0,245,212,0.08)', borderColor: 'rgba(0,245,212,0.35)', color: 'var(--primary)' }}
+          style={{ ...s.qaBtn, background: 'rgba(244,176,74,0.08)', borderColor: 'rgba(244,176,74,0.35)', color: 'var(--primary)' }}
           onClick={() => navigate('/ai-search')}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,245,212,0.18)'; e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary-hover)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,245,212,0.08)'; e.currentTarget.style.borderColor = 'rgba(0,245,212,0.35)'; e.currentTarget.style.color = 'var(--primary)' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,176,74,0.18)'; e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary-hover)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(244,176,74,0.08)'; e.currentTarget.style.borderColor = 'rgba(244,176,74,0.35)'; e.currentTarget.style.color = 'var(--primary)' }}
         >
           <Sparkles size={13} /> AI Search
         </button>

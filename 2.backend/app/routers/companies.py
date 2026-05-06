@@ -14,7 +14,7 @@ from app.schemas.financial import (
     MetricTransitionOut,
     SectorNormalizedOut,
 )
-from app.services.kap_financials_service import get_kap_company_tickers
+from app.services.dataset_service import get_dataset_tickers
 
 
 router = APIRouter(prefix="/companies", tags=["companies"])
@@ -22,43 +22,35 @@ router = APIRouter(prefix="/companies", tags=["companies"])
 
 @router.get("", response_model=list[CompanyOut])
 def search_companies(
-    q: str = Query(default="", description="Search by ticker or company name"),
+    q: str = Query(default="", description="Search by ticker, company name, or sector"),
     limit: int = Query(default=200, le=500),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
-    kap_tickers = sorted(get_kap_company_tickers(db))
+    dataset_tickers = set(get_dataset_tickers())
 
-    db_rows = db.query(Company).filter(Company.ticker.in_(kap_tickers)).all()
-    row_by_ticker = {company.ticker: company for company in db_rows}
+    query = db.query(Company).filter(Company.is_active == True)
+
+    if dataset_tickers:
+        query = query.filter(Company.ticker.in_(dataset_tickers))
 
     q_lower = q.strip().lower()
-    results = []
 
-    for ticker in kap_tickers:
-        company = row_by_ticker.get(ticker)
-        company_name = company.company_name if company else ticker
+    if q_lower:
+        like = f"%{q_lower}%"
+        query = query.filter(
+            (Company.ticker.ilike(like))
+            | (Company.company_name.ilike(like))
+            | (Company.sector.ilike(like))
+            | (Company.sector_code.ilike(like))
+        )
 
-        if q_lower:
-            if q_lower not in ticker.lower() and q_lower not in company_name.lower():
-                continue
-
-        if company:
-            results.append(company)
-        else:
-            results.append(
-                CompanyOut(
-                    id=0,
-                    ticker=ticker,
-                    company_name=ticker,
-                    sector=None,
-                    sector_code=None,
-                    description=None,
-                    is_active=True,
-                )
-            )
-
-    return results[:limit]
+    return (
+        query
+        .order_by(Company.ticker.asc())
+        .limit(limit)
+        .all()
+    )
 
 
 @router.get("/{company_id}", response_model=CompanyOut)
@@ -67,9 +59,16 @@ def get_company(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
-    company = db.get(Company, company_id)
+    company = (
+        db.query(Company)
+        .filter(Company.id == company_id)
+        .filter(Company.is_active == True)
+        .first()
+    )
+
     if not company:
         raise HTTPException(status_code=404, detail="Company not found.")
+
     return company
 
 
@@ -79,6 +78,16 @@ def get_financials(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
+    company = (
+        db.query(Company)
+        .filter(Company.id == company_id)
+        .filter(Company.is_active == True)
+        .first()
+    )
+
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found.")
+
     return (
         db.query(FinancialStatement)
         .filter(FinancialStatement.company_id == company_id)
@@ -93,9 +102,20 @@ def get_metrics(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
+    company = (
+        db.query(Company)
+        .filter(Company.id == company_id)
+        .filter(Company.is_active == True)
+        .first()
+    )
+
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found.")
+
     return (
         db.query(ComputedMetric)
         .filter(ComputedMetric.company_id == company_id)
+        .filter(ComputedMetric.period.like("%Q4"))
         .order_by(ComputedMetric.period.desc())
         .all()
     )
@@ -107,7 +127,13 @@ def get_transitions(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
-    company = db.get(Company, company_id)
+    company = (
+        db.query(Company)
+        .filter(Company.id == company_id)
+        .filter(Company.is_active == True)
+        .first()
+    )
+
     if not company:
         raise HTTPException(status_code=404, detail="Company not found.")
 
@@ -126,7 +152,13 @@ def get_sector_scores(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
-    company = db.get(Company, company_id)
+    company = (
+        db.query(Company)
+        .filter(Company.id == company_id)
+        .filter(Company.is_active == True)
+        .first()
+    )
+
     if not company:
         raise HTTPException(status_code=404, detail="Company not found.")
 

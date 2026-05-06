@@ -8,6 +8,7 @@ Run five model families on multiple companies and return:
 from __future__ import annotations
 
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.models.company import Company
 from app.models.financial import ComputedMetric
@@ -48,6 +49,12 @@ def compare_companies(
         for c in db.query(Company).filter(Company.id.in_(company_ids)).all()
     }
 
+    mean_query = db.query(*[func.avg(getattr(ComputedMetric, k)).label(k) for k in _METRIC_KEYS])
+    if period:
+        mean_query = mean_query.filter(ComputedMetric.period == period)
+    mean_row = mean_query.first()
+    mean_map = {k: (float(getattr(mean_row, k)) if mean_row and getattr(mean_row, k) is not None else None) for k in _METRIC_KEYS}
+
     for cid in company_ids:
         company = company_map.get(cid)
         if not company:
@@ -81,7 +88,10 @@ def compare_companies(
 
         current_dict = _metrics_to_dict(current)
         previous_dict = _metrics_to_dict(previous) if previous else None
-
+        if mean_map:
+            current_dict = {k: (mean_map.get(k) if current_dict.get(k) is None else current_dict.get(k)) for k in _METRIC_KEYS}
+            if previous_dict:
+                previous_dict = {k: (mean_map.get(k) if previous_dict.get(k) is None else previous_dict.get(k)) for k in _METRIC_KEYS}
         per_model_scores: dict[str, float] = {}
         per_model_probs: dict[str, float] = {}
         model_warnings: list[str] = []

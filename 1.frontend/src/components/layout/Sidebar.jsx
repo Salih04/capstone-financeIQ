@@ -64,7 +64,7 @@ const s = {
   logoIcon: {
     width: 32,
     height: 32,
-    background: 'linear-gradient(135deg, var(--primary), #6366f1)',
+    background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
     borderRadius: 10,
     display: 'flex',
     alignItems: 'center',
@@ -163,7 +163,7 @@ const s = {
     width: 32,
     height: 32,
     borderRadius: 10,
-    background: 'linear-gradient(135deg, var(--primary-muted), #1e3a5f)',
+    background: 'linear-gradient(135deg, var(--primary-muted), rgba(85,194,195,0.25))',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -290,12 +290,12 @@ export default function Sidebar({ collapsed, onToggle }) {
       {/* Logo */}
       <Link to="/dashboard" style={s.logo}>
         <div style={s.logoIcon}>
-          <TrendingUp size={17} color="#fff" />
+          <TrendingUp size={17} color="#0b111a" />
         </div>
         {!collapsed && (
           <div>
-            <div style={s.logoText}>FinanceIQ</div>
-            <div style={s.logoSub}>Pro Platform</div>
+          <div style={s.logoText}>FinanceIQ</div>
+          <div style={s.logoSub}>Success DNA</div>
           </div>
         )}
       </Link>
@@ -337,40 +337,40 @@ export default function Sidebar({ collapsed, onToggle }) {
               padding: collapsed ? '10px' : '10px 14px',
               borderRadius: 12,
               background: isActive('/ai-search')
-                ? 'linear-gradient(135deg, rgba(0,245,212,0.2), rgba(99,102,241,0.15))'
-                : 'linear-gradient(135deg, rgba(0,245,212,0.08), rgba(99,102,241,0.06))',
-              border: '1px solid rgba(0,245,212,0.25)',
+                ? 'linear-gradient(135deg, rgba(244,176,74,0.2), rgba(85,194,195,0.15))'
+                : 'linear-gradient(135deg, rgba(244,176,74,0.08), rgba(85,194,195,0.06))',
+              border: '1px solid rgba(244,176,74,0.25)',
               textDecoration: 'none',
               transition: 'all 0.2s',
               cursor: 'pointer',
-              boxShadow: isActive('/ai-search') ? '0 0 16px rgba(0,245,212,0.2)' : '0 0 8px rgba(0,245,212,0.08)',
+              boxShadow: isActive('/ai-search') ? '0 0 16px rgba(244,176,74,0.2)' : '0 0 8px rgba(244,176,74,0.08)',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0,245,212,0.2), rgba(99,102,241,0.15))'
-              e.currentTarget.style.borderColor = 'rgba(0,245,212,0.4)'
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(0,245,212,0.25)'
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(244,176,74,0.2), rgba(85,194,195,0.15))'
+              e.currentTarget.style.borderColor = 'rgba(244,176,74,0.4)'
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(244,176,74,0.25)'
             }}
             onMouseLeave={e => {
               if (!isActive('/ai-search')) {
-                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0,245,212,0.08), rgba(99,102,241,0.06))'
-                e.currentTarget.style.borderColor = 'rgba(0,245,212,0.25)'
-                e.currentTarget.style.boxShadow = '0 0 8px rgba(0,245,212,0.08)'
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(244,176,74,0.08), rgba(85,194,195,0.06))'
+                e.currentTarget.style.borderColor = 'rgba(244,176,74,0.25)'
+                e.currentTarget.style.boxShadow = '0 0 8px rgba(244,176,74,0.08)'
               }
             }}
             title={collapsed ? 'AI Search' : undefined}
           >
             <div style={{
               width: 26, height: 26, borderRadius: 8, flexShrink: 0,
-              background: 'linear-gradient(135deg, var(--primary), #6366f1)',
+              background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(0,245,212,0.3)',
+              boxShadow: '0 2px 8px rgba(244,176,74,0.3)',
             }}>
               <Sparkles size={13} color="#fff" />
             </div>
             {!collapsed && (
               <>
                 <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--primary-hover)', flex: 1 }}>AI Search</span>
-                <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-3)', fontFamily: 'monospace', background: 'rgba(0,245,212,0.1)', borderRadius: 4, padding: '1px 5px' }}>
+                <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-3)', fontFamily: 'var(--font-mono)', background: 'rgba(244,176,74,0.1)', borderRadius: 4, padding: '1px 5px' }}>
                   {navigator.platform?.includes('Mac') ? '⌘' : '⌃'}K
                 </span>
               </>

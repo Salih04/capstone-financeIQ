@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GitCompare, Play, X, ChevronRight, Trophy, Search, Loader2, Filter, BarChart3, Zap } from 'lucide-react'
+import { GitCompare, Play, X, ChevronRight, Trophy, Search, Filter, Zap } from 'lucide-react'
 import api from '../api/client'
-import { Card, ScoreBadge, getBand, Skeleton, EmptyState, GhostButton, SectionHeader } from '../components/ui'
-
+import { Card, getBand, Skeleton, EmptyState, GhostButton, SectionHeader } from '../components/ui'
 const RANK_STYLES = [
   { color: '#fbbf24', label: '1' },
   { color: 'var(--text-2)', label: '2' },
@@ -11,20 +10,11 @@ const RANK_STYLES = [
 ]
 
 function generateQuarters() {
-  const quarters = []
-  const now = new Date()
-  let year = now.getFullYear()
-  let q = Math.ceil((now.getMonth() + 1) / 3)
-  while (!(year === 2022 && q < 1)) {
-    quarters.push(`${year}Q${q}`)
-    q--
-    if (q < 1) { q = 4; year-- }
-    if (year < 2022) break
-  }
-  return quarters
+  const years = [2025, 2024, 2023, 2022, 2021, 2020]
+  return years.map(y => `${y}Q4`)
 }
 const ALL_QUARTERS = generateQuarters()
-const FIVE_MODELS = ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'lstm']
+const ACTIVE_MODELS = ['elasticnet', 'random_forest']
 
 function formatApiError(err, fallback = 'Request failed.') {
   const detail = err?.response?.data?.detail
@@ -43,6 +33,7 @@ export default function ComparePage() {
   const [selected, setSelected] = useState(new Set())
   const [period, setPeriod] = useState('')
   const [results, setResults] = useState(null)
+  const [warnings, setWarnings] = useState([])
   const [modelOutputs, setModelOutputs] = useState({})
   const [ensembleWeights, setEnsembleWeights] = useState({})
   const [loading, setLoading] = useState(false)
@@ -56,7 +47,7 @@ export default function ComparePage() {
 
   useEffect(() => {
     api.get('/companies?limit=200')
-      .then(({ data }) => setCompanies(data))
+      .then(({ data }) => setCompanies(data || []))
       .catch(() => {})
       .finally(() => setCompLoading(false))
   }, [])
@@ -119,11 +110,12 @@ export default function ComparePage() {
       const { data } = await api.post('/scoring/compare', {
         company_ids: Array.from(selected),
         period: period || null,
-        selected_models: FIVE_MODELS,
+        selected_models: ACTIVE_MODELS,
       })
       finishProgress()
       await new Promise(r => setTimeout(r, 1200))
       setResults(data.items || [])
+      setWarnings(data.warnings || [])
       setModelOutputs(data.model_outputs || {})
       setEnsembleWeights(data.ensemble_weights || {})
     } catch (e) {
@@ -148,9 +140,14 @@ export default function ComparePage() {
   )
 
   const selectedCompanies = companies.filter(c => selected.has(c.id))
+  const companyWarnings = warnings.filter(w =>
+
+  w.toLowerCase().includes('excluded') || w.toLowerCase().includes('no computed metrics')
+
+)
 
   return (
-    <div style={{ maxWidth: 980, margin: '0 auto', padding: '2rem 1.5rem' }}>
+    <div style={{ maxWidth: 1040, margin: '0 auto', padding: '2.5rem 1.75rem' }}>
 
       {/* ── Loading overlay ── */}
       {loading && (
@@ -165,9 +162,9 @@ export default function ComparePage() {
           {/* Glow ring */}
           <div style={{
             width: 88, height: 88, borderRadius: '50%', marginBottom: 28,
-            background: 'radial-gradient(circle, rgba(0,245,212,0.18) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(244,176,74,0.2) 0%, transparent 70%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 40px rgba(0,245,212,0.25)',
+            boxShadow: '0 0 40px rgba(244,176,74,0.25)',
           }}>
             <GitCompare size={36} color='var(--primary)' style={{ animation: 'spin 2s linear infinite' }} />
           </div>
@@ -188,8 +185,8 @@ export default function ComparePage() {
             <div style={{
               height: '100%', borderRadius: 99,
               width: `${progress}%`,
-              background: 'linear-gradient(90deg, rgba(0,245,212,0.6) 0%, #00F5D4 100%)',
-              boxShadow: '0 0 12px rgba(0,245,212,0.6)',
+              background: 'linear-gradient(90deg, rgba(244,176,74,0.6) 0%, #F4B04A 100%)',
+              boxShadow: '0 0 12px rgba(244,176,74,0.6)',
               transition: 'width 0.12s linear',
             }} />
           </div>
@@ -206,8 +203,8 @@ export default function ComparePage() {
             {selectedCompanies.map(c => (
               <div key={c.id} style={{
                 padding: '4px 12px', borderRadius: 99,
-                background: 'rgba(0,245,212,0.08)',
-                border: '1px solid rgba(0,245,212,0.25)',
+                background: 'rgba(244,176,74,0.08)',
+                border: '1px solid rgba(244,176,74,0.25)',
                 fontSize: 12, color: 'var(--primary)', fontWeight: 600,
               }}>
                 {c.ticker}
@@ -219,10 +216,10 @@ export default function ComparePage() {
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       {/* Header */}
-      <div style={{ marginBottom: 24, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, var(--surface-2), rgba(0,245,212,0.04))', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-xl)', padding: '28px 32px' }}>
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,245,212,0.08), transparent)', pointerEvents: 'none' }} />
+      <div style={{ marginBottom: 24, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, var(--surface-2), rgba(244,176,74,0.08))', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-xl)', padding: '28px 32px' }}>
+        <div style={{ position: 'absolute', top: -60, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(85,194,195,0.12), transparent)', pointerEvents: 'none' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6, position: 'relative' }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, rgba(0,245,212,0.15), rgba(99,102,241,0.1))', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(0,245,212,0.2)' }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, rgba(244,176,74,0.2), rgba(85,194,195,0.12))', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(244,176,74,0.25)' }}>
             <GitCompare size={18} color="var(--primary)" />
           </div>
           <div>
@@ -391,8 +388,8 @@ export default function ComparePage() {
               background: 'var(--surface-1)', border: '1px solid var(--border-strong)',
               borderRadius: 'var(--radius-md)', padding: '8px 10px',
             }}>
-              <div style={{ fontWeight: 700, color: 'var(--primary)', marginBottom: 4 }}>Ensemble v1 (always-on)</div>
-              <div>ElasticNet + RandomForest + XGBoost + SARIMAX + LSTM</div>
+              <div style={{ fontWeight: 700, color: 'var(--primary)', marginBottom: 4 }}>Ensemble v1</div>
+              <div>ElasticNet + RandomForest</div>
             </div>
 
             <label style={{ display: 'block', fontSize: 12, color: 'var(--text-2)', marginBottom: 6 }}>Period</label>
@@ -455,44 +452,19 @@ export default function ComparePage() {
             style={{ marginBottom: 16 }}
           />
 
-          {/* Score distribution bar */}
-          {results.length > 0 && (
-            <Card style={{ padding: '16px 20px', marginBottom: 16, background: 'linear-gradient(135deg, var(--surface-2), rgba(0,245,212,0.03))' }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-2)', marginBottom: 12 }}>Score Distribution</div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 60 }}>
-                {results.map((r, i) => {
-                  const band = getBand(r.total_score)
-                  const pct = Math.max((r.total_score || 0), 5)
-                  return (
-                    <div key={r.company_id} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: band.color, fontVariantNumeric: 'tabular-nums' }}>
-                        {r.total_score?.toFixed(0)}
-                      </div>
-                      <div style={{
-                        width: '100%', maxWidth: 40, height: `${pct * 0.5}px`,
-                        background: `linear-gradient(180deg, ${band.color}, ${band.color}88)`,
-                        borderRadius: '4px 4px 0 0', transition: 'height 0.8s ease',
-                        minHeight: 4,
-                      }} />
-                      <div style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-3)', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 60 }}>
-                        {r.ticker}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, fontSize: 11, color: 'var(--text-3)' }}>
-                <span>Avg: <strong style={{ color: 'var(--text-1)' }}>{(results.reduce((s, r) => s + (r.total_score || 0), 0) / results.length).toFixed(1)}</strong></span>
-                <span>Spread: <strong style={{ color: 'var(--text-1)' }}>{(Math.max(...results.map(r => r.total_score || 0)) - Math.min(...results.map(r => r.total_score || 0))).toFixed(1)}</strong> pts</span>
-              </div>
-            </Card>
-          )}
+        {companyWarnings.length > 0 && (
+          <Card style={{ padding: '12px 16px', marginBottom: 16, border: '1px solid rgba(251,191,36,0.35)', background: 'rgba(251,191,36,0.08)' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#fbbf24', marginBottom: 6 }}>Excluded companies</div>
+            <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5 }}>
+              {companyWarnings.join(' · ')}
+            </div>
+          </Card>
+        )}
 
           {/* Ranking cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 20 }}>
             {results.slice(0, 3).map((r, idx) => {
               const band = getBand(r.total_score)
-              const rs = RANK_STYLES[idx] || RANK_STYLES[2]
               return (
                 <Card
                   key={r.company_id}

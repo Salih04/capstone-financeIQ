@@ -27,7 +27,7 @@ from app.models.forecasting import (
 )
 
 
-_ALLOWED_PRESET_PREFIXES = ("2023", "2024", "2025")
+_ALLOWED_PRESET_PREFIXES = ("2020", "2021", "2022", "2023", "2024", "2025")
 
 _FEATURE_COLUMNS: dict[str, str] = {
     "period_return": "period_return",
@@ -122,13 +122,26 @@ def _resolve_preset_file(file_name: str) -> Path:
     if not cleaned.lower().endswith(".xlsx"):
         raise ValueError("Only .xlsx files are accepted for preset import.")
     if not cleaned.startswith(_ALLOWED_PRESET_PREFIXES):
-        raise ValueError("Only 2023/2024/2025 preset files are allowed.")
+        raise ValueError("Only 2020-2025 preset files are allowed.")
 
     root = Path(__file__).resolve().parents[3]
-    candidates = list(root.glob("*.xlsx"))
-    for p in candidates:
-        if _normalize_text(p.name) == cleaned:
-            return p
+    normalized_cleaned = cleaned.replace("İ", "I").replace("ı", "i")
+    direct_path = Path(cleaned)
+    if direct_path.is_absolute() and direct_path.exists():
+        return direct_path
+
+    candidate_dirs = [root, root / "3.Datasets"]
+    for base in candidate_dirs:
+        direct = base / cleaned
+        if direct.exists():
+            return direct
+        direct_norm = base / normalized_cleaned
+        if direct_norm.exists():
+            return direct_norm
+        for p in base.glob("*.xlsx"):
+            pn = _normalize_text(p.name)
+            if pn == cleaned or pn == normalized_cleaned:
+                return p
     raise FileNotFoundError(f"Preset file not found: {cleaned}")
 
 
@@ -175,6 +188,14 @@ def import_winner_excel_preset(db: Session, file_name: str) -> dict[str, Any]:
 
     if not cmap["stock_code"] or not cmap["sector"]:
         raise ValueError("File must include company code and sector columns.")
+
+    # Apply median imputation per numeric feature column across the whole dataset
+    feature_cols = {src_key: cmap.get(src_key) for src_key in _FEATURE_COLUMNS if cmap.get(src_key)}
+    for col in feature_cols.values():
+        if col in df.columns:
+            numeric = pd.to_numeric(df[col], errors="coerce")
+            col_median = numeric.median()
+            df[col] = numeric.fillna(col_median)
 
     imported = 0
     skipped = 0
@@ -693,8 +714,8 @@ def run_forecast_for_sector(
     investment_scope: float | None = None,
     model_type: str = "scoring",
 ) -> dict[str, Any]:
-    if year < 2023 or year > 2025:
-        raise ValueError("Year must be between 2023 and 2025 for this dataset scope.")
+    if year < 2020 or year > 2025:
+        raise ValueError("Year must be between 2020 and 2025 for this dataset scope.")
 
     params = get_ranked_parameters(db, year=year, sector=sector)
     if not params:
@@ -930,7 +951,7 @@ def run_time_cv_evaluation(
     created_by_user_id: int | None = None,
 ) -> dict[str, Any]:
     years = sorted({r[0] for r in db.query(WinnerCohortRow.year).filter(WinnerCohortRow.sector == sector).distinct().all()})
-    years = [y for y in years if 2023 <= int(y) <= 2025]
+    years = [y for y in years if 2020 <= int(y) <= 2025]
     if len(years) < max(3, window_size + 1):
         raise ValueError("Not enough years for rolling-window evaluation.")
 
@@ -1072,7 +1093,7 @@ def get_yearly_trend_series(db: Session, stock_code: str, sector: str | None = N
 
 
 def get_sector_heatmap_data(db: Session, year: int) -> dict[str, Any]:
-    if year < 2023 or year > 2025:
+    if year < 2020 or year > 2025:
         return {"year": year, "heatmap": []}
     rows = db.query(WinnerCohortRow).filter(WinnerCohortRow.year == year).all()
     if not rows:
@@ -1206,7 +1227,7 @@ def get_stock_explanation(db: Session, run_id: int, stock_code: str) -> dict[str
 def get_available_filters(db: Session) -> dict[str, Any]:
     rows = db.query(WinnerCohortRow.year, WinnerCohortRow.sector).distinct().all()
     years = sorted({int(r[0]) for r in rows if r[0] is not None})
-    years = [y for y in years if 2023 <= y <= 2025]
+    years = [y for y in years if 2020 <= y <= 2025]
     sectors = sorted({str(r[1]) for r in rows if r[1]})
     return {"years": years, "sectors": sectors}
 

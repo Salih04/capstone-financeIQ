@@ -27,7 +27,7 @@ def compute_ratios(stmt: FinancialStatement) -> dict:
         # Leverage
         "debt_to_equity": _safe_div(stmt.total_liabilities, stmt.total_equity),
         "debt_to_assets": _safe_div(stmt.total_liabilities, stmt.total_assets),
-        # TODO: CLEANED_Financial currently does not include operating cash flow.
+        # NOTE: Source dataset may not include operating cash flow for every company/period.
         # Cash flow ratios are excluded from scoring until OCF data is added.
         # Future formulas:
         # ocf_to_debt = operating_cash_flow / total_liabilities

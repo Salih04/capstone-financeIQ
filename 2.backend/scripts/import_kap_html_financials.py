@@ -12,64 +12,70 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR / "docs" / "DATA_Financial"
 
 
-# ✅ 44 HİSSE — SOURCE OF TRUTH
+# ✅ 40 HİSSE — SOURCE OF TRUTH
 FULL_TICKERS = {
-    "AEFES","AKSA","AKSEN","ASELS","BIMAS","BRSAN","BSOKE","BTCIM",
-    "CCOLA","CIMSA","CLEBI","DOAS","ECILC","EGEEN","ENJSA","EREGL",
-    "FROTO","GENIL","GRSEL","GUBRF","KCAER","KRDMD","MAGEN","MAVI",
-    "MGROS","MIATK","MPARK","OTKAR","OYAKC","PGSUS","SOKM","TAVHL",
-    "TCELL","THYAO","TOASO","TRALT","TRENJ","TRMET","TTKOM","TTRAK",
-    "TUPRS","TUREX","ULKER","YEOTK"
+    "AEFES", "ARCLK", "ASELS", "ASTOR", "BIMAS", "BRSAN", "BTCIM", "CANTE",
+    "CCOLA", "CIMSA", "DOAS", "DSTKF", "ENKAI", "EREGL", "FROTO", "GUBRF",
+    "HEKTS", "KONTR", "KRDMD", "KUYAS", "MAVI", "MGROS", "MIATK", "OYAKC",
+    "PASEU", "PETKM", "PGSUS", "SASA", "SISE", "TAVHL", "TCELL", "THYAO",
+    "TOASO", "TRALT", "TRMET", "TSKB", "TTKOM", "TUPRS", "TURSG", "ULKER"
 }
 
 
-# 🔥 TÜM DOSYA ADI → TICKER MAP
+# Dosya adı / şirket adı → ticker map
 TICKER_NAME_HINTS = {
     "ANADOLU EFES": "AEFES",
-    "AKSA AKRILIK": "AKSA",
-    "AKSA ENERJI": "AKSEN",
+    "ARCELIK": "ARCLK",
+    "ARCLK": "ARCLK",
     "ASELSAN": "ASELS",
+    "ASTOR": "ASTOR",
     "BIM BIRLESIK": "BIMAS",
+    "BIM": "BIMAS",
     "BORUSAN": "BRSAN",
-    "BATISOKE": "BSOKE",
-    "SOKE CIMENTO": "BSOKE",
     "BATI ANADOLU CIMENTO": "BTCIM",
+    "BATI CIMENTO": "BTCIM",
+    "BTCIM": "BTCIM",
+    "CAN2 TERMIK": "CANTE",
+    "CAN 2 TERMIK": "CANTE",
+    "CANTE": "CANTE",
     "COCA COLA": "CCOLA",
+    "COCA-COLA": "CCOLA",
     "CIMSA": "CIMSA",
-    "CELEBI": "CLEBI",
     "DOGUS OTOMOTIV": "DOAS",
-    "ECZACIBASI": "ECILC",
-    "EGE ENDUSTRI": "EGEEN",
-    "ENERJISA": "ENJSA",
+    "DESTEK FINANS": "DSTKF",
+    "DSTKF": "DSTKF",
+    "ENKA": "ENKAI",
     "EREGLI": "EREGL",
     "FORD OTOMOTIV": "FROTO",
-    "GEN ILAC": "GENIL",
-    "GURSEL": "GRSEL",
     "GUBRE": "GUBRF",
-    "KOCAER": "KCAER",
+    "HEKTAS": "HEKTS",
+    "KONTROLMATIK": "KONTR",
     "KARDEMIR": "KRDMD",
-    "MARGUN": "MAGEN",
+    "KUYAS": "KUYAS",
     "MAVI": "MAVI",
     "MIGROS": "MGROS",
     "MIA TEKNOLOJI": "MIATK",
-    "MLP SAGLIK": "MPARK",
-    "OTOKAR": "OTKAR",
     "OYAK CIMENTO": "OYAKC",
+    "PASIFIK EURASIA": "PASEU",
+    "PASEU": "PASEU",
+    "PETKIM": "PETKM",
     "PEGASUS": "PGSUS",
-    "SOK MARKETLER": "SOKM",
+    "SASA": "SASA",
+    "SISE": "SISE",
+    "TURKIYE SISE": "SISE",
     "TAV": "TAVHL",
     "TURKCELL": "TCELL",
     "TURK HAVA": "THYAO",
     "TOFAS": "TOASO",
     "TRABZON LIMAN": "TRALT",
-    "TRENJ": "TRENJ",
-    "TURKIYE SISE": "TRMET",
+    "TRMET": "TRMET",
+    "TURKIYE SINAI KALKINMA": "TSKB",
+    "TSKB": "TSKB",
     "TURK TELEKOM": "TTKOM",
-    "TURK TRAKTOR": "TTRAK",
     "TUPRAS": "TUPRS",
-    "TUREX": "TUREX",
+    "TURKIYE SIGORTA": "TURSG",
+    "TURSG": "TURSG",
     "ULKER": "ULKER",
-    "YEO": "YEOTK",
 }
 
 
@@ -93,14 +99,12 @@ def normalize(text):
 def detect_ticker(filename):
     name = normalize(filename)
 
-    # 1. direkt ticker var mı?
-    for t in FULL_TICKERS:
-        if t in name:
-            return t
+    for ticker in FULL_TICKERS:
+        if ticker in name:
+            return ticker
 
-    # 2. isimden eşleş
     for hint, ticker in TICKER_NAME_HINTS.items():
-        if normalize(hint) in name:
+        if ticker in FULL_TICKERS and normalize(hint) in name:
             return ticker
 
     return None
@@ -109,17 +113,21 @@ def detect_ticker(filename):
 def parse_number(x):
     if pd.isna(x):
         return None
+
     s = str(x).replace(".", "").replace(",", ".")
+
     try:
         return float(s)
-    except:
+    except Exception:
         return None
 
 
 def detect_multiplier(df):
     text = normalize(" ".join(df.astype(str).values.flatten()))
+
     if "BIN TL" in text or "1000 TL" in text:
         return 1000
+
     return 1
 
 
@@ -129,22 +137,31 @@ def find_periods(df):
 
 def upsert_company(db, ticker):
     c = db.query(Company).filter_by(ticker=ticker).first()
+
     if not c:
         c = Company(ticker=ticker, company_name=ticker, is_active=True)
         db.add(c)
         db.flush()
+
+    c.is_active = ticker in FULL_TICKERS
+
     return c
 
 
-def upsert_fs(db, cid, period, values):
-    fs = db.query(FinancialStatement).filter_by(company_id=cid, period=period).first()
+def upsert_fs(db, company_id, period, values):
+    fs = (
+        db.query(FinancialStatement)
+        .filter_by(company_id=company_id, period=period)
+        .first()
+    )
+
     if not fs:
-        fs = FinancialStatement(company_id=cid, period=period)
+        fs = FinancialStatement(company_id=company_id, period=period)
         db.add(fs)
 
-    for k, v in values.items():
-        if hasattr(fs, k):
-            setattr(fs, k, v)
+    for field, value in values.items():
+        if hasattr(fs, field):
+            setattr(fs, field, value)
 
 
 def parse_file(path):
@@ -161,7 +178,7 @@ def parse_file(path):
         if df.shape[1] < 2:
             continue
 
-        mult = detect_multiplier(df)
+        multiplier = detect_multiplier(df)
         periods = find_periods(df)
 
         if not periods:
@@ -177,13 +194,14 @@ def parse_file(path):
 
             field = ROW_MAP[label]
 
-            for p in periods:
-                if p not in result:
-                    result[p] = {}
+            for period in periods:
+                if period not in result:
+                    result[period] = {}
 
-                val = parse_number(row[p])
-                if val is not None:
-                    result[p][field] = val * mult
+                value = parse_number(row[period])
+
+                if value is not None:
+                    result[period][field] = value * multiplier
 
     return ticker, result
 
@@ -198,8 +216,9 @@ def main():
 
         imported = set()
 
-        for f in files:
-            ticker, data = parse_file(f)
+        for file in files:
+            ticker, data = parse_file(file)
+
             if not ticker:
                 continue
 
@@ -211,17 +230,24 @@ def main():
             imported.add(ticker)
             print("✔", ticker, len(data), "periods")
 
+        db.query(Company).filter(~Company.ticker.in_(FULL_TICKERS)).update(
+            {Company.is_active: False},
+            synchronize_session=False,
+        )
+
         missing = FULL_TICKERS - imported
 
         db.commit()
 
         print("\nDONE")
+        print("Expected:", len(FULL_TICKERS))
         print("Imported:", len(imported))
-        print("Missing:", missing)
+        print("Missing:", sorted(missing))
 
     except Exception as e:
         db.rollback()
         print("ERROR:", e)
+        raise
     finally:
         db.close()
 
