@@ -21,6 +21,7 @@ from app.models.governance import LabelDefinition
 from app.services.ratio_service import compute_ratios, upsert_computed_metrics
 from app.services.transition_service import compute_transitions_for_company
 from app.services.sector_service import recompute_sector_benchmarks, recompute_sector_normalized
+from scripts.import_datasets import main as import_datasets
 
 # Wait for Postgres to be ready before doing anything
 MAX_RETRIES = 20
@@ -38,6 +39,20 @@ else:
     sys.exit(1)
 
 Base.metadata.create_all(bind=engine)
+
+# ── Schema migrations: add new columns to existing tables ────────────────────
+_NEW_COMPUTED_METRIC_COLS = [
+    "gross_profit_margin", "ebitda_margin", "roic",
+    "revenue_growth", "ebitda_growth", "net_income_growth",
+    "pe_ratio", "pb_ratio", "ev_ebitda", "ev_sales", "peg_ratio", "working_capital",
+]
+
+with engine.begin() as _conn:
+    for _col in _NEW_COMPUTED_METRIC_COLS:
+        _conn.execute(text(
+            f"ALTER TABLE computed_metrics ADD COLUMN IF NOT EXISTS {_col} FLOAT"
+        ))
+    # stock_returns is created by create_all above (new table), so no ALTER needed
 
 COMPANIES = [
     {"ticker": "ASELS", "company_name": "Aselsan Elektronik Sanayi ve Ticaret A.Ş.", "sector": "Savunma & Havacılık", "sector_code": "SAVUNMA"},
@@ -91,6 +106,26 @@ COMPANIES = [
     {"ticker": "VESTL",  "company_name": "Vestel Elektronik Sanayi ve Ticaret A.Ş.",            "sector": "Elektronik",              "sector_code": "ELEKTRONIK"},
     {"ticker": "ARCLK",  "company_name": "Arçelik A.Ş.",                                         "sector": "Dayanıklı Tüketim",       "sector_code": "TUKETIM"},
     {"ticker": "TAVHL",  "company_name": "TAV Havalimanları Holding A.Ş.",                       "sector": "Havacılık & Ulaşım",      "sector_code": "HAVACILIK"},
+    # ── Additional companies from 3.Datasets ────────────────────────────────
+    {"ticker": "ASTOR",  "company_name": "Astor Enerji A.Ş.",                                    "sector": "Enerji",                  "sector_code": "ENERJI"},
+    {"ticker": "BRSAN",  "company_name": "Borçelik Çelik Sanayii T.A.Ş.",                       "sector": "Demir-Çelik",             "sector_code": "DEMIR_CELIK"},
+    {"ticker": "BTCIM",  "company_name": "Batıçim Batı Anadolu Çimento Sanayii A.Ş.",           "sector": "Çimento",                 "sector_code": "CIMENTO"},
+    {"ticker": "CANTE",  "company_name": "Cante Yazılım ve Bilgi Teknolojileri A.Ş.",           "sector": "Teknoloji",               "sector_code": "TEKNOLOJI"},
+    {"ticker": "CCOLA",  "company_name": "Coca-Cola İçecek A.Ş.",                                "sector": "Gıda & İçecek",           "sector_code": "GIDA"},
+    {"ticker": "CIMSA",  "company_name": "Çimsa Çimento Sanayi ve Ticaret A.Ş.",               "sector": "Çimento",                 "sector_code": "CIMENTO"},
+    {"ticker": "DSTKF",  "company_name": "Doğuş Teknoloji ve Finansman A.Ş.",                   "sector": "Finans",                  "sector_code": "FINANS"},
+    {"ticker": "GUBRF",  "company_name": "Gübre Fabrikaları T.A.Ş.",                             "sector": "Kimya",                   "sector_code": "KIMYA"},
+    {"ticker": "HEKTS",  "company_name": "Hektaş Ticaret T.A.Ş.",                               "sector": "Kimya",                   "sector_code": "KIMYA"},
+    {"ticker": "KONTR",  "company_name": "Kontrolmatik Teknoloji A.Ş.",                          "sector": "Teknoloji",               "sector_code": "TEKNOLOJI"},
+    {"ticker": "KUYAS",  "company_name": "Kuyaş Yatırım ve Gayrimenkul A.Ş.",                   "sector": "Gayrimenkul",             "sector_code": "GAYRIMENKUL"},
+    {"ticker": "MAVI",   "company_name": "Mavi Giyim Sanayi ve Ticaret A.Ş.",                   "sector": "Tekstil & Perakende",     "sector_code": "TEKSTIL"},
+    {"ticker": "MIATK",  "company_name": "MİA Teknoloji A.Ş.",                                   "sector": "Teknoloji",               "sector_code": "TEKNOLOJI"},
+    {"ticker": "OYAKC",  "company_name": "Oyak Çimento Fabrikaları A.Ş.",                       "sector": "Çimento",                 "sector_code": "CIMENTO"},
+    {"ticker": "PASEU",  "company_name": "Paşabahçe Cam Sanayi ve Ticaret A.Ş.",               "sector": "Cam",                     "sector_code": "CAM"},
+    {"ticker": "TRALT",  "company_name": "Trakya Alüminyum Sanayi A.Ş.",                         "sector": "Metal",                   "sector_code": "METAL"},
+    {"ticker": "TRMET",  "company_name": "Trakya Metal Sanayi A.Ş.",                             "sector": "Metal",                   "sector_code": "METAL"},
+    {"ticker": "TSKB",   "company_name": "Türkiye Sınai Kalkınma Bankası A.Ş.",                 "sector": "Bankacılık",              "sector_code": "BANKACILIK"},
+    {"ticker": "TURSG",  "company_name": "Türkiye Sigorta A.Ş.",                                 "sector": "Sigorta",                 "sector_code": "SIGORTA"},
 ]
 
 FLOAT_COLS = [
@@ -99,80 +134,14 @@ FLOAT_COLS = [
     "operating_income", "gross_profit", "inventory",
 ]
 
-# Synthetic financial parameters for new non-financial companies.
-# fmt: (ticker, rev_q4, ni_pct, assets_q4, eq_pct, ca_pct, cl_pct,
-#        cash_pct_of_assets, ocf_pct, op_pct, gp_pct, inv_pct_of_rev)
-SYNTHETIC_DATA = [
-    ("TTKOM",   62_000_000_000, 0.18, 130_000_000_000, 0.38, 0.25, 0.22, 0.08, 0.25, 0.28, 0.38, 0.00),
-    ("TCELL",   78_000_000_000, 0.15, 148_000_000_000, 0.35, 0.22, 0.20, 0.07, 0.22, 0.25, 0.35, 0.00),
-    ("NETAS",    2_500_000_000, 0.08,   6_000_000_000, 0.45, 0.50, 0.35, 0.12, 0.10, 0.12, 0.25, 0.15),
-    ("LOGO",     3_500_000_000, 0.22,  10_000_000_000, 0.55, 0.45, 0.25, 0.15, 0.25, 0.27, 0.62, 0.00),
-    ("INDES",   14_000_000_000, 0.03,  10_000_000_000, 0.30, 0.70, 0.55, 0.08, 0.04, 0.04, 0.08, 0.25),
-    ("ARENA",   11_000_000_000, 0.03,   8_000_000_000, 0.28, 0.72, 0.57, 0.06, 0.04, 0.04, 0.07, 0.22),
-    ("TUPRS",  280_000_000_000, 0.05, 190_000_000_000, 0.30, 0.35, 0.28, 0.06, 0.06, 0.08, 0.12, 0.15),
-    ("PETKM",   48_000_000_000, 0.08,  65_000_000_000, 0.42, 0.30, 0.22, 0.08, 0.10, 0.12, 0.20, 0.18),
-    ("AYGAZ",   28_000_000_000, 0.08,  22_000_000_000, 0.50, 0.40, 0.28, 0.10, 0.10, 0.12, 0.20, 0.10),
-    ("AKSEN",   14_000_000_000, 0.06,  32_000_000_000, 0.38, 0.20, 0.18, 0.05, 0.15, 0.18, 0.35, 0.02),
-    ("AKENR",    9_000_000_000, 0.05,  22_000_000_000, 0.35, 0.18, 0.16, 0.05, 0.14, 0.17, 0.32, 0.02),
-    ("MGROS",   62_000_000_000, 0.03,  32_000_000_000, 0.35, 0.55, 0.48, 0.05, 0.05, 0.06, 0.20, 0.20),
-    ("SOKM",    48_000_000_000, 0.02,  20_000_000_000, 0.30, 0.55, 0.50, 0.04, 0.04, 0.05, 0.18, 0.22),
-    ("ADESE",   10_000_000_000, 0.02,   6_000_000_000, 0.35, 0.50, 0.45, 0.04, 0.04, 0.05, 0.18, 0.20),
-    ("HEPSI",   13_000_000_000,-0.02,  10_000_000_000, 0.35, 0.60, 0.50, 0.10, 0.02, 0.01, 0.35, 0.10),
-    ("KRDMD",   22_000_000_000, 0.10,  35_000_000_000, 0.45, 0.40, 0.28, 0.08, 0.14, 0.17, 0.28, 0.22),
-    ("ANACM",    9_000_000_000, 0.12,  16_000_000_000, 0.52, 0.35, 0.22, 0.09, 0.15, 0.18, 0.30, 0.15),
-    ("TRKCM",   26_000_000_000, 0.13,  38_000_000_000, 0.50, 0.32, 0.20, 0.08, 0.16, 0.19, 0.32, 0.14),
-    ("CEMTS",   14_000_000_000, 0.12,  18_000_000_000, 0.55, 0.28, 0.18, 0.08, 0.16, 0.18, 0.35, 0.08),
-    ("ENKAI",   55_000_000_000, 0.15, 110_000_000_000, 0.50, 0.30, 0.18, 0.08, 0.18, 0.20, 0.35, 0.05),
-    ("TEKFEN",  42_000_000_000, 0.12,  55_000_000_000, 0.45, 0.45, 0.33, 0.10, 0.15, 0.18, 0.28, 0.05),
-    ("AKCNS",   15_000_000_000, 0.18,  19_000_000_000, 0.58, 0.30, 0.18, 0.08, 0.20, 0.22, 0.38, 0.07),
-    ("BUCIM",    6_000_000_000, 0.16,   9_000_000_000, 0.55, 0.30, 0.18, 0.07, 0.18, 0.20, 0.36, 0.07),
-    ("TOASO",   72_000_000_000, 0.09,  65_000_000_000, 0.42, 0.38, 0.28, 0.07, 0.11, 0.12, 0.20, 0.18),
-    ("DOAS",    42_000_000_000, 0.04,  25_000_000_000, 0.35, 0.55, 0.45, 0.06, 0.05, 0.06, 0.12, 0.25),
-    ("OTKAR",   12_000_000_000, 0.14,  18_000_000_000, 0.45, 0.45, 0.35, 0.10, 0.16, 0.18, 0.30, 0.20),
-    ("ULKER",   48_000_000_000, 0.08,  38_000_000_000, 0.45, 0.35, 0.25, 0.06, 0.10, 0.12, 0.32, 0.15),
-    ("AEFES",   38_000_000_000, 0.09,  58_000_000_000, 0.42, 0.30, 0.22, 0.07, 0.12, 0.14, 0.45, 0.12),
-    ("TATGD",    6_000_000_000, 0.06,   7_000_000_000, 0.45, 0.40, 0.30, 0.06, 0.08, 0.10, 0.25, 0.18),
-    ("BANVT",    9_000_000_000, 0.05,   8_000_000_000, 0.42, 0.38, 0.30, 0.05, 0.07, 0.08, 0.22, 0.20),
-    ("KERVT",    7_000_000_000, 0.05,   7_000_000_000, 0.42, 0.40, 0.32, 0.05, 0.07, 0.09, 0.22, 0.20),
-    ("PGSUS",   45_000_000_000, 0.10,  72_000_000_000, 0.38, 0.28, 0.22, 0.08, 0.14, 0.15, 0.30, 0.02),
-    ("ECILC",    9_000_000_000, 0.10,  14_000_000_000, 0.48, 0.42, 0.28, 0.08, 0.12, 0.13, 0.35, 0.18),
-    ("DEVA",     8_000_000_000, 0.08,  13_000_000_000, 0.46, 0.40, 0.28, 0.07, 0.10, 0.12, 0.33, 0.20),
-    ("HURGZ",    4_000_000_000, 0.05,   7_000_000_000, 0.45, 0.45, 0.32, 0.10, 0.08, 0.10, 0.40, 0.00),
-    ("RYSAS",    4_000_000_000, 0.15,  14_000_000_000, 0.55, 0.25, 0.15, 0.06, 0.20, 0.22, 0.45, 0.00),
-    ("SASA",    32_000_000_000, 0.08,  45_000_000_000, 0.38, 0.30, 0.22, 0.05, 0.10, 0.12, 0.20, 0.20),
-    ("VESBE",   35_000_000_000, 0.07,  28_000_000_000, 0.38, 0.45, 0.38, 0.06, 0.09, 0.10, 0.28, 0.20),
-    ("VESTL",   45_000_000_000, 0.07,  40_000_000_000, 0.35, 0.50, 0.40, 0.05, 0.08, 0.10, 0.25, 0.22),
-    ("ARCLK",  112_000_000_000, 0.08, 145_000_000_000, 0.35, 0.42, 0.32, 0.06, 0.10, 0.12, 0.32, 0.18),
-    ("TAVHL",   32_000_000_000, 0.12,  82_000_000_000, 0.40, 0.25, 0.18, 0.07, 0.16, 0.18, 0.55, 0.00),
-]
-
+# Synthetic financial parameters are disabled. The app relies solely on
+# uploaded datasets in 3.Datasets.
+SYNTHETIC_DATA = []
 
 def _syn_financial_rows(ticker, rev4, ni_pct, assets4, eq_pct, ca_pct, cl_pct,
                          cash_pct, ocf_pct, op_pct, gp_pct, inv_pct):
-    """Return 4 quarterly financial-data dicts for seed insertion (2023Q1–Q4)."""
-    rev_factors   = [0.70, 0.80, 0.90, 1.00]
-    asset_factors = [0.90, 0.93, 0.96, 1.00]
-    rows = []
-    for i, period in enumerate(["2023Q1", "2023Q2", "2023Q3", "2023Q4"]):
-        rev   = int(rev4   * rev_factors[i])
-        ta    = int(assets4 * asset_factors[i])
-        eq    = int(ta * eq_pct)
-        rows.append({
-            "ticker": ticker, "period": period,
-            "revenue":            rev,
-            "net_income":         int(rev * ni_pct),
-            "total_assets":       ta,
-            "total_equity":       eq,
-            "total_liabilities":  ta - eq,
-            "current_assets":     int(ta  * ca_pct),
-            "current_liabilities":int(ta  * cl_pct),
-            "cash":               int(ta  * cash_pct),
-            "operating_cash_flow":int(rev * ocf_pct),
-            "operating_income":   int(rev * op_pct),
-            "gross_profit":       int(rev * gp_pct),
-            "inventory":          int(rev * inv_pct),
-        })
-    return rows
+    """Deprecated: synthetic seed data disabled by default."""
+    return []
 
 # Default rule-based scoring model seeded on first run
 DEFAULT_MODEL = {
@@ -197,8 +166,6 @@ DEFAULT_MODEL = {
 
 
 def seed():
-    import csv, os
-
     db = SessionLocal()
     try:
         # ── Companies ───────────────────────────────────────────────────────
@@ -213,96 +180,15 @@ def seed():
         db.commit()
         print(f"[seed] {len(COMPANIES)} companies upserted.")
 
-        # ── Financial data ──────────────────────────────────────────────────
-        csv_path = os.path.join(os.path.dirname(__file__), "seed_data", "financial_data.csv")
-        with open(csv_path, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            count = 0
-            affected_companies: set[int] = set()
-            affected_periods: set[str] = set()
-            for row in reader:
-                ticker = row["ticker"].strip().upper()
-                period = row["period"].strip()
-                company = db.query(Company).filter(Company.ticker == ticker).first()
-                if not company:
-                    continue
+        # ── Financial data from 3.Datasets xlsx ────────────────────────────
+        print("[seed] Importing datasets from 3.Datasets…")
+        import_datasets()
 
-                existing = (
-                    db.query(FinancialStatement)
-                    .filter(
-                        FinancialStatement.company_id == company.id,
-                        FinancialStatement.period == period,
-                    )
-                    .first()
-                )
-                data = {col: (float(row[col]) if row.get(col) else None) for col in FLOAT_COLS}
-
-                if existing:
-                    for k, v in data.items():
-                        setattr(existing, k, v)
-                    db.commit()
-                    db.refresh(existing)
-                    stmt = existing
-                else:
-                    stmt = FinancialStatement(
-                        company_id=company.id,
-                        period=period,
-                        source_name="seed",
-                        **data,
-                    )
-                    db.add(stmt)
-                    db.commit()
-                    db.refresh(stmt)
-
-                ratios = compute_ratios(stmt)
-                upsert_computed_metrics(db, company.id, period, ratios)
-
-                affected_companies.add(company.id)
-                affected_periods.add(period)
-                count += 1
-            print(f"[seed] {count} financial records imported.")
-
-        # ── Synthetic financial data for new non-financial companies ────────
-        print("[seed] Inserting synthetic financial data for new companies…")
-        syn_count = 0
-        for params in SYNTHETIC_DATA:
-            for row in _syn_financial_rows(*params):
-                ticker = row["ticker"]
-                period = row["period"]
-                company = db.query(Company).filter(Company.ticker == ticker).first()
-                if not company:
-                    continue
-                existing = (
-                    db.query(FinancialStatement)
-                    .filter(
-                        FinancialStatement.company_id == company.id,
-                        FinancialStatement.period == period,
-                    )
-                    .first()
-                )
-                data = {col: row.get(col) for col in FLOAT_COLS}
-                if existing:
-                    for k, v in data.items():
-                        setattr(existing, k, v)
-                    db.commit()
-                    db.refresh(existing)
-                    stmt = existing
-                else:
-                    stmt = FinancialStatement(
-                        company_id=company.id,
-                        period=period,
-                        source_name="synthetic",
-                        **data,
-                    )
-                    db.add(stmt)
-                    db.commit()
-                    db.refresh(stmt)
-                ratios = compute_ratios(stmt)
-                upsert_computed_metrics(db, company.id, period, ratios)
-                affected_companies.add(company.id)
-                affected_periods.add(period)
-                syn_count += 1
-        print(f"[seed] {syn_count} synthetic financial records inserted.")
+        # Collect all company IDs and periods for post-processing
+        from app.models.financial import ComputedMetric as CM
+        _metrics = db.query(CM.company_id, CM.period).distinct().all()
+        affected_companies: set[int] = {r[0] for r in _metrics}
+        affected_periods: set[str] = {r[1] for r in _metrics}
 
         # ── V2 post-processing ──────────────────────────────────────────────
         print("[seed] Computing transitions…")
@@ -382,4 +268,3 @@ def seed():
 if __name__ == "__main__":
     seed()
     print("[seed] Done.")
-

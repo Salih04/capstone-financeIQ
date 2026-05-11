@@ -1,7 +1,6 @@
 """
-Run this script to regenerate financial_data.csv with multi-year,
-multi-company coverage: 2022Q1 → 2025Q2 for 25+ BIST companies.
-Usage: python generate_data.py
+Deprecated: This generator is no longer used.
+The app now relies solely on datasets in 3.Datasets.
 """
 import csv
 import os
@@ -24,7 +23,7 @@ QM = {1: 0.68, 2: 0.82, 3: 0.92, 4: 1.00}
 YEAR_GROWTH = {2022: 1.72, 2023: 1.48, 2024: 1.32}
 
 def scale_year(base_2023q4_rev, target_year):
-    """Scale 2023Q4 revenue to a given year's Q4 baseline."""
+    """Scale 2023/12 revenue to a given year's Q4 baseline."""
     v = base_2023q4_rev
     if target_year < 2023:
         for y in range(target_year, 2023):
@@ -36,7 +35,7 @@ def scale_year(base_2023q4_rev, target_year):
 
 def build_row(ticker, year, quarter, base):
     """
-    base = dict with 2023Q4 financials.
+    base = dict with 2023/12 financials.
     Scale everything proportionally to revenue scale factor.
     """
     yr_rev = scale_year(base["rev"], year)

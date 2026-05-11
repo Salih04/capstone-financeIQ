@@ -74,7 +74,7 @@ function ScoreRunRow({ run, onClick }) {
           {run.ticker || run.company_name || `Company #${run.company_id}`}
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 1 }}>
-          {run.model_name} · {run.period}
+          {run.period}
         </div>
       </div>
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
@@ -89,6 +89,7 @@ function ScoreRunRow({ run, onClick }) {
 }
 
 function CompanyRow({ company, onClick }) {
+  const sectorLabel = company.sector || (company.sector_code || '').replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, m => m.toUpperCase())
   return (
     <div
       onClick={onClick}
@@ -115,9 +116,9 @@ function CompanyRow({ company, onClick }) {
           {company.company_name}
         </div>
       </div>
-      {company.sector && (
+      {sectorLabel && (
         <span style={{ fontSize: 11, color: 'var(--text-3)', background: 'var(--surface-3)', borderRadius: 5, padding: '2px 8px', whiteSpace: 'nowrap' }}>
-          {company.sector}
+          {sectorLabel}
         </span>
       )}
       <ChevronRight size={14} style={{ color: 'var(--text-3)', flexShrink: 0 }} />

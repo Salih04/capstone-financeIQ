@@ -39,6 +39,14 @@ const SECTOR_LABELS = {
   HOLDING: 'Holding', TEKSTIL: 'Textile', INSAAT: 'Construction',
 }
 
+const formatSectorCode = (value) => {
+  if (!value) return ''
+  return String(value)
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (m) => m.toUpperCase())
+}
+
 const SUGGESTED_QUERIES = [
   'tech companies', 'banking sector', 'energy companies', 'automotive industry',
   'pharma stocks', 'defense sector', 'logistics companies', 'holding companies',
@@ -116,7 +124,7 @@ function CompanyCard({ company: c, compareMode, selected, onToggleCompare, onCli
           padding: '2px 8px', marginRight: 6,
           textTransform: 'uppercase', letterSpacing: 0.4,
         }}>
-          {SECTOR_LABELS[c.sector_code] || c.sector_code}
+          {SECTOR_LABELS[c.sector_code] || formatSectorCode(c.sector_code)}
         </span>
       )}
 
@@ -399,7 +407,7 @@ export default function AISearchPage() {
                 fontSize: 11, fontWeight: 600, color: '#22c55e',
                 background: 'rgba(34,197,94,0.1)', borderRadius: 5, padding: '2px 8px',
               }}>
-                {SECTOR_LABELS[s] || s}
+                  {SECTOR_LABELS[s] || formatSectorCode(s)}
               </span>
             ))}
           </div>
@@ -623,7 +631,7 @@ export default function AISearchPage() {
                   padding: '2px 8px', textTransform: 'uppercase', letterSpacing: 0.4,
                   whiteSpace: 'nowrap',
                 }}>
-                  {SECTOR_LABELS[c.sector_code] || c.sector_code}
+                  {SECTOR_LABELS[c.sector_code] || formatSectorCode(c.sector_code)}
                 </span>
               )}
               <ChevronRight size={14} style={{ color: 'var(--text-3)', flexShrink: 0 }} />

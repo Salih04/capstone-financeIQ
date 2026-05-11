@@ -18,6 +18,7 @@ from app.schemas.scoring import (
 from app.services.comparison_service import compare_companies
 from app.services.scoring_service import ModelScoringUnavailable, run_multi_model_score, run_score
 from app.services.explanation_service import build_rich_explanations
+from app.services.adaptive_weights_service import compute_adaptive_weights
 
 router = APIRouter(tags=["scoring"])
 
@@ -94,6 +95,21 @@ def score_company(
     if body.custom_weights:
         custom_weights = body.custom_weights
 
+    # Adaptive weights: compute data-driven adjustments from historical returns
+    adaptive_weights_info: dict | None = None
+    if body.use_adaptive_weights:
+        from app.services.scoring_service import _RULE_WEIGHTS
+        base_w = custom_weights or _RULE_WEIGHTS.copy()
+        sector_code = company.sector_code if hasattr(company, "sector_code") else None
+        adaptive_weights_info = compute_adaptive_weights(
+            target_period=current_metric.period,
+            base_weights=base_w,
+            db=db,
+            sector_code=sector_code,
+        )
+        if adaptive_weights_info.get("sufficient_data"):
+            custom_weights = adaptive_weights_info["adjusted_weights"]
+
     try:
         if body.ensemble or body.selected_models:
             result = run_multi_model_score(
@@ -127,6 +143,8 @@ def score_company(
     )
 
     rich = v3_result.get("rich_explanation", {})
+    if adaptive_weights_info:
+        rich["adaptive_weights"] = adaptive_weights_info
     confidence_flag = (
         "high" if rich.get("data_completeness", 0) >= 0.9
         else "medium" if rich.get("data_completeness", 0) >= 0.6
@@ -250,6 +268,37 @@ def compare_stocks(
         model_outputs=comparison.get("model_outputs", {}),
         ensemble_weights=comparison.get("ensemble_weights", {}),
     )
+
+
+@router.get("/scoring/adaptive-weights")
+def preview_adaptive_weights(
+    period: str,
+    sector_code: str | None = None,
+    scoring_model_id: int | None = None,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    """
+    Preview the weight adjustments that adaptive scoring would apply for a given period.
+    Returns the adjusted weights + per-category correlation analysis.
+    """
+    from app.services.scoring_service import _RULE_WEIGHTS
+    base_weights: dict
+    if scoring_model_id:
+        model = db.get(ScoringModel, scoring_model_id)
+        if not model:
+            raise HTTPException(status_code=404, detail="Scoring model not found.")
+        base_weights = {m.feature_name: m.weight for m in (model.metrics or [])}
+    else:
+        base_weights = _RULE_WEIGHTS.copy()
+
+    result = compute_adaptive_weights(
+        target_period=period,
+        base_weights=base_weights,
+        db=db,
+        sector_code=sector_code,
+    )
+    return result
 
 
 @router.get("/score-runs/{run_id}", response_model=ScoreRunOut)

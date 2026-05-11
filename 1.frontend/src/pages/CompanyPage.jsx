@@ -70,10 +70,10 @@ const METRIC_GROUPS = [
 ]
 
 const SCORING_PRESETS = [
-  { key: 'all',          label: '5-Model Ensemble', desc: 'ElasticNet + RF + XGBoost + SARIMAX + TFT', selected_models: ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'tft'] },
-  { key: 'stable',       label: 'Stability Focus',  desc: 'ElasticNet + RF + SARIMAX', selected_models: ['elasticnet', 'random_forest', 'sarimax'] },
-  { key: 'growth',       label: 'Growth Focus',     desc: 'RF + XGBoost + TFT', selected_models: ['random_forest', 'xgboost', 'tft'] },
-  { key: 'interpretable',label: 'Interpretable',    desc: 'ElasticNet + RF', selected_models: ['elasticnet', 'random_forest'] },
+  { key: 'all', label: 'Balanced Ensemble', desc: 'Blends multiple approaches for a stable overall score.', selected_models: ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'tft'] },
+  { key: 'stable', label: 'Stability Focus', desc: 'Emphasizes consistency and lower volatility signals.', selected_models: ['elasticnet', 'random_forest', 'sarimax'] },
+  { key: 'growth', label: 'Growth Focus', desc: 'Prioritizes expansion and momentum indicators.', selected_models: ['random_forest', 'xgboost', 'tft'] },
+  { key: 'interpretable', label: 'Transparent Focus', desc: 'Simpler signals for easier interpretation.', selected_models: ['elasticnet', 'random_forest'] },
 ]
 
 const TABS = [
@@ -85,15 +85,59 @@ const TABS = [
   { value: 'score', label: 'Run Analysis', icon: Play },
 ]
 
-// Q4-only periods for available datasets
+// 20xx/12 -only periods for available datasets
 const ALL_QUARTERS = [
-  '2025Q4',
-  '2024Q4',
-  '2023Q4',
-  '2022Q4',
-  '2021Q4',
-  '2020Q4',
+  '2025/12',
+  '2024/12',
+  '2023/12',
+  '2022/12',
+  '2021/12',
+  '2020/12',
 ]
+
+const METRIC_LABELS = {
+  roa: 'ROA',
+  roe: 'ROE',
+  operating_margin: 'Operating Margin',
+  net_margin: 'Net Margin',
+  current_ratio: 'Current Ratio',
+  quick_ratio: 'Quick Ratio',
+  cash_ratio: 'Cash Ratio',
+  debt_to_equity: 'Debt / Equity',
+  debt_to_assets: 'Debt / Assets',
+  ocf_to_debt: 'OCF / Debt',
+  ocf_to_assets: 'OCF / Assets',
+  cash_flow_margin: 'Cash Flow Margin',
+}
+
+const TOKEN_LABELS = {
+  roa: 'ROA',
+  roe: 'ROE',
+  ocf: 'OCF',
+  ebit: 'EBIT',
+  ytd: 'YTD',
+}
+
+const formatMetricLabel = (value) => {
+  if (!value) return '—'
+  const raw = String(value)
+  const key = raw.toLowerCase()
+  if (METRIC_LABELS[key]) return METRIC_LABELS[key]
+  const tokens = raw.replace(/_/g, ' ').split(' ')
+  return tokens.map((t) => {
+    const k = t.toLowerCase()
+    if (TOKEN_LABELS[k]) return TOKEN_LABELS[k]
+    return t.charAt(0).toUpperCase() + t.slice(1)
+  }).join(' ')
+}
+
+const formatSectorCode = (value) => {
+  if (!value) return ''
+  return String(value)
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (m) => m.toUpperCase())
+}
 
 function MetricCardGroup({ group, metric }) {
   return (
@@ -149,16 +193,17 @@ export default function CompanyPage() {
   const [selectedPreset, setSelectedPreset] = useState('all')
   const [selectedYear, setSelectedYear] = useState(2025)
   const [activeTab, setActiveTab] = useState('overview')
+  const [useAdaptiveWeights, setUseAdaptiveWeights] = useState(false)
 
   const SCORE_STEPS = [
-    'Fetching financial data...',
-    'Computing ratios...',
-    'Normalizing metrics...',
-    'Running scoring model...',
-    'Calculating success probability...',
-    'Building sector comparisons...',
-    'Generating AI insights...',
-    'Finalising report...',
+    'Fetching financial data…',
+    'Computing ratios…',
+    'Normalizing metrics…',
+    'Running scoring analysis…',
+    'Calculating success probability…',
+    'Building sector comparisons…',
+    'Generating AI insights…',
+    'Finalizing report…',
   ]
 
   useEffect(() => {
@@ -200,8 +245,9 @@ export default function CompanyPage() {
     const apiPromise = api.post(`/companies/${id}/score`, {
       period: selectedPeriod || null,
       year: selectedYear,
-       ensemble: true,
-       selected_models: preset?.selected_models || ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'tft'],
+      ensemble: true,
+      selected_models: preset?.selected_models || ['elasticnet', 'random_forest', 'xgboost', 'sarimax', 'tft'],
+      use_adaptive_weights: useAdaptiveWeights,
     }).then(r => r.data).catch(e => ({ error: e }))
 
     // Animate progress over ~12 seconds regardless of API speed
@@ -432,7 +478,7 @@ export default function CompanyPage() {
                 )}
                 {company.sector_code && (
                   <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)', background: 'var(--primary-subtle)', borderRadius: 6, padding: '3px 10px' }}>
-                    {company.sector_code}
+                    {formatSectorCode(company.sector_code)}
                   </span>
                 )}
               </div>
@@ -495,7 +541,7 @@ export default function CompanyPage() {
       {activeTab === 'overview' && (
         <div>
           {metrics.length === 0 ? (
-            <EmptyState icon={BarChart3} title="No metrics data available" sub="Upload financial data to compute ratios." />
+              <EmptyState icon={BarChart3} title="No metrics data available" sub="Upload financial data to compute ratios." />
           ) : (
             <>
               {/* Health Summary Card */}
@@ -649,7 +695,7 @@ export default function CompanyPage() {
                 <tbody>
                   {latestTrans.map(t => (
                     <tr key={t.metric_name}>
-                      <td style={{ ...tdStyle, fontWeight: 500 }}>{t.metric_name}</td>
+                      <td style={{ ...tdStyle, fontWeight: 500 }}>{formatMetricLabel(t.metric_name)}</td>
                       <td style={{ ...tdStyle, textAlign: 'right' }}>{t.old_value != null ? t.old_value.toFixed(4) : '—'}</td>
                       <td style={{ ...tdStyle, textAlign: 'right' }}>{t.new_value != null ? t.new_value.toFixed(4) : '—'}</td>
                       <td style={{ ...tdStyle, textAlign: 'right' }}>
@@ -689,7 +735,7 @@ export default function CompanyPage() {
                     const chipColor = pct >= 60 ? 'success' : pct <= 40 ? 'danger' : 'default'
                     return (
                       <tr key={ss.feature_name}>
-                        <td style={{ ...tdStyle, fontWeight: 500 }}>{ss.feature_name}</td>
+                        <td style={{ ...tdStyle, fontWeight: 500 }}>{formatMetricLabel(ss.feature_name)}</td>
                         <td style={{ ...tdStyle, textAlign: 'right' }}>{ss.raw_value != null ? ss.raw_value.toFixed(4) : '—'}</td>
                         <td style={{ ...tdStyle, textAlign: 'right' }}>{ss.z_score != null ? ss.z_score.toFixed(3) : '—'}</td>
                         <td style={{ ...tdStyle, textAlign: 'right' }}>
@@ -710,7 +756,7 @@ export default function CompanyPage() {
         <Card style={{ padding: 28, maxWidth: 480 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-1)', marginBottom: 4 }}>Run Scoring Analysis</div>
           <p style={{ color: 'var(--text-3)', fontSize: 13.5, marginBottom: 22, lineHeight: 1.5 }}>
-            Select a period and model to compute a financial health score for {company.ticker}.
+            Select a period and scoring preset to compute a financial health score for {company.ticker}.
           </p>
 
           {metrics.length === 0 ? (
@@ -750,6 +796,37 @@ export default function CompanyPage() {
                       </button>
                     )
                   })}
+                </div>
+              </div>
+
+              {/* Adaptive Weights Toggle */}
+              <div
+                onClick={() => setUseAdaptiveWeights(v => !v)}
+                style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 12,
+                  background: useAdaptiveWeights ? 'rgba(0,245,212,0.06)' : 'var(--surface-3)',
+                  border: `1.5px solid ${useAdaptiveWeights ? 'rgba(0,245,212,0.4)' : 'var(--border-strong)'}`,
+                  borderRadius: 10, padding: '12px 14px', cursor: 'pointer',
+                  marginBottom: 20, transition: 'all 0.15s',
+                }}
+              >
+                <div style={{
+                  width: 18, height: 18, borderRadius: 4, flexShrink: 0, marginTop: 1,
+                  border: `2px solid ${useAdaptiveWeights ? 'var(--primary)' : 'var(--border-strong)'}`,
+                  background: useAdaptiveWeights ? 'var(--primary)' : 'transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.15s',
+                }}>
+                  {useAdaptiveWeights && <span style={{ color: '#000', fontSize: 11, fontWeight: 900 }}>✓</span>}
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: useAdaptiveWeights ? 'var(--primary-hover)' : 'var(--text-1)', marginBottom: 3 }}>
+                    Use Adaptive Weights
+                  </div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-3)', lineHeight: 1.4 }}>
+                    Automatically adjusts scoring weights based on historical return correlations.
+                    Best performers in each category drive the weight allocation.
+                  </div>
                 </div>
               </div>
 

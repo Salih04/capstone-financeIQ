@@ -36,6 +36,14 @@ const SECTOR_LABELS = {
   HOLDING: 'Holding', TEKSTIL: 'Textile', INSAAT: 'Construction',
 }
 
+const formatSectorCode = (value) => {
+  if (!value) return ''
+  return String(value)
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (m) => m.toUpperCase())
+}
+
 const parseAISectors = (query) => {
   const lower = query.toLowerCase()
   const sectors = []
@@ -82,7 +90,7 @@ function CompanyCard({ company, onClick }) {
         </div>
         {company.sector_code && (
           <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--primary)', background: 'rgba(0,245,212,0.08)', borderRadius: 5, padding: '3px 8px', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-            {SECTOR_LABELS[company.sector_code] || company.sector_code}
+            {SECTOR_LABELS[company.sector_code] || formatSectorCode(company.sector_code)}
           </span>
         )}
       </div>
@@ -108,7 +116,7 @@ function CompanyRow({ company, onClick }) {
       <td style={{ padding: '12px 16px', color: 'var(--text-2)', fontSize: 13.5 }}>{company.company_name}</td>
       <td style={{ padding: '12px 16px' }}>
         {company.sector_code ? (
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)', background: 'rgba(0,245,212,0.08)', borderRadius: 5, padding: '3px 9px' }}>{SECTOR_LABELS[company.sector_code] || company.sector_code}</span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)', background: 'rgba(0,245,212,0.08)', borderRadius: 5, padding: '3px 9px' }}>{SECTOR_LABELS[company.sector_code] || formatSectorCode(company.sector_code)}</span>
         ) : <span style={{ color: 'var(--text-4)' }}>—</span>}
       </td>
       <td style={{ padding: '12px 16px', textAlign: 'right' }}>

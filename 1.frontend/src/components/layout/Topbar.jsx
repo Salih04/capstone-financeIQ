@@ -338,7 +338,7 @@ export default function Topbar({ sidebarCollapsed }) {
                     >
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {run.model_name || `Run #${run.id}`}
+                          {run.ticker || run.company_name || `Analysis #${run.id}`}
                         </div>
                         <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>
                           {run.period} · {new Date(run.created_at).toLocaleDateString('en-US')}

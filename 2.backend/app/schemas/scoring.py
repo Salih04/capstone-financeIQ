@@ -62,6 +62,7 @@ class ScoreRequest(BaseModel):
     ensemble: bool = False
     scoring_model_id: int | None = None # if set, use custom weights from DB
     custom_weights: dict | None = None  # optional direct weight override
+    use_adaptive_weights: bool = False  # enable historical return-based weight adjustment
 
 
 class CommonPeriodsRequest(BaseModel):

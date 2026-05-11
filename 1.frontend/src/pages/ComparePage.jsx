@@ -9,9 +9,17 @@ const RANK_STYLES = [
   { color: '#cd7c3a', label: '3' },
 ]
 
+const formatSectorCode = (value) => {
+  if (!value) return ''
+  return String(value)
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (m) => m.toUpperCase())
+}
+
 function generateQuarters() {
   const years = [2025, 2024, 2023, 2022, 2021, 2020]
-  return years.map(y => `${y}Q4`)
+  return years.map(y => `${y}/12`)
 }
 const ALL_QUARTERS = generateQuarters()
 const ACTIVE_MODELS = ['elasticnet', 'random_forest']
@@ -34,8 +42,6 @@ export default function ComparePage() {
   const [period, setPeriod] = useState('')
   const [results, setResults] = useState(null)
   const [warnings, setWarnings] = useState([])
-  const [modelOutputs, setModelOutputs] = useState({})
-  const [ensembleWeights, setEnsembleWeights] = useState({})
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [progressStep, setProgressStep] = useState('')
@@ -76,7 +82,7 @@ export default function ComparePage() {
   const STEPS = [
     { at: 8,  label: 'Loading financial statements…' },
     { at: 22, label: 'Computing financial ratios…' },
-    { at: 40, label: 'Running scoring model…' },
+    { at: 40, label: 'Running scoring analysis…' },
     { at: 58, label: 'Normalising sector benchmarks…' },
     { at: 72, label: 'Ranking companies…' },
     { at: 85, label: 'Preparing results…' },
@@ -116,8 +122,6 @@ export default function ComparePage() {
       await new Promise(r => setTimeout(r, 1200))
       setResults(data.items || [])
       setWarnings(data.warnings || [])
-      setModelOutputs(data.model_outputs || {})
-      setEnsembleWeights(data.ensemble_weights || {})
     } catch (e) {
       setError(formatApiError(e, 'Comparison failed.'))
     } finally {
@@ -227,7 +231,7 @@ export default function ComparePage() {
               Company Comparison
             </h1>
             <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>
-              Pick 2–8 companies and score them with the same model and period
+              Pick 2–8 companies and score them with the same settings and period
             </p>
           </div>
         </div>
@@ -367,7 +371,7 @@ export default function ComparePage() {
                   </div>
                   {c.sector_code && (
                     <span style={{ fontSize: 11, background: 'var(--surface-3)', color: 'var(--text-3)', borderRadius: 'var(--radius-sm)', padding: '2px 8px' }}>
-                      {c.sector_code}
+                    {formatSectorCode(c.sector_code)}
                     </span>
                   )}
                 </div>
@@ -494,7 +498,7 @@ export default function ComparePage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'var(--surface-1)' }}>
-                  {['#', 'Company', 'Score', 'Success Prob.', 'Period', 'Model', ''].map((h, i) => (
+                  {['#', 'Company', 'Score', 'Success Prob.', 'Period', ''].map((h, i) => (
                     <th key={i} style={{
                       padding: '10px 14px', fontSize: 11, color: 'var(--text-3)',
                       textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600,
@@ -537,7 +541,6 @@ export default function ComparePage() {
                         {r.success_probability != null ? `${(r.success_probability * 100).toFixed(1)}%` : '—'}
                       </td>
                       <td style={{ padding: '12px 14px', textAlign: 'right', fontSize: 13, color: 'var(--text-2)' }}>{r.period || '—'}</td>
-                      <td style={{ padding: '12px 14px', textAlign: 'right', fontSize: 12, color: 'var(--text-3)' }}>{r.label_used || '—'}</td>
                       <td style={{ padding: '12px 14px', textAlign: 'right' }}>
                         <GhostButton onClick={() => navigate(`/companies/${r.company_id}`)} style={{ padding: '5px 12px', fontSize: 12, gap: 4 }}>
                           Profile <ChevronRight size={12} />
@@ -549,43 +552,6 @@ export default function ComparePage() {
               </tbody>
             </table>
           </Card>
-
-          {Object.keys(modelOutputs || {}).length > 0 && (
-            <Card style={{ marginTop: 16, padding: '1rem' }}>
-              <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>
-                Per-Model Leaderboards
-              </div>
-              {Object.entries(modelOutputs).map(([modelName, rows]) => {
-                const top = (rows || []).slice(0, 3)
-                return (
-                  <div key={modelName} style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-2)', marginBottom: 6 }}>
-                      {modelName}
-                      {ensembleWeights?.[modelName] != null && (
-                        <span style={{ marginLeft: 8, color: 'var(--text-3)', fontWeight: 500 }}>
-                          w={(ensembleWeights[modelName] * 100).toFixed(0)}%
-                        </span>
-                      )}
-                    </div>
-                    {top.length === 0 ? (
-                      <div style={{ fontSize: 12, color: 'var(--text-3)' }}>No output</div>
-                    ) : (
-                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        {top.map((r, i) => (
-                          <div key={`${modelName}-${r.company_id}`} style={{
-                            border: '1px solid var(--border)', borderRadius: 8, padding: '6px 10px',
-                            fontSize: 12, color: 'var(--text-2)', background: 'var(--surface-1)',
-                          }}>
-                            {i + 1}. <strong>{r.ticker}</strong> ({(r.total_score ?? 0).toFixed(1)})
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </Card>
-          )}
 
           {results.length > 0 && (
             <div style={{ marginTop: 14, fontSize: 13, color: 'var(--text-3)' }}>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Download, RotateCcw, GitCompare, TrendingUp, TrendingDown, Lightbulb, FileText, Sparkles } from 'lucide-react'
+import { ArrowLeft, Download, RotateCcw, GitCompare, TrendingUp, TrendingDown, Lightbulb, FileText, Sparkles, BrainCircuit } from 'lucide-react'
 import api from '../api/client'
 import { Card, GhostButton, ScoreBadge, getBand, Skeleton, Chip, SectionHeader } from '../components/ui'
 
@@ -10,6 +10,42 @@ const fmt = (v, isRate = false) => {
   if (v == null) return '—'
   if (isRate) return `${(v * 100).toFixed(2)}%`
   return typeof v === 'number' ? v.toFixed(2) : v
+}
+
+const METRIC_LABELS = {
+  roa: 'ROA',
+  roe: 'ROE',
+  operating_margin: 'Operating Margin',
+  net_margin: 'Net Margin',
+  current_ratio: 'Current Ratio',
+  quick_ratio: 'Quick Ratio',
+  cash_ratio: 'Cash Ratio',
+  debt_to_equity: 'Debt / Equity',
+  debt_to_assets: 'Debt / Assets',
+  ocf_to_debt: 'OCF / Debt',
+  ocf_to_assets: 'OCF / Assets',
+  cash_flow_margin: 'Cash Flow Margin',
+}
+
+const TOKEN_LABELS = {
+  roa: 'ROA',
+  roe: 'ROE',
+  ocf: 'OCF',
+  ebit: 'EBIT',
+  ytd: 'YTD',
+}
+
+const formatMetricLabel = (value) => {
+  if (!value) return '—'
+  const raw = String(value)
+  const key = raw.toLowerCase()
+  if (METRIC_LABELS[key]) return METRIC_LABELS[key]
+  const tokens = raw.replace(/_/g, ' ').split(' ')
+  return tokens.map((t) => {
+    const k = t.toLowerCase()
+    if (TOKEN_LABELS[k]) return TOKEN_LABELS[k]
+    return t.charAt(0).toUpperCase() + t.slice(1)
+  }).join(' ')
 }
 
 function generateAIInsights(run) {
@@ -89,6 +125,81 @@ function generateAIInsights(run) {
   return insights.slice(0, 5)
 }
 
+const CATEGORY_COLORS = {
+  profitability: 'var(--success)',
+  liquidity: 'var(--primary)',
+  leverage: 'var(--warning)',
+  cash_flow: 'var(--info)',
+}
+
+const CATEGORY_LABELS = {
+  profitability: 'Profitability',
+  liquidity: 'Liquidity',
+  leverage: 'Leverage',
+  cash_flow: 'Cash Flow',
+}
+
+function AdaptiveWeightsCard({ adaptiveInfo }) {
+  if (!adaptiveInfo) return null
+  const { sufficient_data, message, category_adjustments, periods_analyzed, companies_analyzed, sector_adjustment } = adaptiveInfo
+  return (
+    <Card style={{ padding: '1.25rem', marginBottom: 20, borderColor: 'rgba(139,92,246,0.3)', background: 'rgba(139,92,246,0.03)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <BrainCircuit size={15} style={{ color: '#8B5CF6' }} />
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#8B5CF6', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          Adaptive Weight Analysis
+        </span>
+        {sufficient_data && (
+          <span style={{ fontSize: 11, background: 'rgba(139,92,246,0.12)', color: '#8B5CF6', borderRadius: 20, padding: '2px 8px' }}>
+            {periods_analyzed?.length} periods · {companies_analyzed} companies
+          </span>
+        )}
+      </div>
+      {!sufficient_data ? (
+        <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>{message || 'Insufficient historical data for adaptive weight adjustment.'}</p>
+      ) : (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10, marginBottom: 12 }}>
+            {Object.entries(category_adjustments || {}).map(([cat, info]) => {
+              const corr = info.correlation
+              const mult = info.multiplier
+              const color = CATEGORY_COLORS[cat] || 'var(--text-2)'
+              const change = mult > 1.05 ? '+' : mult < 0.95 ? '−' : '='
+              const changeColor = mult > 1.05 ? 'var(--success)' : mult < 0.95 ? 'var(--danger)' : 'var(--text-3)'
+              return (
+                <div key={cat} style={{ background: 'var(--surface-3)', borderRadius: 8, padding: '10px 12px', borderLeft: `3px solid ${color}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color }}>{CATEGORY_LABELS[cat] || cat}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: changeColor }}>
+                      {change} {((Math.abs(mult - 1)) * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 10.5, color: 'var(--text-3)', lineHeight: 1.4 }}>
+                    Correlation: <strong style={{ color: 'var(--text-2)' }}>{corr >= 0 ? '+' : ''}{corr.toFixed(2)}</strong>
+                    {' · '}{info.samples} samples
+                  </div>
+                  <div style={{ fontSize: 10.5, color: 'var(--text-3)', marginTop: 3, lineHeight: 1.35 }}>
+                    {info.explanation}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          {sector_adjustment && (
+            <div style={{ background: 'rgba(139,92,246,0.08)', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: 'var(--text-2)' }}>
+              <strong style={{ color: '#8B5CF6' }}>Sector Adjustment:</strong>{' '}
+              {sector_adjustment.explanation}
+            </div>
+          )}
+          <p style={{ fontSize: 11.5, color: 'var(--text-3)', margin: '10px 0 0', lineHeight: 1.5 }}>
+            Historical data from {periods_analyzed?.join(', ')} was used to compute correlations between metric category strength and 1-year returns. Weights adjusted accordingly.
+          </p>
+        </>
+      )}
+    </Card>
+  )
+}
+
 export default function ScoreResultPage() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -141,6 +252,10 @@ export default function ScoreResultPage() {
   const drivers = run.details ? [...run.details].sort((a, b) => b.contribution - a.contribution) : []
   const topDrivers = drivers.slice(0, 3)
   const riskDrivers = drivers.slice(-3).reverse()
+  const richExplanation = (() => {
+    try { return run.rich_explanation_json ? JSON.parse(run.rich_explanation_json) : null } catch { return null }
+  })()
+  const adaptiveWeightsInfo = richExplanation?.adaptive_weights || null
 
   return (
     <div style={{ maxWidth: 860, margin: '0 auto', padding: '2rem 1.5rem' }}>
@@ -205,7 +320,7 @@ export default function ScoreResultPage() {
             Dönem: {run.period}
           </span>
           {' · '}
-          <span>{run.model_name}</span>
+          <span>Scoring Summary</span>
           {run.label_used && run.label_used !== run.model_name && (
             <Chip label={run.label_used} style={{ marginLeft: 8, fontSize: 11 }} />
           )}
@@ -276,6 +391,9 @@ export default function ScoreResultPage() {
         </p>
       </Card>
 
+      {/* ── Adaptive Weights Explanation ── */}
+      {adaptiveWeightsInfo && <AdaptiveWeightsCard adaptiveInfo={adaptiveWeightsInfo} />}
+
       {/* ── Drivers row ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
         <Card style={{ padding: '1.25rem' }}>
@@ -291,7 +409,7 @@ export default function ScoreResultPage() {
               : topDrivers.map(d => (
                 <div key={d.metric_name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 13, color: 'var(--text-2)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {d.metric_name}
+                    {formatMetricLabel(d.metric_name)}
                   </span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--success)', fontVariantNumeric: 'tabular-nums' }}>
                     +{d.contribution?.toFixed(1)}
@@ -314,7 +432,7 @@ export default function ScoreResultPage() {
               : riskDrivers.map(d => (
                 <div key={d.metric_name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 13, color: 'var(--text-2)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {d.metric_name}
+                      {formatMetricLabel(d.metric_name)}
                   </span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--danger)', fontVariantNumeric: 'tabular-nums' }}>
                     {d.contribution?.toFixed(1)}

@@ -173,7 +173,7 @@ export default function LabelingLabPage() {
                 <span>{BENCHMARK_OPTIONS.find(o => o.value === d.sector_benchmark_type)?.label || d.sector_benchmark_type}</span>
                 <span>· {d.horizon_months} months</span>
                 <span>· {(d.success_threshold * 100).toFixed(0)}% threshold</span>
-                {d.sector_adjustment_mode && d.sector_adjustment_mode !== 'none' && <span>· {d.sector_adjustment_mode}</span>}
+                {d.sector_adjustment_mode && d.sector_adjustment_mode !== 'none' && <span>· {d.sector_adjustment_mode.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>}
               </div>
             </div>
             <div style={{ display: 'flex', gap: 6, flexShrink: 0, flexWrap: 'wrap' }}>

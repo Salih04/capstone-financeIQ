@@ -110,7 +110,7 @@ To keep outputs reliable and avoid memorization:
 
 `stock_code, sector, period, net_income, equity, total_assets, revenue, gross_profit, ebitda, ocf, capex, total_debt, cash, ebit, interest_expense, inventory, receivables, net_working_capital, market_cap, book_value, enterprise_value, eps, growth_rate, current_assets, current_liabilities, dividend_per_share, price`
 
-- `period` format must be `2020Q1` .. `2025Q4`
+- `period` format must be `2020Q4`,`2021Q4`,`2022Q4`,`2023Q4`,`2024Q4`,`2025Q4`
 - Upload endpoint: `POST /fundamentals/upload-csv`
 
 ## Key Pages

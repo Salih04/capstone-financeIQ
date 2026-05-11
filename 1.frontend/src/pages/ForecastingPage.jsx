@@ -222,7 +222,7 @@ export default function ForecastingPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 16, marginBottom: 16 }}>
         <Card style={{ padding: '1rem' }}>
-          <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>1) Import Winner Files</div>
+           <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>Step 1: Import Winner Files</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {PRESET_FILES.map((f) => (
               <button
@@ -253,7 +253,7 @@ export default function ForecastingPage() {
           )}
 
           <div style={{ marginTop: 14, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
-            <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 8 }}>Upload Quarterly Fundamentals (Exact Ratios, CSV)</div>
+           <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 8 }}>Upload Quarterly Fundamentals (Exact Ratios, CSV)</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
               <input
                 type="file"
@@ -280,7 +280,7 @@ export default function ForecastingPage() {
         </Card>
 
         <Card style={{ padding: '1rem' }}>
-          <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>2) User Setup + Scope</div>
+           <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>Step 2: User Setup and Scope</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
             <select value={userType} onChange={(e) => setUserType(e.target.value)} style={inputS}>
               <option value="individual">Individual</option>
@@ -305,11 +305,11 @@ export default function ForecastingPage() {
           </div>
           <select value={modelType} onChange={(e) => setModelType(e.target.value)} style={{ ...inputS, marginTop: 8 }}>
             <option value="scoring">Scoring (Primary)</option>
-            <option value="dbscan">DBSCAN-style profile</option>
-            <option value="gmm">Gaussian Mixture-style profile</option>
-            <option value="xgboost">XGBoost-style ensemble proxy</option>
-            <option value="prophet">Prophet-style trend proxy</option>
-            <option value="arima">ARIMA-style momentum proxy</option>
+            <option value="dbscan">Cluster Profile</option>
+            <option value="gmm">Mixture Profile</option>
+            <option value="xgboost">Tree Ensemble</option>
+            <option value="prophet">Trend Projection</option>
+            <option value="arima">Momentum Projection</option>
           </select>
           <input
             value={investmentScope}
@@ -366,7 +366,7 @@ export default function ForecastingPage() {
                 cursor: 'pointer',
               }}
             >
-              Run Time-CV
+              Run Time CV
             </button>
           </div>
         </Card>

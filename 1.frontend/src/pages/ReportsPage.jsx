@@ -45,8 +45,6 @@ function ReportCard({ run }) {
           <span>{TYPE_LABELS.score}</span>
           <span>·</span>
           <span>Period: {run.period}</span>
-          <span>·</span>
-          <span>{run.model_name}</span>
         </div>
       </div>
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
@@ -68,7 +66,7 @@ function ExportRow({ run, onExport }) {
           {run.ticker || run.company_name || `Company #${run.company_id}`} — {run.period}
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-3)' }}>
-          {new Date(run.created_at).toLocaleDateString('en-US')} · {run.model_name}
+          {new Date(run.created_at).toLocaleDateString('en-US')}
         </div>
       </div>
       <div style={{ display: 'flex', gap: 6 }}>

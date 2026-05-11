@@ -62,4 +62,4 @@ def get_dataset_tickers() -> list[str]:
 
 
 def get_allowed_periods() -> list[str]:
-    return [f"{year}Q4" for year in _DATASET_YEARS]
+    return [f"{year}/12" for year in _DATASET_YEARS]

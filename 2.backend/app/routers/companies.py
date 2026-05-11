@@ -115,7 +115,6 @@ def get_metrics(
     return (
         db.query(ComputedMetric)
         .filter(ComputedMetric.company_id == company_id)
-        .filter(ComputedMetric.period.like("%Q4"))
         .order_by(ComputedMetric.period.desc())
         .all()
     )

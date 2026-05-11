@@ -210,7 +210,7 @@ export default function ValidationLabPage() {
           <div>
             <label style={{ fontSize: 11, color: 'var(--text-3)', display: 'block', marginBottom: 4 }}>Model</label>
             <select style={inputS} value={selectedModel} onChange={e => handleModelChange(e.target.value)}>
-              {models.map(m => <option key={m.id} value={m.id}>{m.model_name} v{m.version}</option>)}
+              {models.map(m => <option key={m.id} value={m.id}>{m.model_name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} v{m.version}</option>)}
             </select>
           </div>
           <div>

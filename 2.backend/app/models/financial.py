@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy import String, Float, Integer, ForeignKey, DateTime, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import Optional
 
 from app.database import Base
 
@@ -11,7 +12,7 @@ class FinancialStatement(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"), nullable=False, index=True)
-    period: Mapped[str] = mapped_column(String(20), nullable=False)  # e.g. "2023Q4"
+    period: Mapped[str] = mapped_column(String(20), nullable=False)  # e.g. "2023/12"
     period_type: Mapped[str] = mapped_column(String(20), default="quarterly")  # quarterly | annual
     source_name: Mapped[str] = mapped_column(String(100), default="manual")
     raw_payload_json: Mapped[str | None] = mapped_column(Text)
@@ -66,4 +67,48 @@ class ComputedMetric(Base):
     ocf_to_assets: Mapped[float | None] = mapped_column(Float)
     cash_flow_margin: Mapped[float | None] = mapped_column(Float)
 
+    # Extended metrics (imported from xlsx, not used in scoring weights)
+    gross_profit_margin: Mapped[Optional[float]] = mapped_column(Float)
+    ebitda_margin: Mapped[Optional[float]] = mapped_column(Float)
+    roic: Mapped[Optional[float]] = mapped_column(Float)
+    revenue_growth: Mapped[Optional[float]] = mapped_column(Float)
+    ebitda_growth: Mapped[Optional[float]] = mapped_column(Float)
+    net_income_growth: Mapped[Optional[float]] = mapped_column(Float)
+    pe_ratio: Mapped[Optional[float]] = mapped_column(Float)
+    pb_ratio: Mapped[Optional[float]] = mapped_column(Float)
+    ev_ebitda: Mapped[Optional[float]] = mapped_column(Float)
+    ev_sales: Mapped[Optional[float]] = mapped_column(Float)
+    peg_ratio: Mapped[Optional[float]] = mapped_column(Float)
+    working_capital: Mapped[Optional[float]] = mapped_column(Float)
+
     company: Mapped["Company"] = relationship("Company", back_populates="computed_metrics")
+
+
+class StockReturn(Base):
+    """Market return and price data from dataset xlsx files."""
+    __tablename__ = "stock_returns"
+    __table_args__ = (UniqueConstraint("company_id", "period", name="uq_return_company_period"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"), nullable=False, index=True)
+    period: Mapped[str] = mapped_column(String(20), nullable=False)
+
+    # Year-specific annual return (e.g. "Return % (2025-01-02 - 2025-12-31)")
+    annual_return: Mapped[Optional[float]] = mapped_column(Float)
+
+    # Rolling return windows (as percentage, e.g. 13.11 means 13.11%)
+    return_1w: Mapped[Optional[float]] = mapped_column(Float)
+    return_1m: Mapped[Optional[float]] = mapped_column(Float)
+    return_3m: Mapped[Optional[float]] = mapped_column(Float)
+    return_6m: Mapped[Optional[float]] = mapped_column(Float)
+    return_ytd: Mapped[Optional[float]] = mapped_column(Float)
+    return_1y: Mapped[Optional[float]] = mapped_column(Float)
+    return_3y: Mapped[Optional[float]] = mapped_column(Float)
+    return_5y: Mapped[Optional[float]] = mapped_column(Float)
+
+    # Market snapshot data
+    price: Mapped[Optional[float]] = mapped_column(Float)
+    market_cap: Mapped[Optional[float]] = mapped_column(Float)
+    enterprise_value: Mapped[Optional[float]] = mapped_column(Float)
+
+    company: Mapped["Company"] = relationship("Company")
