@@ -314,6 +314,19 @@
       "leakage_risk": "none"
     }
   ],
+  "manual_financials": {
+    "files": [],
+    "rows_ingested": 0,
+    "coverage_by_year": {},
+    "columns_ingested": [],
+    "unknown_columns_ignored": [],
+    "misaligned_columns_rejected": [],
+    "all_null_columns_rejected": [],
+    "issues": [
+      "manual financial history missing (data/trusted_raw/financials/ empty)"
+    ],
+    "present": false
+  },
   "issues": [],
   "valid_for_T_to_T1_modeling": true
 }

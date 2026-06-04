@@ -1,0 +1,69 @@
+# Manual financial-history ingestion
+
+Supply **real per-year** financial history so the pipeline stops relying on the
+frozen 2025 snapshot. Drop files under `data/trusted_raw/financials/` and re-run
+`make data`. Nothing here is fabricated or imputed.
+
+## Where files go
+
+```
+data/trusted_raw/financials/
+  ASELS.csv               # one ticker per file; `ticker` may be omitted (inferred from filename)
+  THYAO.csv
+  all_financials.csv      # OR one combined file; `ticker` REQUIRED here
+  templates/              # ignored by the loader (templates + example live here)
+```
+
+Grain: **exactly one row per ticker-year**. Duplicates are rejected.
+
+## How to fill
+
+- Use `templates/company_financials_template.csv` as the header.
+- See `templates/example_2tickers_2years.csv` for a worked example (2 tickers × 2 years).
+- Leave a cell **blank** if a value is genuinely unknown — **never** write `0`.
+- Values must reflect **year-end of `year`** — information available at year T,
+  not future or heavily-restated figures.
+- Export from a source you have rights to (Fintables, İş Yatırım, TradingView,
+  Matriks, Finnet, official KAP). Record `source` and `retrieved_at`.
+
+## Column dictionary (all optional except ticker/year)
+
+| group | columns |
+|---|---|
+| identity | `ticker`, `year` |
+| income statement | `revenue`, `gross_profit`, `operating_income`, `ebitda`, `net_income` |
+| margins / profitability | `gross_margin`, `operating_margin`, `ebitda_margin`, `net_margin`, `roe`, `roa` |
+| balance sheet | `total_assets`, `current_assets`, `non_current_assets`, `total_liabilities`, `short_term_liabilities`, `long_term_liabilities`, `total_equity`, `working_capital`, `net_debt` |
+| valuation (year-end) | `market_cap`, `enterprise_value`, `pe_ratio`, `pb_ratio`, `ps_ratio`, `ev_ebitda` |
+| momentum / trading | `return_3m_pct`, `return_6m_pct`, `return_12m_pct`, `avg_volume`, `turnover_ratio` |
+| provenance (free text) | `source`, `retrieved_at` |
+
+Common aliases are accepted (e.g. `equity`→`total_equity`, `ebit`→`operating_income`,
+`ev_sales`→`ps_ratio`, `current_liabilities`→`short_term_liabilities`).
+
+## What ingestion does
+
+- **Override**: balance-sheet columns that already exist in the base dataset
+  (`total_assets`, `equity`, …) are replaced by your real values where supplied.
+- **Add**: new columns (revenue, margins, valuation, momentum) are added.
+- **Accept as feature** only if a column genuinely **varies across years** and is
+  not all-null. Columns that stay frozen or all-null are **rejected** (reported,
+  not used).
+- Years you do not supply are left **NaN** — the frozen snapshot is never used to
+  fill them.
+
+## Validation (strict, never silently passes bad data)
+
+Reported in `data/trusted_clean/data_quality_report.{json,md}`:
+missing ticker/year, invalid year, duplicate ticker-year, **non-numeric cells
+(suspected column misalignment)**, unknown tickers, empty/malformed files,
+all-null columns, partial coverage, and columns still frozen after ingestion.
+
+Flags: `--manual-financials-dir DIR`, `--strict-manual-validation` (abort on any
+issue), `--allow-partial-manual-coverage` (default on), `--manual-only`.
+
+## Leakage protections (unchanged)
+
+`next_year_*`, `same_year_return_pct`, and `target_year` can never be features.
+Supplying momentum (`return_12m_pct` etc.) adds **year-T** features only; the
+**target** is always next year's realized return.

@@ -55,6 +55,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--skip-download", action="store_true", default=True)
     ap.add_argument("--manual-only", action="store_true")
     ap.add_argument("--validate-only", action="store_true")
+    ap.add_argument("--manual-financials-dir", type=str, default=None)
+    ap.add_argument("--strict-manual-validation", action="store_true")
+    ap.add_argument("--allow-partial-manual-coverage", action="store_true", default=True)
     args = ap.parse_args(argv)
 
     cfg = P.PipelineConfig(
@@ -62,7 +65,15 @@ def main(argv: list[str] | None = None) -> int:
         tickers=[t.strip() for t in args.tickers.split(",")] if args.tickers else None,
         force_refresh=args.force_refresh, skip_download=args.skip_download,
         manual_only=args.manual_only, validate_only=args.validate_only,
+        strict_manual_validation=args.strict_manual_validation,
+        allow_partial_manual_coverage=args.allow_partial_manual_coverage,
     )
+    if args.manual_financials_dir:
+        from pathlib import Path
+        cfg.manual_financials_dir = Path(args.manual_financials_dir)
+    if args.manual_only and not cfg.manual_financials_dir.is_dir():
+        cfg.say("--manual-only set but no manual financials dir; nothing to ingest.")
+        return 1
     P.CLEAN_DIR.mkdir(parents=True, exist_ok=True)
     P.RAW_DIR.mkdir(parents=True, exist_ok=True)
 

@@ -1,0 +1,5 @@
+ticker,year,revenue,gross_profit,operating_income,ebitda,net_income,gross_margin,operating_margin,ebitda_margin,net_margin,roe,roa,total_assets,current_assets,non_current_assets,total_liabilities,short_term_liabilities,long_term_liabilities,total_equity,working_capital,net_debt,market_cap,enterprise_value,pe_ratio,pb_ratio,ps_ratio,ev_ebitda,return_3m_pct,return_6m_pct,return_12m_pct,avg_volume,turnover_ratio,source,retrieved_at
+# One row per ticker-year. Leave a cell BLANK if genuinely unknown (do NOT use 0).
+# Values must reflect information at YEAR-END of `year` (not future/restated).
+# Per-ticker file (e.g. ASELS.csv) may omit `ticker` (inferred from filename).
+# Combined all_financials.csv MUST include `ticker`.

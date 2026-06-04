@@ -75,6 +75,9 @@ TARGET_COLS = (
 META_COLS = ("has_target", "target_year", "is_inference_row", "same_year_return_pct")
 
 
+FINANCIALS_DIR = RAW_DIR / "financials"
+
+
 @dataclass
 class PipelineConfig:
     start_year: int = 2020
@@ -84,6 +87,12 @@ class PipelineConfig:
     skip_download: bool = True   # default: no network; manual/reference only
     manual_only: bool = False
     validate_only: bool = False
+    manual_financials_dir: Path = FINANCIALS_DIR
+    strict_manual_validation: bool = False
+    allow_partial_manual_coverage: bool = True
+    manual_report: dict = field(default_factory=dict)
+    manual_overrides: dict = field(default_factory=dict)
+    manual_feature_columns: list = field(default_factory=list)
     log: list[str] = field(default_factory=list)
 
     def say(self, msg: str) -> None:
@@ -214,6 +223,80 @@ def load_benchmark(cfg: PipelineConfig) -> pd.DataFrame | None:
 
 
 # --------------------------------------------------------------------------- #
+# Manual real financial-history merge
+# --------------------------------------------------------------------------- #
+def merge_manual_financials(cfg: PipelineConfig, df: pd.DataFrame, base_features: set[str]) -> pd.DataFrame:
+    """Merge real per-year history from data/trusted_raw/financials/ if present.
+
+    Overrides matching base columns where supplied; adds new columns otherwise.
+    A manual column becomes a valid feature only if it genuinely varies across
+    years and is not all-null. Frozen snapshot values are never used to fill the
+    years a user did not supply.
+    """
+    from scripts.data_collection import manual_ingest as M
+
+    known = set(df["ticker"].unique())
+    man, rep = M.load_manual(
+        cfg.manual_financials_dir, known_tickers=known,
+        strict=cfg.strict_manual_validation, allow_partial=cfg.allow_partial_manual_coverage,
+    )
+    if cfg.strict_manual_validation and rep.issues:
+        for i in rep.issues:
+            cfg.say(f"[manual] STRICT issue: {i}")
+        raise SystemExit("Strict manual validation failed; aborting.")
+
+    if man is None or not rep.present:
+        rep.issues.append("manual financial history missing (data/trusted_raw/financials/ empty)")
+        cfg.manual_report = rep.as_dict()
+        cfg.say("[manual] no manual financial history found; using reference-only features.")
+        return df
+
+    man_cols = [c for c in man.columns if c not in ("ticker", "year")]
+    df = df.merge(man, on=["ticker", "year"], how="left", suffixes=("", "_manual"))
+
+    overrides: dict[str, int] = {}
+    added: list[str] = []
+    for c in man_cols:
+        target = M.OVERRIDE_MAP.get(c)
+        if target and target in df.columns:
+            # When manual col name == base col name, pandas suffixed the manual
+            # side to "<c>_manual"; otherwise it is just <c>.
+            src = f"{c}_manual" if f"{c}_manual" in df.columns else c
+            mask = df[src].notna()
+            overrides[target] = int(mask.sum())
+            df.loc[mask, target] = df.loc[mask, src]
+            if src != target:
+                df = df.drop(columns=[src])
+        else:
+            added.append(c)  # new column, already merged in
+
+    # Accept added manual columns only if they vary across years and aren't all-null.
+    var = classify_variability(df[["ticker", "year", *added]]) if added else {"varying": [], "frozen": []}
+    accepted, rejected = [], {}
+    for c in added:
+        if df[c].isna().all():
+            rejected[c] = "all_null"
+            df = df.drop(columns=[c])
+        elif c in var["frozen"]:
+            rejected[c] = "frozen_across_years"
+            df = df.drop(columns=[c])
+        else:
+            accepted.append(c)
+
+    cfg.manual_overrides = overrides
+    cfg.manual_feature_columns = accepted
+    rep.issues = rep.issues  # keep
+    d = rep.as_dict()
+    d["overrides_from_snapshot"] = overrides
+    d["accepted_feature_columns"] = accepted
+    d["rejected_feature_columns"] = rejected
+    cfg.manual_report = d
+    cfg.say(f"[manual] ingested {rep.rows_ingested} rows from {len(rep.files)} file(s); "
+            f"overrides={list(overrides)} accepted_features={accepted} rejected={rejected}")
+    return df
+
+
+# --------------------------------------------------------------------------- #
 # Assemble modeling dataset
 # --------------------------------------------------------------------------- #
 def build_modeling_dataset(cfg: PipelineConfig) -> pd.DataFrame:
@@ -241,6 +324,10 @@ def build_modeling_dataset(cfg: PipelineConfig) -> pd.DataFrame:
         for c in ("next_year_bist100_return_pct", "next_year_excess_return_vs_bist100",
                   "next_year_outperform_bist100"):
             df[c] = np.nan
+
+    # Merge real manual financial history (if any) and accept varying columns.
+    base_features = set(feature_columns(df))
+    df = merge_manual_financials(cfg, df, base_features)
 
     df["has_target"] = df["next_year_return_pct"].notna()
     df["is_inference_row"] = ~df["has_target"]

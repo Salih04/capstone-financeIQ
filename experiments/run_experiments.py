@@ -156,6 +156,26 @@ def run() -> None:
     panel = build_panel()
     feat_cols = [c for c in panel.columns if c not in ("ticker", "feature_year", "target_return")]
 
+    # honest feature/sample reporting
+    manual_feats = []
+    qr = ROOT / "data" / "trusted_clean" / "data_quality_report.json"
+    if qr.is_file():
+        import json as _json
+        manual_feats = (_json.loads(qr.read_text()).get("manual_financials", {}) or {}).get(
+            "accepted_feature_columns", []) or []
+    used_source = "clean modeling dataset" if CLEAN_MODELING.is_file() else "legacy reference panel"
+    train_years = sorted({y for s in SPLITS for y in s["train_target_years"]})
+    test_years = sorted({s["test_feature_year"] + 1 for s in SPLITS})
+    print(f"[experiments] source: {used_source}")
+    print(f"[experiments] features used: {len(feat_cols)} -> {feat_cols}")
+    print(f"[experiments] manual-history features included: "
+          f"{[c for c in manual_feats if c in feat_cols] or 'none'}")
+    print(f"[experiments] train target years: {train_years} | test years: {test_years}")
+    per_split_n = panel.groupby("feature_year").size().to_dict()
+    if max(per_split_n.values(), default=0) < 60:
+        print(f"[experiments] ⚠️ SMALL SAMPLE: ~{max(per_split_n.values(), default=0)} rows/year. "
+              "Out-of-sample metrics are noisy and overfitting-prone; trust baselines over single-split ML spikes.")
+
     leaderboard_rows = []
     for split in SPLITS:
         tr = panel[(panel["feature_year"] + 1).isin(split["train_target_years"])]

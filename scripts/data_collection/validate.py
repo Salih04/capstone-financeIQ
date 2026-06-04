@@ -97,6 +97,7 @@ def validate(df: pd.DataFrame, cfg: P.PipelineConfig) -> dict:
         if "next_year_bist100_return_pct" in df.columns else False,
         "extreme_growth_counts": extreme,
         "feature_registry": feature_registry(df),
+        "manual_financials": getattr(cfg, "manual_report", {}) or {"present": False},
         "issues": issues,
         "valid_for_T_to_T1_modeling": len(issues) == 0,
     }
@@ -119,7 +120,17 @@ def _write_md(r: dict) -> None:
              "## Rows by year", "", "| year | rows | tickers | target coverage |", "|---|---|---|---|"]
     for y in sorted(r["rows_by_year"]):
         lines.append(f"| {y} | {r['rows_by_year'][y]} | {r['tickers_by_year'][y]} | {r['target_coverage_by_year'].get(y,'-')} |")
-    lines += ["", "## Frozen reference columns EXCLUDED from features (unreliable snapshot)",
+    man = r.get("manual_financials", {}) or {}
+    lines += ["", "## Manual financial history",
+              f"- Present: **{man.get('present', False)}**",
+              f"- Files: {man.get('files', [])}",
+              f"- Rows ingested: {man.get('rows_ingested', 0)}",
+              f"- Accepted as features: {man.get('accepted_feature_columns', [])}",
+              f"- Overrides from snapshot: {man.get('overrides_from_snapshot', {})}",
+              f"- Rejected: {man.get('rejected_feature_columns', {})}",
+              f"- Misaligned columns: {man.get('misaligned_columns_rejected', [])}",
+              f"- Issues: {man.get('issues', [])}", ""]
+    lines += ["## Frozen reference columns EXCLUDED from features (unreliable snapshot)",
               "", ", ".join(r["frozen_columns_excluded_from_features"]) or "none", "",
               "## Provisional feature columns (year-T, genuinely varying)",
               "", ", ".join(r["feature_columns"]) or "none", ""]
