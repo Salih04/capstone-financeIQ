@@ -44,8 +44,31 @@ LEADERBOARD = ROOT / "experiments" / "leaderboard.csv"
 PRED_FEATURES = [f for f in reg.features_for_next_year_prediction()]
 
 
+CLEAN_MODELING = ROOT / "data" / "trusted_clean" / "modeling_dataset_2020_2025.csv"
+
+
 def build_panel() -> pd.DataFrame:
-    """One row per (ticker, feature_year) with the NEXT year's return as target."""
+    """One row per (ticker, feature_year) with the NEXT year's return as target.
+
+    Prefer the clean T->T+1 modeling dataset (frozen-snapshot columns already
+    excluded, real next-year targets). Fall back to the legacy reference panel.
+    """
+    if CLEAN_MODELING.is_file():
+        m = pd.read_csv(CLEAN_MODELING)
+        _non_feat = {
+            "ticker", "company_name", "year", "sector", "indices", "is_bist100",
+            "same_year_return_pct", "target_year", "has_target", "is_inference_row",
+        }
+        feat_cols = [c for c in m.columns
+                     if c not in _non_feat and not c.startswith("next_year_")]
+        out = m[["ticker", "year", *feat_cols]].copy()
+        out = out.rename(columns={"year": "feature_year"})
+        # rank-normalize each feature within its year (robust, no leak)
+        for c in feat_cols:
+            out[c] = out.groupby("feature_year")[c].rank(pct=True)
+        out["target_return"] = m["next_year_return_pct"].values
+        return out.dropna(subset=["target_return"]).reset_index(drop=True)
+
     frames = []
     years = data.available_years()
     for y in years:
@@ -131,7 +154,7 @@ def run() -> None:
     RESULTS.mkdir(parents=True, exist_ok=True)
     REPORTS.mkdir(parents=True, exist_ok=True)
     panel = build_panel()
-    feat_cols = [f.name for f in PRED_FEATURES if f.name in panel.columns]
+    feat_cols = [c for c in panel.columns if c not in ("ticker", "feature_year", "target_return")]
 
     leaderboard_rows = []
     for split in SPLITS:

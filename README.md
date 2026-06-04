@@ -21,9 +21,29 @@ trusted XLSX files to CSV and loads them into Postgres on startup.
 
 Entry route: `/login`.
 
-## Trusted data source (single source of truth)
+## ⚠️ Data reliability & the modeling pipeline
 
-The ONLY accepted financial data is the yearly XLSX set in `3.Datasets/`:
+The yearly XLSX / `data/trusted/stocks_2020_2025.csv` files are **unreliable for
+fundamentals**: income-statement, profitability, valuation and momentum fields
+are a frozen 2025 snapshot repeated across years (only balance-sheet, growth and
+realized return vary). They are kept as **reference / target bootstrap only**.
+
+The correct **T → T+1** modeling dataset (year-T features → year-(T+1) realized
+return) is built by a separate, validated pipeline:
+
+```bash
+make data        # or: PYTHONPATH=. python -m scripts.data_collection.build_all
+```
+
+Outputs in `data/trusted_clean/` (`modeling_dataset_2020_2025.csv`,
+`data_quality_report.json/.md`, `data_dictionary.md`). See **[DATA_PIPELINE.md](DATA_PIPELINE.md)**
+and **[DATA_REQUIREMENTS.md](DATA_REQUIREMENTS.md)**. Real income-statement/valuation
+history must be ingested manually (see DATA_REQUIREMENTS) for true prediction;
+the current targets are real, the year-T fundamentals are provisional.
+
+## Trusted data source (legacy reference)
+
+The yearly XLSX set in `3.Datasets/` (reference/bootstrap, see warning above):
 
 ```
 3.Datasets/2020stocks.xlsx … 2025stocks.xlsx   (40 BIST companies × 54 columns)

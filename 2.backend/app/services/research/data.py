@@ -27,6 +27,21 @@ DEFAULT_CSV = Path(
 TARGET_COLUMN = "annual_return_pct"  # realized yearly return = ground truth
 SUPPORTED_YEARS = (2020, 2021, 2022, 2023, 2024, 2025)
 
+# Clean T->T+1 modeling dataset produced by scripts/data_collection/build_all.
+# Legacy stocks_2020_2025.csv is UNRELIABLE for fundamentals (frozen snapshot);
+# use this for next-year modelling once present.
+MODELING_DATASET = REPO_ROOT / "data" / "trusted_clean" / "modeling_dataset_2020_2025.csv"
+
+
+def load_modeling_dataset() -> "pd.DataFrame":
+    """Clean company-year dataset with next-year return targets, or None-raise."""
+    if not MODELING_DATASET.is_file():
+        raise TrustedDataMissing(
+            f"Modeling dataset not found at {MODELING_DATASET}. Run "
+            "`python -m scripts.data_collection.build_all`."
+        )
+    return pd.read_csv(MODELING_DATASET)
+
 
 class TrustedDataMissing(RuntimeError):
     """Raised when the trusted CSV is absent. Never silently fabricated."""

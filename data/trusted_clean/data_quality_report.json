@@ -1,0 +1,319 @@
+{
+  "rows": 240,
+  "rows_by_year": {
+    "2020": 40,
+    "2021": 40,
+    "2022": 40,
+    "2023": 40,
+    "2024": 40,
+    "2025": 40
+  },
+  "tickers_by_year": {
+    "2020": 40,
+    "2021": 40,
+    "2022": 40,
+    "2023": 40,
+    "2024": 40,
+    "2025": 40
+  },
+  "n_features": 17,
+  "feature_columns": [
+    "current_assets",
+    "current_ratio",
+    "ebitda_growth_pct",
+    "equity",
+    "financial_debt_ratio",
+    "gross_profit_growth_pct",
+    "leverage_ratio",
+    "long_term_liabilities",
+    "net_debt",
+    "net_debt_to_ebitda",
+    "net_income_growth_pct",
+    "non_current_assets",
+    "operating_income_growth_pct",
+    "revenue_growth_pct",
+    "short_term_liabilities",
+    "total_assets",
+    "working_capital"
+  ],
+  "target_columns": [
+    "next_year_return_pct",
+    "next_year_rank_by_return",
+    "next_year_return_percentile",
+    "next_year_top_10pct_returner",
+    "next_year_top_20pct_returner",
+    "next_year_bist100_return_pct",
+    "next_year_excess_return_vs_bist100",
+    "next_year_outperform_bist100"
+  ],
+  "frozen_columns_excluded_from_features": [
+    "daily_change_pct",
+    "ebitda",
+    "ebitda_margin_pct",
+    "enterprise_value",
+    "ev_ebitda",
+    "ev_sales",
+    "fcf_financing",
+    "free_cash_flow",
+    "gross_margin_pct",
+    "gross_profit",
+    "icf",
+    "market_cap",
+    "net_income",
+    "net_margin_pct",
+    "ocf",
+    "operating_income",
+    "pb",
+    "pe",
+    "peg",
+    "price",
+    "return_1m_pct",
+    "return_1w_pct",
+    "return_1y_pct",
+    "return_3m_pct",
+    "return_3y_pct",
+    "return_5y_pct",
+    "return_6m_pct",
+    "return_ytd_pct",
+    "revenue",
+    "roa_pct",
+    "roe_pct",
+    "roic_pct",
+    "volume"
+  ],
+  "frozen_feature_columns_remaining": [],
+  "missingness": {
+    "ticker": 0.0,
+    "company_name": 0.0,
+    "year": 0.0,
+    "sector": 1.0,
+    "indices": 0.0,
+    "is_bist100": 0.0,
+    "current_assets": 0.0,
+    "current_ratio": 0.0,
+    "ebitda_growth_pct": 0.0,
+    "equity": 0.0,
+    "financial_debt_ratio": 0.0,
+    "gross_profit_growth_pct": 0.0,
+    "leverage_ratio": 0.0,
+    "long_term_liabilities": 0.0,
+    "net_debt": 0.0,
+    "net_debt_to_ebitda": 0.0,
+    "net_income_growth_pct": 0.0,
+    "non_current_assets": 0.0,
+    "operating_income_growth_pct": 0.0,
+    "revenue_growth_pct": 0.0,
+    "short_term_liabilities": 0.0,
+    "total_assets": 0.0,
+    "working_capital": 0.0,
+    "next_year_return_pct": 0.167,
+    "next_year_rank_by_return": 0.167,
+    "next_year_return_percentile": 0.167,
+    "next_year_top_10pct_returner": 0.167,
+    "next_year_top_20pct_returner": 0.167,
+    "next_year_bist100_return_pct": 1.0,
+    "next_year_excess_return_vs_bist100": 1.0,
+    "next_year_outperform_bist100": 1.0,
+    "same_year_return_pct": 0.0,
+    "target_year": 0.0,
+    "has_target": 0.0,
+    "is_inference_row": 0.0
+  },
+  "target_coverage_by_year": {
+    "2020": 1.0,
+    "2021": 1.0,
+    "2022": 1.0,
+    "2023": 1.0,
+    "2024": 1.0,
+    "2025": 0.0
+  },
+  "rows_with_target": 200,
+  "inference_only_rows": 40,
+  "benchmark_available": false,
+  "extreme_growth_counts": {
+    "ebitda_growth_pct": 40,
+    "gross_profit_growth_pct": 40,
+    "net_income_growth_pct": 40,
+    "operating_income_growth_pct": 40,
+    "revenue_growth_pct": 40
+  },
+  "feature_registry": [
+    {
+      "column": "ticker",
+      "role": "identifier",
+      "leakage_risk": "none"
+    },
+    {
+      "column": "company_name",
+      "role": "identifier",
+      "leakage_risk": "none"
+    },
+    {
+      "column": "year",
+      "role": "identifier",
+      "leakage_risk": "none"
+    },
+    {
+      "column": "sector",
+      "role": "metadata",
+      "leakage_risk": "none"
+    },
+    {
+      "column": "indices",
+      "role": "metadata",
+      "leakage_risk": "none"
+    },
+    {
+      "column": "is_bist100",
+      "role": "metadata",
+      "leakage_risk": "none"
+    },
+    {
+      "column": "current_assets",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "current_ratio",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "ebitda_growth_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "equity",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "financial_debt_ratio",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "gross_profit_growth_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "leverage_ratio",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "long_term_liabilities",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "net_debt",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "net_debt_to_ebitda",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "net_income_growth_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "non_current_assets",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "operating_income_growth_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "revenue_growth_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "short_term_liabilities",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "total_assets",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "working_capital",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "next_year_return_pct",
+      "role": "target",
+      "leakage_risk": "is_target"
+    },
+    {
+      "column": "next_year_rank_by_return",
+      "role": "target",
+      "leakage_risk": "is_target"
+    },
+    {
+      "column": "next_year_return_percentile",
+      "role": "target",
+      "leakage_risk": "is_target"
+    },
+    {
+      "column": "next_year_top_10pct_returner",
+      "role": "target",
+      "leakage_risk": "is_target"
+    },
+    {
+      "column": "next_year_top_20pct_returner",
+      "role": "target",
+      "leakage_risk": "is_target"
+    },
+    {
+      "column": "next_year_bist100_return_pct",
+      "role": "benchmark",
+      "leakage_risk": "is_target"
+    },
+    {
+      "column": "next_year_excess_return_vs_bist100",
+      "role": "benchmark",
+      "leakage_risk": "is_target"
+    },
+    {
+      "column": "next_year_outperform_bist100",
+      "role": "benchmark",
+      "leakage_risk": "is_target"
+    },
+    {
+      "column": "same_year_return_pct",
+      "role": "same_year_analysis_only",
+      "leakage_risk": "is_same_year_outcome"
+    },
+    {
+      "column": "target_year",
+      "role": "metadata",
+      "leakage_risk": "none"
+    },
+    {
+      "column": "has_target",
+      "role": "metadata",
+      "leakage_risk": "none"
+    },
+    {
+      "column": "is_inference_row",
+      "role": "metadata",
+      "leakage_risk": "none"
+    }
+  ],
+  "issues": [],
+  "valid_for_T_to_T1_modeling": true
+}
