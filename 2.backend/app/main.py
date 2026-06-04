@@ -14,6 +14,7 @@ from app.routers import validation, labeling
 from app.routers import forecasting
 from app.routers import users
 from app.routers import fundamentals
+from app.routers import research
 from pathlib import Path
 
 # Wait for DB then create tables
@@ -73,6 +74,7 @@ app.include_router(labeling.router)
 app.include_router(forecasting.router)
 app.include_router(users.router)
 app.include_router(fundamentals.router)
+app.include_router(research.router)
 
 
 @app.get("/health")

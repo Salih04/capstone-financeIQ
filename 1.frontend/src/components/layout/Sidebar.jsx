@@ -20,8 +20,9 @@ const NAV_SECTIONS = [
   {
     label: 'Analysis',
     items: [
+      { path: '/research', icon: Sparkles, label: 'Research', roles: ['analyst', 'admin'] },
       { path: '/validation', icon: FlaskConical, label: 'Validation Lab', roles: ['analyst', 'admin'] },
-      { path: '/forecasting', icon: BrainCircuit, label: 'Forecasting', roles: ['analyst', 'admin'] },
+      { path: '/forecasting', icon: BrainCircuit, label: 'Forecasting (legacy)', roles: ['analyst', 'admin'] },
     ],
   },
   {

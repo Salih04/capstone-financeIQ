@@ -150,11 +150,64 @@ def check_compile(failures: list[str]) -> None:
         _fail(f"py_compile failed: {rc.stderr.strip()[:300]}", failures)
 
 
+def check_research(failures: list[str]) -> None:
+    print("[research] scoring + validation + leakage")
+    from app.services.research import benchmark, company, scoring, validation
+    from app.services.research import feature_registry as reg
+
+    # Target must never be a feature.
+    if any(f.fundamental and f.name == "annual_return_pct" for f in reg.REGISTRY):
+        _fail("realized return is marked as a fundamental feature (leak)", failures)
+    if "annual_return_pct" in {f.name for f in reg.fundamental_features()}:
+        _fail("realized return leaked into fundamental feature set", failures)
+
+    years = scoring.data.available_years()
+    prev_returns = None
+    for y in years:
+        sc = scoring.score_year(y).set_index("ticker").sort_index()
+        if sc["fundamental_score"].isna().all():
+            _fail(f"all fundamental scores NaN for {y}", failures)
+        # Realized returns MUST change across years (that is the real time axis).
+        rets = sc[scoring.data.TARGET_COLUMN].round(4)
+        if prev_returns is not None and rets.equals(prev_returns):
+            _fail(f"realized returns identical {y-1}->{y} (year not applied to returns)", failures)
+        prev_returns = rets
+
+    # Data-integrity report: which columns are frozen vs time-varying.
+    var = scoring.data.column_variability()
+    frozen_statement = [c for c in var["frozen_snapshot"]
+                        if c in {"revenue", "net_income", "ebitda", "operating_income",
+                                 "roe_pct", "roa_pct", "roic_pct", "net_margin_pct"}]
+    if frozen_statement:
+        print(f"  WARN: income-statement/profitability columns are FROZEN across years "
+              f"(single 2025 snapshot): {frozen_statement}. Only balance-sheet, growth, "
+              f"and realized return vary. Per-year fundamental trends are partly invalid.")
+    print(f"  variability: {var['n_varying']} time-varying, {var['n_frozen']} frozen columns")
+
+    v = validation.validate_all()
+    if not v["per_year"]:
+        _fail("validation produced no per-year results", failures)
+
+    # Benchmark-missing state must be honest (no fabricated returns).
+    if not benchmark.is_available():
+        if benchmark.year_return(years[0]) is not None:
+            _fail("benchmark reports missing but returns a value (fabrication)", failures)
+
+    # ASELSAN example only if present (do not hardcode requirement).
+    df = scoring.data.load_trusted()
+    if "ASELS" in set(df["ticker"]):
+        d = company.company_detail("ASELS", max(years))
+        if d["fundamental_score"] is None:
+            _fail("ASELS detail missing fundamental score", failures)
+        print(f"  ASELS {max(years)}: score={d['fundamental_score']} return={d['realized_return']}")
+
+
 def main() -> int:
     failures: list[str] = []
     check_data(failures)
     check_combined_csv(failures)
     check_hygiene(failures)
+    check_research(failures)
     check_compile(failures)
 
     print()
