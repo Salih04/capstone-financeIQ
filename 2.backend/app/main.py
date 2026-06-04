@@ -13,7 +13,6 @@ from app.routers import ingestion, admin, reports
 from app.routers import validation, labeling
 from app.routers import forecasting
 from app.routers import users
-from app.routers import news
 from app.routers import fundamentals
 from pathlib import Path
 
@@ -73,7 +72,6 @@ app.include_router(validation.router)
 app.include_router(labeling.router)
 app.include_router(forecasting.router)
 app.include_router(users.router)
-app.include_router(news.router)
 app.include_router(fundamentals.router)
 
 

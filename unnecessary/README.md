@@ -15,5 +15,16 @@ Restore with `git mv unnecessary/<file> <original/path>` if needed.
 | `quarterly_fundamentals_correct.csv` | repo root | Old duplicate fundamentals CSV. Not the trusted source. |
 | `quarterly_fundamentals_extended.csv` | repo root | Old duplicate fundamentals CSV. Not the trusted source. |
 | `quarterly_fundamentals_fixed.csv` | repo root | Old duplicate fundamentals CSV. Not the trusted source. |
+| `news_router.py` | `2.backend/app/routers/news.py` | Finnhub-backed news feed. Finnhub removed (key assumed leaked); News API not essential. |
+| `NewsUpdatesPage.jsx` | `1.frontend/src/pages/` | Frontend for the removed news feed. Route + sidebar link removed. |
+| `load_trusted_fundamentals.py` | `2.backend/scripts/` | Quarterly-CSV loader from the previous direction. Superseded by the yearly XLSX pipeline (`load_trusted_yearly.py`). |
 
-The single trusted source — `quarterly_fundamentals_2025.csv` — was **not** touched and remains in the repo root.
+## Direction change (2026-06-04)
+
+The trusted source is now the **yearly 2020–2025 XLSX files** in `3.Datasets/`,
+converted to CSV under `data/trusted/` and loaded into the `yearly_stocks` table.
+The earlier `quarterly_fundamentals_2025.csv` single-quarter direction is retired.
+That CSV still sits in the repo root (untouched) but is no longer loaded or used.
+
+Finnhub and the News API are fully removed. No synthetic, seed, KAP-scraper, or
+external-API data path remains in active code.

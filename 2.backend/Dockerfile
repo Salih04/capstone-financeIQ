@@ -11,7 +11,7 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8000
 
-# Load ONLY the trusted source (quarterly_fundamentals_2025.csv) on startup.
-# The old `python seed.py` step pulled data from xlsx + a synthetic generator
-# (now in unnecessary/) and produced the incorrect/jumbled DB state.
-CMD ["sh", "-c", "python -m scripts.load_trusted_fundamentals && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+# Convert the trusted 2020-2025 XLSX files to CSV and load them into Postgres
+# on startup. This is the ONLY data path: no seed.py, no synthetic generator,
+# no scraper, no external API.
+CMD ["sh", "-c", "python -m scripts.load_trusted_yearly && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]

@@ -193,47 +193,6 @@ class FundamentalsUploadResponse(BaseModel):
     errors: list[str]
 
 
-class RatioItem(BaseModel):
-    category: str
-    ratio_name: str
-    value: float | None
-    formula: str
-    interpretation: str
-    missing_fields: list[str]
-
-
-class CompanyYearRatios(BaseModel):
-    stock_code: str
-    year: int
-    ratios: list[RatioItem]
-
-
-class KapRatiosResponse(BaseModel):
-    items: list[CompanyYearRatios]
-    errors: list[str]
-
-
-class NewsItemOut(BaseModel):
-    id: str
-    title: str
-    source: str
-    published_at: str
-    summary: str
-    url: str | None = None
-    sentiment: str | None = None
-    ai_insight: str | None = None
-
-
-class NewsOut(BaseModel):
-    date: str
-    page: int
-    limit: int
-    max_pages: int
-    max_articles_per_day: int
-    message: str | None = None
-    articles: list[NewsItemOut]
-
-
 class AvailableFiltersResponse(BaseModel):
     years: list[int]
     sectors: list[str]

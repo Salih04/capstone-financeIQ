@@ -8,6 +8,7 @@ from app.models.report import Report
 from app.models.governance import ModelValidationRun, ModelFeatureImportance, LabelDefinition
 from app.models.ingestion import IngestionJob, DataQualityIssue
 from app.models.audit import AuditLog
+from app.models.trusted import YearlyStock
 from app.models.forecasting import (
     WinnerCohortRow,
     SectorParameterRanking,
@@ -28,6 +29,7 @@ __all__ = [
     "ModelValidationRun", "ModelFeatureImportance", "LabelDefinition",
     "IngestionJob", "DataQualityIssue",
     "AuditLog",
+    "YearlyStock",
     "WinnerCohortRow", "SectorParameterRanking", "ForecastRun", "ForecastPrediction",
     "ForecastEvaluationRun", "ForecastEvaluationFold",
     "QuarterlyFundamental",

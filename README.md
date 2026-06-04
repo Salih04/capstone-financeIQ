@@ -1,18 +1,17 @@
-# FinanceIQ 
-Forecasting and comparison platform for BIST stocks using 2020–2025 datasets and multi-model scoring.
+# FinanceIQ
 
-## Quick Start
+Forecasting and comparison platform for BIST stocks, driven by a single trusted
+local dataset: the **2020–2025 yearly stock XLSX files**. No external APIs, no
+synthetic data, no scrapers.
 
-### Requirements
-- Docker + Docker Compose
-- (Local dev) Python 3.12, Node.js 20+
+## Architecture
 
-### Run with Docker
-
-```bash
-cd Capstone_Code
-docker compose up --build
 ```
+React (1.frontend) ──HTTP──▶ FastAPI (2.backend) ──SQLAlchemy──▶ PostgreSQL
+```
+
+Three Docker services: `db`, `backend`, `frontend`. The backend converts the
+trusted XLSX files to CSV and loads them into Postgres on startup.
 
 | Service | URL |
 |---|---|
@@ -20,41 +19,71 @@ docker compose up --build
 | Backend | http://localhost:8000 |
 | API Docs | http://localhost:8000/docs |
 
-Default entry route is ` /login `.
+Entry route: `/login`.
 
-## Trusted Data Source (single source of truth)
+## Trusted data source (single source of truth)
 
-The **only** trusted fundamentals source is `quarterly_fundamentals_2025.csv` (repo root).
-On startup the backend loads it via `scripts/load_trusted_fundamentals.py` — no synthetic,
-xlsx, or scraped data is seeded anymore. To (re)load manually:
+The ONLY accepted financial data is the yearly XLSX set in `3.Datasets/`:
+
+```
+3.Datasets/2020stocks.xlsx … 2025stocks.xlsx   (40 BIST companies × 54 columns)
+```
+
+These are converted, deterministically and without fabrication, to:
+
+```
+data/trusted/2020stocks.csv … 2025stocks.csv   one clean CSV per year
+data/trusted/stocks_2020_2025.csv              combined, with a `year` column
+```
+
+and loaded into the `yearly_stocks` Postgres table (one row per ticker-year).
+
+The data contract lives in [`2.backend/app/trusted_data.py`](2.backend/app/trusted_data.py):
+column map, required/optional columns, percent vs. monetary fields, safe numeric
+parsing (BOM, thousands separators, negatives), and validation. Missing values
+stay null — they are never invented.
+
+### Pipeline commands
 
 ```bash
 cd 2.backend
-TRUSTED_FUNDAMENTALS_CSV=../quarterly_fundamentals_2025.csv python -m scripts.load_trusted_fundamentals
-# inspect current DB state without writing:
-python -m scripts.load_trusted_fundamentals --summary
+
+# 1. Convert XLSX -> clean CSVs (writes data/trusted/)
+python -m scripts.convert_trusted_xlsx
+
+# 2. Load combined CSV -> Postgres (idempotent; aborts on invalid data).
+#    Auto-converts first if the combined CSV is missing.
+python -m scripts.load_trusted_yearly
+python -m scripts.load_trusted_yearly --reconvert   # force re-convert first
+python -m scripts.load_trusted_yearly --summary      # DB summary, no write
+
+# 3. Validate everything (data + schema + no banned refs + compile)
+python -m scripts.validate_trusted_data
 ```
 
-Retired data importers (xlsx/synthetic/KAP) now live in `unnecessary/` — see its README.
+On Docker startup the backend runs `python -m scripts.load_trusted_yearly`
+automatically (see `2.backend/Dockerfile` CMD).
 
-## Database Migrations (Alembic)
-
-Apply latest schema:
+## Run with Docker
 
 ```bash
-cd 2.backend
-alembic upgrade head
+docker compose up --build
 ```
 
-## Local Development
+The trusted dataset is mounted (`./3.Datasets`) and loaded on boot. Paths inside
+the container are set via `TRUSTED_DATASETS_DIR`, `TRUSTED_OUT_DIR`,
+`TRUSTED_COMBINED_CSV` in `docker-compose.yml`.
+
+## Local development
 
 ### Backend
 
 ```bash
 cd 2.backend
-source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/capstone_db" > .env
+cp .env.example .env          # set DATABASE_URL and SECRET_KEY
+python -m scripts.load_trusted_yearly
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -66,114 +95,49 @@ npm install
 npm run dev
 ```
 
-## Data Sources (2020–2025)
+### Database migrations (Alembic)
 
-Winner/stock input files live under `3.Datasets/`:
-
-```
-3.Datasets/
-  2020stocks.xlsx
-  2021stocks.xlsx
-  2022stocks.xlsx
-  2023stocks.xlsx
-  2024stocks.xlsx
-  2025stocks.xlsx
+```bash
+cd 2.backend
+alembic upgrade head        # head includes 20260406_0006 (yearly_stocks)
 ```
 
-Notes:
-- Each year can contain a different number of companies.
-- UI selection should always be year-aware; a stock list should be sourced from the selected year.
-- Missing values are handled with **median imputation**.
+`create_all` on startup is a safety net for fresh DBs; Alembic owns the schema.
 
-## Modeling Strategy (Score + Comparison)
+## Environment variables
 
-The platform uses five models for forecasting and scoring:
+| Var | Purpose |
+|---|---|
+| `DATABASE_URL` | Postgres connection string |
+| `SECRET_KEY` | JWT signing key. **Not committed.** If unset, a random per-process key is generated (JWTs reset on restart) — set it explicitly in production. |
+| `TRUSTED_DATASETS_DIR` | Dir of trusted XLSX (default `3.Datasets/`) |
+| `TRUSTED_OUT_DIR` | Output dir for generated CSVs (default `data/trusted/`) |
+| `TRUSTED_COMBINED_CSV` | Combined CSV path used by the loader |
 
-1. ElasticNet
-2. Random Forest Regressor
-3. XGBoost
-4. SARIMAX
-5. Temporal Fusion Transformer (TFT)
+No real secrets are committed. `.env` is gitignored.
 
-### Single-Stock Scoring
+## What was removed / quarantined
 
-Users can select one model to generate a score for a single stock. Output is based on trained model predictions and never synthetic or hard-coded values.
+Everything non-trusted is in [`unnecessary/`](unnecessary/README.md):
 
-### Comparison Mode
+- **Finnhub** — removed entirely (API key assumed leaked).
+- **News API / news page** — removed (not essential, was Finnhub-backed).
+- **Synthetic generator, seeders, KAP scraper, xlsx-into-quarterly importer** — quarantined.
+- **Old quarterly-CSV workflow** (`quarterly_fundamentals_2025.csv`, `load_trusted_fundamentals.py`) — retired in favor of the yearly XLSX pipeline.
+- **Hardcoded secrets** — the `SECRET_KEY` and `NEWS_API_KEY` defaults are gone.
 
-When comparing multiple stocks, the system runs **all five models** and produces a combined ranking. If a stock does not have data for the requested year/quarter, it is excluded from comparison and the UI should surface a clear warning.
+## Known limitations
 
-### Reliability & Generalization
-
-To keep outputs reliable and avoid memorization:
-- Use time-based train/validation splits.
-- Report evaluation metrics for each model.
-- Favor cross-validation or rolling-window evaluation where available.
-- Avoid leaking future data into training features.
-
-## Forecasting Flow
-
-1. Login/Register from `/login`
-2. Select year + upload winners (2020–2025 `.xlsx`)
-3. Upload quarterly fundamentals CSV (per year/quarter)
-4. Train model(s)
-5. Predict rankings
-6. Inspect details and explanations
-7. Run rolling time-CV evaluation
-
-## Required Quarterly Fundamentals CSV Columns
-
-`stock_code, sector, period, net_income, equity, total_assets, revenue, gross_profit, ebitda, ocf, capex, total_debt, cash, ebit, interest_expense, inventory, receivables, net_working_capital, market_cap, book_value, enterprise_value, eps, growth_rate, current_assets, current_liabilities, dividend_per_share, price`
-
-- `period` format must be `2020Q4`,`2021Q4`,`2022Q4`,`2023Q4`,`2024Q4`,`2025Q4`
-- Upload endpoint: `POST /fundamentals/upload-csv`
-
-## Key Pages
-
-| Page | Route | Purpose |
-|---|---|---|
-| Login | `/login` | Authentication |
-| Dashboard | `/dashboard` | Overall platform view |
-| Forecasting | `/forecasting` | Upload, train, predict, evaluate |
-| Forecast Detail | `/forecasting/detail` | Trend/importance/heatmap charts |
-| News | `/news` | Market updates + AI insight |
-| Validation Lab | `/validation` | Model validation tooling |
-| Data Health | `/data-health` | Ingestion/quality monitoring |
-
-## Forecasting API (Main)
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/upload-data` | Import yearly winner Excel preset |
-| POST | `/fundamentals/upload-csv` | Upload quarterly fundamentals |
-| POST | `/train-model` | Train sector/year parameter ranking |
-| POST | `/predict` | Generate stock rankings |
-| GET | `/get-parameters` | Ranked solid parameters |
-| GET | `/parameters/catalog` | Parameter catalog (category/formula/purpose) |
-| GET | `/get-stock-detail` | Per-stock score detail |
-| GET | `/get-explanation` | Explainability payload |
-| GET | `/predict/history` | Prediction run history |
-| POST | `/predict/evaluate` | Rolling window time-CV report |
-| GET | `/predict/trends` | Stock yearly trend series |
-| GET | `/predict/heatmap` | Sector feature heatmap |
-| POST | `/get-portfolio-analysis` | Corporate portfolio suggestions |
-| GET | `/news/updates` | News updates + AI insight |
-
-## Continuous Learning Ops
-
-Scripts are under `2.backend/scripts/`:
-- `rebuild_financial_pipeline.py` — full financial data rebuild
-- `retrain_forecasting.py` — batch forecasting model retrain
-- `incremental_retrain.py` — retrain only on new year data
-- `pipeline_runner.py` — incremental retrain + time-CV evaluation
-
-Airflow DAG template:
-- `2.backend/airflow/dags/forecasting_retrain_dag.py`
-
-## Infrastructure Scaffolding
-
-Cloud starter configs/docs:
-- `infra/aws/`
-- `infra/azure/`
-- `infra/gcp/`
-- `docs/DEPLOYMENT.md`
+- **Forecasting engine still reads the legacy `quarterly_fundamentals` /
+  `winner_cohort_rows` tables.** The trusted yearly data now lives in
+  `yearly_stocks`; wiring the scoring/forecasting engine onto it is the next
+  integration step (the data layer is ready; the contract maps 1:1 to the
+  features it needs). Until then, forecasting returns clear empty/insufficient
+  results rather than fabricated ones.
+- **No winner/target labels** ship with the trusted data. Supervised scoring
+  must not be presented as trained until real labels are provided. No labels are
+  generated or inferred.
+- The dataset is **yearly**, not quarterly. Period selection is a year
+  (2020–2025); year-over-year and multi-year comparisons use only data up to the
+  selected year (no future-year leakage — enforced in `validate_trusted_data`).
+```

@@ -13,7 +13,6 @@ import DataHealthPage from './pages/DataHealthPage'
 import LabelingLabPage from './pages/LabelingLabPage'
 import ForecastingPage from './pages/ForecastingPage'
 import ForecastingDetailPage from './pages/ForecastingDetailPage'
-import NewsUpdatesPage from './pages/NewsUpdatesPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppShell from './components/layout/AppShell'
 
@@ -44,7 +43,6 @@ export default function App() {
       <Route path="/labeling" element={<Protected><LabelingLabPage /></Protected>} />
       <Route path="/forecasting" element={<Protected><ForecastingPage /></Protected>} />
       <Route path="/forecasting/detail" element={<Protected><ForecastingDetailPage /></Protected>} />
-      <Route path="/news" element={<Protected><NewsUpdatesPage /></Protected>} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )

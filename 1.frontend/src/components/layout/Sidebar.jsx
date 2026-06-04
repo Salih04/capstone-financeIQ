@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import {
   LayoutDashboard, Building2, BarChart3, GitCompare, FileText,
   ShieldCheck, Activity, Tag, FlaskConical, ChevronLeft,
-  ChevronRight, LogOut, User, Settings, TrendingUp, Sparkles, BrainCircuit, Newspaper,
+  ChevronRight, LogOut, User, Settings, TrendingUp, Sparkles, BrainCircuit,
 } from 'lucide-react'
 
 const NAV_SECTIONS = [
@@ -15,7 +15,6 @@ const NAV_SECTIONS = [
       { path: '/companies', icon: Building2, label: 'Companies' },
       { path: '/compare', icon: GitCompare, label: 'Compare' },
       { path: '/reports', icon: FileText, label: 'Reports' },
-      { path: '/news', icon: Newspaper, label: 'News' },
     ],
   },
   {
