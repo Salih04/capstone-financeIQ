@@ -173,20 +173,14 @@ def build_returns(cfg: PipelineConfig) -> pd.DataFrame:
     r = r.merge(nxt[["ticker", "year", "next_year_return_pct"]], on=["ticker", "year"], how="left")
     r["target_year"] = r["year"] + 1
 
-    # cross-sectional ranks/percentiles WITHIN the target year
-    def _rank_block(g: pd.DataFrame) -> pd.DataFrame:
-        v = g["next_year_return_pct"]
-        g = g.copy()
-        g["next_year_rank_by_return"] = v.rank(ascending=False, method="min")
-        g["next_year_return_percentile"] = v.rank(pct=True) * 100
-        g["next_year_top_10pct_returner"] = (g["next_year_return_percentile"] >= 90).where(v.notna())
-        g["next_year_top_20pct_returner"] = (g["next_year_return_percentile"] >= 80).where(v.notna())
-        return g
-
-    r = r.groupby("target_year", group_keys=False).apply(_rank_block)
-    # pandas 3.x drops the grouping column from apply output; restore it.
-    if "target_year" not in r.columns:
-        r["target_year"] = r["year"] + 1
+    # cross-sectional ranks/percentiles WITHIN the target year (vectorized
+    # groupby-transforms; no apply -> no grouping-column FutureWarning).
+    grp = r.groupby("target_year")["next_year_return_pct"]
+    v = r["next_year_return_pct"]
+    r["next_year_rank_by_return"] = grp.rank(ascending=False, method="min")
+    r["next_year_return_percentile"] = grp.rank(pct=True) * 100
+    r["next_year_top_10pct_returner"] = (r["next_year_return_percentile"] >= 90).where(v.notna())
+    r["next_year_top_20pct_returner"] = (r["next_year_return_percentile"] >= 80).where(v.notna())
     r.to_csv(RETURNS_CSV, index=False)
     cov = int(r["next_year_return_pct"].notna().sum())
     cfg.say(f"[returns] {len(r)} rows; next-year target coverage {cov}/{len(r)}")
