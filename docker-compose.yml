@@ -27,12 +27,15 @@ services:
       SECRET_KEY: CHANGE_ME_IN_PRODUCTION_supersecretkey123
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: 1440
+      # Single trusted data source loaded on startup (see backend Dockerfile CMD)
+      TRUSTED_FUNDAMENTALS_CSV: /app/quarterly_fundamentals_2025.csv
     depends_on:
       db:
         condition: service_healthy
     volumes:
     - ./2.backend:/app
     - ./3.Datasets:/app/3.Datasets
+    - ./quarterly_fundamentals_2025.csv:/app/quarterly_fundamentals_2025.csv:ro
 
   frontend:
     build: ./1.frontend

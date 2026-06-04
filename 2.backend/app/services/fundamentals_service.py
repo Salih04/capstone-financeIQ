@@ -73,8 +73,11 @@ def _parse_period(period: str) -> tuple[int, int]:
 
 
 def upload_quarterly_fundamentals_csv(db: Session, content: bytes) -> dict[str, Any]:
-    df = pd.read_csv(io.StringIO(content.decode("utf-8")))
-    df.columns = [c.strip() for c in df.columns]
+    # utf-8-sig strips a leading BOM (the trusted CSV ships with one); plain
+    # utf-8 would leave "﻿" glued to the first header, and str.strip()
+    # does not remove it -> the required-column check would wrongly fail.
+    df = pd.read_csv(io.StringIO(content.decode("utf-8-sig")))
+    df.columns = [c.strip().lstrip("﻿") for c in df.columns]
 
     cols = set(df.columns)
     missing = REQUIRED_COLUMNS - cols

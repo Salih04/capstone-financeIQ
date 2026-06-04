@@ -22,6 +22,21 @@ docker compose up --build
 
 Default entry route is ` /login `.
 
+## Trusted Data Source (single source of truth)
+
+The **only** trusted fundamentals source is `quarterly_fundamentals_2025.csv` (repo root).
+On startup the backend loads it via `scripts/load_trusted_fundamentals.py` — no synthetic,
+xlsx, or scraped data is seeded anymore. To (re)load manually:
+
+```bash
+cd 2.backend
+TRUSTED_FUNDAMENTALS_CSV=../quarterly_fundamentals_2025.csv python -m scripts.load_trusted_fundamentals
+# inspect current DB state without writing:
+python -m scripts.load_trusted_fundamentals --summary
+```
+
+Retired data importers (xlsx/synthetic/KAP) now live in `unnecessary/` — see its README.
+
 ## Database Migrations (Alembic)
 
 Apply latest schema:
