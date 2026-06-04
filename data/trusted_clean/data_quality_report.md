@@ -16,14 +16,14 @@
 | 2025 | 40 | 40 | 0.0 |
 
 ## Manual financial history
-- Present: **False**
-- Files: []
-- Rows ingested: 0
+- Present: **True**
+- Files: ['candidate_from_yearly_snapshots.csv']
+- Rows ingested: 240
 - Accepted as features: []
-- Overrides from snapshot: {}
-- Rejected: {}
+- Overrides from snapshot: {'working_capital': 240, 'net_debt': 240, 'total_assets': 240, 'current_assets': 240, 'non_current_assets': 200, 'short_term_liabilities': 240, 'long_term_liabilities': 240, 'equity': 240}
+- Rejected: {'market_cap': 'frozen_across_years', 'enterprise_value': 'frozen_across_years', 'pe_ratio': 'frozen_across_years', 'pb_ratio': 'frozen_across_years', 'ps_ratio': 'frozen_across_years', 'ev_ebitda': 'frozen_across_years', 'gross_margin': 'frozen_across_years', 'ebitda_margin': 'frozen_across_years', 'net_margin': 'frozen_across_years', 'roe': 'frozen_across_years', 'roa': 'frozen_across_years', 'revenue': 'frozen_across_years', 'gross_profit': 'frozen_across_years', 'operating_income': 'frozen_across_years', 'ebitda': 'frozen_across_years', 'net_income': 'frozen_across_years'}
 - Misaligned columns: []
-- Issues: ['manual financial history missing (data/trusted_raw/financials/ empty)']
+- Issues: []
 
 ## Frozen reference columns EXCLUDED from features (unreliable snapshot)
 

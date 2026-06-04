@@ -4,12 +4,35 @@ Goal: study whether **year-T** financial metrics relate to **year-(T+1)**
 realized stock return for BIST companies. Research/educational only — **not
 investment advice.**
 
-## One command
+## Commands
 
 ```bash
-python -m scripts.data_collection.build_all          # build + validate
-make data                                            # same thing
+make extract-yearly-financials   # XLSX -> candidate manual file (validated)
+make data                        # build + validate modeling dataset
+make research                    # walk-forward experiments
+make full-research               # all three in order
 ```
+
+## Reusing the yearly Excel files (honest extraction)
+
+`scripts/data_collection/extract_yearly_snapshots_to_manual_financials.py` reads
+`20YYstocks.xlsx` (handles `(1)` duplicates — picks the richer file, reports
+both), normalizes headers, maps recognized financial columns to the manual
+schema, and writes `data/trusted_raw/financials/candidate_from_yearly_snapshots.csv`
+plus `data/trusted_clean/yearly_snapshot_migration_report.{json,md}`.
+
+It is **candidate** data — it then flows through the same manual-ingestion
+validator. The honest outcome on the current files: the income-statement,
+profitability and valuation columns (revenue, net income, margins, ROE/ROA, P/E,
+P/B, EV/EBITDA, market cap) are **rejected as `frozen_across_years`** because they
+are a single 2025 snapshot repeated in every file; return/price/volume columns are
+**skipped as leakage/momentum** at extraction. Only the genuinely year-varying
+balance-sheet columns survive (and merely override the identical base values).
+**Net new features from the XLSX: 0** — proven by the report, not asserted.
+
+So: the yearly XLSX files are safe for **returns, the ticker universe, and
+balance-sheet/growth features only**. Real valuation/profitability/momentum
+history must be supplied manually (see `MANUAL_FINANCIALS.md`).
 
 Flags: `--start-year`, `--end-year`, `--tickers A,B,C`, `--force-refresh`,
 `--skip-download` (default on), `--manual-only`, `--validate-only`.

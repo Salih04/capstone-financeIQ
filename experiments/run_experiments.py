@@ -171,6 +171,22 @@ def run() -> None:
     print(f"[experiments] manual-history features included: "
           f"{[c for c in manual_feats if c in feat_cols] or 'none'}")
     print(f"[experiments] train target years: {train_years} | test years: {test_years}")
+    # available targets / benchmark
+    avail_targets, bench_ok = [], False
+    if CLEAN_MODELING.is_file():
+        mcols = pd.read_csv(CLEAN_MODELING, nrows=1).columns
+        for t in ("next_year_return_pct", "next_year_top_20pct_returner",
+                  "next_year_excess_return_vs_bist100", "next_year_outperform_bist100"):
+            if t in mcols:
+                col = pd.read_csv(CLEAN_MODELING, usecols=[t])[t]
+                if col.notna().any():
+                    avail_targets.append(t)
+        bench_ok = "next_year_excess_return_vs_bist100" in avail_targets
+    print(f"[experiments] available targets: {avail_targets or ['next_year_return_pct']}")
+    print(f"[experiments] benchmark targets available: {bench_ok} "
+          f"{'' if bench_ok else '(provide BIST100 returns to enable excess/outperform targets)'}")
+    print("[experiments] primary target: next_year_return_pct (regression + top-k selection). "
+          "On small/static-feature data, prefer ranking/top-k + baselines over exact return claims.")
     per_split_n = panel.groupby("feature_year").size().to_dict()
     if max(per_split_n.values(), default=0) < 60:
         print(f"[experiments] ⚠️ SMALL SAMPLE: ~{max(per_split_n.values(), default=0)} rows/year. "

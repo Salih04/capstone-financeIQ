@@ -199,26 +199,42 @@ def build_returns(cfg: PipelineConfig) -> pd.DataFrame:
 # --------------------------------------------------------------------------- #
 # BIST100 benchmark — manual CSV only, never fabricated
 # --------------------------------------------------------------------------- #
+# Benchmark may live in trusted_raw (preferred, user-provided) or trusted_clean.
+BENCHMARK_RAW_CSV = RAW_DIR / "bist100_benchmark_returns.csv"
+BENCHMARK_RAW_TEMPLATE = RAW_DIR / "bist100_benchmark_returns.template.csv"
+_BENCHMARK_TEMPLATE_TEXT = (
+    "year,bist100_return_pct\n"
+    "# Fill REAL BIST100 yearly total-return % (one row per year). Do not fabricate.\n"
+)
+
+
 def ensure_benchmark_template() -> None:
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
     if not BENCHMARK_TEMPLATE.exists():
-        BENCHMARK_TEMPLATE.write_text(
-            "year,bist100_return_pct,source,notes\n"
-            "# Fill REAL BIST100 yearly total-return %, then save as "
-            "bist100_benchmark_returns.csv. Do not fabricate.\n"
-        )
+        BENCHMARK_TEMPLATE.write_text(_BENCHMARK_TEMPLATE_TEXT)
+    if not BENCHMARK_RAW_TEMPLATE.exists():
+        BENCHMARK_RAW_TEMPLATE.write_text(_BENCHMARK_TEMPLATE_TEXT)
 
 
 def load_benchmark(cfg: PipelineConfig) -> pd.DataFrame | None:
     ensure_benchmark_template()
-    if not BENCHMARK_CSV.is_file():
-        cfg.say(f"[benchmark] MISSING. Provide {BENCHMARK_CSV.name} "
-                f"(template: {BENCHMARK_TEMPLATE.name}). Excess-return targets skipped.")
+    path = next((p for p in (BENCHMARK_RAW_CSV, BENCHMARK_CSV) if p.is_file()), None)
+    if path is None:
+        cfg.say(f"[benchmark] MISSING. Provide {BENCHMARK_RAW_CSV} or {BENCHMARK_CSV} "
+                "(year,bist100_return_pct). Excess-return targets skipped.")
         return None
-    b = pd.read_csv(BENCHMARK_CSV, comment="#")
+    b = pd.read_csv(path, comment="#")
     b.columns = [c.strip().lower() for c in b.columns]
+    if "year" not in b.columns or "bist100_return_pct" not in b.columns:
+        cfg.say(f"[benchmark] {path.name}: missing year/bist100_return_pct columns; skipping.")
+        return None
+    b["bist100_return_pct"] = pd.to_numeric(b["bist100_return_pct"], errors="coerce")
     b = b.dropna(subset=["year", "bist100_return_pct"])
     b["year"] = b["year"].astype(int)
-    cfg.say(f"[benchmark] loaded {len(b)} years: {sorted(b['year'].tolist())}")
+    if b.duplicated("year").any():
+        cfg.say(f"[benchmark] {path.name}: duplicate year rows; keeping last.")
+        b = b.drop_duplicates("year", keep="last")
+    cfg.say(f"[benchmark] loaded {len(b)} years from {path.name}: {sorted(b['year'].tolist())}")
     return b[["year", "bist100_return_pct"]]
 
 

@@ -315,17 +315,84 @@
     }
   ],
   "manual_financials": {
-    "files": [],
-    "rows_ingested": 0,
-    "coverage_by_year": {},
-    "columns_ingested": [],
-    "unknown_columns_ignored": [],
+    "files": [
+      "candidate_from_yearly_snapshots.csv"
+    ],
+    "rows_ingested": 240,
+    "coverage_by_year": {
+      "2020": 40,
+      "2021": 40,
+      "2022": 40,
+      "2023": 40,
+      "2024": 40,
+      "2025": 40
+    },
+    "columns_ingested": [
+      "market_cap",
+      "enterprise_value",
+      "pe_ratio",
+      "pb_ratio",
+      "ps_ratio",
+      "ev_ebitda",
+      "gross_margin",
+      "ebitda_margin",
+      "net_margin",
+      "roe",
+      "roa",
+      "working_capital",
+      "net_debt",
+      "total_assets",
+      "current_assets",
+      "non_current_assets",
+      "short_term_liabilities",
+      "long_term_liabilities",
+      "total_equity",
+      "revenue",
+      "gross_profit",
+      "operating_income",
+      "ebitda",
+      "net_income"
+    ],
+    "unknown_columns_ignored": [
+      "roic",
+      "net_debt_to_ebitda",
+      "current_ratio",
+      "leverage_ratio",
+      "financial_debt_ratio"
+    ],
     "misaligned_columns_rejected": [],
     "all_null_columns_rejected": [],
-    "issues": [
-      "manual financial history missing (data/trusted_raw/financials/ empty)"
-    ],
-    "present": false
+    "issues": [],
+    "present": true,
+    "overrides_from_snapshot": {
+      "working_capital": 240,
+      "net_debt": 240,
+      "total_assets": 240,
+      "current_assets": 240,
+      "non_current_assets": 200,
+      "short_term_liabilities": 240,
+      "long_term_liabilities": 240,
+      "equity": 240
+    },
+    "accepted_feature_columns": [],
+    "rejected_feature_columns": {
+      "market_cap": "frozen_across_years",
+      "enterprise_value": "frozen_across_years",
+      "pe_ratio": "frozen_across_years",
+      "pb_ratio": "frozen_across_years",
+      "ps_ratio": "frozen_across_years",
+      "ev_ebitda": "frozen_across_years",
+      "gross_margin": "frozen_across_years",
+      "ebitda_margin": "frozen_across_years",
+      "net_margin": "frozen_across_years",
+      "roe": "frozen_across_years",
+      "roa": "frozen_across_years",
+      "revenue": "frozen_across_years",
+      "gross_profit": "frozen_across_years",
+      "operating_income": "frozen_across_years",
+      "ebitda": "frozen_across_years",
+      "net_income": "frozen_across_years"
+    }
   },
   "issues": [],
   "valid_for_T_to_T1_modeling": true

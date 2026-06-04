@@ -34,13 +34,22 @@ Margins/ratios/growth are **derived** by `normalize_financials`, so you only nee
 the raw statement lines + year-end valuation. Valuation must match the year end —
 never copy current multiples into past years; leave null instead.
 
-### `data/trusted_clean/bist100_benchmark_returns.csv`
+### BIST100 benchmark — `data/trusted_raw/bist100_benchmark_returns.csv` (preferred) or `data/trusted_clean/bist100_benchmark_returns.csv`
 
 ```
-year,bist100_return_pct,source,notes
+year,bist100_return_pct
 ```
-Real BIST100 yearly total returns. Template:
-`bist100_benchmark_returns.template.csv`.
+Real BIST100 yearly total returns, one row per year. Templates are emitted in
+both locations (`*.template.csv`). When present, the pipeline adds
+`next_year_bist100_return_pct`, `next_year_excess_return_vs_bist100`,
+`next_year_outperform_bist100`. Never fabricated.
+
+### Reusing the yearly Excel files
+
+`make extract-yearly-financials` pulls any genuinely year-varying columns from
+`3.Datasets/20YYstocks.xlsx` into a candidate manual file. Frozen
+(snapshot) and return/momentum columns are auto-rejected — see the migration
+report. This does **not** replace supplying real per-year statements above.
 
 ## Acceptable export sources
 

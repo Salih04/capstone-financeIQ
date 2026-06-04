@@ -1,0 +1,170 @@
+# Yearly-snapshot migration report
+
+- Output: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/data/trusted_raw/financials/candidate_from_yearly_snapshots.csv`  | rows: **240**
+- Candidate columns written: ['current_assets', 'current_ratio', 'ebitda', 'ebitda_margin', 'enterprise_value', 'ev_ebitda', 'financial_debt_ratio', 'gross_margin', 'gross_profit', 'leverage_ratio', 'long_term_liabilities', 'market_cap', 'net_debt', 'net_debt_to_ebitda', 'net_income', 'net_margin', 'non_current_assets', 'operating_income', 'pb_ratio', 'pe_ratio', 'ps_ratio', 'revenue', 'roa', 'roe', 'roic', 'short_term_liabilities', 'total_assets', 'total_equity', 'working_capital']
+- Ticker-year coverage: {2020: 40, 2021: 40, 2022: 40, 2023: 40, 2024: 40, 2025: 40}
+- Duplicate-year files: none
+- Misaligned columns rejected: [{'year': 2024, 'column': 'leverage_ratio', 'reason': 'ratio_column_has_balance_sheet_like_magnitudes'}, {'year': 2024, 'column': 'financial_debt_ratio', 'reason': 'ratio_column_has_balance_sheet_like_magnitudes'}, {'year': 2024, 'column': 'non_current_assets', 'reason': 'money_column_has_tiny_decimal_values'}]
+- Ambiguous columns: none
+- Issues: none
+
+## Selected file per year
+
+- 2020: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2020stocks.xlsx` (rows 40, annual-return col: None)
+- 2021: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2021stocks.xlsx` (rows 40, annual-return col: None)
+- 2022: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2022stocks.xlsx` (rows 40, annual-return col: None)
+- 2023: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2023stocks.xlsx` (rows 40, annual-return col: None)
+- 2024: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2024stocks.xlsx` (rows 40, annual-return col: None)
+- 2025: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2025stocks.xlsx` (rows 40, annual-return col: None)
+
+## Columns skipped (per year, with reason)
+
+### 2020
+- `return_2020_01_02_2020_12_31`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `price`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `daily_change`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `volume`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_week`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_month`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_6_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_year_to_date_ytd`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_year`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_5_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `peg_ratio`: unrecognized
+- `net_financial_expenses_ebitda`: unrecognized
+- `revenue_growth`: unrecognized
+- `gross_profit_growth`: unrecognized
+- `ebitda_growth`: unrecognized
+- `operating_income_growth`: unrecognized
+- `net_income_growth`: unrecognized
+- `free_cash_flow_fcf`: unrecognized
+- `cash_flow_from_operating_activities`: unrecognized
+- `cash_flow_from_investing_activities`: unrecognized
+- `cash_flow_from_financing_activities`: unrecognized
+### 2021
+- `return_2021_01_04_2021_12_31`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `price`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `daily_change`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `volume`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_week`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_month`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_6_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_year_to_date_ytd`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_year`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_5_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `peg_ratio`: unrecognized
+- `net_financial_expenses_ebitda`: unrecognized
+- `revenue_growth`: unrecognized
+- `gross_profit_growth`: unrecognized
+- `ebitda_growth`: unrecognized
+- `operating_income_growth`: unrecognized
+- `net_income_growth`: unrecognized
+- `free_cash_flow_fcf`: unrecognized
+- `cash_flow_from_operating_activities`: unrecognized
+- `cash_flow_from_investing_activities`: unrecognized
+- `cash_flow_from_financing_activities`: unrecognized
+### 2022
+- `return_2022_01_03_2022_12_30`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `price`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `daily_change`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `volume`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_week`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_month`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_6_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_year_to_date_ytd`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_year`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_5_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `peg_ratio`: unrecognized
+- `net_financial_expenses_ebitda`: unrecognized
+- `revenue_growth`: unrecognized
+- `gross_profit_growth`: unrecognized
+- `ebitda_growth`: unrecognized
+- `operating_income_growth`: unrecognized
+- `net_income_growth`: unrecognized
+- `free_cash_flow_fcf`: unrecognized
+- `cash_flow_from_operating_activities`: unrecognized
+- `cash_flow_from_investing_activities`: unrecognized
+- `cash_flow_from_financing_activities`: unrecognized
+### 2023
+- `return_2023_01_02_2023_12_29`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `price`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `daily_change`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `volume`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_week`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_month`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_6_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_year_to_date_ytd`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_year`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_5_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `peg_ratio`: unrecognized
+- `net_financial_expenses_ebitda`: unrecognized
+- `revenue_growth`: unrecognized
+- `gross_profit_growth`: unrecognized
+- `ebitda_growth`: unrecognized
+- `operating_income_growth`: unrecognized
+- `net_income_growth`: unrecognized
+- `free_cash_flow_fcf`: unrecognized
+- `cash_flow_from_operating_activities`: unrecognized
+- `cash_flow_from_investing_activities`: unrecognized
+- `cash_flow_from_financing_activities`: unrecognized
+### 2024
+- `return_2024_01_01_2024_12_31`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `price`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `daily_change`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `volume`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_week`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_month`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_6_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_year_to_date_ytd`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_year`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_5_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `peg_ratio`: unrecognized
+- `net_financial_expenses_ebitda`: unrecognized
+- `leverage_ratio`: misaligned:ratio_column_has_balance_sheet_like_magnitudes
+- `financial_debt_ratio`: misaligned:ratio_column_has_balance_sheet_like_magnitudes
+- `revenue_growth`: unrecognized
+- `gross_profit_growth`: unrecognized
+- `ebitda_growth`: unrecognized
+- `operating_income_growth`: unrecognized
+- `net_income_growth`: unrecognized
+- `non_current_assets`: misaligned:money_column_has_tiny_decimal_values
+- `free_cash_flow_fcf`: unrecognized
+- `cash_flow_from_operating_activities`: unrecognized
+- `cash_flow_from_investing_activities`: unrecognized
+- `cash_flow_from_financing_activities`: unrecognized
+### 2025
+- `return_2025_01_02_2025_12_31`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `price`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `daily_change`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `volume`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_week`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_month`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_6_months`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_year_to_date_ytd`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_1_year`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_3_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `return_last_5_years`: leaky_or_snapshot_return/price/volume (target/momentum)
+- `peg_ratio`: unrecognized
+- `net_financial_expenses_ebitda`: unrecognized
+- `revenue_growth`: unrecognized
+- `gross_profit_growth`: unrecognized
+- `ebitda_growth`: unrecognized
+- `operating_income_growth`: unrecognized
+- `net_income_growth`: unrecognized
+- `free_cash_flow_fcf`: unrecognized
+- `cash_flow_from_operating_activities`: unrecognized
+- `cash_flow_from_investing_activities`: unrecognized
+- `cash_flow_from_financing_activities`: unrecognized
+
+Next: `make data   # ingest + validate the candidate file`
