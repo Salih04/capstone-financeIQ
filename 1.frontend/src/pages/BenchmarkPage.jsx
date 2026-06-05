@@ -1,71 +1,74 @@
 import { useEffect, useState } from 'react'
 import { LineChart } from 'lucide-react'
-import { Card, SectionHeader } from '../components/ui'
+import { SectionHeader } from '../components/ui'
 import { researchApi } from '../api/researchApi'
-import { MetricCard, RenderList, formatPercent, asText } from '../utils/safeRender'
+import { MetricCard, EvidencePanel, Bullets, formatPercent, asText } from '../utils/safeRender'
 
 export default function BenchmarkPage() {
   const [b, setB] = useState(null)
   useEffect(() => { researchApi.benchmark().then(r => setB(r.data)) }, [])
 
   const returns = b?.returns_by_year || {}
-  const years = b?.years_covered || Object.keys(returns).map(Number)
+  const years = (b?.years_covered || Object.keys(returns).map(Number)).slice().sort((a, c) => a - c)
+  const maxAbs = Math.max(1, ...years.map(y => Math.abs(Number(returns[y]) || 0)))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <SectionHeader title="BIST100 Benchmark" sub="Yearly index returns used for excess/outperform targets" icon={LineChart} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
+      <SectionHeader title="BIST100 Benchmark" sub="Yearly index returns used for excess / outperform targets" icon={LineChart} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px,1fr))', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(165px,1fr))', gap: 12 }}>
         <MetricCard label="Status" value={b?.available ? 'Available' : 'Missing'} tone={b?.available ? 'good' : 'warn'} />
-        <MetricCard label="Source" value={asText(b?.source)} />
+        <MetricCard label="Source" value={asText(b?.source)} mono={false} />
         <MetricCard label="Years covered" value={asText(years.length)} sub={years.join(', ')} />
-        <MetricCard label="Excess/outperform targets" value={b?.targets_enabled ? 'enabled' : 'disabled'} tone={b?.targets_enabled ? 'good' : 'warn'} />
+        <MetricCard label="Excess / outperform" value={b?.targets_enabled ? 'Enabled' : 'Disabled'} tone={b?.targets_enabled ? 'good' : 'warn'} mono={false} />
       </div>
 
-      <Card>
-        <SectionHeader title="BIST100 yearly return %" />
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-            <thead><tr style={{ color: 'var(--text-3)', textAlign: 'left' }}><th style={th}>Year</th><th style={th}>Return %</th><th style={th}>Bar</th></tr></thead>
-            <tbody>
-              {years.sort((a, b2) => a - b2).map(y => {
-                const v = Number(returns[y])
-                const w = Math.min(100, Math.abs(v) / 2)
-                return (
-                  <tr key={y}>
-                    <td style={td}>{asText(y)}</td>
-                    <td style={{ ...td, fontWeight: 700, color: v >= 0 ? 'var(--success,#16a34a)' : 'var(--danger,#dc2626)' }}>{formatPercent(v)}</td>
-                    <td style={td}><div style={{ height: 8, width: `${w}%`, minWidth: 4, background: 'var(--accent,#6366f1)', borderRadius: 4 }} /></td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+      {/* Yearly returns with proportional bars */}
+      <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: 18 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 700, marginBottom: 14 }}>BIST100 yearly return</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+          {years.map(y => {
+            const v = Number(returns[y])
+            const pos = v >= 0
+            const w = Math.max(2, (Math.abs(v) / maxAbs) * 100)
+            const color = pos ? 'var(--success)' : 'var(--danger)'
+            return (
+              <div key={y} style={{ display: 'grid', gridTemplateColumns: '52px 1fr 72px', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-2)', fontVariantNumeric: 'tabular-nums' }}>{y}</span>
+                <div style={{ height: 12, background: 'var(--surface-1)', borderRadius: 999, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${w}%`, background: color, borderRadius: 999, transition: 'width .3s' }} />
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 800, textAlign: 'right', color, fontVariantNumeric: 'tabular-nums' }}>
+                  {formatPercent(v)}
+                </span>
+              </div>
+            )
+          })}
+          {years.length === 0 && <div style={{ color: 'var(--text-3)', fontSize: 13 }}>No benchmark data.</div>}
         </div>
-      </Card>
+      </div>
 
-      <Card>
-        <SectionHeader title="How benchmark targets are created" />
-        <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: 'var(--text-2)', lineHeight: 1.7 }}>
-          <li><code>next_year_bist100_return_pct</code> — the index return in the target year.</li>
-          <li><code>next_year_excess_return_vs_bist100</code> = stock next-year return − BIST100 next-year return.</li>
-          <li><code>next_year_outperform_bist100</code> = excess &gt; 0.</li>
-        </ul>
-        <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 8 }}>{asText(b?.explanation)}</p>
-        <div style={{ marginTop: 8 }}><RenderList items={b?.derived_targets} /></div>
-      </Card>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px,1fr))', gap: 16 }}>
+        <EvidencePanel title="What benchmark-adjusted targets mean" tone="info">
+          <Bullets size={12.5} items={[
+            'next_year_bist100_return_pct — the index return in the target year.',
+            'next_year_excess_return_vs_bist100 — stock next-year return minus BIST100 next-year return.',
+            'next_year_outperform_bist100 — true when excess return is greater than zero.',
+          ]} />
+        </EvidencePanel>
+        <EvidencePanel title="Source & fallback" tone="neutral"
+          footer="Yearly return = (last close ÷ first close − 1) × 100. Never fabricated.">
+          <Bullets size={12.5} items={[
+            'Primary: Yahoo Finance chart API for XU100.IS (no key / paid API).',
+            'Fallback: manual daily CSV (data/trusted_raw/bist100_daily.csv, accepts Turkish number formats).',
+            'Last resort: template — flagged as unavailable rather than faked.',
+          ]} />
+        </EvidencePanel>
+      </div>
 
-      <Card>
-        <SectionHeader title="Source & fallback" />
-        <p style={{ fontSize: 13, color: 'var(--text-2)' }}>
-          Collected by <code>make benchmark</code>: Yahoo Finance XU100.IS (no key/paid API) → manual daily CSV
-          fallback (<code>data/trusted_raw/bist100_daily.csv</code>, accepts Turkish number formats) → template.
-          Yearly return = (last close ÷ first close − 1) × 100. Never fabricated.
-        </p>
-      </Card>
+      {b?.explanation ? (
+        <p style={{ fontSize: 12, color: 'var(--text-3)', margin: 0 }}>{asText(b.explanation)}</p>
+      ) : null}
     </div>
   )
 }
-
-const th = { padding: '8px 10px', borderBottom: '1px solid var(--border)' }
-const td = { padding: '7px 10px' }

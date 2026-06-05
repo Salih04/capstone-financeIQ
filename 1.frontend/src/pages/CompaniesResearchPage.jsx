@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Building2, Search } from 'lucide-react'
-import { Card, SectionHeader } from '../components/ui'
+import { Building2, Search, ChevronRight } from 'lucide-react'
+import { SectionHeader } from '../components/ui'
 import { researchApi } from '../api/researchApi'
-import { formatNumber, asText } from '../utils/safeRender'
+import { CompactTable, MiniBar, formatNumber, asText } from '../utils/safeRender'
 
 export default function CompaniesResearchPage() {
   const nav = useNavigate()
@@ -13,46 +13,45 @@ export default function CompaniesResearchPage() {
   useEffect(() => { researchApi.companies().then(r => setData(r.data)) }, [])
 
   const rows = useMemo(() => {
-    const all = data?.companies || []
-    return q ? all.filter(c => c.ticker.toLowerCase().includes(q.toLowerCase())) : all
-  }, [data, q])
+    const all = (data?.companies || []).slice().sort((a, b) => (a.ml_rank ?? 1e9) - (b.ml_rank ?? 1e9))
+    const filtered = q ? all.filter(c => c.ticker.toLowerCase().includes(q.toLowerCase())) : all
+    return filtered.map(c => ({ ...c, __onClick: () => nav(`/research/companies/${c.ticker}`) }))
+  }, [data, q, nav])
+
+  const columns = [
+    { key: 'ml_rank', label: '#', align: 'right' },
+    { key: 'ticker', label: 'Ticker' },
+    { key: 'year', label: 'Year', align: 'right' },
+    { key: 'ml_score', label: 'ML score', align: 'right' },
+    { key: 'bar', label: '', align: 'left' },
+    { key: 'go', label: '', align: 'right' },
+  ]
+
+  const renderCell = (c, r) => {
+    if (c.key === 'ticker') return <span style={{ fontWeight: 700, color: 'var(--text-1)' }}>{r.ticker}</span>
+    if (c.key === 'ml_score') return formatNumber(r.ml_score, 3)
+    if (c.key === 'bar') return <div style={{ width: 90 }}><MiniBar value={(r.ml_score ?? 0) * 100} max={100} tone="accent" /></div>
+    if (c.key === 'go') return <ChevronRight size={15} color="var(--text-3)" />
+    return asText(r[c.key])
+  }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1000 }}>
       <SectionHeader title="Companies" sub={`Research scores · latest year ${asText(data?.year)} · ${asText(data?.count)} companies`} icon={Building2}
         actions={
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 7, alignItems: 'center', background: 'var(--surface-2)',
+            border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-md)', padding: '6px 11px' }}>
             <Search size={15} color="var(--text-3)" />
-            <input value={q} onChange={e => setQ(e.target.value)} placeholder="filter ticker" style={inp} />
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder="filter ticker"
+              style={{ background: 'transparent', color: 'var(--text-1)', border: 0, outline: 'none', fontSize: 13, width: 130 }} />
           </div>
         } />
-      <Card>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-            <thead><tr style={{ color: 'var(--text-3)', textAlign: 'left' }}>
-              <th style={th}>Ticker</th><th style={th}>Year</th><th style={th}>ML score (0–1)</th><th style={th}>ML rank</th>
-            </tr></thead>
-            <tbody>
-              {rows.length === 0 && <tr><td colSpan={4} style={{ padding: 12, color: 'var(--text-3)' }}>—</td></tr>}
-              {rows.map(c => (
-                <tr key={c.ticker} onClick={() => nav(`/research/companies/${c.ticker}`)} style={{ cursor: 'pointer' }}>
-                  <td style={{ ...td, fontWeight: 700 }}>{c.ticker}</td>
-                  <td style={td}>{asText(c.year)}</td>
-                  <td style={td}>{formatNumber(c.ml_score, 3)}</td>
-                  <td style={td}>{asText(c.ml_rank)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-      <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
-        ML score = transparent rank of validated year-T features (no trained model beats baseline). Click a row for detail.
+      <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: 8 }}>
+        <CompactTable columns={columns} rows={rows} renderCell={renderCell} empty="No matching companies." />
+      </div>
+      <p style={{ fontSize: 11.5, color: 'var(--text-3)', margin: 0 }}>
+        ML score = transparent rank of validated year-T features (no trained model beats baseline). Click a row for the research snapshot.
       </p>
     </div>
   )
 }
-
-const inp = { background: 'var(--surface-1)', color: 'var(--text-1)', border: '1px solid var(--border-strong)', borderRadius: 8, padding: '6px 10px', fontSize: 12 }
-const th = { padding: '8px 10px', borderBottom: '1px solid var(--border)' }
-const td = { padding: '7px 10px' }

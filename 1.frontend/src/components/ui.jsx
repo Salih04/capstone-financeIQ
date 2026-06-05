@@ -262,6 +262,7 @@ export function Chip({ children, color = 'default' }) {
       background: c.bg, color: c.color,
       borderRadius: 6, padding: '2px 9px',
       fontSize: 11, fontWeight: 700,
+      maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word',
     }}>{children}</span>
   )
 }

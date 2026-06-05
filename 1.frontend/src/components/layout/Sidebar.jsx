@@ -9,22 +9,22 @@ import {
 
 const NAV_SECTIONS = [
   {
-    label: null,
+    label: 'Research Terminal',
     items: [
       { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+      { path: '/research-agent', icon: Bot, label: 'Research Agent' },
       { path: '/research/companies', icon: Building2, label: 'Companies' },
-      { path: '/reports', icon: FileText, label: 'Reports' },
+      { path: '/experiments', icon: FlaskConical, label: 'Experiments' },
+      { path: '/data-quality', icon: Database, label: 'Data Quality' },
+      { path: '/benchmark', icon: LineChart, label: 'Benchmark' },
     ],
   },
   {
-    label: 'Research',
+    label: 'Legacy / Tools',
     items: [
-      { path: '/research-agent', icon: Bot, label: 'Research Agent' },
-      { path: '/data-quality', icon: Database, label: 'Data Quality' },
-      { path: '/experiments', icon: FlaskConical, label: 'Experiments' },
-      { path: '/benchmark', icon: LineChart, label: 'Benchmark' },
+      { path: '/forecasting', icon: BrainCircuit, label: 'Forecasting' },
       { path: '/research', icon: Sparkles, label: 'Score Explorer' },
-      { path: '/forecasting', icon: BrainCircuit, label: 'Forecasting (legacy)' },
+      { path: '/reports', icon: FileText, label: 'Reports' },
     ],
   },
   {
