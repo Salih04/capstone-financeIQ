@@ -95,6 +95,7 @@ class CompareItem(BaseModel):
 
 
 class CompareResult(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
     items: list[CompareItem]
     warnings: list[str] = Field(default_factory=list)
     model_outputs: dict[str, list[CompareItem]] = Field(default_factory=dict)

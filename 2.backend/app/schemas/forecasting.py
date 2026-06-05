@@ -1,6 +1,10 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+
+# Models below carry fields named model_* (model_type/model_version) which collide
+# with Pydantic v2's protected "model_" namespace. Opt out without renaming.
+_ALLOW_MODEL = ConfigDict(protected_namespaces=())
 
 
 class UploadPresetRequest(BaseModel):
@@ -44,6 +48,7 @@ class GetStocksResponseItem(BaseModel):
 
 
 class GetStocksResponse(BaseModel):
+    model_config = _ALLOW_MODEL
     run_id: int
     year: int
     sector: str
@@ -55,6 +60,7 @@ class GetStocksResponse(BaseModel):
 
 
 class PredictRequest(BaseModel):
+    model_config = _ALLOW_MODEL
     year: int
     sector: str
     user_type: str = "individual"
@@ -113,6 +119,7 @@ class PortfolioAnalysisResponse(BaseModel):
 
 
 class EvaluationRequest(BaseModel):
+    model_config = _ALLOW_MODEL
     sector: str
     model_type: str = "scoring"
     window_size: int = 2
@@ -128,6 +135,7 @@ class EvaluationFoldOut(BaseModel):
 
 
 class EvaluationOut(BaseModel):
+    model_config = _ALLOW_MODEL
     run_id: int
     sector: str
     model_type: str
@@ -139,6 +147,7 @@ class EvaluationOut(BaseModel):
 
 
 class PredictHistoryItem(BaseModel):
+    model_config = _ALLOW_MODEL
     run_id: int
     year: int
     sector: str

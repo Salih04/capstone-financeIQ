@@ -1,0 +1,1181 @@
+{
+  "columns": {
+    "pe_ratio": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              12.55
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              53.95
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              23.88
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              3.27
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              17.69
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              12.17
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              47.31
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              19.19
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              3.19
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              12.47
+            ]
+          }
+        }
+      }
+    },
+    "pb_ratio": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              1.03
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              6.82
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              2.69
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              0.44
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              1.43
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              0.98
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              5.98
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              2.38
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              0.43
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              1.27
+            ]
+          }
+        }
+      }
+    },
+    "ev_ebitda": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              4.24
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              35.91
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              11.12
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              5.65
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              7.49
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              3.86
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              31.54
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              9.35
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              5.58
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              5.26
+            ]
+          }
+        }
+      }
+    },
+    "roe": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              8.19
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              14.61
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              11.66
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              15.43
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              8.05
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              8.17
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              14.61
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              12.95
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              15.43
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              9.98
+            ]
+          }
+        }
+      }
+    },
+    "roa": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              2.05
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              8.47
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              5.76
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              7.04
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              4.98
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              2.1
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              8.47
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              6.06
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              7.04
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              5.43
+            ]
+          }
+        }
+      }
+    },
+    "gross_margin": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              37.7
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              30.72
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              19.34
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              8.36
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              9.78
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              35.84
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              30.72
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              18.94
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              8.36
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              8.35
+            ]
+          }
+        }
+      }
+    },
+    "ebitda_margin": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              16.22
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              25.16
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              6.03
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              8.24
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              7.48
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              12.92
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              25.16
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              4.75
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              8.24
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              6.12
+            ]
+          }
+        }
+      }
+    },
+    "net_margin": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 38,
+        "total_ticker_count": 40,
+        "frozen_share": 0.95,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              3.67
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              16.15
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              2.58
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              3.84
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              3.56
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              3.22
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              16.15
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              3.04
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              3.84
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              1.44
+            ]
+          }
+        }
+      }
+    },
+    "market_cap": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              112381578917.4
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              1916340000000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              444900000000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              425385000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              522161607058.0
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              116940789442.5
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              1680360000000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              449400000000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              414000000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              449906772133.0
+            ]
+          }
+        }
+      }
+    },
+    "enterprise_value": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              167765622917.4
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              1938424087000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              483474474000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              955779000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              465173846058.0
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              181064791442.5
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              1702444087000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              477517311000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              944394000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              375200557133.0
+            ]
+          }
+        }
+      }
+    },
+    "revenue": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              243847131000.0
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              34305800000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              721062506000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              257961000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              830356131000.0
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              62424703000.0
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              34305800000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              212862328000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              257961000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              258253850000.0
+            ]
+          }
+        }
+      }
+    },
+    "ebitda": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              39545145000.0
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              8632803000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              43484618000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              21261000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              62072685000.0
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              8065157000.0
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              8632803000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              10112206000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              21261000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              15795554000.0
+            ]
+          }
+        }
+      }
+    },
+    "net_income": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              8956856000.0
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              5539312000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              18632108000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              9915000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              29523183000.0
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              2009692000.0
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              5539312000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              6460986000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              9915000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              3709759000.0
+            ]
+          }
+        }
+      }
+    },
+    "price": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 40,
+        "total_ticker_count": 40,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              18.98
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              420.25
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              741.5
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              308.25
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              271.0
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              20.66
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              362.25
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              373.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              299.75
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              232.2
+            ]
+          }
+        }
+      }
+    },
+    "total_assets": {
+      "yearly": {
+        "dataset": "yearly",
+        "frozen_ticker_count": 0,
+        "total_ticker_count": 40,
+        "frozen_share": 0.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 2,
+            "values": [
+              413578419000.0,
+              55384044000.0
+            ]
+          },
+          "ASELS": {
+            "unique_values": 2,
+            "values": [
+              485018937000.0,
+              22084087000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 2,
+            "values": [
+              338093384000.0,
+              38574474000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 2,
+            "values": [
+              2158033000000.0,
+              530394000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 2,
+            "values": [
+              591973843000.0,
+              -56987761000.0
+            ]
+          }
+        }
+      },
+      "quarterly": {
+        "dataset": "quarterly",
+        "frozen_ticker_count": 78,
+        "total_ticker_count": 78,
+        "frozen_share": 1.0,
+        "representative": {
+          "AEFES": {
+            "unique_values": 1,
+            "values": [
+              445641756000.0
+            ]
+          },
+          "ASELS": {
+            "unique_values": 1,
+            "values": [
+              485018937000.0
+            ]
+          },
+          "BIMAS": {
+            "unique_values": 1,
+            "values": [
+              398302331000.0
+            ]
+          },
+          "THYAO": {
+            "unique_values": 1,
+            "values": [
+              2158033000000.0
+            ]
+          },
+          "TUPRS": {
+            "unique_values": 1,
+            "values": [
+              704745459000.0
+            ]
+          }
+        }
+      }
+    }
+  },
+  "verdict": "Some columns vary across periods; see per-column detail.",
+  "note": "Columns are valuable in theory but are REJECTED because the current files appear to contain a repeated point-in-time snapshot: per ticker the value is identical across all periods, so the column carries no historical T->T+1 signal."
+}

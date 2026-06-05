@@ -27,6 +27,7 @@ MODELING_CSV = CLEAN / "modeling_dataset_2020_2025.csv"
 QUALITY_JSON = CLEAN / "data_quality_report.json"
 MIGRATION_JSON = CLEAN / "yearly_snapshot_migration_report.json"
 LEADERBOARD = REPO_ROOT / "experiments" / "leaderboard.csv"
+MODEL_OUTPUTS = REPO_ROOT / "experiments" / "results" / "research_agent_model_outputs.csv"
 
 NOT_ADVICE = ("This is a research-support score, NOT investment advice. The LLM is a "
               "decision-support layer, not the numerical predictor.")
@@ -92,6 +93,7 @@ def load_research_state() -> dict:
         "migration": _load_json(MIGRATION_JSON),
         "leaderboard": None,
         "modeling": None,
+        "model_outputs": None,
     }
     if MODELING_CSV.is_file():
         state["modeling"] = pd.read_csv(MODELING_CSV)
@@ -100,6 +102,13 @@ def load_research_state() -> dict:
             state["leaderboard"] = pd.read_csv(LEADERBOARD)
         except Exception:
             state["leaderboard"] = None
+    if MODEL_OUTPUTS.is_file():
+        try:
+            mo = pd.read_csv(MODEL_OUTPUTS)
+            mo["ticker"] = mo["ticker"].astype(str).str.upper()
+            state["model_outputs"] = mo
+        except Exception:
+            state["model_outputs"] = None
     return state
 
 
@@ -273,23 +282,39 @@ def confidence_score(state: dict | None = None) -> dict:
 # ML score (PHASE 6) — never fabricated
 # --------------------------------------------------------------------------- #
 def ml_score_for_company(ticker: str, state: dict | None = None) -> dict:
-    """Deterministic rank-based ML proxy in [0,1] from validated features.
+    """ML score in [0,1]. Prefer the experiments artifact, else a feature-rank proxy.
 
-    There is no trained per-company score column (experiments show baselines
-    beat ML on this data), so we use a transparent rank of available year-T
-    features as the structured score, clearly labelled as a fallback proxy.
+    There is no trained per-company model that beats the baseline on this data, so
+    even the artifact score is a transparent rank-based fallback. score_source,
+    target_name and model_name are always exposed.
     """
     state = state or load_research_state()
+    t = str(ticker).strip().upper()
+
+    mo = state.get("model_outputs")
+    if mo is not None and "ticker" in mo.columns:
+        row = mo[mo["ticker"] == t]
+        if not row.empty:
+            r = row.sort_values("year").iloc[-1]
+            return {"ml_score": _num(r.get("ml_score")), "ml_rank": int(r["ml_rank"]) if pd.notna(r.get("ml_rank")) else None,
+                    "score_source": str(r.get("score_source", "fallback_rank_score")),
+                    "target_name": str(r.get("target_name", "next_year_return_pct")),
+                    "model_name": str(r.get("model_name", "baseline_equal_weight")),
+                    "ml_score_note": str(r.get("notes", ""))}
+
     try:
         ctx = build_company_context(ticker, state)
     except (KeyError, ValueError) as exc:
-        return {"ml_score": None, "ml_score_note": str(exc)}
+        return {"ml_score": None, "score_source": "unavailable", "target_name": None,
+                "model_name": None, "ml_score_note": str(exc)}
     pcts = list(ctx["top_positive_features"].values()) + list(ctx["top_negative_features"].values())
     if not pcts:
-        return {"ml_score": None, "ml_score_note": "no usable features for this company-year"}
+        return {"ml_score": None, "score_source": "unavailable", "target_name": None,
+                "model_name": None, "ml_score_note": "no usable features for this company-year"}
     score = round(sum(pcts) / len(pcts) / 100.0, 3)
-    return {"ml_score": score,
-            "ml_score_note": "rank-based proxy from validated year-T features (no trained model beats baseline on this data)"}
+    return {"ml_score": score, "ml_rank": None, "score_source": "deterministic_feature_rank",
+            "target_name": "next_year_return_pct", "model_name": "feature_rank_proxy",
+            "ml_score_note": "rank-based proxy from validated year-T features (no trained model beats baseline)"}
 
 
 # --------------------------------------------------------------------------- #
@@ -435,10 +460,24 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
 
     llm_score = llm_out.get("llm_research_score")
     comp = composite_score(ml.get("ml_score"), conf["confidence_score"], llm_score, cfg)
+    # Flat, explicit score block (PHASE 5 contract) — components never hidden.
+    score = {
+        "ticker": ctx["ticker"], "year": ctx["latest_year"],
+        "score_source": ml.get("score_source"), "target_name": ml.get("target_name"),
+        "model_name": ml.get("model_name"), "ml_rank": ml.get("ml_rank"),
+        "ml_score": comp["ml_score"], "confidence_score": comp["confidence_score"],
+        "llm_research_score": comp["llm_research_score"],
+        "final_research_score": comp["final_research_score"],
+        "partial_score": comp["partial_score"], "weights_used": comp["weights_used"],
+        "confidence_level": conf["confidence_level"], "confidence_reasons": conf["confidence_reasons"],
+        "reasoning": llm_out.get("reasoning"), "warnings": ctx["warnings"],
+        "limitations": llm_out.get("limitations"), "scoring_notes": comp["scoring_notes"],
+        "not_investment_advice": True,
+    }
     return {
         "ticker": ctx["ticker"], "context": ctx, "ml": ml, "confidence": conf,
-        "llm": llm_out, "score": comp, "provider_used": cfg["provider"],
-        "fallback_used": fallback, "disclaimer": NOT_ADVICE,
+        "llm": llm_out, "score": score, "provider_used": cfg["provider"],
+        "fallback_used": fallback, "disclaimer": NOT_ADVICE, "not_investment_advice": True,
     }
 
 

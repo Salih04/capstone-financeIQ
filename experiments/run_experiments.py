@@ -89,6 +89,84 @@ def build_panel() -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
+# Targets evaluated when present + non-null in the modeling dataset.
+TARGETS = ["next_year_return_pct", "next_year_excess_return_vs_bist100",
+           "next_year_outperform_bist100", "next_year_top_20pct_returner"]
+
+
+def _feature_cols(m: pd.DataFrame) -> list[str]:
+    non = {"ticker", "company_name", "year", "sector", "indices", "is_bist100",
+           "same_year_return_pct", "target_year", "has_target", "is_inference_row"}
+    return [c for c in m.columns if c not in non and not c.startswith("next_year_")]
+
+
+def build_panel_for_target(target_col: str):
+    """(panel, feat_cols) with the given next_year_* column as target. None if absent."""
+    if not CLEAN_MODELING.is_file():
+        return None, []
+    m = pd.read_csv(CLEAN_MODELING)
+    if target_col not in m.columns or m[target_col].notna().sum() == 0:
+        return None, []
+    feat_cols = _feature_cols(m)
+    out = m[["ticker", "year", *feat_cols]].copy().rename(columns={"year": "feature_year"})
+    for c in feat_cols:
+        out[c] = out.groupby("feature_year")[c].rank(pct=True)
+    out["target_return"] = pd.to_numeric(m[target_col], errors="coerce").values
+    out = out.dropna(subset=["target_return"]).reset_index(drop=True)
+    return out, feat_cols
+
+
+def _eval_target(target_col: str) -> list[dict]:
+    panel, feat_cols = build_panel_for_target(target_col)
+    if panel is None:
+        return []
+    rows = []
+    for split in SPLITS:
+        tr = panel[(panel["feature_year"] + 1).isin(split["train_target_years"])]
+        te = panel[panel["feature_year"] == split["test_feature_year"]]
+        Xtr, ytr = tr[feat_cols].to_numpy(float), tr["target_return"].to_numpy(float)
+        Xte, yte = te[feat_cols].to_numpy(float), te["target_return"].to_numpy(float)
+        m = ~np.isnan(ytr)
+        Xtr, ytr = Xtr[m], ytr[m]
+        if len(ytr) < 5 or np.sum(~np.isnan(yte)) < 5:
+            continue
+        for name, (kind, fn) in MODELS.items():
+            try:
+                yp = np.asarray(fn(Xtr, ytr, Xte), dtype=float)
+                met = _metrics(yte, yp)
+            except Exception as exc:  # noqa
+                met = {"error": str(exc)}
+            rows.append({"target": target_col, "split": split["name"], "model": name,
+                         "kind": kind, **{k: v for k, v in met.items() if k != "n"}})
+    return rows
+
+
+def write_model_outputs(path: Path) -> None:
+    """Latest usable-year company scores for the research agent.
+
+    No trained model beats the equal-weight baseline on this data, so the score
+    is a transparent rank-based fallback (mean of validated feature percentiles).
+    """
+    if not CLEAN_MODELING.is_file():
+        return
+    m = pd.read_csv(CLEAN_MODELING)
+    feat_cols = _feature_cols(m)
+    year = int(m["year"].max())
+    sub = m[m["year"] == year].copy()
+    pr = sub[feat_cols].rank(pct=True)
+    sub["ml_score"] = pr.mean(axis=1, skipna=True).round(4)
+    sub = sub.sort_values("ml_score", ascending=False)
+    sub["ml_rank"] = range(1, len(sub) + 1)
+    out = pd.DataFrame({
+        "ticker": sub["ticker"], "year": year, "ml_score": sub["ml_score"],
+        "ml_rank": sub["ml_rank"], "prediction": None,
+        "target_name": "next_year_return_pct", "model_name": "baseline_equal_weight",
+        "score_source": "fallback_rank_score",
+        "notes": "mean of validated year-T feature percentiles; baseline beats ML on this small/static data",
+    })
+    out.to_csv(path, index=False)
+
+
 # ---------------- metrics ----------------
 def _metrics(y_true: np.ndarray, y_pred: np.ndarray, k: int = 5) -> dict:
     m = ~np.isnan(y_true) & ~np.isnan(y_pred)
@@ -216,6 +294,32 @@ def run() -> None:
 
     lb = pd.DataFrame(leaderboard_rows)
     lb.to_csv(LEADERBOARD, index=False)
+    lb.to_csv(RESULTS / "leaderboard.csv", index=False)
+
+    # ---- benchmark-aware multi-target leaderboard + artifacts (PHASE 4) ----
+    by_target_rows = []
+    for tgt in TARGETS:
+        by_target_rows.extend(_eval_target(tgt))
+    bt = pd.DataFrame(by_target_rows)
+    if len(bt):
+        bt.to_csv(RESULTS / "leaderboard_by_target.csv", index=False)
+    write_model_outputs(RESULTS / "research_agent_model_outputs.csv")
+
+    # honest per-target summary
+    sm = ["# Experiment summary (benchmark-aware, walk-forward)\n",
+          "Small data (~40 stocks/year), leakage-controlled. Treat all numbers as noisy.",
+          "Features are largely a static snapshot; baselines usually match/beat ML.\n",
+          f"Targets evaluated: {sorted(bt['target'].unique()) if len(bt) else ['next_year_return_pct']}\n"]
+    if len(bt):
+        for tgt in sorted(bt["target"].unique()):
+            sub = bt[bt["target"] == tgt]
+            base = sub[sub["kind"] == "baseline"]["spearman"].dropna()
+            ml = sub[sub["kind"] == "ml"]["spearman"].dropna()
+            sm.append(f"## {tgt}")
+            sm.append(f"- baseline mean Spearman: {round(float(base.mean()),3) if len(base) else 'n/a'}")
+            sm.append(f"- best ML Spearman: {round(float(ml.max()),3) if len(ml) else 'n/a'}")
+            sm.append(f"- ML beats baseline: {bool(len(ml) and len(base) and ml.max() > base.mean())}\n")
+    (RESULTS / "experiment_summary.md").write_text("\n".join(sm))
 
     # Honest summary report.
     lines = ["# Experiment summary (next-year return prediction)\n",

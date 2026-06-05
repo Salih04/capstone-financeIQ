@@ -5,6 +5,10 @@
 inspect-quarterly:
 	PYTHONPATH=. python -m scripts.data_collection.inspect_quarterly_snapshots
 
+# Frozen-column evidence report for the data provider / stakeholders.
+frozen-evidence:
+	PYTHONPATH=. python -m scripts.data_collection.generate_frozen_column_evidence
+
 # Generate the research-agent instruction dataset (sample + full).
 research-agent-dataset:
 	PYTHONPATH=. python research_agent_training/generate_instruction_dataset.py
@@ -13,9 +17,10 @@ research-agent-dataset:
 research-agent-check:
 	PYTHONPATH=. python -m pytest tests/
 
-# Full pipeline + dataset generation + tests.
+# Full pipeline + frozen evidence + dataset generation + tests.
 full-research-agent:
 	$(MAKE) full-research
+	$(MAKE) frozen-evidence
 	$(MAKE) research-agent-dataset
 	PYTHONPATH=. python -m pytest tests/
 
