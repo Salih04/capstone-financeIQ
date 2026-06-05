@@ -88,4 +88,19 @@ class AskBody(BaseModel):
 def ask(body: AskBody, _: User = Depends(get_current_user)):
     if not body.question.strip():
         raise HTTPException(422, "question is required")
-    return RA.answer_research_question(body.question, body.ticker, body.max_context_tokens)
+    try:
+        return RA.answer_research_question(body.question, body.ticker, body.max_context_tokens)
+    except Exception as exc:  # noqa - never 500 for a normal research question
+        return {
+            "answer": ("This question could not be fully processed from the current validated data. "
+                       "No values were fabricated. Research support only — not investment advice."),
+            "intent": RA.classify_intent(body.question),
+            "data_used": {"source": "none", "year": None, "rows_used": 0, "fields_used": []},
+            "llm_result": None,
+            "warnings": ["request_processing_error"],
+            "limitations": [f"internal error: {type(exc).__name__}"],
+            "provider_used": RA.get_config()["provider"],
+            "fallback_used": True,
+            "llm_error": str(exc),
+            "disclaimer": "This is research support, not investment advice.",
+        }

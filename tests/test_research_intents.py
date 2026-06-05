@@ -71,6 +71,22 @@ def test_benchmark_outperformers_helper(state):
     assert "next_year_outperform_bist100" in o["fields_used"]
 
 
+def test_ask_responses_are_json_serializable(state):
+    """Regression: numpy int64 in target_year/years_available broke the API with 500."""
+    import json
+    for q in ("Which stocks beat BIST100?", "Which stocks beat BIST100 in 2025?",
+              "Top ranked stocks", "What changed after corrected yearly files?"):
+        r = RA.answer_research_question(q, state=state)
+        json.dumps(r)  # must not raise TypeError (int64 not serializable)
+
+
+def test_beat_bist100_year_specific(state):
+    r = RA.answer_research_question("Which stocks beat BIST100 in 2025?", state=state)
+    assert r["intent"] == "benchmark_outperformers"
+    assert r["data_used"].get("target_year") == 2025
+    assert "historical" in r["answer"].lower() and "not a future recommendation" in r["answer"].lower()
+
+
 def test_no_advice_in_answers(state):
     for q in ("Which stocks beat BIST100?", "Which stocks are ranked highest?"):
         ans = RA.answer_research_question(q, state=state)["answer"].lower()

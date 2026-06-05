@@ -52,6 +52,24 @@ class ForecastingApiContractTests(unittest.TestCase):
         self.assertIn("items", body)
         self.assertTrue(isinstance(body["items"], list))
 
+    def test_filters_populate_after_fundamentals_upload(self):
+        # Uploading quarterly fundamentals (with a sector) must make Year/Sector
+        # dropdowns populate via /forecasting/filters (union of cohort + fundamentals).
+        cols = ("ticker,sector,period,revenue,net_income,total_assets,total_equity,"
+                "total_liabilities,current_assets,current_liabilities,cash,"
+                "operating_cash_flow,operating_income,gross_profit,inventory")
+        row = "ASELS,Savunma,2025Q4,100,10,500,200,300,150,80,30,40,25,15,20"
+        csv = (cols + "\n" + row + "\n").encode()
+        up = self.client.post("/fundamentals/upload-csv", headers=self.headers,
+                              files={"file": ("quarterly_fundamentals_2025.csv", io.BytesIO(csv), "text/csv")})
+        self.assertNotEqual(up.status_code, 500)
+        self.assertEqual(up.status_code, 200)
+        r = self.client.get("/forecasting/filters", headers=self.headers)
+        self.assertEqual(r.status_code, 200)
+        body = r.json()
+        self.assertIn(2025, body["years"])
+        self.assertIn("Savunma", body["sectors"])
+
 
 if __name__ == "__main__":
     unittest.main()

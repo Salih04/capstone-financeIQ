@@ -89,7 +89,10 @@ export default function ForecastingPage() {
       const { data } = await api.post('/fundamentals/upload-csv', form, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-      setMsg(`Fundamentals uploaded. created=${data.created}, updated=${data.updated}, skipped=${data.skipped}`)
+      // Refetch filters: uploaded fundamentals carry sector + year, so Year/Sector
+      // dropdowns should now populate and Train Parameters become usable.
+      await loadFilters()
+      setMsg(`Corrected financial history loaded (created=${data.created}, updated=${data.updated}, skipped=${data.skipped}). Year/Sector refreshed.`)
     } catch (e) {
       setMsg(e.response?.data?.detail || 'Fundamentals upload failed.')
     }
@@ -303,6 +306,12 @@ export default function ForecastingPage() {
               {filters.sectors.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
+          {(filters.years.length === 0 || filters.sectors.length === 0) && (
+            <div style={{ marginTop: 8, fontSize: 11.5, color: 'var(--text-3)', lineHeight: 1.5 }}>
+              Year & Sector populate after importing a Winner file (Step 1) or uploading quarterly
+              fundamentals (Step 2). After upload they refresh automatically.
+            </div>
+          )}
           <select value={modelType} onChange={(e) => setModelType(e.target.value)} style={{ ...inputS, marginTop: 8 }}>
             <option value="scoring">Scoring (Primary)</option>
             <option value="dbscan">Cluster Profile</option>

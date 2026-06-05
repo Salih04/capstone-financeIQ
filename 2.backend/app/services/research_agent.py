@@ -944,8 +944,8 @@ def get_benchmark_outperformers(year: int | None = None, limit: int = 10, state:
     if sub.empty:
         return {"available": False, "reason": "no completed benchmark target years yet"}
     sub["target_year"] = sub["target_year"].astype(int)
-    years_avail = sorted(sub["target_year"].unique())
-    use_year = int(year) if year in years_avail else years_avail[-1]
+    years_avail = sorted(int(y) for y in sub["target_year"].unique())
+    use_year = int(year) if (year is not None and int(year) in years_avail) else years_avail[-1]
     yr = sub[sub["target_year"] == use_year].copy()
     out = yr[yr["next_year_outperform_bist100"].astype(bool)].copy()
     out = out.sort_values("next_year_excess_return_vs_bist100", ascending=False)
@@ -954,10 +954,14 @@ def get_benchmark_outperformers(year: int | None = None, limit: int = 10, state:
              "stock_return_pct": _num(r.get("next_year_return_pct")),
              "bist100_return_pct": _num(r.get("next_year_bist100_return_pct"))}
             for _, r in out.head(limit).iterrows()]
+    bench_ret = None
+    if "next_year_bist100_return_pct" in yr.columns and len(yr):
+        bench_ret = _num(yr["next_year_bist100_return_pct"].dropna().iloc[0]) if yr["next_year_bist100_return_pct"].notna().any() else None
     return {
         "available": True,
         "target_year": use_year,
         "years_available": years_avail,
+        "benchmark_return_pct": bench_ret,
         "outperformer_count": int(len(out)),
         "total_in_year": int(len(yr)),
         "truncated": bool(len(out) > limit),
@@ -1029,14 +1033,15 @@ def _intent_answer(intent: str, question: str, state: dict, ticker: str | None) 
         names = ", ".join(f"{r['ticker']} (+{r['excess_return_vs_bist100_pct']:.1f}% vs BIST100)"
                           for r in o["outperformers"]) or "none"
         trunc = " (top 10 shown)" if o["truncated"] else ""
-        ans = (f"Using completed target years {o['years_available'][0]}–{o['years_available'][-1]}, the system "
-               f"can identify historical outperformers versus BIST100. For target year {o['target_year']}, "
-               f"{o['outperformer_count']} of {o['total_in_year']} stocks beat BIST100{trunc}: {names}. "
-               "This is historical evaluation of realized returns, not a future recommendation.")
+        bench = f"BIST100 returned {o['benchmark_return_pct']:.1f}% that year; " if o.get("benchmark_return_pct") is not None else ""
+        ans = (f"For target year {o['target_year']}, {bench}{o['outperformer_count']} of {o['total_in_year']} "
+               f"stocks beat BIST100{trunc}: {names}. Completed target years available: "
+               f"{o['years_available'][0]}–{o['years_available'][-1]}. This is historical evaluation of realized "
+               "returns, not a future recommendation.")
         return {"answer": ans, "intent_data": o,
                 "data_used": {"source": "modeling_dataset (realized benchmark targets)",
-                              "year": o["target_year"], "rows_used": len(o["outperformers"]),
-                              "fields_used": o["fields_used"]},
+                              "year": o["target_year"], "target_year": o["target_year"],
+                              "rows_used": o["total_in_year"], "fields_used": o["fields_used"]},
                 "warnings": warns, "limitations": lims}
 
     if intent == "benchmark_status":

@@ -1225,10 +1225,22 @@ def get_stock_explanation(db: Session, run_id: int, stock_code: str) -> dict[str
 
 
 def get_available_filters(db: Session) -> dict[str, Any]:
-    rows = db.query(WinnerCohortRow.year, WinnerCohortRow.sector).distinct().all()
-    years = sorted({int(r[0]) for r in rows if r[0] is not None})
-    years = [y for y in years if 2020 <= y <= 2025]
-    sectors = sorted({str(r[1]) for r in rows if r[1]})
+    # Years/sectors come from imported Winner cohort files AND uploaded quarterly
+    # fundamentals — so the dropdowns populate after either ingestion path.
+    years: set[int] = set()
+    sectors: set[str] = set()
+    for r in db.query(WinnerCohortRow.year, WinnerCohortRow.sector).distinct().all():
+        if r[0] is not None:
+            years.add(int(r[0]))
+        if r[1]:
+            sectors.add(str(r[1]))
+    for r in db.query(QuarterlyFundamental.year, QuarterlyFundamental.sector).distinct().all():
+        if r[0] is not None:
+            years.add(int(r[0]))
+        if r[1]:
+            sectors.add(str(r[1]))
+    years = sorted(y for y in years if 2020 <= y <= 2025)
+    sectors = sorted(sectors)
     return {"years": years, "sectors": sectors}
 
 

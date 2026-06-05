@@ -5,7 +5,9 @@ import {
 } from 'recharts'
 import { FlaskConical, Search, AlertTriangle, Trophy } from 'lucide-react'
 import api from '../api/client'
+import { researchApi } from '../api/researchApi'
 import { Card, SectionHeader, StatCard, EmptyState, ScoreBadge, Chip } from '../components/ui'
+import { MetricCard } from '../utils/safeRender'
 
 const fmt = (v, d = 1) => (v === null || v === undefined || Number.isNaN(v) ? '—' : Number(v).toFixed(d))
 const pct = (v) => (v === null || v === undefined ? '—' : `${Number(v).toFixed(1)}%`)
@@ -21,6 +23,7 @@ export default function ResearchPage() {
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [terminal, setTerminal] = useState(null)   // current validated truth (research-agent)
 
   useEffect(() => {
     api.get('/research/years')
@@ -30,6 +33,10 @@ export default function ResearchPage() {
       })
       .catch((e) => setError(e?.response?.data?.detail || 'Failed to load years'))
     api.get('/research/dashboard').then(({ data }) => setDashboard(data)).catch(() => {})
+    // current validated state (benchmark, 27 features, corrected financials, model signal)
+    Promise.all([researchApi.summary(), researchApi.benchmark(), researchApi.diagnostics()])
+      .then(([s, b, d]) => setTerminal({ ctx: s.data?.context || {}, bench: b.data || {}, diag: d.data?.diagnostics || {} }))
+      .catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -69,7 +76,11 @@ export default function ResearchPage() {
   if (error) return <EmptyState icon={AlertTriangle} title="Research data unavailable" description={String(error)} />
 
   const v = dashboard?.validation
-  const benchMissing = dashboard && !dashboard.benchmark?.available
+  // Current validated truth overrides any stale dashboard artifact.
+  const benchOk = terminal?.bench?.available ?? dashboard?.benchmark?.available
+  const featureCount = terminal?.ctx?.feature_count
+  const correctedLoaded = terminal?.ctx?.corrected_yearly_financials?.available
+  const weak = terminal?.diag?.weak_backtest
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180 }}>
@@ -85,30 +96,31 @@ export default function ResearchPage() {
         }
       />
 
-      {dashboard?.data_note && (
-        <Card style={{ borderColor: 'var(--warning)' }}>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', color: 'var(--text-2)', fontSize: 13 }}>
-            <AlertTriangle size={18} />
-            <span><b>Data note:</b> {dashboard.data_note}</span>
-          </div>
-        </Card>
-      )}
+      {/* Current validated status strip (overrides any stale artifact) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(155px,1fr))', gap: 12 }}>
+        <MetricCard label="Validated features" value={featureCount ?? '—'} tone="good" sub="changed 17 → 27" />
+        <MetricCard label="BIST100 benchmark" value={benchOk ? 'Available' : 'Missing'} tone={benchOk ? 'good' : 'warn'} sub="excess/outperform enabled" />
+        <MetricCard label="Corrected financials" value={correctedLoaded ? 'Loaded' : 'Pending'} tone={correctedLoaded ? 'good' : 'warn'} sub="income & profitability" />
+        <MetricCard label="Model signal" value={weak ? 'Weak' : 'OK'} tone={weak ? 'bad' : 'good'} sub="still unstable" />
+      </div>
 
-      {benchMissing && (
-        <Card style={{ borderColor: 'var(--warning)' }}>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', color: 'var(--text-2)' }}>
-            <AlertTriangle size={18} />
-            <span>{dashboard.benchmark?.message || 'BIST100 benchmark missing.'} Excess-return vs BIST100 is hidden until provided.</span>
-          </div>
-        </Card>
-      )}
+      <div style={{ fontSize: 12.5, color: 'var(--text-2)', background: 'var(--surface-2)', border: '1px solid var(--border-strong)',
+        borderRadius: 'var(--radius-md)', padding: '10px 13px', lineHeight: 1.55 }}>
+        {benchOk
+          ? <>BIST100 benchmark available — excess/outperform evaluation enabled. </>
+          : <>BIST100 benchmark file missing. </>}
+        The original snapshot files had the same valuation/profitability values repeated each year. Corrected
+        yearly files now add 10 year-varying income/profitability features. Historical valuation fields such as
+        P/E, P/B and EV/EBITDA are still missing/frozen. Score vs realized same-year return below is diagnostic
+        only, not a future prediction.
+      </div>
 
       {/* Model-quality strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
         <StatCard label="Mean Spearman (all years)" value={v ? fmt(v.mean_spearman, 3) : '—'} sub="score vs same-year return" />
         <StatCard label="Years score worked" value={v ? (v.years_score_worked.join(', ') || 'none') : '—'} />
         <StatCard label="Years score failed" value={v ? (v.years_score_failed.join(', ') || 'none') : '—'} />
-        <StatCard label="Companies this year" value={overview?.count ?? '—'} sub={`BIST100: ${overview?.bist100_return != null ? pct(overview.bist100_return) : 'missing'}`} />
+        <StatCard label="Companies this year" value={overview?.count ?? '—'} sub={`BIST100: ${overview?.bist100_return != null ? pct(overview.bist100_return) : (benchOk ? 'available' : 'missing')}`} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.3fr) minmax(0, 1fr)', gap: 16 }}>
@@ -207,7 +219,7 @@ function CompanyDetail({ d }) {
         <Mini label="Return Rank" value={`${d.return_rank ?? '—'} / ${d.total_companies}`} />
         <Mini label="Score Rank" value={`${d.score_rank ?? '—'} / ${d.total_companies}`} />
         <Mini label="Market Score" value={fmt(d.market_score)} />
-        <Mini label="vs BIST100" value={d.excess_vs_bist100 != null ? `${d.excess_vs_bist100.toFixed(1)}%` : 'benchmark missing'} />
+        <Mini label="vs BIST100" value={d.excess_vs_bist100 != null ? `${d.excess_vs_bist100.toFixed(1)}%` : 'n/a this view'} />
         <Mini label="Gap to best" value={d.gap_to_best != null ? `${d.gap_to_best.toFixed(1)}%` : '—'} />
       </div>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
