@@ -8,77 +8,77 @@
       "n": 40,
       "mae": 82.62,
       "rmse": 132.23,
-      "spearman": -0.192,
+      "spearman": -0.2,
       "precision_at_5": 0.0,
-      "top_bucket_avg_return": 18.13,
+      "top_bucket_avg_return": 16.08,
       "median_actual_return": 44.38,
-      "directional_acc": 0.45
+      "directional_acc": 0.4
     },
     "baseline_rank_score": {
       "kind": "baseline",
       "n": 40,
       "mae": 82.62,
       "rmse": 132.23,
-      "spearman": -0.192,
+      "spearman": -0.2,
       "precision_at_5": 0.0,
-      "top_bucket_avg_return": 18.13,
+      "top_bucket_avg_return": 16.08,
       "median_actual_return": 44.38,
-      "directional_acc": 0.45
+      "directional_acc": 0.4
     },
     "linear_regression": {
       "kind": "ml",
       "n": 40,
-      "mae": 129.1,
-      "rmse": 168.14,
-      "spearman": -0.013,
-      "precision_at_5": 0.2,
-      "top_bucket_avg_return": 74.23,
+      "mae": 141.0,
+      "rmse": 197.65,
+      "spearman": 0.09,
+      "precision_at_5": 0.0,
+      "top_bucket_avg_return": 14.63,
       "median_actual_return": 44.38,
-      "directional_acc": 0.55
+      "directional_acc": 0.6
     },
     "ridge": {
       "kind": "ml",
       "n": 40,
-      "mae": 124.25,
-      "rmse": 157.7,
-      "spearman": 0.028,
+      "mae": 131.03,
+      "rmse": 172.35,
+      "spearman": 0.119,
       "precision_at_5": 0.2,
-      "top_bucket_avg_return": 74.23,
+      "top_bucket_avg_return": 82.19,
       "median_actual_return": 44.38,
-      "directional_acc": 0.55
+      "directional_acc": 0.65
     },
     "lasso": {
       "kind": "ml",
       "n": 40,
-      "mae": 127.38,
-      "rmse": 166.41,
-      "spearman": -0.009,
+      "mae": 138.12,
+      "rmse": 192.84,
+      "spearman": 0.131,
       "precision_at_5": 0.2,
-      "top_bucket_avg_return": 74.23,
+      "top_bucket_avg_return": 82.19,
       "median_actual_return": 44.38,
-      "directional_acc": 0.6
+      "directional_acc": 0.65
     },
     "elasticnet": {
       "kind": "ml",
       "n": 40,
-      "mae": 122.76,
-      "rmse": 153.15,
-      "spearman": 0.055,
+      "mae": 128.07,
+      "rmse": 162.29,
+      "spearman": 0.053,
       "precision_at_5": 0.2,
-      "top_bucket_avg_return": 74.23,
+      "top_bucket_avg_return": 61.71,
       "median_actual_return": 44.38,
-      "directional_acc": 0.55
+      "directional_acc": 0.6
     },
     "random_forest": {
       "kind": "ml",
       "n": 40,
-      "mae": 140.41,
-      "rmse": 197.73,
-      "spearman": -0.247,
+      "mae": 140.91,
+      "rmse": 194.8,
+      "spearman": -0.097,
       "precision_at_5": 0.0,
-      "top_bucket_avg_return": -10.32,
+      "top_bucket_avg_return": 24.25,
       "median_actual_return": 44.38,
-      "directional_acc": 0.5
+      "directional_acc": 0.65
     }
   }
 }

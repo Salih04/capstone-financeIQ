@@ -52,6 +52,7 @@ BENCHMARK_CSV_ALT = CLEAN / "bist100_benchmark_returns.csv"
 BENCHMARK_REPORT = CLEAN / "bist100_benchmark_report.json"
 FROZEN_EVIDENCE = CLEAN / "frozen_column_evidence.json"
 QUARTERLY_INSPECTION = CLEAN / "quarterly_snapshot_inspection.json"
+CORRECTED_YEARLY_REPORT = CLEAN / "corrected_yearly_ingestion_report.json"
 
 NOT_ADVICE = ("This is a research-support score, NOT investment advice. The LLM is a "
               "decision-support layer, not the numerical predictor.")
@@ -185,7 +186,23 @@ def build_summary_context(state: dict | None = None) -> dict:
         "benchmark_years": live_bench["years_covered"],
         "benchmark_returns": live_bench["returns_by_year"],
         "enabled_benchmark_targets": (live_bench["derived_targets"] if live_bench["available"] else []),
+        "corrected_yearly_financials": corrected_yearly_payload(),
         "valid_for_modeling": q.get("valid_for_T_to_T1_modeling"),
+    }
+
+
+def corrected_yearly_payload() -> dict:
+    """Status of the corrected-yearly income/profitability ingestion (if present)."""
+    if not CORRECTED_YEARLY_REPORT.is_file():
+        return {"available": False}
+    j = _load_json(CORRECTED_YEARLY_REPORT)
+    return {
+        "available": bool(j),
+        "accepted_columns": sorted((j.get("accepted_columns") or {}).keys()),
+        "frozen_valuation_columns": sorted((j.get("frozen_valuation_columns") or {}).keys()),
+        "misalignment_2024_columns": sorted((j.get("misalignment_2024_evidence") or {}).keys()),
+        "rows_written": j.get("rows_written"),
+        "note": j.get("note", ""),
     }
 
 
@@ -198,7 +215,9 @@ def build_data_quality_context(state: dict | None = None) -> dict:
         "leakage_controls": "next_year_* / same_year_return_pct / target_year never used as features",
         "misaligned_columns": mig.get("columns_rejected_misaligned", []),
         "manual_financials_present": man.get("present", False),
+        "manual_accepted_features": man.get("accepted_feature_columns", []),
         "manual_rejected": man.get("rejected_feature_columns", {}),
+        "corrected_yearly": corrected_yearly_payload(),
         "benchmark": q.get("benchmark", {}),
         "extreme_growth_counts": q.get("extreme_growth_counts", {}),
     }

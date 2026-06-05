@@ -16,22 +16,32 @@
     "2024": 40,
     "2025": 40
   },
-  "n_features": 17,
+  "n_features": 27,
   "feature_columns": [
     "current_assets",
     "current_ratio",
+    "ebitda",
     "ebitda_growth_pct",
+    "ebitda_margin",
     "equity",
     "financial_debt_ratio",
+    "gross_margin",
+    "gross_profit",
     "gross_profit_growth_pct",
     "leverage_ratio",
     "long_term_liabilities",
     "net_debt",
     "net_debt_to_ebitda",
+    "net_income",
     "net_income_growth_pct",
+    "net_margin",
     "non_current_assets",
+    "operating_income",
     "operating_income_growth_pct",
+    "revenue",
     "revenue_growth_pct",
+    "roa",
+    "roe",
     "short_term_liabilities",
     "total_assets",
     "working_capital"
@@ -91,18 +101,28 @@
     "is_bist100": 0.0,
     "current_assets": 0.0,
     "current_ratio": 0.0,
+    "ebitda": 0.0,
     "ebitda_growth_pct": 0.0,
+    "ebitda_margin": 0.0,
     "equity": 0.0,
     "financial_debt_ratio": 0.0,
+    "gross_margin": 0.0,
+    "gross_profit": 0.0,
     "gross_profit_growth_pct": 0.0,
     "leverage_ratio": 0.0,
     "long_term_liabilities": 0.0,
     "net_debt": 0.0,
     "net_debt_to_ebitda": 0.0,
+    "net_income": 0.0,
     "net_income_growth_pct": 0.0,
+    "net_margin": 0.0,
     "non_current_assets": 0.0,
+    "operating_income": 0.004,
     "operating_income_growth_pct": 0.0,
+    "revenue": 0.0,
     "revenue_growth_pct": 0.0,
+    "roa": 0.0,
+    "roe": 0.004,
     "short_term_liabilities": 0.0,
     "total_assets": 0.0,
     "working_capital": 0.0,
@@ -197,7 +217,17 @@
       "leakage_risk": "provisional_reference_fundamental"
     },
     {
+      "column": "ebitda",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
       "column": "ebitda_growth_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "ebitda_margin",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -208,6 +238,16 @@
     },
     {
       "column": "financial_debt_ratio",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "gross_margin",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "gross_profit",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -237,7 +277,17 @@
       "leakage_risk": "provisional_reference_fundamental"
     },
     {
+      "column": "net_income",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
       "column": "net_income_growth_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "net_margin",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -247,12 +297,32 @@
       "leakage_risk": "provisional_reference_fundamental"
     },
     {
+      "column": "operating_income",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
       "column": "operating_income_growth_pct",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
     {
+      "column": "revenue",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
       "column": "revenue_growth_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "roa",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "roe",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -334,7 +404,8 @@
   ],
   "manual_financials": {
     "files": [
-      "candidate_from_yearly_snapshots.csv"
+      "candidate_from_yearly_snapshots.csv",
+      "corrected_yearly_financials_candidate.csv"
     ],
     "rows_ingested": 240,
     "coverage_by_year": {
@@ -346,25 +417,11 @@
       "2025": 40
     },
     "columns_ingested": [
-      "market_cap",
-      "enterprise_value",
-      "pe_ratio",
-      "pb_ratio",
-      "ps_ratio",
-      "ev_ebitda",
       "gross_margin",
       "ebitda_margin",
       "net_margin",
       "roe",
       "roa",
-      "working_capital",
-      "net_debt",
-      "total_assets",
-      "current_assets",
-      "non_current_assets",
-      "short_term_liabilities",
-      "long_term_liabilities",
-      "total_equity",
       "revenue",
       "gross_profit",
       "operating_income",
@@ -379,38 +436,40 @@
       "financial_debt_ratio"
     ],
     "misaligned_columns_rejected": [],
-    "all_null_columns_rejected": [],
-    "issues": [],
+    "all_null_columns_rejected": [
+      "market_cap",
+      "enterprise_value",
+      "pe_ratio",
+      "pb_ratio",
+      "ps_ratio",
+      "ev_ebitda",
+      "working_capital",
+      "net_debt",
+      "total_assets",
+      "current_assets",
+      "non_current_assets",
+      "short_term_liabilities",
+      "long_term_liabilities",
+      "total_equity"
+    ],
+    "issues": [
+      "240 duplicate ticker-year rows across manual files"
+    ],
     "present": true,
-    "overrides_from_snapshot": {
-      "working_capital": 240,
-      "net_debt": 240,
-      "total_assets": 240,
-      "current_assets": 240,
-      "non_current_assets": 200,
-      "short_term_liabilities": 240,
-      "long_term_liabilities": 240,
-      "equity": 240
-    },
-    "accepted_feature_columns": [],
-    "rejected_feature_columns": {
-      "market_cap": "frozen_across_years",
-      "enterprise_value": "frozen_across_years",
-      "pe_ratio": "frozen_across_years",
-      "pb_ratio": "frozen_across_years",
-      "ps_ratio": "frozen_across_years",
-      "ev_ebitda": "frozen_across_years",
-      "gross_margin": "frozen_across_years",
-      "ebitda_margin": "frozen_across_years",
-      "net_margin": "frozen_across_years",
-      "roe": "frozen_across_years",
-      "roa": "frozen_across_years",
-      "revenue": "frozen_across_years",
-      "gross_profit": "frozen_across_years",
-      "operating_income": "frozen_across_years",
-      "ebitda": "frozen_across_years",
-      "net_income": "frozen_across_years"
-    }
+    "overrides_from_snapshot": {},
+    "accepted_feature_columns": [
+      "gross_margin",
+      "ebitda_margin",
+      "net_margin",
+      "roe",
+      "roa",
+      "revenue",
+      "gross_profit",
+      "operating_income",
+      "ebitda",
+      "net_income"
+    ],
+    "rejected_feature_columns": {}
   },
   "issues": [],
   "valid_for_T_to_T1_modeling": true

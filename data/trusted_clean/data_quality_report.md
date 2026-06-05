@@ -1,6 +1,6 @@
 # Data quality report
 
-- Rows: **240**  |  Features: **17**  |  Rows with target: **200**  |  Inference-only: **40**
+- Rows: **240**  |  Features: **27**  |  Rows with target: **200**  |  Inference-only: **40**
 - Benchmark available: **True**
 - Valid for T→T+1 modeling: **True**
 
@@ -24,13 +24,13 @@
 
 ## Manual financial history
 - Present: **True**
-- Files: ['candidate_from_yearly_snapshots.csv']
+- Files: ['candidate_from_yearly_snapshots.csv', 'corrected_yearly_financials_candidate.csv']
 - Rows ingested: 240
-- Accepted as features: []
-- Overrides from snapshot: {'working_capital': 240, 'net_debt': 240, 'total_assets': 240, 'current_assets': 240, 'non_current_assets': 200, 'short_term_liabilities': 240, 'long_term_liabilities': 240, 'equity': 240}
-- Rejected: {'market_cap': 'frozen_across_years', 'enterprise_value': 'frozen_across_years', 'pe_ratio': 'frozen_across_years', 'pb_ratio': 'frozen_across_years', 'ps_ratio': 'frozen_across_years', 'ev_ebitda': 'frozen_across_years', 'gross_margin': 'frozen_across_years', 'ebitda_margin': 'frozen_across_years', 'net_margin': 'frozen_across_years', 'roe': 'frozen_across_years', 'roa': 'frozen_across_years', 'revenue': 'frozen_across_years', 'gross_profit': 'frozen_across_years', 'operating_income': 'frozen_across_years', 'ebitda': 'frozen_across_years', 'net_income': 'frozen_across_years'}
+- Accepted as features: ['gross_margin', 'ebitda_margin', 'net_margin', 'roe', 'roa', 'revenue', 'gross_profit', 'operating_income', 'ebitda', 'net_income']
+- Overrides from snapshot: {}
+- Rejected: {}
 - Misaligned columns: []
-- Issues: []
+- Issues: ['240 duplicate ticker-year rows across manual files']
 
 ## Frozen reference columns EXCLUDED from features (unreliable snapshot)
 
@@ -38,7 +38,7 @@ daily_change_pct, ebitda, ebitda_margin_pct, enterprise_value, ev_ebitda, ev_sal
 
 ## Provisional feature columns (year-T, genuinely varying)
 
-current_assets, current_ratio, ebitda_growth_pct, equity, financial_debt_ratio, gross_profit_growth_pct, leverage_ratio, long_term_liabilities, net_debt, net_debt_to_ebitda, net_income_growth_pct, non_current_assets, operating_income_growth_pct, revenue_growth_pct, short_term_liabilities, total_assets, working_capital
+current_assets, current_ratio, ebitda, ebitda_growth_pct, ebitda_margin, equity, financial_debt_ratio, gross_margin, gross_profit, gross_profit_growth_pct, leverage_ratio, long_term_liabilities, net_debt, net_debt_to_ebitda, net_income, net_income_growth_pct, net_margin, non_current_assets, operating_income, operating_income_growth_pct, revenue, revenue_growth_pct, roa, roe, short_term_liabilities, total_assets, working_capital
 
 ## Issues
 

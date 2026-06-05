@@ -1,5 +1,5 @@
 .PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research \
-	inspect-quarterly research-agent-dataset research-agent-check full-research-agent \
+	inspect-quarterly research-agent-dataset research-agent-check full-research-agent ingest-corrected-yearly \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration
@@ -62,9 +62,16 @@ benchmark:
 extract-yearly-financials:
 	PYTHONPATH=. python -m scripts.data_collection.extract_yearly_snapshots_to_manual_financials --validate --strict
 
+# Ingest the CORRECTED yearly XLSX files (real per-year income/profitability).
+# Writes a validated candidate into data/trusted_raw/financials/ so build_all
+# picks it up; valuation stays frozen-rejected, 2024 misalignment rejected.
+ingest-corrected-yearly:
+	PYTHONPATH=. python -m scripts.data_collection.ingest_corrected_yearly_financials
+
 # Build the T->T+1 modeling dataset + validation report.
 # Runs from the repo root so `scripts.data_collection` resolves correctly.
 data:
+	$(MAKE) ingest-corrected-yearly
 	PYTHONPATH=. python -m scripts.data_collection.build_all
 
 # Re-run validation only on the existing modeling dataset.

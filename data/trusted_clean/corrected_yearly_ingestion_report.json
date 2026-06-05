@@ -1,0 +1,467 @@
+{
+  "source_dir": "data/trusted_raw/financials_corrected_yearly",
+  "sheet": "clean_data",
+  "rows_read": 240,
+  "rows_written": 240,
+  "coverage_by_year": {
+    "2020": 40,
+    "2021": 40,
+    "2022": 40,
+    "2023": 40,
+    "2024": 40,
+    "2025": 40
+  },
+  "expected_tickers_per_year": 40,
+  "accepted_columns": {
+    "revenue": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "accepted",
+      "rejection_reason": "",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 4,
+      "misaligned_cells": 0,
+      "kind": "money"
+    },
+    "gross_profit": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "accepted",
+      "rejection_reason": "",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 3,
+      "misaligned_cells": 0,
+      "kind": "money"
+    },
+    "operating_income": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "accepted",
+      "rejection_reason": "",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 4,
+      "misaligned_cells": 1,
+      "kind": "money"
+    },
+    "ebitda": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "accepted",
+      "rejection_reason": "",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 4,
+      "misaligned_cells": 0,
+      "kind": "money"
+    },
+    "net_income": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "accepted",
+      "rejection_reason": "",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 2,
+      "misaligned_cells": 0,
+      "kind": "money"
+    },
+    "gross_profit_margin": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "accepted",
+      "rejection_reason": "",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 5,
+      "misaligned_cells": 0,
+      "kind": "ratio"
+    },
+    "ebitda_margin": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "accepted",
+      "rejection_reason": "",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 4,
+      "misaligned_cells": 0,
+      "kind": "ratio"
+    },
+    "net_profit_margin": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "accepted",
+      "rejection_reason": "",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 2,
+      "misaligned_cells": 0,
+      "kind": "ratio"
+    },
+    "roe": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "accepted",
+      "rejection_reason": "",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 4,
+      "misaligned_cells": 1,
+      "kind": "ratio"
+    },
+    "roa": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "accepted",
+      "rejection_reason": "",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 2,
+      "misaligned_cells": 0,
+      "kind": "ratio"
+    }
+  },
+  "rejected_columns": {
+    "price": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "period_return": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 0
+    },
+    "day_return": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "volume": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "return_1w": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "return_1m": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "return_3m": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "return_6m": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "return_ytd": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "return_1y": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "return_3y": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "return_5y": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "leakage_field",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    }
+  },
+  "frozen_valuation_columns": {
+    "pe": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "frozen_snapshot",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "pb": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "frozen_snapshot",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "ev_ebitda": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "frozen_snapshot",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "ev_sales": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "frozen_snapshot",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 38
+    },
+    "peg_ratio": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "frozen_snapshot",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 27
+    },
+    "market_capitalization": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "frozen_snapshot",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    },
+    "enterprise_value": {
+      "source_file": "corrected_yearly/*.xlsx",
+      "status": "rejected",
+      "rejection_reason": "frozen_snapshot",
+      "years_covered": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "frozen_ticker_count": 40
+    }
+  },
+  "misalignment_2024_evidence": {
+    "total_assets": 7,
+    "current_assets": 40,
+    "non_current_assets": 40,
+    "short_term_liabilities": 40,
+    "long_term_liabilities": 40,
+    "equity": 40,
+    "working_capital": 40,
+    "net_debt": 40,
+    "leverage_ratio": 40,
+    "financial_debt_ratio": 40,
+    "revenue_growth": 40,
+    "gross_profit_growth": 40,
+    "ebitda_growth": 40,
+    "operating_income_growth": 40,
+    "net_income_growth": 40
+  },
+  "candidate_csv": "data/trusted_raw/financials/corrected_yearly_financials_candidate.csv",
+  "issues": [],
+  "note": "Income/profitability fields vary per year and are accepted; valuation fields are a frozen snapshot and rejected; 2024 misaligned cells rejected, not imputed."
+}

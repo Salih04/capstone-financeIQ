@@ -23,6 +23,7 @@ export default function DataQualityPage() {
   const frozen = d.frozen_columns || ctx.rejected_frozen_columns || []
   const misaligned = d.misaligned_columns || []
   const bench = d.benchmark || {}
+  const cy = d.corrected_yearly || {}
   const acceptedCount = Object.values(groups).reduce((a, arr) => a + (arr || []).length, 0) || ctx.feature_count
 
   return (
@@ -58,6 +59,27 @@ export default function DataQualityPage() {
           )}
         </EvidencePanel>
       </div>
+
+      {/* Corrected yearly ingestion status */}
+      {cy.available && (
+        <EvidencePanel title="Corrected yearly financials — verified per-year history" tone="good"
+          sub={`${asText(cy.rows_written)} rows ingested · income & profitability now genuinely vary by year`}>
+          <div>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--success-light)', marginBottom: 5 }}>Accepted (non-frozen) — {(cy.accepted_columns || []).length}</div>
+            <RenderList items={cy.accepted_columns} color="success" empty="none" />
+          </div>
+          <div>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--danger-light)', margin: '4px 0 5px' }}>Valuation still frozen — rejected</div>
+            <RenderList items={cy.frozen_valuation_columns} color="danger" empty="none" />
+          </div>
+          {(cy.misalignment_2024_columns || []).length > 0 && (
+            <div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--warning-light)', margin: '4px 0 5px' }}>2024 misalignment handled (cells rejected, not imputed)</div>
+              <RenderList items={cy.misalignment_2024_columns} color="warning" empty="none" />
+            </div>
+          )}
+        </EvidencePanel>
+      )}
 
       {/* Evidence per source */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px,1fr))', gap: 16 }}>
