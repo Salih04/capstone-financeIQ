@@ -1,0 +1,68 @@
+{
+  "tickers_covered": 40,
+  "years_covered": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "price_coverage": {
+    "rows_with_price": 226,
+    "total_rows": 240,
+    "yahoo_meta": {
+      "attempted": 40,
+      "yahoo_ok": 40,
+      "from_cache": 0,
+      "from_manual": 0,
+      "failed": []
+    }
+  },
+  "shares_status": "missing",
+  "shares_template_path": "data/trusted_raw/shares_outstanding_manual_template.csv",
+  "financial_dependency_coverage": {
+    "net_income": 240,
+    "equity": 240,
+    "ebitda": 240,
+    "net_debt": 240
+  },
+  "target_column_status": {
+    "market_cap": "missing",
+    "enterprise_value": "missing",
+    "pe": "missing",
+    "pb": "missing",
+    "ev_ebitda": "missing"
+  },
+  "usable_values_by_column": {
+    "market_cap": 0,
+    "enterprise_value": 0,
+    "pe": 0,
+    "pb": 0,
+    "ev_ebitda": 0
+  },
+  "columns_entering_candidate": [],
+  "rejection_summary": {
+    "market_cap": {
+      "missing_shares": 240,
+      "missing_price": 14
+    },
+    "enterprise_value": {},
+    "pe": {},
+    "pb": {},
+    "ev_ebitda": {}
+  },
+  "coverage_by_year": {
+    "2020": 40,
+    "2021": 40,
+    "2022": 40,
+    "2023": 40,
+    "2024": 40,
+    "2025": 40
+  },
+  "feature_count_before": 27,
+  "feature_count_after_if_accepted": 27,
+  "candidate_csv": "data/trusted_raw/financials/free_valuation_history_candidate.csv",
+  "limitations": "Shares outstanding is the binding gap: without a real per-ticker-year share count (KAP/company reports), market_cap cannot be computed and all derived ratios stay null. Yahoo provides only year-end PRICE freely, not historical shares. 2024 equity/net_debt are misaligned and were rejected, not imputed.",
+  "not_investment_advice": true
+}

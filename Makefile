@@ -1,5 +1,6 @@
 .PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research \
 	inspect-quarterly research-agent-dataset research-agent-check full-research-agent ingest-corrected-yearly \
+	prices valuation \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration
@@ -68,6 +69,16 @@ extract-yearly-financials:
 ingest-corrected-yearly:
 	PYTHONPATH=. python -m scripts.data_collection.ingest_corrected_yearly_financials
 
+# Collect free year-end prices from Yahoo (TICKER.IS) and cache them. No shares.
+prices:
+	PYTHONPATH=. python -m scripts.data_collection.build_free_valuation_history --prices-only
+
+# Build free-data valuation candidate (market_cap/pe/pb/ev/ev_ebitda) from
+# Yahoo prices + manual shares + validated financials. Generates a shares
+# template and reports honestly if shares are missing (never crashes).
+valuation:
+	PYTHONPATH=. python -m scripts.data_collection.build_free_valuation_history
+
 # Build the T->T+1 modeling dataset + validation report.
 # Runs from the repo root so `scripts.data_collection` resolves correctly.
 data:
@@ -86,9 +97,11 @@ data-benchmark:
 research:
 	PYTHONPATH=. python experiments/run_experiments.py
 
-# Full pipeline: extract -> benchmark -> build -> experiments.
+# Full pipeline: extract -> benchmark -> corrected yearly -> valuation -> build -> experiments.
 full-research:
 	$(MAKE) extract-yearly-financials
 	$(MAKE) benchmark
+	$(MAKE) ingest-corrected-yearly
+	$(MAKE) valuation
 	$(MAKE) data
 	PYTHONPATH=. python experiments/run_experiments.py

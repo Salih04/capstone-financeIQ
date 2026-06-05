@@ -24,7 +24,7 @@
 
 ## Manual financial history
 - Present: **True**
-- Files: ['candidate_from_yearly_snapshots.csv', 'corrected_yearly_financials_candidate.csv']
+- Files: ['candidate_from_yearly_snapshots.csv', 'corrected_yearly_financials_candidate.csv', 'free_valuation_history_candidate.csv']
 - Rows ingested: 240
 - Accepted as features: ['gross_margin', 'ebitda_margin', 'net_margin', 'roe', 'roa', 'revenue', 'gross_profit', 'operating_income', 'ebitda', 'net_income']
 - Overrides from snapshot: {}

@@ -63,6 +63,7 @@ def _benchmark_report(df: pd.DataFrame) -> dict:
 
 
 CORRECTED_REPORT = P.CLEAN_DIR / "corrected_yearly_ingestion_report.json"
+FREE_VALUATION_REPORT = P.CLEAN_DIR / "free_valuation_history_report.json"
 STILL_MISSING_VALUATION = ["pe", "pb", "ev_ebitda", "market_capitalization",
                            "enterprise_value", "ev_sales", "peg_ratio"]
 LEAKAGE_FIELDS = ["price", "period_return", "day_return", "volume", "return_1w", "return_1m",
@@ -81,11 +82,24 @@ def _source_distinction() -> dict:
             mis = sorted((j.get("misalignment_2024_evidence") or {}).keys())
         except Exception:
             pass
+    free_val = {}
+    if FREE_VALUATION_REPORT.is_file():
+        try:
+            j = json.loads(FREE_VALUATION_REPORT.read_text())
+            free_val = {
+                "attempted": True,
+                "shares_status": j.get("shares_status"),
+                "target_column_status": j.get("target_column_status", {}),
+                "columns_entering_candidate": j.get("columns_entering_candidate", []),
+            }
+        except Exception:
+            free_val = {"attempted": True}
     return {
         "accepted_corrected_yearly_columns": acc,
         "still_rejected_valuation_columns": froz or STILL_MISSING_VALUATION,
         "rejected_2024_misaligned_columns": mis,
         "rejected_leakage_columns": LEAKAGE_FIELDS,
+        "free_valuation_builder": free_val or {"attempted": False},
         "old_snapshot_rejected_but_corrected_accepted": [c for c in acc if c in
             ("revenue", "ebitda", "net_income", "roe", "roa", "gross_profit", "operating_income")],
         "source_note": ("Some names (revenue, ebitda, roe, ...) appear as BOTH rejected and accepted because "

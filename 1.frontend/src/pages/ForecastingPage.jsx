@@ -38,6 +38,7 @@ export default function ForecastingPage() {
   const [sector, setSector] = useState('')
   const [training, setTraining] = useState(false)
   const [running, setRunning] = useState(false)
+  const [cvLoading, setCvLoading] = useState(false)
   const [modelResult, setModelResult] = useState(null)
   const [stocksResult, setStocksResult] = useState(null)
   const [selectedStock, setSelectedStock] = useState(null)
@@ -153,6 +154,8 @@ export default function ForecastingPage() {
       setMsg('Select sector for evaluation.')
       return
     }
+    if (cvLoading) return
+    setCvLoading(true)
     try {
       const { data } = await api.post('/predict/evaluate', {
         sector,
@@ -162,7 +165,9 @@ export default function ForecastingPage() {
       setEvaluation(data)
       setMsg('Time-CV evaluation completed.')
     } catch (e) {
-      setMsg(e.response?.data?.detail || 'Evaluation failed.')
+      setMsg(e.response?.data?.detail || 'Evaluation failed. You can try again.')
+    } finally {
+      setCvLoading(false)
     }
   }
 
@@ -367,6 +372,7 @@ export default function ForecastingPage() {
             </button>
             <button
               onClick={runEvaluation}
+              disabled={cvLoading}
               style={{
                 border: '1px solid var(--border-strong)',
                 borderRadius: 'var(--radius-md)',
@@ -374,10 +380,10 @@ export default function ForecastingPage() {
                 color: 'var(--text-1)',
                 fontSize: 12,
                 padding: '8px 12px',
-                cursor: 'pointer',
+                cursor: cvLoading ? 'wait' : 'pointer',
               }}
             >
-              Run Time CV
+              {cvLoading ? 'Running CV…' : 'Run Time CV'}
             </button>
           </div>
         </Card>

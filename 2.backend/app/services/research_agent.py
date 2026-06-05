@@ -53,6 +53,7 @@ BENCHMARK_REPORT = CLEAN / "bist100_benchmark_report.json"
 FROZEN_EVIDENCE = CLEAN / "frozen_column_evidence.json"
 QUARTERLY_INSPECTION = CLEAN / "quarterly_snapshot_inspection.json"
 CORRECTED_YEARLY_REPORT = CLEAN / "corrected_yearly_ingestion_report.json"
+FREE_VALUATION_REPORT = CLEAN / "free_valuation_history_report.json"
 
 NOT_ADVICE = ("This is a research-support score, NOT investment advice. The LLM is a "
               "decision-support layer, not the numerical predictor.")
@@ -203,6 +204,7 @@ def build_summary_context(state: dict | None = None) -> dict:
         "still_missing_valuation_features": STILL_MISSING_VALUATION,
         "old_snapshot_rejected_but_corrected_accepted": OLD_SNAPSHOT_REJECTED_NOW_CORRECTED,
         "model_signal_after_corrected_yearly": "still weak/unstable",
+        "free_valuation": free_valuation_payload(),
         "valid_for_modeling": q.get("valid_for_T_to_T1_modeling"),
     }
 
@@ -222,6 +224,25 @@ def corrected_yearly_payload() -> dict:
     }
 
 
+def free_valuation_payload() -> dict:
+    """Status of the free-data valuation builder (Yahoo prices + manual shares)."""
+    if not FREE_VALUATION_REPORT.is_file():
+        return {"available": False, "attempted": False}
+    j = _load_json(FREE_VALUATION_REPORT)
+    pc = j.get("price_coverage", {}) or {}
+    return {
+        "available": True,
+        "attempted": True,
+        "shares_status": j.get("shares_status"),
+        "price_rows": pc.get("rows_with_price"),
+        "total_rows": pc.get("total_rows"),
+        "target_column_status": j.get("target_column_status", {}),
+        "columns_entering_candidate": j.get("columns_entering_candidate", []),
+        "shares_template_path": j.get("shares_template_path"),
+        "limitations": j.get("limitations", ""),
+    }
+
+
 def build_data_quality_context(state: dict | None = None) -> dict:
     state = state or load_research_state()
     q, mig = state["quality"], state["migration"]
@@ -235,6 +256,7 @@ def build_data_quality_context(state: dict | None = None) -> dict:
         "manual_source_note": man.get("source_note", ""),
         "manual_rejected": man.get("rejected_feature_columns", {}),
         "corrected_yearly": corrected_yearly_payload(),
+        "free_valuation": free_valuation_payload(),
         "source_distinction": q.get("source_distinction", {}),
         "benchmark": q.get("benchmark", {}),
         "extreme_growth_counts": q.get("extreme_growth_counts", {}),
@@ -1003,6 +1025,9 @@ def classify_intent(question: str) -> str:
     if any(k in q for k in ("top rank", "highest score", "best ranked", "top stocks", "highest rank",
                             "top ranked", "best stocks", "ranked highest")):
         return "top_ranked"
+    if any(k in q for k in ("valuation", "p/e", " pe ", "p/b", " pb ", "ev/ebitda", "ev_ebitda",
+                            "market cap", "market_cap", "enterprise value", "calculate p", "fintables", "kap")):
+        return "valuation"
     if any(k in q for k in ("why", "weak", "signal", "reliable", "edge", "backtest", "diagnostic")):
         return "diagnostics"
     if any(k in q for k in ("accept", "reject", "feature", "column", "frozen", "valuation",
@@ -1100,6 +1125,34 @@ def _intent_answer(intent: str, question: str, state: dict, ticker: str | None) 
                 "data_used": {"source": "corrected_yearly_ingestion_report + data_quality_report", "year": None,
                               "rows_used": cy["feature_count_after_corrected_yearly"],
                               "fields_used": cy["accepted_corrected_yearly_features"]},
+                "warnings": warns, "limitations": lims}
+
+    if intent == "valuation":
+        fv = free_valuation_payload()
+        attempted = fv.get("attempted")
+        entered = fv.get("columns_entering_candidate") or []
+        shares = fv.get("shares_status", "missing")
+        if not attempted:
+            ans = ("Valuation columns (P/E, P/B, EV/EBITDA, market cap, enterprise value) are not available "
+                   "yet. The old Fintables snapshot repeated one value across years and was rejected. A free "
+                   "builder can reconstruct them from year-end price × shares plus validated financials.")
+        elif entered:
+            ans = (f"Yes — free valuation columns now in the model: {', '.join(entered)}. They are computed "
+                   "from Yahoo year-end price × shares outstanding and validated financials (P/E = market cap / "
+                   "net income, P/B = market cap / equity, EV/EBITDA = (market cap + net debt) / EBITDA).")
+        else:
+            ans = ("We can calculate P/E, P/B and EV/EBITDA ourselves WITHOUT buying frozen Fintables data: "
+                   f"P/E = market cap / net income, P/B = market cap / equity, EV/EBITDA = (market cap + net "
+                   f"debt) / EBITDA, where market cap = year-end price × shares outstanding. Year-end prices were "
+                   f"collected free from Yahoo ({fv.get('price_rows')}/{fv.get('total_rows')} rows). The binding "
+                   f"gap is shares outstanding ({shares}) — Yahoo gives price but not historical share counts. "
+                   "Until real shares are supplied (KAP / company reports), market cap and the ratios stay null "
+                   "and cannot enter the model. The old Fintables valuation snapshot remains rejected.")
+        return {"answer": ans, "intent_data": fv,
+                "data_used": {"source": "free_valuation_history_report", "year": None,
+                              "rows_used": fv.get("price_rows", 0),
+                              "fields_used": ["year_end_close", "shares_outstanding", "net_income", "equity",
+                                              "ebitda", "net_debt"]},
                 "warnings": warns, "limitations": lims}
 
     if intent == "company" and ticker:

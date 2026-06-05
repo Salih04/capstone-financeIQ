@@ -1,5 +1,9 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
+logger = logging.getLogger("forecasting")
 
 from app.core.dependencies import get_current_user
 from app.database import get_db
@@ -72,6 +76,11 @@ def train_model(
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+    except Exception as exc:  # noqa - never raw 500 for the train action
+        logger.exception("train-model failed")
+        raise HTTPException(status_code=400,
+                            detail=f"Training could not run for {body.sector} {body.year}. "
+                                   f"Check that quarterly fundamentals up to Q4 exist for this sector/year. ({type(exc).__name__})")
 
 
 @router.get("/get-stocks", response_model=GetStocksResponse)
@@ -119,6 +128,11 @@ def predict(
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+    except Exception as exc:  # noqa - never raw 500 for the forecast action
+        logger.exception("predict failed")
+        raise HTTPException(status_code=400,
+                            detail=f"Forecast could not complete for {body.sector} {body.year}. "
+                                   f"Train parameters first and ensure fundamentals exist. ({type(exc).__name__})")
 
 
 @router.post("/predict/evaluate", response_model=EvaluationOut)
@@ -137,6 +151,11 @@ def evaluate_predict_family(
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+    except Exception as exc:  # noqa - never raw 500 for time-CV
+        logger.exception("predict/evaluate failed")
+        raise HTTPException(status_code=400,
+                            detail=f"Time-CV could not complete for {body.sector}. Needs enough historical "
+                                   f"years of fundamentals. ({type(exc).__name__})")
 
 
 @router.get("/predict/history", response_model=PredictHistoryOut)
@@ -146,7 +165,11 @@ def predict_history(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
-    return get_predict_history(db, limit=limit, sector=sector)
+    try:
+        return get_predict_history(db, limit=limit, sector=sector)
+    except Exception:  # noqa - history must never 500; empty is fine
+        logger.exception("predict/history failed")
+        return {"items": []}
 
 
 @router.get("/predict/trends", response_model=TrendSeriesOut)

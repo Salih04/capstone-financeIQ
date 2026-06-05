@@ -179,6 +179,18 @@
       "return_3y",
       "return_5y"
     ],
+    "free_valuation_builder": {
+      "attempted": true,
+      "shares_status": "missing",
+      "target_column_status": {
+        "market_cap": "missing",
+        "enterprise_value": "missing",
+        "pe": "missing",
+        "pb": "missing",
+        "ev_ebitda": "missing"
+      },
+      "columns_entering_candidate": []
+    },
     "old_snapshot_rejected_but_corrected_accepted": [
       "ebitda",
       "gross_profit",
@@ -504,7 +516,8 @@
   "manual_financials": {
     "files": [
       "candidate_from_yearly_snapshots.csv",
-      "corrected_yearly_financials_candidate.csv"
+      "corrected_yearly_financials_candidate.csv",
+      "free_valuation_history_candidate.csv"
     ],
     "rows_ingested": 240,
     "coverage_by_year": {
@@ -532,7 +545,14 @@
       "net_debt_to_ebitda",
       "current_ratio",
       "leverage_ratio",
-      "financial_debt_ratio"
+      "financial_debt_ratio",
+      "year_end_close",
+      "shares_outstanding",
+      "source_price",
+      "source_shares",
+      "source_financials",
+      "validation_status",
+      "validation_notes"
     ],
     "misaligned_columns_rejected": [],
     "all_null_columns_rejected": [],

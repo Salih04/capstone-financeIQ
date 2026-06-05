@@ -28,6 +28,7 @@ export default function DataQualityPage() {
   const groups = ctx.feature_groups || {}
   const bench = d.benchmark || {}
   const cy = d.corrected_yearly || {}
+  const fv = d.free_valuation || {}
   const sd = d.source_distinction || {}
   const accCorrected = sd.accepted_corrected_yearly_columns || cy.accepted_columns || []
   const missingVal = sd.still_rejected_valuation_columns || cy.frozen_valuation_columns || []
@@ -96,6 +97,34 @@ export default function DataQualityPage() {
             Rather than guessing or filling these values, the affected 2024 cells were rejected. The model never
             sees shifted/misaligned numbers.
           </p>
+        </EvidencePanel>
+      )}
+
+      {/* Free valuation builder status */}
+      {fv.attempted && (
+        <EvidencePanel title="F · Free valuation builder (no Fintables)" tone={(fv.columns_entering_candidate || []).length ? 'good' : 'info'}
+          sub="Reconstruct P/E, P/B, EV/EBITDA from free price + shares + validated financials">
+          <p style={{ fontSize: 13, color: 'var(--text-2)', margin: 0, lineHeight: 1.6 }}>
+            We do not need to buy frozen valuation data if we can calculate it ourselves:
+            <b> market cap = year-end price × shares</b>, then P/E = market cap / net income, P/B = market cap / equity,
+            EV/EBITDA = (market cap + net debt) / EBITDA.
+          </p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Chip color="success">Year-end price (Yahoo): {asText(fv.price_rows)}/{asText(fv.total_rows)} rows</Chip>
+            <Chip color={fv.shares_status === 'manual' ? 'success' : 'warning'}>Shares outstanding: {asText(fv.shares_status)}</Chip>
+          </div>
+          {(fv.columns_entering_candidate || []).length ? (
+            <div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--success-light)', marginBottom: 5 }}>Derived columns now in the model</div>
+              <RenderList items={fv.columns_entering_candidate} color="success" />
+            </div>
+          ) : (
+            <WarningCallout title="Shares outstanding required" tone="warn">
+              Year-end prices are collected free from Yahoo, but historical <b>shares outstanding</b> are not
+              freely available. Provide them (KAP / company reports) in <code>data/trusted_raw/shares_outstanding_manual.csv</code>,
+              then re-run <code>make valuation</code> — P/E, P/B and EV/EBITDA will be computed and can enter the model.
+            </WarningCallout>
+          )}
         </EvidencePanel>
       )}
 
