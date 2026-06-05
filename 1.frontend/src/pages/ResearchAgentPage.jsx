@@ -23,8 +23,10 @@ export default function ResearchAgentPage() {
   const [ticker, setTicker] = useState('ASELS')
   const [score, setScore] = useState(null)
   const [askTicker, setAskTicker] = useState('')
-  const [question, setQuestion] = useState('Is the BIST100 benchmark available and what does it change?')
+  const [question, setQuestion] = useState('Which stocks beat BIST100?')
   const [answer, setAnswer] = useState(null)
+  const [askLoading, setAskLoading] = useState(false)
+  const [askErr, setAskErr] = useState(null)
 
   const loadAll = useCallback(() => {
     setLoadErr(null)
@@ -38,12 +40,22 @@ export default function ResearchAgentPage() {
     api.get(`/research/company/${encodeURIComponent(ticker.trim().toUpperCase())}/score`)
       .then(r => setScore(r.data)).catch(e => setScore({ error: errText(e) }))
   }
-  const ask = () => {
-    setAnswer({ loading: true })
-    const body = { question }
+  const ask = async () => {
+    if (!question.trim() || askLoading) return
+    setAskLoading(true)
+    setAskErr(null)
+    const body = { question: question.trim() }
     if (askTicker.trim()) body.ticker = askTicker.trim().toUpperCase()
-    api.post('/research/ask', body).then(r => setAnswer(r.data)).catch(e => setAnswer({ error: errText(e) }))
+    try {
+      const r = await api.post('/research/ask', body)
+      setAnswer(r.data)
+    } catch (e) {
+      setAskErr(errText(e))
+    } finally {
+      setAskLoading(false)
+    }
   }
+  const clearAnswer = () => { setAnswer(null); setAskErr(null) }
 
   const sctx = summary?.context || {}
   const conf = summary?.confidence || {}
@@ -53,9 +65,10 @@ export default function ResearchAgentPage() {
   const llm = (score && score.llm) || {}
 
   // agent status — provider/fallback surface from last call, else defaults
-  const lastMeta = (ready && score) || (answer && !answer.loading && !answer.error && answer) || {}
+  const lastMeta = (ready && score) || answer || {}
   const provider = lastMeta.provider_used ?? 'none'
   const fallback = lastMeta.fallback_used
+  const isFallback = provider === 'none' || fallback
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
@@ -85,10 +98,18 @@ export default function ResearchAgentPage() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <SignalBadge tone={provider === 'none' ? 'warn' : 'good'}>provider: {asText(provider)}</SignalBadge>
-          <SignalBadge tone={fallback ? 'warn' : 'good'}>fallback: {asText(fallback ?? (provider === 'none'))}</SignalBadge>
+          <SignalBadge tone={isFallback ? 'warn' : 'good'}>{isFallback ? 'Deterministic fallback mode' : 'Connected to LM Studio'}</SignalBadge>
           <SignalBadge tone="good"><ShieldCheck size={12} /> safety mode active</SignalBadge>
         </div>
+      </div>
+
+      {/* Plain-language provider explanation */}
+      <div style={{ fontSize: 12, color: 'var(--text-3)', background: 'var(--surface-1)',
+        border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '9px 12px', lineHeight: 1.5 }}>
+        {isFallback
+          ? <>The backend is using <b style={{ color: 'var(--warning-light)' }}>deterministic fallback</b> — answers come from validated reports only.
+              If you run Docker and want LM Studio, set <code>RESEARCH_LLM_BASE_URL</code> to <code>http://host.docker.internal:1234/v1/chat/completions</code> (inside a container <code>localhost</code> is the container itself, not your Mac).</>
+          : <>Connected to <b style={{ color: 'var(--success-light)' }}>LM Studio</b> — the assistant phrases answers, but tickers and numbers always come from validated project data.</>}
       </div>
 
       {/* Dataset KPIs */}
@@ -137,29 +158,33 @@ export default function ResearchAgentPage() {
         </EvidencePanel>
 
         {/* Ask */}
-        <EvidencePanel title="Ask the research assistant" sub="Grounded, constrained answers — no raw model dump" tone="info">
+        <EvidencePanel title="Ask the research assistant" sub="Grounded, specific answers from validated project data" tone="info">
           <input value={askTicker} onChange={e => setAskTicker(e.target.value)} placeholder="ticker (optional)" style={inputS} />
           <textarea value={question} onChange={e => setQuestion(e.target.value)} rows={3}
+            placeholder="e.g. Which stocks beat BIST100? · Why is the signal weak? · What columns were rejected?"
             style={{ ...inputS, width: '100%', resize: 'vertical' }} />
-          <button onClick={ask} style={{ ...primaryBtn, alignSelf: 'flex-start' }}>
-            <Search size={14} style={{ verticalAlign: 'middle', marginRight: 5 }} />Ask
-          </button>
-          {answer?.loading && <div style={{ color: 'var(--text-3)', fontSize: 13 }}>Thinking…</div>}
-          {answer?.error && <div style={{ color: 'var(--danger-light)', fontSize: 13 }}>{asText(answer.error)}</div>}
-          {answer && !answer.loading && !answer.error && (() => {
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={ask} disabled={askLoading || !question.trim()}
+              style={{ ...primaryBtn, opacity: (askLoading || !question.trim()) ? 0.6 : 1, cursor: askLoading ? 'wait' : 'pointer' }}>
+              <Search size={14} style={{ verticalAlign: 'middle', marginRight: 5 }} />{askLoading ? 'Asking…' : 'Ask'}
+            </button>
+            {answer && !askLoading && (
+              <button onClick={clearAnswer} style={{ ...ghostBtn }}>Clear answer</button>
+            )}
+          </div>
+          {askLoading && <div style={{ color: 'var(--text-3)', fontSize: 13 }}>Updating answer…</div>}
+          {askErr && <div style={{ color: 'var(--danger-light)', fontSize: 13 }}>{asText(askErr)} — you can ask again.</div>}
+          {answer && !askLoading && (() => {
             const r = answer.llm_result || {}
+            const du = answer.data_used || {}
             return (
               <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {answer.intent ? <SignalBadge tone="neutral">intent: {asText(answer.intent)}</SignalBadge> : null}
                 <p style={{ whiteSpace: 'pre-wrap', fontSize: 13, color: 'var(--text-1)', margin: 0, lineHeight: 1.55, fontWeight: 600 }}>{asText(answer.answer)}</p>
                 {r.reasoning ? <p style={{ fontSize: 12, color: 'var(--text-3)', margin: 0, lineHeight: 1.5 }}>{asText(r.reasoning)}</p> : null}
-                {r.positive_signals?.length ? <div><div style={lbl('var(--success-light)')}>Positive</div><Bullets tone="good" size={12} items={r.positive_signals} /></div> : null}
-                {r.negative_signals?.length ? <div><div style={lbl('var(--danger-light)')}>Negative</div><Bullets tone="bad" size={12} items={r.negative_signals} /></div> : null}
-                {(r.warnings?.length || answer.warnings?.length) ? <div><div style={lbl('var(--warning-light)')}>Warnings</div><Bullets tone="warn" size={12} items={hw(r.warnings?.length ? r.warnings : answer.warnings)} /></div> : null}
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {r.llm_research_score != null ? <SignalBadge tone="info">support {formatNumber(r.llm_research_score, 2)}</SignalBadge> : null}
-                  {r.llm_confidence ? <SignalBadge tone="neutral">confidence {asText(r.llm_confidence)}</SignalBadge> : null}
-                  <SignalBadge tone={answer.fallback_used ? 'warn' : 'good'}>provider: {asText(answer.provider_used)}{answer.fallback_used ? ' (fallback)' : ''}</SignalBadge>
-                </div>
+                {(answer.warnings?.length) ? <div><div style={lbl('var(--warning-light)')}>Notes</div><Bullets tone="warn" size={12} items={hw(answer.warnings)} /></div> : null}
+                {(du.source) ? <div style={{ fontSize: 11, color: 'var(--text-3)' }}>Data used: {asText(du.source)}{du.year ? ` · year ${asText(du.year)}` : ''}{du.rows_used ? ` · ${asText(du.rows_used)} rows` : ''}</div> : null}
+                <ProviderLine provider={answer.provider_used} fallback={answer.fallback_used} diag={answer.diagnostics} />
               </div>
             )
           })()}
@@ -191,7 +216,20 @@ export default function ResearchAgentPage() {
   )
 }
 
+function ProviderLine({ provider, fallback, diag }) {
+  const fb = provider === 'none' || fallback
+  return (
+    <div style={{ fontSize: 11, color: 'var(--text-3)' }}>
+      {fb
+        ? 'LLM unavailable; answer generated from validated reports only.'
+        : `Connected to LM Studio (${asText(diag?.configured_model || provider)}).`}
+    </div>
+  )
+}
+
 const lbl = (c) => ({ fontSize: 11.5, fontWeight: 700, color: c, marginBottom: 6 })
+const ghostBtn = { background: 'transparent', color: 'var(--text-2)', border: '1px solid var(--border-strong)',
+  borderRadius: 'var(--radius-md)', padding: '9px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }
 const inputS = { background: 'var(--surface-1)', color: 'var(--text-1)', border: '1px solid var(--border-strong)',
   borderRadius: 'var(--radius-md)', padding: '9px 11px', fontSize: 13, flex: 1, boxSizing: 'border-box', outline: 'none' }
 const primaryBtn = { background: 'var(--primary)', color: '#0b111a', border: 0, borderRadius: 'var(--radius-md)',

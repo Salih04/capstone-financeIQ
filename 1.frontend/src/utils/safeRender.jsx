@@ -311,9 +311,12 @@ const WARNING_LABELS = {
   frozen_features: 'Frozen valuation/profitability features excluded',
   no_real_valuation_profitability_features: 'Real historical valuation/profitability data is still missing',
   no_real_valuation: 'Real valuation history missing',
-  weak_backtest: 'Weak/unstable backtest signal',
+  weak_backtest: 'Model signal is still weak',
   benchmark_missing: 'BIST100 benchmark missing',
   manual_financials_missing: 'Manual historical financials missing',
+  frozen_snapshot: 'Same snapshot repeated across years',
+  leakage_field: 'Future price/return info — not allowed as input',
+  misaligned_cells: 'Values appear shifted into wrong columns',
 }
 export const humanizeWarning = (key) => {
   if (key === null || key === undefined) return '—'

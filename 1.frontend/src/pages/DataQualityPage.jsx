@@ -6,6 +6,12 @@ import {
   MetricCard, RenderList, WarningCallout, CollapsibleJson, EvidencePanel, Bullets, asText,
 } from '../utils/safeRender'
 
+const GROUP_LABEL = {
+  balance_sheet: 'Balance-sheet features',
+  growth: 'Growth features',
+  other: 'Income & profitability features',
+}
+
 export default function DataQualityPage() {
   const [dq, setDq] = useState(null)
   const [summary, setSummary] = useState(null)
@@ -20,92 +26,78 @@ export default function DataQualityPage() {
   const d = dq?.data_quality || {}
   const ctx = summary?.context || {}
   const groups = ctx.feature_groups || {}
-  const frozen = d.frozen_columns || ctx.rejected_frozen_columns || []
-  const misaligned = d.misaligned_columns || []
   const bench = d.benchmark || {}
   const cy = d.corrected_yearly || {}
-  const acceptedCount = Object.values(groups).reduce((a, arr) => a + (arr || []).length, 0) || ctx.feature_count
+  const sd = d.source_distinction || {}
+  const accCorrected = sd.accepted_corrected_yearly_columns || cy.accepted_columns || []
+  const missingVal = sd.still_rejected_valuation_columns || cy.frozen_valuation_columns || []
+  const mis2024 = sd.rejected_2024_misaligned_columns || cy.misalignment_2024_columns || []
+  const oldSnapshot = d.frozen_columns || ctx.rejected_frozen_columns || []
+  const featureCount = ctx.feature_count
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
-      <SectionHeader title="Data Quality & Integrity" sub="Why each column is accepted or rejected — capstone jury & data-provider evidence" icon={Database} />
+      <SectionHeader title="Data Quality & Integrity" sub="Which financial data the model uses, and why — for stakeholders and the data provider" icon={Database} />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(155px,1fr))', gap: 12 }}>
-        <MetricCard label="Accepted features" value={asText(acceptedCount)} tone="good" sub="year-varying" />
-        <MetricCard label="Frozen rejected" value={asText(frozen.length)} tone="bad" sub="snapshot columns" />
-        <MetricCard label="Misaligned cols" value={asText(misaligned.length)} tone={misaligned.length ? 'warn' : 'good'} sub="2024 export" />
-        <MetricCard label="Benchmark" value={bench.excess_outperform_targets_enabled ? 'Available' : 'Missing'} tone={bench.excess_outperform_targets_enabled ? 'good' : 'warn'} sub="targets" />
-        <MetricCard label="Manual financials" value={d.manual_financials_present ? 'Present' : 'None'} tone={d.manual_financials_present ? 'good' : 'warn'} />
+        <MetricCard label="Features used by model" value={asText(featureCount)} tone="good" sub="change year to year" />
+        <MetricCard label="Newly accepted" value={asText(accCorrected.length)} tone="good" sub="corrected income/profit" />
+        <MetricCard label="Still missing valuation" value={asText(missingVal.length)} tone="warn" sub="repeated snapshot" />
+        <MetricCard label="2024 file issue" value={mis2024.length ? 'Detected' : 'None'} tone={mis2024.length ? 'warn' : 'good'} sub="columns shifted" />
+        <MetricCard label="Market benchmark" value={bench.excess_outperform_targets_enabled ? 'Available' : 'Missing'} tone={bench.excess_outperform_targets_enabled ? 'good' : 'warn'} sub="BIST100" />
       </div>
 
-      {/* Accepted vs Rejected two-column */}
+      {/* Section A — validated features currently used */}
+      <EvidencePanel title="A · Features the model uses today" sub="All known at the end of each year and genuinely change year to year" tone="good">
+        {Object.entries(groups).map(([g, arr]) => (
+          <div key={g}>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-3)', marginBottom: 5 }}>{GROUP_LABEL[g] || g} ({(arr || []).length})</div>
+            <RenderList items={arr} color="success" empty="none" />
+          </div>
+        ))}
+      </EvidencePanel>
+
+      {/* Section B & D — corrected accepted vs still-missing valuation */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px,1fr))', gap: 16 }}>
-        <EvidencePanel title="Accepted features" sub="Genuinely year-varying — safe for T→T+1 modeling" tone="good">
-          {Object.entries(groups).map(([g, arr]) => (
-            <div key={g}>
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-3)', marginBottom: 5 }}>{g} ({(arr || []).length})</div>
-              <RenderList items={arr} color="success" empty="none" />
-            </div>
-          ))}
+        <EvidencePanel title="B · Corrected yearly columns accepted" tone="good"
+          sub="Genuinely change year by year in the corrected files — now feed the model">
+          <RenderList items={accCorrected} color="success" empty="none" />
+          <p style={{ fontSize: 12, color: 'var(--text-3)', margin: 0, lineHeight: 1.5 }}>
+            Real per-year income & profitability (revenue, EBITDA, net income, margins, ROE, ROA). These
+            actually move over time, so the model can learn from them.
+          </p>
         </EvidencePanel>
 
-        <EvidencePanel title="Rejected frozen columns" sub="Same snapshot repeated across every period — no per-year signal" tone="bad">
-          <RenderList items={frozen} color="danger" empty="none" />
-          {misaligned.length > 0 && (
-            <div>
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--warning-light)', margin: '4px 0 5px' }}>Misaligned (2024 export)</div>
-              <RenderList items={misaligned} color="warning" empty="none" />
-            </div>
-          )}
+        <EvidencePanel title="D · Still missing: historical valuation" tone="warn"
+          sub="Valuable in theory, but current files repeat the same snapshot">
+          <RenderList items={missingVal} color="warning" empty="none" />
+          <p style={{ fontSize: 12, color: 'var(--text-3)', margin: 0, lineHeight: 1.5 }}>
+            P/E, P/B, EV/EBITDA, market cap and enterprise value are the same value copied into every year, so
+            they carry no history and are rejected until real per-year values are supplied.
+          </p>
         </EvidencePanel>
       </div>
 
-      {/* Corrected yearly ingestion status */}
-      {cy.available && (
-        <EvidencePanel title="Corrected yearly financials — verified per-year history" tone="good"
-          sub={`${asText(cy.rows_written)} rows ingested · income & profitability now genuinely vary by year`}>
-          <div>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--success-light)', marginBottom: 5 }}>Accepted (non-frozen) — {(cy.accepted_columns || []).length}</div>
-            <RenderList items={cy.accepted_columns} color="success" empty="none" />
-          </div>
-          <div>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--danger-light)', margin: '4px 0 5px' }}>Valuation still frozen — rejected</div>
-            <RenderList items={cy.frozen_valuation_columns} color="danger" empty="none" />
-          </div>
-          {(cy.misalignment_2024_columns || []).length > 0 && (
-            <div>
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--warning-light)', margin: '4px 0 5px' }}>2024 misalignment handled (cells rejected, not imputed)</div>
-              <RenderList items={cy.misalignment_2024_columns} color="warning" empty="none" />
-            </div>
-          )}
+      {/* Section C — old snapshot rejected + overlap note */}
+      <EvidencePanel title="C · Old snapshot source rejected" tone="bad"
+        sub="The earlier export repeated one value across years, so it was excluded">
+        <RenderList items={oldSnapshot} color="danger" empty="none" />
+        <WarningCallout title="Why some names appear twice" tone="info">
+          {sd.source_note || 'Names like revenue, EBITDA and ROE appear as both rejected and accepted because the OLD snapshot repeated one value across years (rejected), while the CORRECTED yearly source genuinely changes year by year (accepted and now used by the model).'}
+        </WarningCallout>
+      </EvidencePanel>
+
+      {/* Section E — 2024 file issue */}
+      {mis2024.length > 0 && (
+        <EvidencePanel title="E · 2024 export alignment issue" tone="warn"
+          sub="Some balance-sheet fields in the 2024 file appear shifted into the wrong columns">
+          <RenderList items={mis2024} color="warning" empty="none" />
+          <p style={{ fontSize: 12, color: 'var(--text-3)', margin: 0, lineHeight: 1.5 }}>
+            Rather than guessing or filling these values, the affected 2024 cells were rejected. The model never
+            sees shifted/misaligned numbers.
+          </p>
         </EvidencePanel>
       )}
-
-      {/* Evidence per source */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px,1fr))', gap: 16 }}>
-        <EvidencePanel title="Yearly XLSX exports" tone="warn"
-          footer="Valuation / profitability / income identical across all 6 years.">
-          <Bullets tone="warn" size={12.5} items={[
-            'P/E, P/B, EV/EBITDA, ROE, ROA, margins, revenue, net income, market cap repeat unchanged each year.',
-            'Single point-in-time snapshot copied into every file — carries no T→T+1 historical signal.',
-            '2024 file additionally has misaligned columns.',
-          ]} />
-        </EvidencePanel>
-        <EvidencePanel title="Quarterly Fintables exports" tone="warn"
-          footer="Same defect across all 8 quarterly periods.">
-          <Bullets tone="warn" size={12.5} items={[
-            'new_data_quarter Q1–Q4 (2020–2021) show the same frozen valuation/profitability values.',
-            'Not usable as time-varying fundamentals despite being labelled per-quarter.',
-            'Balance-sheet & growth fields remain the only genuinely varying inputs.',
-          ]} />
-        </EvidencePanel>
-      </div>
-
-      <WarningCallout title="Why frozen columns are rejected" tone="bad">
-        Columns such as <b>P/E, ROE, revenue and market cap</b> are valuable in theory, but rejected because
-        the current exports repeat the same snapshot across periods. The validator excludes any column whose
-        value never changes per company — it cannot carry next-year predictive information.
-      </WarningCallout>
 
       {/* Message to data provider */}
       <EvidencePanel title="Message to data provider" tone="info"
@@ -132,10 +124,11 @@ export default function DataQualityPage() {
         </p>
       </EvidencePanel>
 
-      {/* Raw evidence */}
+      {/* Technical evidence (collapsed) */}
       <div>
-        <CollapsibleJson label={evi?.available ? `Frozen-column evidence report — ${asText(evi.verdict)}` : 'Frozen-column evidence report (run make frozen-evidence)'}
-          value={evi?.available ? evi.columns : { note: 'evidence report not generated yet' }} />
+        <CollapsibleJson label="Technical evidence (developer / jury detail)"
+          value={{ source_distinction: sd, corrected_yearly: cy,
+                   frozen_column_evidence: evi?.available ? evi.columns : 'not generated' }} />
       </div>
     </div>
   )

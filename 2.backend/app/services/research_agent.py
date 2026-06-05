@@ -57,6 +57,16 @@ CORRECTED_YEARLY_REPORT = CLEAN / "corrected_yearly_ingestion_report.json"
 NOT_ADVICE = ("This is a research-support score, NOT investment advice. The LLM is a "
               "decision-support layer, not the numerical predictor.")
 
+# Source distinction (corrected yearly files vs old frozen snapshot) — PHASE 5/7.
+FEATURE_COUNT_BEFORE_CORRECTED = 17
+ACCEPTED_CORRECTED_YEARLY = ["revenue", "gross_profit", "operating_income", "ebitda", "net_income",
+                             "gross_margin", "ebitda_margin", "net_margin", "roe", "roa"]
+STILL_MISSING_VALUATION = ["pe", "pb", "ev_ebitda", "market_capitalization",
+                           "enterprise_value", "ev_sales", "peg_ratio"]
+OLD_SNAPSHOT_REJECTED_NOW_CORRECTED = ["revenue", "ebitda", "net_income", "roe", "roa"]
+LEAKAGE_FIELDS_REJECTED = ["price", "period_return", "day_return", "volume", "return_1w", "return_1m",
+                           "return_3m", "return_6m", "return_ytd", "return_1y", "return_3y", "return_5y"]
+
 # --------------------------------------------------------------------------- #
 # config
 # --------------------------------------------------------------------------- #
@@ -187,6 +197,12 @@ def build_summary_context(state: dict | None = None) -> dict:
         "benchmark_returns": live_bench["returns_by_year"],
         "enabled_benchmark_targets": (live_bench["derived_targets"] if live_bench["available"] else []),
         "corrected_yearly_financials": corrected_yearly_payload(),
+        "feature_count_before_corrected_yearly": FEATURE_COUNT_BEFORE_CORRECTED,
+        "feature_count_after_corrected_yearly": q.get("n_features"),
+        "accepted_corrected_yearly_features": ACCEPTED_CORRECTED_YEARLY,
+        "still_missing_valuation_features": STILL_MISSING_VALUATION,
+        "old_snapshot_rejected_but_corrected_accepted": OLD_SNAPSHOT_REJECTED_NOW_CORRECTED,
+        "model_signal_after_corrected_yearly": "still weak/unstable",
         "valid_for_modeling": q.get("valid_for_T_to_T1_modeling"),
     }
 
@@ -216,8 +232,10 @@ def build_data_quality_context(state: dict | None = None) -> dict:
         "misaligned_columns": mig.get("columns_rejected_misaligned", []),
         "manual_financials_present": man.get("present", False),
         "manual_accepted_features": man.get("accepted_feature_columns", []),
+        "manual_source_note": man.get("source_note", ""),
         "manual_rejected": man.get("rejected_feature_columns", {}),
         "corrected_yearly": corrected_yearly_payload(),
+        "source_distinction": q.get("source_distinction", {}),
         "benchmark": q.get("benchmark", {}),
         "extreme_growth_counts": q.get("extreme_growth_counts", {}),
     }
@@ -250,6 +268,15 @@ def build_model_diagnostics_context(state: dict | None = None) -> dict:
     else:
         out["weak_backtest"] = True
         out["ml_beats_baseline_consistently"] = False
+    after = (state["quality"] or {}).get("n_features", FEATURE_COUNT_BEFORE_CORRECTED)
+    out["feature_count_before_corrected_yearly"] = FEATURE_COUNT_BEFORE_CORRECTED
+    out["feature_count_after_corrected_yearly"] = after
+    out["interpretation_business"] = (
+        f"The dataset improved from {FEATURE_COUNT_BEFORE_CORRECTED} to {after} validated features after adding "
+        "corrected yearly income and profitability data. Despite this structural improvement, the out-of-sample "
+        "signal remains weak/unstable — the pipeline is better but the current data still does not demonstrate a "
+        "reliable predictive edge. The missing block is historical valuation: P/E, P/B, EV/EBITDA, market cap and "
+        "enterprise value, which are still repeated snapshots.")
     return out
 
 
@@ -295,6 +322,18 @@ def _num(v):
         return None if pd.isna(v) else round(float(v), 3)
     except (TypeError, ValueError):
         return None
+
+
+def _fmt(v) -> str:
+    """Human string for an answer fragment (None/NaN -> 'n/a')."""
+    if v is None:
+        return "n/a"
+    try:
+        if isinstance(v, float) and pd.isna(v):
+            return "n/a"
+    except (TypeError, ValueError):
+        pass
+    return str(v)
 
 
 def _company_warnings(state: dict) -> list[str]:
@@ -781,6 +820,13 @@ def experiments_payload(state: dict | None = None) -> dict:
         "leaderboard_by_target": by_target,
         "verdict": ("No reliable predictive edge demonstrated yet. Single-split spikes should not be "
                     "trusted; more real historical valuation/profitability data is required."),
+        "interpretation_business": [
+            f"The dataset improved from {FEATURE_COUNT_BEFORE_CORRECTED} to {diag.get('feature_count_after_corrected_yearly', 27)} validated features.",
+            "Corrected yearly income and profitability fields are now included.",
+            "Despite this improvement, out-of-sample signal remains weak/unstable.",
+            "The pipeline improved structurally, but the current data still does not demonstrate a reliable predictive edge.",
+            "The missing block is historical valuation: P/E, P/B, EV/EBITDA, market cap, enterprise value.",
+        ],
         "small_sample": True,
         "disclaimer": NOT_ADVICE,
     }
@@ -855,13 +901,235 @@ def frozen_evidence_payload() -> dict:
     return out
 
 
+# --------------------------------------------------------------------------- #
+# grounded intent helpers (PHASE 3/4) — specific, never-fabricated answers
+# --------------------------------------------------------------------------- #
+def get_corrected_yearly_status(state: dict | None = None) -> dict:
+    state = state or load_research_state()
+    cy = corrected_yearly_payload()
+    q = state["quality"]
+    after = q.get("n_features", FEATURE_COUNT_BEFORE_CORRECTED)
+    return {
+        "corrected_yearly_data_available": bool(cy.get("available")),
+        "feature_count_before_corrected_yearly": FEATURE_COUNT_BEFORE_CORRECTED,
+        "feature_count_after_corrected_yearly": after,
+        "accepted_corrected_yearly_features": cy.get("accepted_columns") or ACCEPTED_CORRECTED_YEARLY,
+        "still_missing_valuation_features": cy.get("frozen_valuation_columns") or STILL_MISSING_VALUATION,
+        "old_snapshot_rejected_but_corrected_accepted": OLD_SNAPSHOT_REJECTED_NOW_CORRECTED,
+        "misalignment_2024_columns": cy.get("misalignment_2024_columns", []),
+        "model_signal_after_corrected_yearly": "still weak/unstable",
+    }
+
+
+def get_missing_data_summary(state: dict | None = None) -> dict:
+    return {
+        "still_missing_valuation_features": STILL_MISSING_VALUATION,
+        "summary": ("Real per-year historical valuation is still missing: P/E, P/B, EV/EBITDA, market cap "
+                    "and enterprise value are repeated snapshots. A non-misaligned 2024 export and a larger "
+                    "cross-section would also help."),
+        "request_from_provider": ("Per-year (or per-quarter) valuation time series that actually change over "
+                                  "time, plus a corrected 2024 file with aligned balance-sheet columns."),
+    }
+
+
+def get_benchmark_outperformers(year: int | None = None, limit: int = 10, state: dict | None = None) -> dict:
+    """Historical realized outperformers vs BIST100 (reporting on completed target years)."""
+    state = state or load_research_state()
+    df = state["modeling"]
+    need = {"ticker", "target_year", "next_year_outperform_bist100",
+            "next_year_excess_return_vs_bist100"}
+    if df is None or not need.issubset(df.columns):
+        return {"available": False, "reason": "benchmark-relative targets not present in modeling dataset"}
+    sub = df[df["next_year_outperform_bist100"].notna()].copy()
+    if sub.empty:
+        return {"available": False, "reason": "no completed benchmark target years yet"}
+    sub["target_year"] = sub["target_year"].astype(int)
+    years_avail = sorted(sub["target_year"].unique())
+    use_year = int(year) if year in years_avail else years_avail[-1]
+    yr = sub[sub["target_year"] == use_year].copy()
+    out = yr[yr["next_year_outperform_bist100"].astype(bool)].copy()
+    out = out.sort_values("next_year_excess_return_vs_bist100", ascending=False)
+    rows = [{"ticker": str(r["ticker"]).upper(),
+             "excess_return_vs_bist100_pct": _num(r["next_year_excess_return_vs_bist100"]),
+             "stock_return_pct": _num(r.get("next_year_return_pct")),
+             "bist100_return_pct": _num(r.get("next_year_bist100_return_pct"))}
+            for _, r in out.head(limit).iterrows()]
+    return {
+        "available": True,
+        "target_year": use_year,
+        "years_available": years_avail,
+        "outperformer_count": int(len(out)),
+        "total_in_year": int(len(yr)),
+        "truncated": bool(len(out) > limit),
+        "outperformers": rows,
+        "fields_used": ["ticker", "target_year", "next_year_return_pct",
+                        "next_year_bist100_return_pct", "next_year_excess_return_vs_bist100",
+                        "next_year_outperform_bist100"],
+    }
+
+
+def get_top_ranked_companies(year: int | None = None, limit: int = 10, state: dict | None = None) -> dict:
+    state = state or load_research_state()
+    mo = state.get("model_outputs")
+    if mo is None or "ml_rank" not in mo.columns:
+        return {"available": False, "reason": "model outputs not available"}
+    df = mo.copy()
+    df["year"] = pd.to_numeric(df.get("year"), errors="coerce")
+    years_avail = sorted(int(y) for y in df["year"].dropna().unique())
+    use_year = int(year) if year in years_avail else (years_avail[-1] if years_avail else None)
+    if use_year is not None:
+        df = df[df["year"] == use_year]
+    df = df.sort_values("ml_rank")
+    rows = [{"ticker": str(r["ticker"]).upper(), "ml_rank": int(r["ml_rank"]) if pd.notna(r.get("ml_rank")) else None,
+             "ml_score": _num(r.get("ml_score")), "score_source": str(r.get("score_source", "")),
+             "target_name": str(r.get("target_name", ""))}
+            for _, r in df.head(limit).iterrows()]
+    return {"available": True, "year": use_year, "years_available": years_avail, "top_ranked": rows}
+
+
+_YEAR_RE = __import__("re").compile(r"\b(20\d{2})\b")
+
+
+def classify_intent(question: str) -> str:
+    q = (question or "").lower()
+    if any(k in q for k in ("beat bist", "outperform", "beat the benchmark", "beat the market", "beat index")):
+        return "benchmark_outperformers"
+    if "bist" in q or "benchmark" in q:
+        return "benchmark_status"
+    if any(k in q for k in ("top rank", "highest score", "best ranked", "top stocks", "highest rank",
+                            "top ranked", "best stocks", "ranked highest")):
+        return "top_ranked"
+    if any(k in q for k in ("why", "weak", "signal", "reliable", "edge", "backtest", "diagnostic")):
+        return "diagnostics"
+    if any(k in q for k in ("accept", "reject", "feature", "column", "frozen", "valuation",
+                            "missing", "corrected", "data quality", "snapshot", "leakage")):
+        return "data_quality"
+    return "general"
+
+
+def _year_in(question: str):
+    m = _YEAR_RE.search(question or "")
+    return int(m.group(1)) if m else None
+
+
+def _intent_answer(intent: str, question: str, state: dict, ticker: str | None) -> dict | None:
+    """Deterministic, specific answer for a detected intent. None for 'general'."""
+    year = _year_in(question)
+    cy = get_corrected_yearly_status(state)
+    warns = _company_warnings(state)
+    lims = _limitations(warns)
+
+    if intent == "benchmark_outperformers":
+        o = get_benchmark_outperformers(year=year, limit=10, state=state)
+        if not o.get("available"):
+            return {"answer": ("Benchmark-relative results are not available yet: " + o.get("reason", "") +
+                               ". 2025 rows are inference-only (no next-year result yet)."),
+                    "data_used": {"source": "modeling_dataset", "year": year, "rows_used": 0, "fields_used": []},
+                    "warnings": warns, "limitations": lims}
+        names = ", ".join(f"{r['ticker']} (+{r['excess_return_vs_bist100_pct']:.1f}% vs BIST100)"
+                          for r in o["outperformers"]) or "none"
+        trunc = " (top 10 shown)" if o["truncated"] else ""
+        ans = (f"Using completed target years {o['years_available'][0]}–{o['years_available'][-1]}, the system "
+               f"can identify historical outperformers versus BIST100. For target year {o['target_year']}, "
+               f"{o['outperformer_count']} of {o['total_in_year']} stocks beat BIST100{trunc}: {names}. "
+               "This is historical evaluation of realized returns, not a future recommendation.")
+        return {"answer": ans, "intent_data": o,
+                "data_used": {"source": "modeling_dataset (realized benchmark targets)",
+                              "year": o["target_year"], "rows_used": len(o["outperformers"]),
+                              "fields_used": o["fields_used"]},
+                "warnings": warns, "limitations": lims}
+
+    if intent == "benchmark_status":
+        b = benchmark_payload()
+        if b["available"]:
+            yrs = ", ".join(str(y) for y in b["years_covered"])
+            ans = (f"The BIST100 benchmark is available (source {b['source']}) for {yrs}. It lets the system "
+                   "compare each stock's next-year return against the market, enabling excess-return and "
+                   "outperform-BIST100 targets.")
+        else:
+            ans = "The BIST100 benchmark is currently missing, so market-comparison targets are disabled."
+        return {"answer": ans,
+                "data_used": {"source": "bist100_benchmark", "year": None,
+                              "rows_used": len(b["years_covered"]), "fields_used": ["year", "bist100_return_pct"]},
+                "warnings": warns, "limitations": lims}
+
+    if intent == "top_ranked":
+        t = get_top_ranked_companies(year=year, limit=10, state=state)
+        if not t.get("available"):
+            return {"answer": "Model-ranked companies are not available: " + t.get("reason", ""),
+                    "data_used": {"source": "research_agent_model_outputs", "year": year, "rows_used": 0, "fields_used": []},
+                    "warnings": warns, "limitations": lims}
+        names = ", ".join(f"{r['ticker']} (#{r['ml_rank']})" for r in t["top_ranked"]) or "none"
+        src = t["top_ranked"][0]["score_source"] if t["top_ranked"] else "rank score"
+        ans = (f"Highest model-ranked companies for {t['year']} (by transparent ML rank score, source: {src}): "
+               f"{names}. Note the backtest signal is still weak, so treat these as research candidates, not advice.")
+        return {"answer": ans, "intent_data": t,
+                "data_used": {"source": "research_agent_model_outputs.csv", "year": t["year"],
+                              "rows_used": len(t["top_ranked"]),
+                              "fields_used": ["ticker", "ml_rank", "ml_score", "score_source", "target_name"]},
+                "warnings": warns, "limitations": lims}
+
+    if intent == "diagnostics":
+        diag = build_model_diagnostics_context(state)
+        ans = (f"The dataset improved from {cy['feature_count_before_corrected_yearly']} to "
+               f"{cy['feature_count_after_corrected_yearly']} validated features after adding corrected yearly "
+               "income and profitability data. Despite this, the out-of-sample signal is still weak/unstable "
+               f"(mean rank-correlation {_fmt(diag.get('mean_spearman'))}, ML does not consistently beat a "
+               "simple baseline). The dataset is small (~40 stocks/year) and historical valuation (P/E, P/B, "
+               "EV/EBITDA, market cap, enterprise value) is still a repeated snapshot — so no reliable "
+               "predictive edge is demonstrated yet.")
+        return {"answer": ans,
+                "data_used": {"source": "experiments + data_quality", "year": None,
+                              "rows_used": 0, "fields_used": ["mean_spearman", "weak_backtest", "feature_count"]},
+                "warnings": warns, "limitations": lims}
+
+    if intent == "data_quality":
+        acc = ", ".join(cy["accepted_corrected_yearly_features"])
+        miss = ", ".join(cy["still_missing_valuation_features"])
+        ans = (f"Corrected yearly files added {len(cy['accepted_corrected_yearly_features'])} real per-year "
+               f"income/profitability features now used by the model: {acc}. These same names were rejected in "
+               "the OLD snapshot source (repeated values), but the corrected source genuinely changes year by "
+               f"year. Still missing/rejected as a frozen snapshot: {miss}. The 2024 export also had columns "
+               "shifted into the wrong place, so those cells were rejected rather than guessed.")
+        return {"answer": ans, "intent_data": cy,
+                "data_used": {"source": "corrected_yearly_ingestion_report + data_quality_report", "year": None,
+                              "rows_used": cy["feature_count_after_corrected_yearly"],
+                              "fields_used": cy["accepted_corrected_yearly_features"]},
+                "warnings": warns, "limitations": lims}
+
+    if intent == "company" and ticker:
+        try:
+            ins = generate_company_insight(ticker, state)
+            sc = ins["score"]
+            ans = (f"{ticker.upper()} ({sc.get('year')}): final research score {_fmt(sc.get('final_research_score'))} "
+                   f"(ML {_fmt(sc.get('ml_score'))}, confidence {_fmt(sc.get('confidence_level'))}). "
+                   f"Decision-support verdict: {sc.get('decision_support_verdict')}. Research support only.")
+            return {"answer": ans, "data_used": {"source": "company score", "year": sc.get("year"),
+                    "rows_used": 1, "fields_used": ["ml_score", "confidence_score", "final_research_score"]},
+                    "warnings": warns, "limitations": lims}
+        except Exception:
+            return None
+    return None
+
+
 def answer_research_question(question: str, ticker: str | None = None,
                             max_context_tokens: int | None = None, state: dict | None = None) -> dict:
     state = state or load_research_state()
     cfg = get_config()
+    intent = classify_intent(question)
+    if intent == "general" and ticker:
+        intent = "company"
+
+    det = _intent_answer(intent, question, state, ticker)
+
+    # compact context for the LLM: only what the intent needs
     ctx: dict[str, Any] = {"summary": build_summary_context(state),
-                           "data_quality": build_data_quality_context(state),
-                           "diagnostics": build_model_diagnostics_context(state)}
+                           "diagnostics": build_model_diagnostics_context(state),
+                           "corrected_yearly_status": get_corrected_yearly_status(state)}
+    if det and det.get("intent_data") is not None:
+        ctx["intent_data"] = det["intent_data"]
+    if det and det.get("answer"):
+        ctx["grounded_answer"] = det["answer"]
     if ticker:
         try:
             ctx["company"] = build_company_context(ticker, state)
@@ -871,7 +1139,7 @@ def answer_research_question(question: str, ticker: str | None = None,
     llm_result, fallback, llm_error = None, True, None
     if cfg["provider"] != "none":
         msg = [{"role": "system", "content": SYSTEM_PROMPT},
-               {"role": "user", "content": json.dumps({"question": question, "context": ctx})}]
+               {"role": "user", "content": json.dumps({"question": question, "intent": intent, "context": ctx})}]
         res = call_local_llm(msg, cfg)
         if res.get("ok"):
             parsed = _parse_llm_json(res["content"])
@@ -882,27 +1150,39 @@ def answer_research_question(question: str, ticker: str | None = None,
         else:
             llm_error = res.get("error")
 
+    warns = (det or {}).get("warnings") or _company_warnings(state)
+    lims = (det or {}).get("limitations") or _limitations(warns)
     if llm_result is None:
-        s = ctx["summary"]
-        bench = "available" if s["benchmark_available"] else "missing"
-        det_summary = (f"Based only on validated reports: {s['feature_count']} year-T features, "
-                       f"BIST100 benchmark {bench}"
-                       + (f" ({', '.join(str(y) for y in s.get('benchmark_years', []))})" if s["benchmark_available"] else "")
-                       + f", {len(s['rejected_frozen_columns'])} frozen columns excluded, small sample. "
-                       "No price/return prediction and no investment advice can be given.")
-        warns = _company_warnings(state)
         llm_result = _coerce_llm_result({
             "llm_research_score": None, "llm_confidence": confidence_score(state)["confidence_level"],
-            "summary": det_summary, "reasoning": "Derived deterministically from validated reports.",
-            "warnings": warns, "limitations": _limitations(warns),
+            "summary": (det or {}).get("answer") or _general_summary(ctx["summary"]),
+            "reasoning": "Derived deterministically from validated project data.",
+            "warnings": warns, "limitations": lims,
         })
 
+    # The headline answer is ALWAYS the grounded deterministic one for known intents
+    # (the LLM may not invent tickers/returns); LLM adds bounded explanation only.
+    answer = (det or {}).get("answer")
+    if not answer:
+        answer = _human_answer(llm_result)
+
     return {
-        "answer": _human_answer(llm_result),
+        "answer": answer,
+        "intent": intent,
+        "data_used": (det or {}).get("data_used", {"source": "validated reports", "year": None,
+                      "rows_used": 0, "fields_used": []}),
         "llm_result": llm_result,
-        "context_used_summary": {k: (list(v) if isinstance(v, dict) else v) for k, v in ctx.items()},
-        "warnings": _company_warnings(state),
+        "context_used_summary": sorted(ctx.keys()),
+        "warnings": warns,
+        "limitations": lims,
         "provider_used": cfg["provider"], "fallback_used": fallback, "llm_error": llm_error,
         "diagnostics": provider_diagnostics(cfg, cfg["provider"], fallback, llm_error),
         "disclaimer": "This is research support, not investment advice.",
     }
+
+
+def _general_summary(s: dict) -> str:
+    bench = "available" if s["benchmark_available"] else "missing"
+    return (f"The validated dataset has {s['feature_count']} year-end features across {s['rows']} company-years, "
+            f"with the BIST100 market benchmark {bench}. Ask about benchmark outperformers, top-ranked "
+            "companies, accepted/rejected data, or why the model signal is still weak.")

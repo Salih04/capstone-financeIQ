@@ -30,7 +30,18 @@
 - Overrides from snapshot: {}
 - Rejected: {}
 - Misaligned columns: []
-- Issues: ['240 duplicate ticker-year rows across manual files']
+- Source note: Multiple manual sources detected. Corrected yearly source was prioritized for income/profitability fields; legacy snapshot source only filled fields it uniquely provided. This overlap is expected, not an error.
+- Issues: []
+
+
+## Source distinction (corrected yearly vs old snapshot)
+- Accepted corrected-yearly columns: ['ebitda', 'ebitda_margin', 'gross_profit', 'gross_profit_margin', 'net_income', 'net_profit_margin', 'operating_income', 'revenue', 'roa', 'roe']
+- Old snapshot rejected but corrected accepted: ['ebitda', 'gross_profit', 'net_income', 'operating_income', 'revenue', 'roa', 'roe']
+- Still missing / rejected valuation: ['enterprise_value', 'ev_ebitda', 'ev_sales', 'market_capitalization', 'pb', 'pe', 'peg_ratio']
+- 2024 misaligned columns rejected: ['current_assets', 'ebitda_growth', 'equity', 'financial_debt_ratio', 'gross_profit_growth', 'leverage_ratio', 'long_term_liabilities', 'net_debt', 'net_income_growth', 'non_current_assets', 'operating_income_growth', 'revenue_growth', 'short_term_liabilities', 'total_assets', 'working_capital']
+- Leakage columns rejected: ['price', 'period_return', 'day_return', 'volume', 'return_1w', 'return_1m', 'return_3m', 'return_6m', 'return_ytd', 'return_1y', 'return_3y', 'return_5y']
+
+> Some names (revenue, ebitda, roe, ...) appear as BOTH rejected and accepted because the OLD snapshot source repeated one value across years (rejected), while the CORRECTED yearly source genuinely changes year by year (accepted and now used by the model).
 
 ## Frozen reference columns EXCLUDED from features (unreliable snapshot)
 

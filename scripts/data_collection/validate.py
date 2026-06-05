@@ -62,6 +62,38 @@ def _benchmark_report(df: pd.DataFrame) -> dict:
     }
 
 
+CORRECTED_REPORT = P.CLEAN_DIR / "corrected_yearly_ingestion_report.json"
+STILL_MISSING_VALUATION = ["pe", "pb", "ev_ebitda", "market_capitalization",
+                           "enterprise_value", "ev_sales", "peg_ratio"]
+LEAKAGE_FIELDS = ["price", "period_return", "day_return", "volume", "return_1w", "return_1m",
+                  "return_3m", "return_6m", "return_ytd", "return_1y", "return_3y", "return_5y"]
+
+
+def _source_distinction() -> dict:
+    """Separate columns by SOURCE so the same name can be rejected (old snapshot)
+    yet accepted (corrected yearly) without looking contradictory."""
+    acc, froz, mis = [], [], []
+    if CORRECTED_REPORT.is_file():
+        try:
+            j = json.loads(CORRECTED_REPORT.read_text())
+            acc = sorted((j.get("accepted_columns") or {}).keys())
+            froz = sorted((j.get("frozen_valuation_columns") or {}).keys())
+            mis = sorted((j.get("misalignment_2024_evidence") or {}).keys())
+        except Exception:
+            pass
+    return {
+        "accepted_corrected_yearly_columns": acc,
+        "still_rejected_valuation_columns": froz or STILL_MISSING_VALUATION,
+        "rejected_2024_misaligned_columns": mis,
+        "rejected_leakage_columns": LEAKAGE_FIELDS,
+        "old_snapshot_rejected_but_corrected_accepted": [c for c in acc if c in
+            ("revenue", "ebitda", "net_income", "roe", "roa", "gross_profit", "operating_income")],
+        "source_note": ("Some names (revenue, ebitda, roe, ...) appear as BOTH rejected and accepted because "
+                        "the OLD snapshot source repeated one value across years (rejected), while the CORRECTED "
+                        "yearly source genuinely changes year by year (accepted and now used by the model)."),
+    }
+
+
 def validate(df: pd.DataFrame, cfg: P.PipelineConfig) -> dict:
     issues: list[str] = []
     ref = P.load_reference()
@@ -112,6 +144,8 @@ def validate(df: pd.DataFrame, cfg: P.PipelineConfig) -> dict:
         "frozen_columns_excluded_from_features": [
             c for c in var["frozen"] if c not in ("source_file",)
         ],
+        "rejected_old_snapshot_columns": [c for c in var["frozen"] if c not in ("source_file",)],
+        "source_distinction": _source_distinction(),
         "frozen_feature_columns_remaining": frozen_feats,
         "missingness": missingness,
         "target_coverage_by_year": cov,
@@ -159,8 +193,19 @@ def _write_md(r: dict) -> None:
               f"- Accepted as features: {man.get('accepted_feature_columns', [])}",
               f"- Overrides from snapshot: {man.get('overrides_from_snapshot', {})}",
               f"- Rejected: {man.get('rejected_feature_columns', {})}",
-              f"- Misaligned columns: {man.get('misaligned_columns_rejected', [])}",
-              f"- Issues: {man.get('issues', [])}", ""]
+              f"- Misaligned columns: {man.get('misaligned_columns_rejected', [])}"]
+    if man.get("source_note"):
+        lines.append(f"- Source note: {man['source_note']}")
+    lines += [f"- Issues: {man.get('issues', [])}", ""]
+    sd = r.get("source_distinction", {}) or {}
+    if sd:
+        lines += ["", "## Source distinction (corrected yearly vs old snapshot)",
+                  f"- Accepted corrected-yearly columns: {sd.get('accepted_corrected_yearly_columns', [])}",
+                  f"- Old snapshot rejected but corrected accepted: {sd.get('old_snapshot_rejected_but_corrected_accepted', [])}",
+                  f"- Still missing / rejected valuation: {sd.get('still_rejected_valuation_columns', [])}",
+                  f"- 2024 misaligned columns rejected: {sd.get('rejected_2024_misaligned_columns', [])}",
+                  f"- Leakage columns rejected: {sd.get('rejected_leakage_columns', [])}",
+                  "", f"> {sd.get('source_note', '')}", ""]
     lines += ["## Frozen reference columns EXCLUDED from features (unreliable snapshot)",
               "", ", ".join(r["frozen_columns_excluded_from_features"]) or "none", "",
               "## Provisional feature columns (year-T, genuinely varying)",

@@ -69,6 +69,13 @@ export default function ExperimentsPage() {
         trust the baselines over the ML model on the current feature set.
       </WarningCallout>
 
+      {exp?.interpretation_business?.length ? (
+        <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>What this means in plain terms</div>
+          <Bullets size={12.5} items={exp.interpretation_business} />
+        </div>
+      ) : null}
+
       {/* Target tabs */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {targets.map(t => {

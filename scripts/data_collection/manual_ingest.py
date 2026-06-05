@@ -76,6 +76,18 @@ MANUAL_NUMERIC = set(_CANON.keys())
 _ALIAS_TO_CANON = {a: c for c, al in _CANON.items() for a in al}
 
 
+# Manual-source priority (lower = higher priority) for resolving expected overlap.
+_SOURCE_PRIORITY = {
+    "corrected_yearly_financials_candidate.csv": 0,   # verified per-year income/profitability
+    "all_financials.csv": 1,
+    "candidate_from_yearly_snapshots.csv": 5,         # legacy frozen snapshot evidence
+}
+
+
+def _source_priority(name: str) -> int:
+    return _SOURCE_PRIORITY.get(name.lower(), 3)
+
+
 def _norm(name: str) -> str:
     s = "".join(ch.lower() if ch.isalnum() else "_" for ch in str(name).strip())
     while "__" in s:
@@ -93,6 +105,7 @@ class ManualReport:
     issues: list[str] = field(default_factory=list)
     misaligned_columns: list[str] = field(default_factory=list)
     all_null_columns: list[str] = field(default_factory=list)
+    source_note: str = ""
     present: bool = False
 
     def as_dict(self) -> dict:
@@ -104,6 +117,7 @@ class ManualReport:
             "unknown_columns_ignored": self.unknown_columns,
             "misaligned_columns_rejected": self.misaligned_columns,
             "all_null_columns_rejected": self.all_null_columns,
+            "source_note": self.source_note,
             "issues": self.issues,
             "present": self.present,
         }
@@ -200,23 +214,52 @@ def load_manual(
     if not files:
         return None, rep
 
+    # Columns a LOW-priority (legacy snapshot) source must NOT contribute: it
+    # carries frozen balance-sheet values and the misaligned 2024 cells, which must
+    # never override clean reference features. Legacy stays a listed source but only
+    # fills genuinely-new gaps it alone provides.
+    _LEGACY_BLOCKED = set(OVERRIDE_MAP) | {"market_cap", "enterprise_value", "pe_ratio",
+                                           "pb_ratio", "ps_ratio", "ev_ebitda"}
     frames = []
     for p in files:
         rep.files.append(p.name)
         one = _read_one(p, rep, strict)
         if one is not None and len(one.columns) > 2:
+            prio = _source_priority(p.name)
+            # Only the legacy frozen-snapshot tier (prio >= 5) is barred from
+            # contributing balance-sheet/valuation override columns; ordinary
+            # manual files keep full override capability.
+            if prio >= 5:
+                drop = [c for c in one.columns if c in _LEGACY_BLOCKED]
+                if drop:
+                    one = one.drop(columns=drop)
+            one["__prio"] = prio
             frames.append(one)
+    frames = [f for f in frames if len([c for c in f.columns if c not in ("ticker", "year", "__prio")]) > 0]
     if not frames:
         rep.issues.append("manual financials present but no usable rows after validation")
         return None, rep
 
     df = pd.concat(frames, ignore_index=True)
 
-    # duplicate ticker-year across files
-    dup = df.duplicated(["ticker", "year"]).sum()
+    # Multiple manual sources legitimately cover the same ticker-years. Resolve by
+    # SOURCE PRIORITY (corrected yearly first) instead of treating the expected
+    # overlap as a scary "duplicate" issue. GroupBy.first() takes the first
+    # NON-NULL value per column, so the higher-priority source wins where present
+    # and a lower-priority source only fills gaps it alone has.
+    dup = int(df.duplicated(["ticker", "year"]).sum())
     if dup:
-        rep.issues.append(f"{dup} duplicate ticker-year rows across manual files")
-        df = df.drop_duplicates(["ticker", "year"], keep="last")
+        n_sources = df["__prio"].nunique()
+        df = (df.sort_values("__prio")
+                .groupby(["ticker", "year"], as_index=False).first())
+        if n_sources > 1:
+            rep.source_note = ("Multiple manual sources detected. Corrected yearly source was prioritized for "
+                               "income/profitability fields; legacy snapshot source only filled fields it "
+                               "uniquely provided. This overlap is expected, not an error.")
+        else:
+            # genuine same-priority duplicates -> still worth flagging
+            rep.issues.append(f"{dup} duplicate ticker-year rows within a single source")
+    df = df.drop(columns=["__prio"], errors="ignore")
 
     # unknown tickers
     if known_tickers:
