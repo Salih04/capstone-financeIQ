@@ -21,7 +21,24 @@ from typing import Any
 
 import pandas as pd
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+def _resolve_repo_root() -> Path:
+    """Find the dir that actually holds data/trusted_clean.
+
+    Works in the repo (parents[3]) and in Docker (WORKDIR /app with data mounted),
+    and honours an explicit RESEARCH_REPO_ROOT override.
+    """
+    candidates = []
+    env = os.environ.get("RESEARCH_REPO_ROOT")
+    if env:
+        candidates.append(Path(env))
+    candidates += [Path(__file__).resolve().parents[3], Path("/app"), Path.cwd()]
+    for c in candidates:
+        if (c / "data" / "trusted_clean").is_dir():
+            return c
+    return Path(__file__).resolve().parents[3]
+
+
+REPO_ROOT = _resolve_repo_root()
 CLEAN = REPO_ROOT / "data" / "trusted_clean"
 MODELING_CSV = CLEAN / "modeling_dataset_2020_2025.csv"
 QUALITY_JSON = CLEAN / "data_quality_report.json"
@@ -139,7 +156,9 @@ def build_summary_context(state: dict | None = None) -> dict:
     state = state or load_research_state()
     q = state["quality"]
     man = q.get("manual_financials", {}) or {}
-    bench = q.get("benchmark", {}) or {}
+    # Use the LIVE benchmark file as truth (the quality report can be stale if it
+    # was generated before the benchmark was collected).
+    live_bench = benchmark_payload()
     return {
         "dataset_available": state["modeling_available"],
         "rows": q.get("rows"),
@@ -149,8 +168,8 @@ def build_summary_context(state: dict | None = None) -> dict:
         "feature_groups": _feature_groups(q),
         "rejected_frozen_columns": q.get("frozen_columns_excluded_from_features", []),
         "manual_accepted_features": man.get("accepted_feature_columns", []),
-        "benchmark_available": bench.get("excess_outperform_targets_enabled", q.get("benchmark_available", False)),
-        "benchmark_source": bench.get("source", "none"),
+        "benchmark_available": live_bench["available"],
+        "benchmark_source": live_bench["source"],
         "valid_for_modeling": q.get("valid_for_T_to_T1_modeling"),
     }
 
@@ -526,6 +545,13 @@ def generate_summary_insight(state: dict | None = None) -> dict:
             "provider_used": cfg["provider"], "fallback_used": fallback, "disclaimer": NOT_ADVICE}
 
 
+def _records(df) -> list[dict]:
+    """JSON-safe records: NaN/inf -> null (FastAPI cannot serialize NaN floats)."""
+    if df is None or len(df) == 0:
+        return []
+    return json.loads(df.to_json(orient="records"))
+
+
 def experiments_payload(state: dict | None = None) -> dict:
     state = state or load_research_state()
     diag = build_model_diagnostics_context(state)
@@ -533,7 +559,7 @@ def experiments_payload(state: dict | None = None) -> dict:
     by_target = []
     if LEADERBOARD_BY_TARGET.is_file():
         try:
-            by_target = pd.read_csv(LEADERBOARD_BY_TARGET).where(lambda d: d.notna(), None).to_dict("records")
+            by_target = _records(pd.read_csv(LEADERBOARD_BY_TARGET))
         except Exception:
             by_target = []
     targets = sorted({r.get("target") for r in by_target if r.get("target")}) or ["next_year_return_pct"]
@@ -541,7 +567,7 @@ def experiments_payload(state: dict | None = None) -> dict:
         "primary_target": "next_year_return_pct",
         "available_targets": targets,
         "diagnostics": diag,
-        "leaderboard": (lb.where(lambda d: d.notna(), None).to_dict("records") if lb is not None else []),
+        "leaderboard": _records(lb),
         "leaderboard_by_target": by_target,
         "verdict": ("No reliable predictive edge demonstrated yet. Single-split spikes should not be "
                     "trusted; more real historical valuation/profitability data is required."),

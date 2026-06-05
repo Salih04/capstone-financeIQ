@@ -38,6 +38,10 @@ services:
     volumes:
     - ./2.backend:/app
     - ./3.Datasets:/app/3.Datasets
+    # Research-agent reads these generated artifacts (research_agent paths
+    # resolve to /app when data is mounted here).
+    - ./data:/app/data
+    - ./experiments:/app/experiments
 
   frontend:
     build: ./1.frontend

@@ -19,12 +19,12 @@ const NAV_SECTIONS = [
   {
     label: 'Research',
     items: [
-      { path: '/research-agent', icon: Bot, label: 'Research Agent', roles: ['analyst', 'admin'] },
-      { path: '/data-quality', icon: Database, label: 'Data Quality', roles: ['analyst', 'admin'] },
-      { path: '/experiments', icon: FlaskConical, label: 'Experiments', roles: ['analyst', 'admin'] },
-      { path: '/benchmark', icon: LineChart, label: 'Benchmark', roles: ['analyst', 'admin'] },
-      { path: '/research', icon: Sparkles, label: 'Score Explorer', roles: ['analyst', 'admin'] },
-      { path: '/forecasting', icon: BrainCircuit, label: 'Forecasting (legacy)', roles: ['analyst', 'admin'] },
+      { path: '/research-agent', icon: Bot, label: 'Research Agent' },
+      { path: '/data-quality', icon: Database, label: 'Data Quality' },
+      { path: '/experiments', icon: FlaskConical, label: 'Experiments' },
+      { path: '/benchmark', icon: LineChart, label: 'Benchmark' },
+      { path: '/research', icon: Sparkles, label: 'Score Explorer' },
+      { path: '/forecasting', icon: BrainCircuit, label: 'Forecasting (legacy)' },
     ],
   },
   {
