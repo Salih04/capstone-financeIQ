@@ -5,8 +5,10 @@ import { SectionHeader, EmptyState, GhostButton } from '../components/ui'
 import { researchApi } from '../api/researchApi'
 import {
   ScoreBreakdown, EvidencePanel, RenderList, Bullets, CollapsibleJson, SignalBadge,
-  asText, NOT_ADVICE,
+  DecisionVerdict, humanizeWarning, asText, NOT_ADVICE,
 } from '../utils/safeRender'
+
+const hw = (items) => (Array.isArray(items) ? items.map(humanizeWarning) : items)
 
 export default function CompanyResearchDetailPage() {
   const { ticker } = useParams()
@@ -44,6 +46,12 @@ export default function CompanyResearchDetailPage() {
             { label: 'LLM support score', value: sc.llm_research_score, tone: 'info', sub: 'decision-support layer' },
             { label: 'Final research score', value: sc.final_research_score, tone: 'accent', emphasis: true },
           ]} />
+          {sc.decision_support_verdict && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 11.5, color: 'var(--text-3)', fontWeight: 700 }}>Decision support</span>
+              <DecisionVerdict verdict={sc.decision_support_verdict} />
+            </div>
+          )}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 2 }}>
             <SignalBadge tone="neutral">target: {asText(sc.target_name)}</SignalBadge>
             <SignalBadge tone="neutral">model: {asText(sc.model_name)}</SignalBadge>
@@ -86,11 +94,11 @@ export default function CompanyResearchDetailPage() {
       <EvidencePanel title="Warnings & limitations" tone="warn">
         <div>
           <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-3)', marginBottom: 6 }}>Warnings</div>
-          <Bullets tone="warn" size={12.5} items={sc.warnings || ctx.warnings} />
+          <Bullets tone="warn" size={12.5} items={hw(sc.warnings || ctx.warnings)} />
         </div>
         <div>
           <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-3)', margin: '4px 0 6px' }}>Limitations</div>
-          <Bullets tone="warn" size={12.5} items={sc.limitations || llm.limitations} />
+          <Bullets tone="warn" size={12.5} items={hw(sc.limitations || llm.limitations)} />
         </div>
         <p style={{ fontSize: 12, color: 'var(--warning-light)', margin: 0 }}>
           Valuation / profitability data is frozen & rejected — score relies on balance-sheet & growth features only.

@@ -320,7 +320,8 @@ export default function ForecastingPage() {
           <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
             <button
               onClick={trainModel}
-              disabled={!canRun || training}
+              disabled={training}
+              title={canRun ? 'Train solid-parameter model' : 'Select year and sector first'}
               style={{
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
@@ -328,15 +329,16 @@ export default function ForecastingPage() {
                 color: '#fff',
                 fontSize: 12,
                 padding: '8px 12px',
-                cursor: canRun ? 'pointer' : 'not-allowed',
-                opacity: canRun ? 1 : 0.6,
+                cursor: training ? 'wait' : 'pointer',
+                opacity: training ? 0.7 : canRun ? 1 : 0.75,
               }}
             >
               {training ? 'Training...' : 'Train Parameters'}
             </button>
             <button
               onClick={runForecast}
-              disabled={!canRun || running}
+              disabled={running}
+              title={canRun ? 'Run forecast' : 'Select year and sector first'}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -347,8 +349,8 @@ export default function ForecastingPage() {
                 color: 'var(--text-1)',
                 fontSize: 12,
                 padding: '8px 12px',
-                cursor: canRun ? 'pointer' : 'not-allowed',
-                opacity: canRun ? 1 : 0.6,
+                cursor: running ? 'wait' : 'pointer',
+                opacity: running ? 0.7 : canRun ? 1 : 0.85,
               }}
             >
               <Play size={13} />

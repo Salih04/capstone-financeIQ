@@ -305,4 +305,45 @@ export function Bullets({ items, tone, size = 13 }) {
   )
 }
 
+// ─── warning/limitation key humanization ────────────────────────────────────
+const WARNING_LABELS = {
+  small_sample: 'Small sample size',
+  frozen_features: 'Frozen valuation/profitability features excluded',
+  no_real_valuation_profitability_features: 'Real historical valuation/profitability data is still missing',
+  no_real_valuation: 'Real valuation history missing',
+  weak_backtest: 'Weak/unstable backtest signal',
+  benchmark_missing: 'BIST100 benchmark missing',
+  manual_financials_missing: 'Manual historical financials missing',
+}
+export const humanizeWarning = (key) => {
+  if (key === null || key === undefined) return '—'
+  const k = String(key)
+  if (WARNING_LABELS[k]) return WARNING_LABELS[k]
+  // already a human sentence? leave it. else prettify snake_case.
+  if (/\s/.test(k) || /[A-Z]/.test(k)) return k
+  return k.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase())
+}
+
+// ─── DecisionVerdict — bounded research-interest badge (never advice) ─────────
+const VERDICT_TONE = {
+  'insufficient evidence': 'neutral',
+  'low confidence watchlist': 'warn',
+  'moderate research interest': 'info',
+  'high research interest': 'good',
+}
+export function DecisionVerdict({ verdict, size = 'md' }) {
+  if (!verdict) return null
+  const tone = VERDICT_TONE[String(verdict).toLowerCase()] || 'neutral'
+  const fg = tone === 'neutral' ? 'var(--text-2)' : toneColor(tone)
+  const bg = tone === 'neutral' ? 'var(--surface-3)' : toneSubtle(tone)
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: bg, color: fg,
+      borderRadius: 999, padding: size === 'md' ? '4px 13px' : '2px 10px',
+      fontSize: size === 'md' ? 12.5 : 11, fontWeight: 800, textTransform: 'capitalize' }}>
+      <span style={{ width: 7, height: 7, borderRadius: '50%', background: fg, flexShrink: 0 }} />
+      {verdict}
+    </span>
+  )
+}
+
 export const NOT_ADVICE = 'Research support only — not investment advice.'

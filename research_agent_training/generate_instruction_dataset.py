@@ -151,14 +151,129 @@ def _global_examples(state):
     return out
 
 
-def generate(n: int, state=None) -> list[dict]:
+def _comparison_examples(state, tickers):
+    """Compare two companies using only provided context (no fabricated facts)."""
+    out = []
+    pairs = [(tickers[i], tickers[i + 1]) for i in range(0, len(tickers) - 1, 2)]
+    for a, b in pairs:
+        try:
+            ca, cb = RA.build_company_context(a, state), RA.build_company_context(b, state)
+        except Exception:
+            continue
+        ma = RA.ml_score_for_company(a, state).get("ml_score")
+        mb = RA.ml_score_for_company(b, state).get("ml_score")
+        warns = ca["warnings"]
+        higher = a if (ma or 0) >= (mb or 0) else b
+        out.append({
+            "instruction": "Compare these two companies using only the provided structured context.",
+            "input": {"a": {"ticker": a, "ml_score": ma, "top_positive_features": list(ca["top_positive_features"])[:3]},
+                      "b": {"ticker": b, "ml_score": mb, "top_positive_features": list(cb["top_positive_features"])[:3]},
+                      "warnings": warns},
+            "output": {"llm_research_score": None, "llm_confidence": "low",
+                       "summary": _clean(f"On the provided year-T feature ranks, {higher} has the higher transparent "
+                                         f"ML rank score; both share the same dataset limitations. This is a structured "
+                                         f"comparison, not a recommendation."),
+                       "reasoning": _clean("Compares only the supplied ML rank scores and feature ranks; no external data."),
+                       "positive_signals": [], "negative_signals": [],
+                       "warnings": warns, "limitations": _limits(warns)},
+        })
+    return out
+
+
+def _benchmark_examples(state):
+    """Explicit benchmark facts so the model never claims a present benchmark is missing."""
+    b = RA.benchmark_payload()
+    if not b["available"]:
+        return []
+    yrs = ", ".join(str(y) for y in b["years_covered"])
+    return [{
+        "instruction": "State whether the BIST100 benchmark is available and summarise its yearly returns.",
+        "input": {"benchmark_available": True, "benchmark_source": b["source"],
+                  "benchmark_years": b["years_covered"], "benchmark_returns": b["returns_by_year"],
+                  "enabled_benchmark_targets": b["derived_targets"]},
+        "output": {"llm_research_score": None, "llm_confidence": "medium",
+                   "summary": _clean(f"The BIST100 benchmark is available (source {b['source']}) for {yrs}; "
+                                     f"excess-return and outperform-BIST100 targets are enabled."),
+                   "reasoning": _clean("Uses only the benchmark facts supplied in the context; values are not invented."),
+                   "positive_signals": ["benchmark available"], "negative_signals": [],
+                   "warnings": ["small_sample"], "limitations": _limits(["small_sample"])},
+    }]
+
+
+def _decision_support_examples(state, tickers):
+    out = []
+    diag = RA.build_model_diagnostics_context(state)
+    for t in tickers[:8]:
+        try:
+            ctx = RA.build_company_context(t, state)
+        except Exception:
+            continue
+        ml = RA.ml_score_for_company(t, state)
+        conf = RA.confidence_score(state)
+        comp = RA.composite_score(ml.get("ml_score"), conf["confidence_score"],
+                                  RA.deterministic_research_score({**ctx, **conf, **ml})["llm_research_score"])
+        ds = RA.decision_support(comp["final_research_score"], conf["confidence_level"], ctx["warnings"], diag)
+        out.append({
+            "instruction": "Give a bounded decision-support verdict for this company (never investment advice).",
+            "input": {"ticker": t, "final_research_score": comp["final_research_score"],
+                      "confidence_level": conf["confidence_level"], "warnings": ctx["warnings"]},
+            "output": {"llm_research_score": None, "llm_confidence": conf["confidence_level"],
+                       "summary": _clean(f"{t}: decision-support verdict is '{ds['decision_support_verdict']}'. "
+                                         f"This is a bounded research-interest signal only, never a trade instruction."),
+                       "reasoning": _clean("Verdict is capped cautiously when the backtest is weak or confidence is low."),
+                       "positive_signals": [], "negative_signals": [],
+                       "warnings": ctx["warnings"], "limitations": ds["blocking_limitations"] or _limits(ctx["warnings"])},
+        })
+    return out
+
+
+def _failure_case_examples(state):
+    """Hard negatives: enforce strict JSON, refusals, no advice, no fabricated numbers."""
+    warns = ["small_sample", "frozen_features", "weak_backtest"]
+    base = [
+        ("A user asks for an exact future price for next year.",
+         {"request": "future price figure"},
+         "No specific future price figure can be produced; the context contains no such value and this is research support, not advice."),
+        ("A user wants a directional trade instruction. Respond within policy.",
+         {"request": "directional trade call"},
+         "A directional trade instruction cannot be given. The system only describes validated structured evidence and its limits."),
+        ("The model previously returned malformed JSON. Restate the answer as strict JSON only.",
+         {"prior_error": "unquoted key"},
+         "Benchmark and feature facts are summarised from context; output must be a single valid JSON object only."),
+        ("A user asks for a certain, risk-free return figure.",
+         {"request": "certain return"},
+         "No certainty of returns can be claimed or invented; only validated, bounded research signals are provided."),
+    ]
+    out = []
+    for instr, inp, summ in base:
+        out.append({
+            "instruction": instr, "input": inp,
+            "output": {"llm_research_score": None, "llm_confidence": "low",
+                       "summary": _clean(summ), "reasoning": _clean("Refusal grounded in policy and missing context."),
+                       "positive_signals": [], "negative_signals": [],
+                       "warnings": warns, "limitations": _limits(warns)},
+        })
+    return out
+
+
+def generate(n: int, state=None, *, seed: int = 42, include_comparisons: bool = True,
+             include_benchmark: bool = True, include_company_explanations: bool = True,
+             include_failure_cases: bool = True) -> list[dict]:
     state = state or RA.load_research_state()
     df = state["modeling"]
     tickers = sorted(df["ticker"].unique()) if df is not None else []
-    random.Random(42).shuffle(tickers)
+    random.Random(seed).shuffle(tickers)
     examples = _global_examples(state)
-    examples += _company_examples(state, tickers)
-    # pad by re-emitting global exemplars (wording-varied) up to n
+    if include_benchmark:
+        examples += _benchmark_examples(state)
+    if include_failure_cases:
+        examples += _failure_case_examples(state)
+    if include_company_explanations:
+        examples += _company_examples(state, tickers)
+        examples += _decision_support_examples(state, tickers)
+    if include_comparisons:
+        examples += _comparison_examples(state, tickers)
+    # pad by re-emitting company exemplars (wording-varied) up to n
     i = 0
     while len(examples) < n and tickers:
         examples += _company_examples(state, tickers[i % len(tickers):i % len(tickers) + 1])
@@ -173,18 +288,32 @@ def write_jsonl(rows: list[dict], path: Path) -> None:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
 
+def _bool_flag(ap, name, default=True):
+    ap.add_argument(f"--{name}", dest=name.replace("-", "_"), action="store_true", default=default)
+    ap.add_argument(f"--no-{name}", dest=name.replace("-", "_"), action="store_false")
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--n", type=int, default=200)
+    ap.add_argument("--n", type=int, default=1000)
     ap.add_argument("--out", default=str(OUT_DEFAULT))
+    ap.add_argument("--sample-out", default=str(SAMPLE_OUT))
     ap.add_argument("--sample-n", type=int, default=12)
+    ap.add_argument("--seed", type=int, default=42)
+    _bool_flag(ap, "include-comparisons")
+    _bool_flag(ap, "include-benchmark")
+    _bool_flag(ap, "include-company-explanations")
+    _bool_flag(ap, "include-failure-cases")
     a = ap.parse_args(argv)
 
-    rows = generate(a.n)
+    rows = generate(a.n, seed=a.seed, include_comparisons=a.include_comparisons,
+                    include_benchmark=a.include_benchmark,
+                    include_company_explanations=a.include_company_explanations,
+                    include_failure_cases=a.include_failure_cases)
     write_jsonl(rows, Path(a.out))
-    write_jsonl(rows[:a.sample_n], SAMPLE_OUT)
+    write_jsonl(rows[:a.sample_n], Path(a.sample_out))
     print(f"[dataset] wrote {len(rows)} examples -> {a.out}")
-    print(f"[dataset] sample ({min(a.sample_n, len(rows))}) -> {SAMPLE_OUT}")
+    print(f"[dataset] sample ({min(a.sample_n, len(rows))}) -> {a.sample_out}")
     return 0
 
 

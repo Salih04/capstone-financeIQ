@@ -72,9 +72,9 @@ export default function ResearchPage() {
   const benchMissing = dashboard && !dashboard.benchmark?.available
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180 }}>
       <SectionHeader
-        title="Research — Score vs Realized Performance"
+        title="Score Explorer — Score vs Realized Performance"
         sub="Fundamental Score is explanatory, not financial advice. Same-year correlation ≠ future prediction."
         icon={FlaskConical}
         actions={
@@ -86,7 +86,7 @@ export default function ResearchPage() {
       />
 
       {dashboard?.data_note && (
-        <Card style={{ borderColor: 'var(--warning, #b45309)' }}>
+        <Card style={{ borderColor: 'var(--warning)' }}>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center', color: 'var(--text-2)', fontSize: 13 }}>
             <AlertTriangle size={18} />
             <span><b>Data note:</b> {dashboard.data_note}</span>
@@ -95,7 +95,7 @@ export default function ResearchPage() {
       )}
 
       {benchMissing && (
-        <Card style={{ borderColor: 'var(--warning, #b45309)' }}>
+        <Card style={{ borderColor: 'var(--warning)' }}>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center', color: 'var(--text-2)' }}>
             <AlertTriangle size={18} />
             <span>{dashboard.benchmark?.message || 'BIST100 benchmark missing.'} Excess-return vs BIST100 is hidden until provided.</span>
@@ -135,7 +135,7 @@ export default function ResearchPage() {
                   }} />
                 <Scatter data={scatter} onClick={(d) => setSelected(d.ticker)}>
                   {scatter.map((d) => (
-                    <Cell key={d.ticker} fill={d.ticker === selected ? 'var(--accent, #6366f1)' : 'var(--text-3)'}
+                    <Cell key={d.ticker} fill={d.ticker === selected ? 'var(--primary)' : 'var(--text-3)'}
                       opacity={d.ticker === selected ? 1 : 0.5} />
                   ))}
                 </Scatter>
@@ -181,7 +181,7 @@ export default function ResearchPage() {
                     <td style={{ padding: '7px 10px', fontWeight: 600 }}>{c.ticker}</td>
                     <td style={{ padding: '7px 10px' }}><ScoreBadge score={c.fundamental_score} /></td>
                     <td style={{ padding: '7px 10px' }}>{fmt(c.market_score)}</td>
-                    <td style={{ padding: '7px 10px', color: (c.realized_return || 0) >= 0 ? 'var(--success, #16a34a)' : 'var(--danger, #dc2626)' }}>{pct(c.realized_return)}</td>
+                    <td style={{ padding: '7px 10px', color: (c.realized_return || 0) >= 0 ? 'var(--success)' : 'var(--danger)' }}>{pct(c.realized_return)}</td>
                     <td style={{ padding: '7px 10px' }}>{c.score_rank ?? '—'}</td>
                     <td style={{ padding: '7px 10px' }}>{c.return_rank ?? '—'}</td>
                   </tr>
@@ -226,7 +226,7 @@ function CompanyDetail({ d }) {
           <div key={c.category} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <span style={{ width: 110, fontSize: 12 }}>{c.category}</span>
             <div style={{ flex: 1, height: 8, background: 'var(--surface-2)', borderRadius: 4 }}>
-              <div style={{ width: `${c.category_score ?? 0}%`, height: '100%', background: 'var(--accent, #6366f1)', borderRadius: 4 }} />
+              <div style={{ width: `${c.category_score ?? 0}%`, height: '100%', background: 'var(--primary)', borderRadius: 4 }} />
             </div>
             <span style={{ width: 38, fontSize: 12, textAlign: 'right' }}>{c.category_score != null ? c.category_score.toFixed(0) : '—'}</span>
           </div>

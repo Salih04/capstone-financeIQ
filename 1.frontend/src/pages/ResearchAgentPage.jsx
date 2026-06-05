@@ -4,8 +4,10 @@ import api from '../api/client'
 import { SectionHeader, GhostButton } from '../components/ui'
 import {
   MetricCard, EvidencePanel, ScoreBreakdown, SignalBadge, Bullets,
-  WarningCallout, asText, formatNumber, NOT_ADVICE,
+  WarningCallout, DecisionVerdict, humanizeWarning, asText, formatNumber, NOT_ADVICE,
 } from '../utils/safeRender'
+
+const hw = (items) => (Array.isArray(items) ? items.map(humanizeWarning) : items)
 
 const errText = (e) => {
   const d = e?.response?.data?.detail
@@ -121,6 +123,15 @@ export default function ResearchAgentPage() {
                 { label: 'LLM support score', value: sc.llm_research_score, tone: 'info' },
                 { label: 'Final research score', value: sc.final_research_score, tone: 'accent', emphasis: true },
               ]} />
+              {sc.decision_support_verdict && (
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 11.5, color: 'var(--text-3)', fontWeight: 700 }}>Decision support</span>
+                    <DecisionVerdict verdict={sc.decision_support_verdict} />
+                  </div>
+                  {sc.blocking_limitations?.length ? <Bullets tone="warn" size={12} items={sc.blocking_limitations} /> : null}
+                </div>
+              )}
             </>
           )}
         </EvidencePanel>
@@ -135,16 +146,23 @@ export default function ResearchAgentPage() {
           </button>
           {answer?.loading && <div style={{ color: 'var(--text-3)', fontSize: 13 }}>Thinking…</div>}
           {answer?.error && <div style={{ color: 'var(--danger-light)', fontSize: 13 }}>{asText(answer.error)}</div>}
-          {answer && !answer.loading && !answer.error && (
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
-              <p style={{ whiteSpace: 'pre-wrap', fontSize: 13, color: 'var(--text-2)', margin: 0, lineHeight: 1.55 }}>{asText(answer.answer)}</p>
-              {answer.warnings?.length ? <div style={{ marginTop: 8 }}><Bullets tone="warn" size={12} items={answer.warnings} /></div> : null}
-              <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
-                <SignalBadge tone="neutral">provider: {asText(answer.provider_used)}</SignalBadge>
-                <SignalBadge tone="neutral">fallback: {asText(answer.fallback_used)}</SignalBadge>
+          {answer && !answer.loading && !answer.error && (() => {
+            const r = answer.llm_result || {}
+            return (
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <p style={{ whiteSpace: 'pre-wrap', fontSize: 13, color: 'var(--text-1)', margin: 0, lineHeight: 1.55, fontWeight: 600 }}>{asText(answer.answer)}</p>
+                {r.reasoning ? <p style={{ fontSize: 12, color: 'var(--text-3)', margin: 0, lineHeight: 1.5 }}>{asText(r.reasoning)}</p> : null}
+                {r.positive_signals?.length ? <div><div style={lbl('var(--success-light)')}>Positive</div><Bullets tone="good" size={12} items={r.positive_signals} /></div> : null}
+                {r.negative_signals?.length ? <div><div style={lbl('var(--danger-light)')}>Negative</div><Bullets tone="bad" size={12} items={r.negative_signals} /></div> : null}
+                {(r.warnings?.length || answer.warnings?.length) ? <div><div style={lbl('var(--warning-light)')}>Warnings</div><Bullets tone="warn" size={12} items={hw(r.warnings?.length ? r.warnings : answer.warnings)} /></div> : null}
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {r.llm_research_score != null ? <SignalBadge tone="info">support {formatNumber(r.llm_research_score, 2)}</SignalBadge> : null}
+                  {r.llm_confidence ? <SignalBadge tone="neutral">confidence {asText(r.llm_confidence)}</SignalBadge> : null}
+                  <SignalBadge tone={answer.fallback_used ? 'warn' : 'good'}>provider: {asText(answer.provider_used)}{answer.fallback_used ? ' (fallback)' : ''}</SignalBadge>
+                </div>
               </div>
-            </div>
-          )}
+            )
+          })()}
         </EvidencePanel>
       </div>
 
@@ -164,7 +182,7 @@ export default function ResearchAgentPage() {
             </div>
             <div>
               <div style={lbl('var(--warning-light)')}>Limitations</div>
-              <Bullets tone="warn" size={12.5} items={sc.limitations || llm.limitations} />
+              <Bullets tone="warn" size={12.5} items={hw(sc.limitations || llm.limitations)} />
             </div>
           </div>
         </EvidencePanel>

@@ -84,20 +84,32 @@ def get_config() -> dict:
 
 SYSTEM_PROMPT = """You are a cautious financial RESEARCH-SUPPORT assistant for a capstone project.
 
-STRICT RULES:
-- Use ONLY the structured context provided in the user message. Do not use outside knowledge or external data.
-- Do NOT invent or estimate any financial fact, number, price, or return not present in the context.
-- Do NOT give investment advice. Never output buy, sell, hold, al, sat, or tut.
-- Do NOT output a price target or an exact expected return unless that exact value is in the provided model output.
-- The structured ML pipeline is the primary predictor; your llm_research_score is only a bounded support signal in [0,1], distinct from the ML score.
-- ALWAYS surface the relevant limitations present in the context: small sample size, missing BIST100 benchmark, frozen valuation/profitability data, missing real historical financials, weak/unstable backtest metrics.
-- State that this is a research-support system, not an investment recommendation.
+OUTPUT FORMAT (MANDATORY):
+- Return ONLY a single valid JSON object. No markdown, no code fences, no prose before or after.
+- Every key MUST be wrapped in double quotes. Every string value MUST be wrapped in double quotes.
+- No trailing commas. No comments. No extra keys.
+- The object MUST have exactly these keys:
+  {"llm_research_score": 0.0, "llm_confidence": "low",
+   "summary": "...", "reasoning": "...", "positive_signals": [],
+   "negative_signals": [], "warnings": [], "limitations": []}
+- llm_research_score is a number in [0,1]. llm_confidence is exactly one of "low", "medium", "high".
 
-Respond with a single JSON object:
-{"llm_research_score": 0.0-1.0, "llm_confidence": "low|medium|high",
- "summary": "...", "reasoning": "...", "positive_signals": ["..."],
- "negative_signals": ["..."], "warnings": ["..."], "limitations": ["..."]}
-Output JSON only, no prose around it."""
+CONTENT RULES:
+- Use ONLY the structured context provided in the user message. Do not use outside knowledge.
+- Do NOT invent or estimate any financial fact, number, price, year, or return not present in the context.
+- If the context contains benchmark_available=true with benchmark_returns, the benchmark IS available.
+  NEVER say benchmark data is missing or unavailable when it is present in the context. Use the exact
+  years and values given; do not drop or add years.
+- Do NOT give investment advice. Never output buy, sell, hold, al, sat, or tut.
+- Do NOT output a price target or an exact expected return unless that exact value is in the context.
+- The structured ML pipeline is the primary predictor; your llm_research_score is only a bounded support
+  signal in [0,1], distinct from the ML score, confidence score and final research score.
+- ALWAYS surface the relevant limitations actually present in the context: small sample size, frozen
+  valuation/profitability data, missing real historical financials, weak/unstable backtest metrics, and
+  a missing benchmark ONLY if benchmark_available is false.
+- Keep summary and reasoning concise (1-3 sentences each).
+- This is research support, NOT investment advice.
+Output JSON only."""
 
 
 # --------------------------------------------------------------------------- #
@@ -170,6 +182,9 @@ def build_summary_context(state: dict | None = None) -> dict:
         "manual_accepted_features": man.get("accepted_feature_columns", []),
         "benchmark_available": live_bench["available"],
         "benchmark_source": live_bench["source"],
+        "benchmark_years": live_bench["years_covered"],
+        "benchmark_returns": live_bench["returns_by_year"],
+        "enabled_benchmark_targets": (live_bench["derived_targets"] if live_bench["available"] else []),
         "valid_for_modeling": q.get("valid_for_T_to_T1_modeling"),
     }
 
@@ -391,46 +406,137 @@ def _limitations(warns: list[str]) -> list[str]:
 # --------------------------------------------------------------------------- #
 # LLM provider abstraction (PHASE 3) — fails safe
 # --------------------------------------------------------------------------- #
+def _http_post_json(url: str, payload: dict, timeout: float) -> dict:
+    req = urllib.request.Request(
+        url, data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json"}, method="POST")
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read().decode())
+
+
 def call_local_llm(messages: list[dict], cfg: dict | None = None) -> dict:
     cfg = cfg or get_config()
     if cfg["provider"] == "none" or not cfg["base_url"]:
         return {"ok": False, "provider": "none", "error": "no provider configured"}
-    try:
-        if cfg["provider"] == "ollama":
+    timeout = cfg["timeout"]
+    # ---- Ollama -----------------------------------------------------------
+    if cfg["provider"] == "ollama":
+        try:
             payload = {"model": cfg["model"], "messages": messages, "stream": False,
                        "options": {"temperature": 0.2}}
-        else:  # lmstudio / openai-compatible
-            payload = {"model": cfg["model"], "messages": messages, "temperature": 0.2}
-        req = urllib.request.Request(
-            cfg["base_url"], data=json.dumps(payload).encode(),
-            headers={"Content-Type": "application/json"}, method="POST")
-        with urllib.request.urlopen(req, timeout=cfg["timeout"]) as r:
-            data = json.loads(r.read().decode())
-        if cfg["provider"] == "ollama":
-            content = data.get("message", {}).get("content", "")
-        else:
-            content = data["choices"][0]["message"]["content"]
+            data = _http_post_json(cfg["base_url"], payload, timeout)
+            return {"ok": True, "provider": "ollama",
+                    "content": data.get("message", {}).get("content", "")}
+        except Exception as exc:  # noqa
+            return {"ok": False, "provider": "ollama", "error": str(exc)}
+    # ---- LM Studio / OpenAI-compatible primary ----------------------------
+    try:
+        payload = {"model": cfg["model"], "messages": messages, "temperature": 0.2}
+        data = _http_post_json(cfg["base_url"], payload, timeout)
+        content = data["choices"][0]["message"]["content"]
         return {"ok": True, "provider": cfg["provider"], "content": content}
-    except Exception as exc:  # noqa - fail safe, never crash the endpoint
-        return {"ok": False, "provider": cfg["provider"], "error": str(exc)}
+    except Exception as primary_exc:  # noqa - try LM Studio native endpoint
+        try:
+            alt = cfg["base_url"].replace("/v1/chat/completions", "/api/v1/chat")
+            if alt == cfg["base_url"]:
+                raise primary_exc
+            sys_txt = "\n".join(m["content"] for m in messages if m["role"] == "system")
+            usr_txt = "\n".join(m["content"] for m in messages if m["role"] != "system")
+            data = _http_post_json(alt, {"model": cfg["model"], "system_prompt": sys_txt,
+                                         "input": usr_txt}, timeout)
+            content = data["output"][0]["content"] if isinstance(data.get("output"), list) else data.get("content", "")
+            return {"ok": True, "provider": cfg["provider"], "content": content, "endpoint": "native"}
+        except Exception as alt_exc:  # noqa
+            return {"ok": False, "provider": cfg["provider"], "error": f"{primary_exc} | alt: {alt_exc}"}
+
+
+LLM_RESULT_SCHEMA: dict[str, Any] = {
+    "llm_research_score": None, "llm_confidence": "low", "summary": "", "reasoning": "",
+    "positive_signals": [], "negative_signals": [], "warnings": [], "limitations": [],
+}
+
+
+def _strip_code_fences(text: str) -> str:
+    t = text.strip()
+    if t.startswith("```"):
+        # drop leading ```lang and trailing ```
+        t = t.split("\n", 1)[1] if "\n" in t else t
+        if t.rstrip().endswith("```"):
+            t = t.rstrip()[:-3]
+    return t.strip()
+
+
+def _repair_json(blob: str) -> str:
+    """Best-effort, SAFE repair of small model JSON mistakes.
+
+    Handles: code fences, trailing commas, and the common
+    `"key: value"` / `key: value` mistakes where the model forgot quotes.
+    """
+    import re
+    s = _strip_code_fences(blob)
+    start, end = s.find("{"), s.rfind("}")
+    if start >= 0 and end > start:
+        s = s[start:end + 1]
+    # `"llm_confidence: medium"` -> `"llm_confidence": "medium"`  (quote opened before key, value unquoted)
+    s = re.sub(r'"(\w+)\s*:\s*([A-Za-z0-9_.\- ]+?)"', r'"\1": "\2"', s)
+    # bare-key `key:` (no opening quote) at start of a field -> `"key":`
+    s = re.sub(r'([{,]\s*)([A-Za-z_]\w*)(\s*):', r'\1"\2"\3:', s)
+    # trailing commas before } or ]
+    s = re.sub(r',\s*([}\]])', r'\1', s)
+    return s
+
+
+def _coerce_llm_result(obj: dict) -> dict:
+    """Force a parsed dict into the strict schema with safe defaults."""
+    out = dict(LLM_RESULT_SCHEMA)
+    if isinstance(obj, dict):
+        for k in out:
+            if k in obj and obj[k] is not None:
+                out[k] = obj[k]
+    s = out.get("llm_research_score")
+    out["llm_research_score"] = max(0.0, min(1.0, float(s))) if isinstance(s, (int, float)) else None
+    conf = str(out.get("llm_confidence", "low")).strip().lower()
+    out["llm_confidence"] = conf if conf in ("low", "medium", "high") else "low"
+    for k in ("summary", "reasoning"):
+        out[k] = "" if out[k] is None else str(out[k])
+    for k in ("positive_signals", "negative_signals", "warnings", "limitations"):
+        v = out[k]
+        out[k] = [str(x) for x in v] if isinstance(v, list) else ([str(v)] if v else [])
+    return out
 
 
 def _parse_llm_json(content: str) -> dict | None:
-    try:
-        start, end = content.find("{"), content.rfind("}")
-        if start < 0 or end < 0:
-            return None
-        obj = json.loads(content[start:end + 1])
-        s = obj.get("llm_research_score")
-        if isinstance(s, (int, float)):
-            obj["llm_research_score"] = max(0.0, min(1.0, float(s)))
-        else:
-            obj["llm_research_score"] = None
-        if obj.get("llm_confidence") not in ("low", "medium", "high"):
-            obj["llm_confidence"] = "low"
-        return obj
-    except Exception:
+    """Parse model output into the strict schema. Returns None only if no object recoverable."""
+    if not content or not str(content).strip():
         return None
+    for candidate in (content, _repair_json(content)):
+        try:
+            start, end = candidate.find("{"), candidate.rfind("}")
+            if start < 0 or end < 0:
+                continue
+            obj = json.loads(candidate[start:end + 1])
+            if isinstance(obj, dict):
+                return _coerce_llm_result(obj)
+        except Exception:
+            continue
+    return None
+
+
+def _human_answer(result: dict) -> str:
+    """Compact human-readable line from a structured llm_result (no raw JSON)."""
+    parts = []
+    if result.get("summary"):
+        parts.append(str(result["summary"]).strip())
+    conf = result.get("llm_confidence")
+    score = result.get("llm_research_score")
+    meta = []
+    if score is not None:
+        meta.append(f"LLM support score {score:.2f}")
+    if conf:
+        meta.append(f"confidence {conf}")
+    if meta:
+        parts.append("(" + ", ".join(meta) + ")")
+    return " ".join(parts) if parts else "No summary produced."
 
 
 # --------------------------------------------------------------------------- #
@@ -461,6 +567,76 @@ def composite_score(ml_score, confidence_score_v, llm_research_score, cfg: dict 
 
 
 # --------------------------------------------------------------------------- #
+# provider diagnostics (safe, no secrets)
+# --------------------------------------------------------------------------- #
+def provider_diagnostics(cfg: dict | None = None, provider_used=None,
+                         fallback_used=None, llm_error=None) -> dict:
+    cfg = cfg or get_config()
+    return {
+        "configured_provider": cfg["provider"],
+        "configured_model": cfg["model"],
+        "configured_base_url": cfg["base_url"],
+        "provider_used": provider_used,
+        "fallback_used": fallback_used,
+        "llm_error": llm_error,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# decision-support layer (deterministic; LLM never overrides hard warnings)
+# --------------------------------------------------------------------------- #
+_VERDICT_ORDER = ["insufficient evidence", "low confidence watchlist",
+                  "moderate research interest", "high research interest"]
+
+
+def decision_support(final_score, confidence_level: str, warnings: list[str], diag: dict) -> dict:
+    weak = bool(diag.get("weak_backtest", True))
+    warnings = warnings or []
+    blocking = []
+    if "frozen_features" in warnings:
+        blocking.append("Valuation/profitability columns are a frozen snapshot (excluded).")
+    if "no_real_valuation_profitability_features" in warnings:
+        blocking.append("Real historical valuation/profitability data is still missing.")
+    if weak:
+        blocking.append("Backtest signal is weak/unstable.")
+    if "small_sample" in warnings:
+        blocking.append("Small sample (~40 stocks/year).")
+
+    if final_score is None:
+        verdict = "insufficient evidence"
+    elif final_score >= 0.60:
+        verdict = "high research interest"
+    elif final_score >= 0.45:
+        verdict = "moderate research interest"
+    else:
+        verdict = "low confidence watchlist"
+
+    # Deterministic caution: weak model / low confidence cannot yield a strong verdict.
+    cap = "low confidence watchlist" if (weak or confidence_level == "low") else "moderate research interest"
+    if _VERDICT_ORDER.index(verdict) > _VERDICT_ORDER.index(cap):
+        verdict = cap
+
+    reasoning = (
+        "Structured ML score and deterministic confidence are primary; the LLM is bounded support. "
+        f"Final research score {('%.2f' % final_score) if final_score is not None else 'n/a'} with "
+        f"{confidence_level} confidence" + (" and a weak backtest" if weak else "") +
+        " keeps this a research-interest signal only, never a buy/sell/hold recommendation."
+    )
+    required = [
+        "Real per-year valuation history (P/E, P/B, EV/EBITDA).",
+        "Real per-year profitability history (ROE, ROA, margins).",
+        "Larger cross-section / more history to stabilise the backtest.",
+    ]
+    return {
+        "decision_support_verdict": verdict,
+        "decision_support_reasoning": reasoning,
+        "blocking_limitations": blocking,
+        "required_next_data": required,
+        "not_investment_advice": True,
+    }
+
+
+# --------------------------------------------------------------------------- #
 # high-level generators (PHASE 2)
 # --------------------------------------------------------------------------- #
 def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
@@ -486,6 +662,8 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
 
     llm_score = llm_out.get("llm_research_score")
     comp = composite_score(ml.get("ml_score"), conf["confidence_score"], llm_score, cfg)
+    diag = build_model_diagnostics_context(state)
+    ds = decision_support(comp["final_research_score"], conf["confidence_level"], ctx["warnings"], diag)
     # Flat, explicit score block (PHASE 5 contract) — components never hidden.
     score = {
         "ticker": ctx["ticker"], "year": ctx["latest_year"],
@@ -498,12 +676,19 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
         "confidence_level": conf["confidence_level"], "confidence_reasons": conf["confidence_reasons"],
         "reasoning": llm_out.get("reasoning"), "warnings": ctx["warnings"],
         "limitations": llm_out.get("limitations"), "scoring_notes": comp["scoring_notes"],
+        "decision_support_verdict": ds["decision_support_verdict"],
+        "decision_support_reasoning": ds["decision_support_reasoning"],
+        "blocking_limitations": ds["blocking_limitations"],
+        "required_next_data": ds["required_next_data"],
         "not_investment_advice": True,
     }
+    llm_err = None if not fallback else "no LLM provider or unparseable output; deterministic fallback used"
     return {
         "ticker": ctx["ticker"], "context": ctx, "ml": ml, "confidence": conf,
-        "llm": llm_out, "score": score, "provider_used": cfg["provider"],
-        "fallback_used": fallback, "disclaimer": NOT_ADVICE, "not_investment_advice": True,
+        "llm": llm_out, "score": score, "decision_support": ds,
+        "provider_used": cfg["provider"], "fallback_used": fallback,
+        "diagnostics": provider_diagnostics(cfg, cfg["provider"], fallback, llm_err),
+        "disclaimer": NOT_ADVICE, "not_investment_advice": True,
     }
 
 
@@ -522,7 +707,7 @@ def generate_summary_insight(state: dict | None = None) -> dict:
     warns.append("small_sample")
 
     cfg = get_config()
-    summary, fallback = None, True
+    summary, fallback, llm_error = None, True, None
     if cfg["provider"] != "none":
         msg = [{"role": "system", "content": SYSTEM_PROMPT},
                {"role": "user", "content": json.dumps({"task": "summary", "context": {**ctx, **conf, "diagnostics": diag}})}]
@@ -531,6 +716,10 @@ def generate_summary_insight(state: dict | None = None) -> dict:
             parsed = _parse_llm_json(res["content"])
             if parsed:
                 summary, fallback = parsed, False
+            else:
+                llm_error = "LLM output could not be parsed into valid JSON; deterministic fallback used"
+        else:
+            llm_error = res.get("error")
     if summary is None:
         summary = {
             "summary": (f"Dataset: {ctx['rows']} rows, {ctx['feature_count']} validated year-T features, "
@@ -542,7 +731,9 @@ def generate_summary_insight(state: dict | None = None) -> dict:
             "llm_research_score": None, "llm_confidence": conf["confidence_level"],
         }
     return {"context": ctx, "confidence": conf, "diagnostics": diag, "summary": summary,
-            "provider_used": cfg["provider"], "fallback_used": fallback, "disclaimer": NOT_ADVICE}
+            "provider_used": cfg["provider"], "fallback_used": fallback, "llm_error": llm_error,
+            "provider_diagnostics": provider_diagnostics(cfg, cfg["provider"], fallback, llm_error),
+            "disclaimer": NOT_ADVICE}
 
 
 def _records(df) -> list[dict]:
@@ -658,23 +849,41 @@ def answer_research_question(question: str, ticker: str | None = None,
         except (KeyError, ValueError) as exc:
             ctx["company_error"] = str(exc)
 
-    answer, fallback = None, True
+    llm_result, fallback, llm_error = None, True, None
     if cfg["provider"] != "none":
         msg = [{"role": "system", "content": SYSTEM_PROMPT},
                {"role": "user", "content": json.dumps({"question": question, "context": ctx})}]
         res = call_local_llm(msg, cfg)
         if res.get("ok"):
-            answer, fallback = res["content"], False
-    if answer is None:
-        answer = ("[deterministic fallback — no LLM configured] Based only on validated reports: "
-                  f"{ctx['summary']['feature_count']} year-T features, benchmark "
-                  f"{'available' if ctx['summary']['benchmark_available'] else 'missing'}, "
-                  f"{len(ctx['summary']['rejected_frozen_columns'])} frozen columns excluded, small sample. "
-                  "No price/return prediction and no investment advice can be given.")
+            parsed = _parse_llm_json(res["content"])
+            if parsed:
+                llm_result, fallback = parsed, False
+            else:
+                llm_error = "LLM output could not be parsed into valid JSON; deterministic fallback used"
+        else:
+            llm_error = res.get("error")
+
+    if llm_result is None:
+        s = ctx["summary"]
+        bench = "available" if s["benchmark_available"] else "missing"
+        det_summary = (f"Based only on validated reports: {s['feature_count']} year-T features, "
+                       f"BIST100 benchmark {bench}"
+                       + (f" ({', '.join(str(y) for y in s.get('benchmark_years', []))})" if s["benchmark_available"] else "")
+                       + f", {len(s['rejected_frozen_columns'])} frozen columns excluded, small sample. "
+                       "No price/return prediction and no investment advice can be given.")
+        warns = _company_warnings(state)
+        llm_result = _coerce_llm_result({
+            "llm_research_score": None, "llm_confidence": confidence_score(state)["confidence_level"],
+            "summary": det_summary, "reasoning": "Derived deterministically from validated reports.",
+            "warnings": warns, "limitations": _limitations(warns),
+        })
+
     return {
-        "answer": answer,
+        "answer": _human_answer(llm_result),
+        "llm_result": llm_result,
         "context_used_summary": {k: (list(v) if isinstance(v, dict) else v) for k, v in ctx.items()},
         "warnings": _company_warnings(state),
-        "provider_used": cfg["provider"], "fallback_used": fallback,
-        "disclaimer": NOT_ADVICE,
+        "provider_used": cfg["provider"], "fallback_used": fallback, "llm_error": llm_error,
+        "diagnostics": provider_diagnostics(cfg, cfg["provider"], fallback, llm_error),
+        "disclaimer": "This is research support, not investment advice.",
     }

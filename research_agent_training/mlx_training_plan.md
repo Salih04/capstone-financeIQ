@@ -48,3 +48,29 @@ deterministic path on any error — so a weak model can never break the pipeline
 no hallucinated numbers · required limitations present · no investment advice ·
 score ∈ [0,1] · mentions benchmark-missing when relevant · mentions frozen data
 when relevant · concise professional style.
+
+## AutoResearch self-improving loop (no training in this repo)
+Run one iteration end-to-end (generate → validate → optional local-LLM eval →
+collect failures → merged next dataset + report):
+```bash
+make research-agent-dataset-1k          # or -5k / -20k
+make research-agent-dataset-validate
+make research-agent-eval-local          # needs LM Studio/Ollama up; skips cleanly if none
+make research-agent-collect-failures
+make research-agent-autoresearch-iteration
+```
+- Sizes: **1k** sanity, **5k** useful, **20k** stronger.
+- `evaluate_local_llm.py` calls the configured local model and flags: invalid
+  JSON, forbidden advice, hallucinated benchmark, out-of-range score, invalid
+  confidence, missing required warning. Results → `eval_results.{json,md}`,
+  failures → `failure_cases.jsonl`.
+- `collect_failure_cases.py` turns those failures into a corrective
+  `failure_augmented_dataset.jsonl` (grounded; no fabricated facts).
+- `build_autoresearch_iteration.py` writes
+  `iterations/iteration_<stamp>/next_iteration_dataset.jsonl` — that file is what
+  you feed to autoresearch-mlx LoRA tuning. **Nothing is trained or downloaded here.**
+
+### After training
+LM Studio: load your fine-tuned model, then set `RESEARCH_LLM_MODEL` to its id and
+restart the backend. The service parses/clamps the JSON and falls back to the
+deterministic path on any malformed output — a weak adapter can never break the API.

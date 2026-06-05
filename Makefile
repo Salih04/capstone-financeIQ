@@ -1,5 +1,8 @@
 .PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research \
-	inspect-quarterly research-agent-dataset research-agent-check full-research-agent
+	inspect-quarterly research-agent-dataset research-agent-check full-research-agent \
+	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
+	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
+	research-agent-autoresearch-iteration
 
 # Diagnose whether new_data_quarter/ files vary per period (they are frozen).
 inspect-quarterly:
@@ -12,6 +15,32 @@ frozen-evidence:
 # Generate the research-agent instruction dataset (sample + full).
 research-agent-dataset:
 	PYTHONPATH=. python research_agent_training/generate_instruction_dataset.py
+
+# Sized instruction datasets (AutoResearch preparation; NO training, NO downloads).
+research-agent-dataset-1k:
+	PYTHONPATH=. python research_agent_training/generate_instruction_dataset.py --n 1000
+
+research-agent-dataset-5k:
+	PYTHONPATH=. python research_agent_training/generate_instruction_dataset.py --n 5000
+
+research-agent-dataset-20k:
+	PYTHONPATH=. python research_agent_training/generate_instruction_dataset.py --n 20000
+
+# Validate the generated dataset against policy + schema.
+research-agent-dataset-validate:
+	PYTHONPATH=. python research_agent_training/validate_instruction_dataset.py
+
+# Evaluate the configured local LLM (LM Studio/Ollama) — skips cleanly if none.
+research-agent-eval-local:
+	PYTHONPATH=. python research_agent_training/evaluate_local_llm.py
+
+# Turn eval failures into a corrective dataset.
+research-agent-collect-failures:
+	PYTHONPATH=. python research_agent_training/collect_failure_cases.py
+
+# One AutoResearch iteration: generate -> validate -> (eval) -> collect -> report.
+research-agent-autoresearch-iteration:
+	PYTHONPATH=. python research_agent_training/build_autoresearch_iteration.py --n 1000
 
 # Run the test suite.
 research-agent-check:
