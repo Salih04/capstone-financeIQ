@@ -111,9 +111,9 @@
     "next_year_return_percentile": 0.167,
     "next_year_top_10pct_returner": 0.167,
     "next_year_top_20pct_returner": 0.167,
-    "next_year_bist100_return_pct": 1.0,
-    "next_year_excess_return_vs_bist100": 1.0,
-    "next_year_outperform_bist100": 1.0,
+    "next_year_bist100_return_pct": 0.167,
+    "next_year_excess_return_vs_bist100": 0.167,
+    "next_year_outperform_bist100": 0.167,
     "same_year_return_pct": 0.0,
     "target_year": 0.0,
     "has_target": 0.0,
@@ -129,7 +129,25 @@
   },
   "rows_with_target": 200,
   "inference_only_rows": 40,
-  "benchmark_available": false,
+  "benchmark_available": true,
+  "benchmark": {
+    "source": "yahoo_chart_api",
+    "target_years_covered": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "bist100_return_values": {
+      "2021": 24.23,
+      "2022": 185.94,
+      "2023": 31.96,
+      "2024": 28.94,
+      "2025": 13.05
+    },
+    "excess_outperform_targets_enabled": true
+  },
   "extreme_growth_counts": {
     "ebitda_growth_pct": 40,
     "gross_profit_growth_pct": 40,

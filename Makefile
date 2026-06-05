@@ -1,4 +1,8 @@
-.PHONY: data data-validate data-benchmark extract-yearly-financials research full-research
+.PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research
+
+# Collect BIST100 yearly benchmark returns (Yahoo -> manual CSV -> template).
+benchmark:
+	PYTHONPATH=. python -m scripts.data_collection.collect_bist100_benchmark
 
 # Extract candidate financial features from the yearly stock Excel files into a
 # manual-ingestion candidate file (validated, never auto-trusted).
@@ -22,8 +26,9 @@ data-benchmark:
 research:
 	PYTHONPATH=. python experiments/run_experiments.py
 
-# Full pipeline: extract -> build -> experiments.
+# Full pipeline: extract -> benchmark -> build -> experiments.
 full-research:
 	$(MAKE) extract-yearly-financials
+	$(MAKE) benchmark
 	$(MAKE) data
 	PYTHONPATH=. python experiments/run_experiments.py

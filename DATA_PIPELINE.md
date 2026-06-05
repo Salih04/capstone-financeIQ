@@ -74,11 +74,24 @@ Do not use future prices as features.
 
 ## Benchmark
 
-No reliable free anonymous source is wired (Stooq now requires an API key; we do
-not use leaked keys or paid APIs). Provide
-`data/trusted_clean/bist100_benchmark_returns.csv`
-(`year,bist100_return_pct,source,notes`) with **real** values. Until then the
-benchmark-relative targets are null and the report says "benchmark missing".
+`make benchmark` collects BIST100 yearly returns:
+1. **Yahoo Finance** XU100.IS (yfinance if installed, else the public chart JSON
+   endpoint via stdlib — no key, no paid API).
+2. **Manual fallback**: `data/trusted_raw/bist100_daily.csv` or
+   `bist100_historical.csv` (`date,close`; also `Tarih/Şimdi`, `Tarih/Kapanış`,
+   `Price/Close`; Turkish numbers `10.628,60` handled).
+3. Else keep the template and report missing.
+
+Yearly return = `(last_close(Y)/first_close(Y) - 1) * 100`. Output
+`data/trusted_raw/bist100_benchmark_returns.csv` (pipeline reads it before
+`data/trusted_clean/…`). When present it enables `next_year_bist100_return_pct`,
+`next_year_excess_return_vs_bist100`, `next_year_outperform_bist100`. Report:
+`data/trusted_clean/bist100_benchmark_report.{json,md}`. Never fabricated.
+
+## new_data_quarter/
+
+Raw Fintables **quarterly** stock exports (2020Q1–2021Q4), added for future
+quarterly fundamentals work. Not yet wired into the yearly T→T+1 pipeline.
 
 ## Leakage prevention
 

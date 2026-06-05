@@ -38,6 +38,30 @@ def feature_registry(df: pd.DataFrame) -> list[dict]:
     return reg
 
 
+def _benchmark_report(df: pd.DataFrame) -> dict:
+    """Benchmark coverage for the quality report (source + years + values)."""
+    src = "none"
+    rep_json = P.CLEAN_DIR / "bist100_benchmark_report.json"
+    if rep_json.is_file():
+        try:
+            src = json.loads(rep_json.read_text()).get("source", "unknown")
+        except Exception:
+            src = "unknown"
+    years, vals = [], {}
+    if "next_year_bist100_return_pct" in df.columns:
+        b = df.dropna(subset=["next_year_bist100_return_pct"])[["target_year", "next_year_bist100_return_pct"]]
+        b = b.drop_duplicates("target_year")
+        years = sorted(int(y) for y in b["target_year"])
+        vals = {int(y): float(v) for y, v in zip(b["target_year"], b["next_year_bist100_return_pct"])}
+    enabled = bool(years)
+    return {
+        "source": src,
+        "target_years_covered": years,
+        "bist100_return_values": vals,
+        "excess_outperform_targets_enabled": enabled,
+    }
+
+
 def validate(df: pd.DataFrame, cfg: P.PipelineConfig) -> dict:
     issues: list[str] = []
     ref = P.load_reference()
@@ -95,6 +119,7 @@ def validate(df: pd.DataFrame, cfg: P.PipelineConfig) -> dict:
         "inference_only_rows": int(df["is_inference_row"].sum()),
         "benchmark_available": bool(df["next_year_bist100_return_pct"].notna().any())
         if "next_year_bist100_return_pct" in df.columns else False,
+        "benchmark": _benchmark_report(df),
         "extreme_growth_counts": extreme,
         "feature_registry": feature_registry(df),
         "manual_financials": getattr(cfg, "manual_report", {}) or {"present": False},
@@ -120,6 +145,12 @@ def _write_md(r: dict) -> None:
              "## Rows by year", "", "| year | rows | tickers | target coverage |", "|---|---|---|---|"]
     for y in sorted(r["rows_by_year"]):
         lines.append(f"| {y} | {r['rows_by_year'][y]} | {r['tickers_by_year'][y]} | {r['target_coverage_by_year'].get(y,'-')} |")
+    b = r.get("benchmark", {}) or {}
+    lines += ["", "## BIST100 benchmark",
+              f"- Source: **{b.get('source', 'none')}**",
+              f"- Target years covered: {b.get('target_years_covered', [])}",
+              f"- Return values: {b.get('bist100_return_values', {})}",
+              f"- Excess/outperform targets enabled: **{b.get('excess_outperform_targets_enabled', False)}**", ""]
     man = r.get("manual_financials", {}) or {}
     lines += ["", "## Manual financial history",
               f"- Present: **{man.get('present', False)}**",

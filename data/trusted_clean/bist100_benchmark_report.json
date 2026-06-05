@@ -1,0 +1,27 @@
+{
+  "source": "yahoo_chart_api",
+  "years_covered": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "returns": {
+    "2020": 27.38,
+    "2021": 24.23,
+    "2022": 185.94,
+    "2023": 31.96,
+    "2024": 28.94,
+    "2025": 13.05
+  },
+  "missing_years": [],
+  "excess_targets_enabled": true,
+  "issues": [],
+  "log": [
+    "yfinance unavailable/failed: No module named 'yfinance'",
+    "source=yahoo_chart_api"
+  ],
+  "output": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/data/trusted_raw/bist100_benchmark_returns.csv"
+}

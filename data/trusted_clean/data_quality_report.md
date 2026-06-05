@@ -1,7 +1,7 @@
 # Data quality report
 
 - Rows: **240**  |  Features: **17**  |  Rows with target: **200**  |  Inference-only: **40**
-- Benchmark available: **False**
+- Benchmark available: **True**
 - Valid for T→T+1 modeling: **True**
 
 ## Rows by year
@@ -14,6 +14,13 @@
 | 2023 | 40 | 40 | 1.0 |
 | 2024 | 40 | 40 | 1.0 |
 | 2025 | 40 | 40 | 0.0 |
+
+## BIST100 benchmark
+- Source: **yahoo_chart_api**
+- Target years covered: [2021, 2022, 2023, 2024, 2025]
+- Return values: {2021: 24.23, 2022: 185.94, 2023: 31.96, 2024: 28.94, 2025: 13.05}
+- Excess/outperform targets enabled: **True**
+
 
 ## Manual financial history
 - Present: **True**
