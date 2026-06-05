@@ -1,5 +1,20 @@
 // Shared UI primitives
-import { useState, isValidElement } from 'react'
+import { useState, isValidElement, createElement } from 'react'
+
+// ─── SafeIcon ─────────────────────────────────────────────────────────────────
+// Render an `icon` prop safely whether it is a component (Building2), an already
+// created element (<Tag/>), or a string/number. Never returns a raw object — a
+// Lucide forwardRef object {$$typeof, render} as a React child throws
+// "Objects are not valid as a React child".
+export function SafeIcon({ icon, size = 16, ...rest }) {
+  if (icon === null || icon === undefined) return null
+  if (isValidElement(icon)) return icon
+  if (typeof icon === 'function') return createElement(icon, { size, ...rest })
+  // forwardRef / memo components are objects carrying $$typeof
+  if (typeof icon === 'object' && icon.$$typeof) return createElement(icon, { size, ...rest })
+  if (typeof icon === 'string' || typeof icon === 'number') return <span>{icon}</span>
+  return null
+}
 
 // ─── StatCard ─────────────────────────────────────────────────────────────────
 export function StatCard({ label, value, sub, accent, icon: Icon, trend }) {
@@ -94,7 +109,7 @@ export function SectionHeader({ title, sub, subtitle, icon, actions }) {
               background: 'var(--primary-subtle)', color: 'var(--primary)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
-              {icon}
+              <SafeIcon icon={icon} size={18} />
             </div>
           )}
           <h1 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-1)', letterSpacing: '-0.3px' }}>{title}</h1>
