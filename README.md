@@ -41,6 +41,48 @@ and **[DATA_REQUIREMENTS.md](DATA_REQUIREMENTS.md)**. Real income-statement/valu
 history must be ingested manually (see DATA_REQUIREMENTS) for true prediction;
 the current targets are real, the year-T fundamentals are provisional.
 
+## Research Assistant (local-LLM-assisted)
+
+A constrained research-support layer. The **structured ML pipeline stays the
+primary numerical model**; the LLM only reads validated structured evidence and
+produces cautious explanation + a bounded `llm_research_score` in [0,1]. It never
+predicts prices/returns, never gives buy/sell/hold, never fabricates facts.
+
+Hybrid score (weights configurable via env):
+```
+final_research_score = 0.65*ml_score + 0.20*confidence_score + 0.15*llm_research_score
+```
+Components are always returned separately; `ml_score` may be null (partial score).
+
+Endpoints (`/research/summary`, `/research/company/{ticker}`,
+`/research/company/{ticker}/score`, `/research/model-diagnostics`,
+`/research/data-quality`, `POST /research/ask`). Frontend page: `/research-agent`.
+
+### Run with / without an LLM
+```bash
+# No LLM (default) — deterministic fallback, always works:
+export RESEARCH_LLM_PROVIDER=none
+
+# LM Studio (OpenAI-compatible):
+export RESEARCH_LLM_PROVIDER=lmstudio
+export RESEARCH_LLM_BASE_URL=http://localhost:1234/v1/chat/completions
+export RESEARCH_LLM_MODEL=your-model
+
+# Ollama:
+export RESEARCH_LLM_PROVIDER=ollama
+export RESEARCH_LLM_BASE_URL=http://localhost:11434/api/chat
+export RESEARCH_LLM_MODEL=qwen2.5:3b-instruct
+```
+Any LLM error falls back to the deterministic path — it cannot break the pipeline.
+
+### Training preparation (no training here)
+```bash
+make research-agent-dataset     # instruction JSONL from real reports (sample committed)
+```
+See `research_agent_training/` (`mlx_training_plan.md`, `prompt_policy.md`,
+`evaluation_rubric.md`, `schema.json`). LLM output is **never** written back into
+the modeling dataset. Research-support only — not investment advice.
+
 ## Trusted data source (legacy reference)
 
 The yearly XLSX set in `3.Datasets/` (reference/bootstrap, see warning above):

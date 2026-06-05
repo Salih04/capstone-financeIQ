@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Research-agent instruction example",
+  "type": "object",
+  "required": ["instruction", "input", "output"],
+  "properties": {
+    "instruction": {"type": "string"},
+    "input": {"type": "object"},
+    "output": {
+      "type": "object",
+      "required": ["llm_research_score", "llm_confidence", "summary", "reasoning", "warnings", "limitations"],
+      "properties": {
+        "llm_research_score": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "llm_confidence": {"type": "string", "enum": ["low", "medium", "high"]},
+        "summary": {"type": "string"},
+        "reasoning": {"type": "string"},
+        "positive_signals": {"type": "array", "items": {"type": "string"}},
+        "negative_signals": {"type": "array", "items": {"type": "string"}},
+        "warnings": {"type": "array", "items": {"type": "string"}},
+        "limitations": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

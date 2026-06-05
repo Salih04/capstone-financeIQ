@@ -14,6 +14,7 @@ import LabelingLabPage from './pages/LabelingLabPage'
 import ForecastingPage from './pages/ForecastingPage'
 import ForecastingDetailPage from './pages/ForecastingDetailPage'
 import ResearchPage from './pages/ResearchPage'
+import ResearchAgentPage from './pages/ResearchAgentPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppShell from './components/layout/AppShell'
 
@@ -45,6 +46,7 @@ export default function App() {
       <Route path="/forecasting" element={<Protected><ForecastingPage /></Protected>} />
       <Route path="/forecasting/detail" element={<Protected><ForecastingDetailPage /></Protected>} />
       <Route path="/research" element={<Protected><ResearchPage /></Protected>} />
+      <Route path="/research-agent" element={<Protected><ResearchAgentPage /></Protected>} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )

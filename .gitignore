@@ -50,3 +50,6 @@ node_modules/
 
 
 
+
+# generated training dataset (sample is committed)
+research_agent_training/instruction_dataset.jsonl

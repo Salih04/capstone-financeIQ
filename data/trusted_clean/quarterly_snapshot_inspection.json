@@ -1,0 +1,66 @@
+{
+  "dir": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/new_data_quarter",
+  "files": [
+    "fintables_hisse_senetleri 1 ekim 31 aral\u0131k 2020 (2020q4).xlsx",
+    "fintables_hisse_senetleri 1 ekim 31 aral\u0131k 2021 (2021q4).xlsx",
+    "fintables_hisse_senetleri 1 nisan 30 haziran (2021q2).xlsx",
+    "fintables_hisse_senetleri 1 nisan 30 haziran 2020 (2020q2).xlsx",
+    "fintables_hisse_senetleri 1 temmuz 30 eylu\u0308l (2021q3).xlsx",
+    "fintables_hisse_senetleri 1 temmuz 30 eylu\u0308l 2020 (2020q3).xlsx",
+    "fintables_hisse_senetleri 2 ocak 31 mart 2020 (2020q1).xlsx",
+    "fintables_hisse_senetleri 4 ocak 31 mart 2021 (2021q1).xlsx"
+  ],
+  "periods": [
+    "2020q1",
+    "2020q2",
+    "2020q3",
+    "2020q4",
+    "2021q1",
+    "2021q2",
+    "2021q3",
+    "2021q4"
+  ],
+  "rows_per_period": {
+    "2020q4": 77,
+    "2021q4": 77,
+    "2021q2": 77,
+    "2020q2": 77,
+    "2021q3": 77,
+    "2020q3": 77,
+    "2020q1": 77,
+    "2021q1": 77
+  },
+  "frozen_columns": [
+    {
+      "column": "Revenue",
+      "share_tickers_varying": 0.0
+    },
+    {
+      "column": "Net Income",
+      "share_tickers_varying": 0.0
+    },
+    {
+      "column": "Return on Equity (ROE)",
+      "share_tickers_varying": 0.0
+    },
+    {
+      "column": "Total Assets",
+      "share_tickers_varying": 0.0
+    },
+    {
+      "column": "Price",
+      "share_tickers_varying": 0.0
+    },
+    {
+      "column": "P/E",
+      "share_tickers_varying": 0.0
+    },
+    {
+      "column": "Market Capitalization",
+      "share_tickers_varying": 0.0
+    }
+  ],
+  "varying_columns": [],
+  "verdict": "FROZEN SNAPSHOT: every checked fundamental is identical across all periods for ~all tickers. Same defect as the yearly files \u2014 NOT usable as time-varying fundamentals for T->T+1.",
+  "issues": []
+}

@@ -1,4 +1,23 @@
-.PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research
+.PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research \
+	inspect-quarterly research-agent-dataset research-agent-check full-research-agent
+
+# Diagnose whether new_data_quarter/ files vary per period (they are frozen).
+inspect-quarterly:
+	PYTHONPATH=. python -m scripts.data_collection.inspect_quarterly_snapshots
+
+# Generate the research-agent instruction dataset (sample + full).
+research-agent-dataset:
+	PYTHONPATH=. python research_agent_training/generate_instruction_dataset.py
+
+# Run the test suite.
+research-agent-check:
+	PYTHONPATH=. python -m pytest tests/
+
+# Full pipeline + dataset generation + tests.
+full-research-agent:
+	$(MAKE) full-research
+	$(MAKE) research-agent-dataset
+	PYTHONPATH=. python -m pytest tests/
 
 # Collect BIST100 yearly benchmark returns (Yahoo -> manual CSV -> template).
 benchmark:
