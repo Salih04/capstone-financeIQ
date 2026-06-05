@@ -34,6 +34,26 @@ def data_quality(_: User = Depends(get_current_user)):
     return {"data_quality": RA.build_data_quality_context(), "disclaimer": RA.NOT_ADVICE}
 
 
+@router.get("/experiments")
+def experiments(_: User = Depends(get_current_user)):
+    return RA.experiments_payload()
+
+
+@router.get("/benchmark")
+def benchmark(_: User = Depends(get_current_user)):
+    return RA.benchmark_payload()
+
+
+@router.get("/companies")
+def companies(_: User = Depends(get_current_user)):
+    return RA.companies_payload()
+
+
+@router.get("/frozen-evidence")
+def frozen_evidence(_: User = Depends(get_current_user)):
+    return RA.frozen_evidence_payload()
+
+
 @router.get("/company/{ticker}")
 def company(ticker: str, _: User = Depends(get_current_user)):
     state = RA.load_research_state()

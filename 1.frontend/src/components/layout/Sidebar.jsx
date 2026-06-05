@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import {
-  LayoutDashboard, Building2, BarChart3, GitCompare, FileText,
-  ShieldCheck, Activity, Tag, FlaskConical, ChevronLeft,
-  ChevronRight, LogOut, User, Settings, TrendingUp, Sparkles, BrainCircuit,
+  LayoutDashboard, Building2, GitCompare, FileText,
+  ShieldCheck, Activity, Tag, FlaskConical, ChevronLeft, Database, LineChart,
+  ChevronRight, LogOut, User, Settings, Bot, Sparkles, BrainCircuit, TrendingUp,
 } from 'lucide-react'
 
 const NAV_SECTIONS = [
@@ -12,17 +12,18 @@ const NAV_SECTIONS = [
     label: null,
     items: [
       { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-      { path: '/companies', icon: Building2, label: 'Companies' },
-      { path: '/compare', icon: GitCompare, label: 'Compare' },
+      { path: '/research/companies', icon: Building2, label: 'Companies' },
       { path: '/reports', icon: FileText, label: 'Reports' },
     ],
   },
   {
-    label: 'Analysis',
+    label: 'Research',
     items: [
-      { path: '/research', icon: Sparkles, label: 'Research', roles: ['analyst', 'admin'] },
-      { path: '/research-agent', icon: BrainCircuit, label: 'Research Assistant', roles: ['analyst', 'admin'] },
-      { path: '/validation', icon: FlaskConical, label: 'Validation Lab', roles: ['analyst', 'admin'] },
+      { path: '/research-agent', icon: Bot, label: 'Research Agent', roles: ['analyst', 'admin'] },
+      { path: '/data-quality', icon: Database, label: 'Data Quality', roles: ['analyst', 'admin'] },
+      { path: '/experiments', icon: FlaskConical, label: 'Experiments', roles: ['analyst', 'admin'] },
+      { path: '/benchmark', icon: LineChart, label: 'Benchmark', roles: ['analyst', 'admin'] },
+      { path: '/research', icon: Sparkles, label: 'Score Explorer', roles: ['analyst', 'admin'] },
       { path: '/forecasting', icon: BrainCircuit, label: 'Forecasting (legacy)', roles: ['analyst', 'admin'] },
     ],
   },

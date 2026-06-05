@@ -27,7 +27,14 @@ MODELING_CSV = CLEAN / "modeling_dataset_2020_2025.csv"
 QUALITY_JSON = CLEAN / "data_quality_report.json"
 MIGRATION_JSON = CLEAN / "yearly_snapshot_migration_report.json"
 LEADERBOARD = REPO_ROOT / "experiments" / "leaderboard.csv"
-MODEL_OUTPUTS = REPO_ROOT / "experiments" / "results" / "research_agent_model_outputs.csv"
+RESULTS_DIR = REPO_ROOT / "experiments" / "results"
+MODEL_OUTPUTS = RESULTS_DIR / "research_agent_model_outputs.csv"
+LEADERBOARD_BY_TARGET = RESULTS_DIR / "leaderboard_by_target.csv"
+BENCHMARK_CSV = REPO_ROOT / "data" / "trusted_raw" / "bist100_benchmark_returns.csv"
+BENCHMARK_CSV_ALT = CLEAN / "bist100_benchmark_returns.csv"
+BENCHMARK_REPORT = CLEAN / "bist100_benchmark_report.json"
+FROZEN_EVIDENCE = CLEAN / "frozen_column_evidence.json"
+QUARTERLY_INSPECTION = CLEAN / "quarterly_snapshot_inspection.json"
 
 NOT_ADVICE = ("This is a research-support score, NOT investment advice. The LLM is a "
               "decision-support layer, not the numerical predictor.")
@@ -517,6 +524,99 @@ def generate_summary_insight(state: dict | None = None) -> dict:
         }
     return {"context": ctx, "confidence": conf, "diagnostics": diag, "summary": summary,
             "provider_used": cfg["provider"], "fallback_used": fallback, "disclaimer": NOT_ADVICE}
+
+
+def experiments_payload(state: dict | None = None) -> dict:
+    state = state or load_research_state()
+    diag = build_model_diagnostics_context(state)
+    lb = state["leaderboard"]
+    by_target = []
+    if LEADERBOARD_BY_TARGET.is_file():
+        try:
+            by_target = pd.read_csv(LEADERBOARD_BY_TARGET).where(lambda d: d.notna(), None).to_dict("records")
+        except Exception:
+            by_target = []
+    targets = sorted({r.get("target") for r in by_target if r.get("target")}) or ["next_year_return_pct"]
+    return {
+        "primary_target": "next_year_return_pct",
+        "available_targets": targets,
+        "diagnostics": diag,
+        "leaderboard": (lb.where(lambda d: d.notna(), None).to_dict("records") if lb is not None else []),
+        "leaderboard_by_target": by_target,
+        "verdict": ("No reliable predictive edge demonstrated yet. Single-split spikes should not be "
+                    "trusted; more real historical valuation/profitability data is required."),
+        "small_sample": True,
+        "disclaimer": NOT_ADVICE,
+    }
+
+
+def benchmark_payload() -> dict:
+    path = next((p for p in (BENCHMARK_CSV, BENCHMARK_CSV_ALT) if p.is_file()), None)
+    returns, source = {}, "none"
+    if path is not None:
+        try:
+            b = pd.read_csv(path, comment="#")
+            b.columns = [c.strip().lower() for c in b.columns]
+            for _, r in b.dropna(subset=["year", "bist100_return_pct"]).iterrows():
+                returns[int(r["year"])] = round(float(r["bist100_return_pct"]), 2)
+        except Exception:
+            returns = {}
+    if BENCHMARK_REPORT.is_file():
+        try:
+            source = json.loads(BENCHMARK_REPORT.read_text()).get("source", "none")
+        except Exception:
+            source = "unknown"
+    return {
+        "available": bool(returns),
+        "source": source,
+        "years_covered": sorted(returns.keys()),
+        "returns_by_year": returns,
+        "targets_enabled": bool(returns),
+        "derived_targets": ["next_year_bist100_return_pct", "next_year_excess_return_vs_bist100",
+                            "next_year_outperform_bist100"],
+        "explanation": ("Excess return = stock next-year return minus BIST100 next-year return. "
+                        "Outperform = excess > 0. Targets are null until benchmark is present."),
+        "disclaimer": NOT_ADVICE,
+    }
+
+
+def companies_payload(state: dict | None = None) -> dict:
+    state = state or load_research_state()
+    df = state["modeling"]
+    if df is None:
+        return {"companies": [], "year": None, "note": "modeling dataset not available"}
+    year = int(df["year"].max())
+    sub = df[df["year"] == year]
+    mo = state.get("model_outputs")
+    score_map, rank_map = {}, {}
+    if mo is not None:
+        for _, r in mo.iterrows():
+            score_map[str(r["ticker"]).upper()] = _num(r.get("ml_score"))
+            rank_map[str(r["ticker"]).upper()] = int(r["ml_rank"]) if pd.notna(r.get("ml_rank")) else None
+    rows = []
+    for t in sorted(sub["ticker"].astype(str).str.upper().unique()):
+        rows.append({"ticker": t, "year": year, "ml_score": score_map.get(t),
+                     "ml_rank": rank_map.get(t)})
+    rows.sort(key=lambda r: (r["ml_rank"] is None, r["ml_rank"] if r["ml_rank"] is not None else 1e9))
+    return {"year": year, "count": len(rows), "companies": rows, "disclaimer": NOT_ADVICE}
+
+
+def frozen_evidence_payload() -> dict:
+    out = {"available": False, "columns": {}, "verdict": "frozen evidence report not generated yet",
+           "quarterly": None}
+    if FROZEN_EVIDENCE.is_file():
+        try:
+            j = json.loads(FROZEN_EVIDENCE.read_text())
+            out = {"available": True, "columns": j.get("columns", {}),
+                   "verdict": j.get("verdict", ""), "note": j.get("note", ""), "quarterly": None}
+        except Exception:
+            pass
+    if QUARTERLY_INSPECTION.is_file():
+        try:
+            out["quarterly"] = json.loads(QUARTERLY_INSPECTION.read_text())
+        except Exception:
+            pass
+    return out
 
 
 def answer_research_question(question: str, ticker: str | None = None,

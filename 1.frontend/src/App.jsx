@@ -15,6 +15,11 @@ import ForecastingPage from './pages/ForecastingPage'
 import ForecastingDetailPage from './pages/ForecastingDetailPage'
 import ResearchPage from './pages/ResearchPage'
 import ResearchAgentPage from './pages/ResearchAgentPage'
+import DataQualityPage from './pages/DataQualityPage'
+import ExperimentsPage from './pages/ExperimentsPage'
+import BenchmarkPage from './pages/BenchmarkPage'
+import CompaniesResearchPage from './pages/CompaniesResearchPage'
+import CompanyResearchDetailPage from './pages/CompanyResearchDetailPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppShell from './components/layout/AppShell'
 
@@ -47,6 +52,11 @@ export default function App() {
       <Route path="/forecasting/detail" element={<Protected><ForecastingDetailPage /></Protected>} />
       <Route path="/research" element={<Protected><ResearchPage /></Protected>} />
       <Route path="/research-agent" element={<Protected><ResearchAgentPage /></Protected>} />
+      <Route path="/data-quality" element={<Protected><DataQualityPage /></Protected>} />
+      <Route path="/experiments" element={<Protected><ExperimentsPage /></Protected>} />
+      <Route path="/benchmark" element={<Protected><BenchmarkPage /></Protected>} />
+      <Route path="/research/companies" element={<Protected><CompaniesResearchPage /></Protected>} />
+      <Route path="/research/companies/:ticker" element={<Protected><CompanyResearchDetailPage /></Protected>} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
