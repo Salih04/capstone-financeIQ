@@ -8,7 +8,7 @@
       "n": 40,
       "mae": 35.19,
       "rmse": 75.77,
-      "spearman": 0.088,
+      "spearman": 0.104,
       "precision_at_5": 0.2,
       "top_bucket_avg_return": 48.36,
       "median_actual_return": 1.64,
@@ -19,7 +19,7 @@
       "n": 40,
       "mae": 35.19,
       "rmse": 75.77,
-      "spearman": 0.088,
+      "spearman": 0.104,
       "precision_at_5": 0.2,
       "top_bucket_avg_return": 48.36,
       "median_actual_return": 1.64,
@@ -28,57 +28,57 @@
     "linear_regression": {
       "kind": "ml",
       "n": 40,
-      "mae": 121.22,
-      "rmse": 142.3,
-      "spearman": 0.08,
-      "precision_at_5": 0.2,
-      "top_bucket_avg_return": 28.82,
+      "mae": 112.23,
+      "rmse": 142.74,
+      "spearman": 0.067,
+      "precision_at_5": 0.0,
+      "top_bucket_avg_return": 12.18,
       "median_actual_return": 1.64,
-      "directional_acc": 0.4
+      "directional_acc": 0.5
     },
     "ridge": {
       "kind": "ml",
       "n": 40,
-      "mae": 105.05,
-      "rmse": 119.51,
-      "spearman": -0.016,
+      "mae": 108.61,
+      "rmse": 120.18,
+      "spearman": -0.023,
       "precision_at_5": 0.0,
-      "top_bucket_avg_return": 12.85,
+      "top_bucket_avg_return": 9.12,
       "median_actual_return": 1.64,
-      "directional_acc": 0.4
+      "directional_acc": 0.45
     },
     "lasso": {
       "kind": "ml",
       "n": 40,
-      "mae": 113.58,
-      "rmse": 128.69,
-      "spearman": -0.042,
-      "precision_at_5": 0.2,
-      "top_bucket_avg_return": 28.82,
+      "mae": 114.26,
+      "rmse": 130.12,
+      "spearman": -0.025,
+      "precision_at_5": 0.0,
+      "top_bucket_avg_return": 12.18,
       "median_actual_return": 1.64,
-      "directional_acc": 0.4
+      "directional_acc": 0.55
     },
     "elasticnet": {
       "kind": "ml",
       "n": 40,
-      "mae": 102.67,
-      "rmse": 111.85,
-      "spearman": -0.038,
-      "precision_at_5": 0.2,
-      "top_bucket_avg_return": 43.83,
+      "mae": 104.13,
+      "rmse": 112.45,
+      "spearman": -0.053,
+      "precision_at_5": 0.0,
+      "top_bucket_avg_return": 8.39,
       "median_actual_return": 1.64,
       "directional_acc": 0.45
     },
     "random_forest": {
       "kind": "ml",
       "n": 40,
-      "mae": 110.48,
-      "rmse": 132.83,
-      "spearman": -0.001,
+      "mae": 108.88,
+      "rmse": 130.76,
+      "spearman": -0.191,
       "precision_at_5": 0.4,
       "top_bucket_avg_return": 98.77,
       "median_actual_return": 1.64,
-      "directional_acc": 0.5
+      "directional_acc": 0.4
     }
   }
 }

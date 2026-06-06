@@ -16,20 +16,23 @@
     "2024": 40,
     "2025": 40
   },
-  "n_features": 27,
+  "n_features": 32,
   "feature_columns": [
     "current_assets",
     "current_ratio",
     "ebitda",
     "ebitda_growth_pct",
     "ebitda_margin",
+    "enterprise_value",
     "equity",
+    "ev_ebitda",
     "financial_debt_ratio",
     "gross_margin",
     "gross_profit",
     "gross_profit_growth_pct",
     "leverage_ratio",
     "long_term_liabilities",
+    "market_cap",
     "net_debt",
     "net_debt_to_ebitda",
     "net_income",
@@ -38,6 +41,8 @@
     "non_current_assets",
     "operating_income",
     "operating_income_growth_pct",
+    "pb_ratio",
+    "pe_ratio",
     "revenue",
     "revenue_growth_pct",
     "roa",
@@ -181,15 +186,21 @@
     ],
     "free_valuation_builder": {
       "attempted": true,
-      "shares_status": "missing",
+      "shares_status": "manual",
       "target_column_status": {
-        "market_cap": "missing",
-        "enterprise_value": "missing",
-        "pe": "missing",
-        "pb": "missing",
-        "ev_ebitda": "missing"
+        "market_cap": "accepted",
+        "enterprise_value": "accepted",
+        "pe": "accepted",
+        "pb": "accepted",
+        "ev_ebitda": "accepted"
       },
-      "columns_entering_candidate": []
+      "columns_entering_candidate": [
+        "market_cap",
+        "enterprise_value",
+        "pe",
+        "pb",
+        "ev_ebitda"
+      ]
     },
     "old_snapshot_rejected_but_corrected_accepted": [
       "ebitda",
@@ -215,13 +226,16 @@
     "ebitda": 0.0,
     "ebitda_growth_pct": 0.0,
     "ebitda_margin": 0.0,
+    "enterprise_value": 0.642,
     "equity": 0.0,
+    "ev_ebitda": 0.662,
     "financial_debt_ratio": 0.0,
     "gross_margin": 0.0,
     "gross_profit": 0.0,
     "gross_profit_growth_pct": 0.0,
     "leverage_ratio": 0.0,
     "long_term_liabilities": 0.0,
+    "market_cap": 0.567,
     "net_debt": 0.0,
     "net_debt_to_ebitda": 0.0,
     "net_income": 0.0,
@@ -230,6 +244,8 @@
     "non_current_assets": 0.0,
     "operating_income": 0.0,
     "operating_income_growth_pct": 0.0,
+    "pb_ratio": 0.642,
+    "pe_ratio": 0.646,
     "revenue": 0.0,
     "revenue_growth_pct": 0.0,
     "roa": 0.0,
@@ -343,7 +359,17 @@
       "leakage_risk": "provisional_reference_fundamental"
     },
     {
+      "column": "enterprise_value",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
       "column": "equity",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "ev_ebitda",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -374,6 +400,11 @@
     },
     {
       "column": "long_term_liabilities",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "market_cap",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -414,6 +445,16 @@
     },
     {
       "column": "operating_income_growth_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "pb_ratio",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "pe_ratio",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -538,7 +579,12 @@
       "gross_profit",
       "operating_income",
       "ebitda",
-      "net_income"
+      "net_income",
+      "market_cap",
+      "enterprise_value",
+      "pe_ratio",
+      "pb_ratio",
+      "ev_ebitda"
     ],
     "unknown_columns_ignored": [
       "roic",
@@ -570,7 +616,12 @@
       "gross_profit",
       "operating_income",
       "ebitda",
-      "net_income"
+      "net_income",
+      "market_cap",
+      "enterprise_value",
+      "pe_ratio",
+      "pb_ratio",
+      "ev_ebitda"
     ],
     "rejected_feature_columns": {}
   },

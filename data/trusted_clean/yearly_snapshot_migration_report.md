@@ -1,6 +1,6 @@
 # Yearly-snapshot migration report
 
-- Output: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/data/trusted_raw/financials/candidate_from_yearly_snapshots.csv`  | rows: **240**
+- Output: `/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/financials/candidate_from_yearly_snapshots.csv`  | rows: **240**
 - Candidate columns written: ['current_assets', 'current_ratio', 'ebitda', 'ebitda_margin', 'enterprise_value', 'ev_ebitda', 'financial_debt_ratio', 'gross_margin', 'gross_profit', 'leverage_ratio', 'long_term_liabilities', 'market_cap', 'net_debt', 'net_debt_to_ebitda', 'net_income', 'net_margin', 'non_current_assets', 'operating_income', 'pb_ratio', 'pe_ratio', 'ps_ratio', 'revenue', 'roa', 'roe', 'roic', 'short_term_liabilities', 'total_assets', 'total_equity', 'working_capital']
 - Ticker-year coverage: {2020: 40, 2021: 40, 2022: 40, 2023: 40, 2024: 40, 2025: 40}
 - Duplicate-year files: none
@@ -10,12 +10,12 @@
 
 ## Selected file per year
 
-- 2020: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2020stocks.xlsx` (rows 40, annual-return col: None)
-- 2021: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2021stocks.xlsx` (rows 40, annual-return col: None)
-- 2022: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2022stocks.xlsx` (rows 40, annual-return col: None)
-- 2023: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2023stocks.xlsx` (rows 40, annual-return col: None)
-- 2024: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2024stocks.xlsx` (rows 40, annual-return col: None)
-- 2025: `/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2025stocks.xlsx` (rows 40, annual-return col: None)
+- 2020: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2020stocks.xlsx` (rows 40, annual-return col: None)
+- 2021: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2021stocks.xlsx` (rows 40, annual-return col: None)
+- 2022: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2022stocks.xlsx` (rows 40, annual-return col: None)
+- 2023: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2023stocks.xlsx` (rows 40, annual-return col: None)
+- 2024: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2024stocks.xlsx` (rows 40, annual-return col: None)
+- 2025: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2025stocks.xlsx` (rows 40, annual-return col: None)
 
 ## Columns skipped (per year, with reason)
 

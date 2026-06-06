@@ -1,59 +1,83 @@
 {
   "input_folders_searched": [
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/data",
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/data/trusted_raw",
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets"
+    "/Users/salihcamci/Downloads/capstone-financeIQ/data",
+    "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw",
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets"
   ],
   "files_discovered": [
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2020stocks.xlsx",
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2021stocks.xlsx",
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2022stocks.xlsx",
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2023stocks.xlsx",
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2024stocks.xlsx",
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2025stocks.xlsx"
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2020stocks.xlsx",
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2021stocks.xlsx",
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2022stocks.xlsx",
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2023stocks.xlsx",
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2024stocks.xlsx",
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2025stocks.xlsx"
   ],
   "files_skipped": [
     {
-      "file": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/data/trusted_raw/company_universe.csv",
+      "file": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/bist100_benchmark_returns.csv",
+      "reason": "name does not match 20YYstocks"
+    },
+    {
+      "file": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/bist100_benchmark_returns.template.csv",
+      "reason": "name does not match 20YYstocks"
+    },
+    {
+      "file": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/company_universe.csv",
+      "reason": "name does not match 20YYstocks"
+    },
+    {
+      "file": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/shares_outstanding_events.csv",
+      "reason": "name does not match 20YYstocks"
+    },
+    {
+      "file": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/shares_outstanding_events_template.csv",
+      "reason": "name does not match 20YYstocks"
+    },
+    {
+      "file": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/shares_outstanding_manual.csv",
+      "reason": "name does not match 20YYstocks"
+    },
+    {
+      "file": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/shares_outstanding_manual_template.csv",
       "reason": "name does not match 20YYstocks"
     }
   ],
   "year_files": {
     "2020": [
-      "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2020stocks.xlsx"
+      "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2020stocks.xlsx"
     ],
     "2021": [
-      "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2021stocks.xlsx"
+      "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2021stocks.xlsx"
     ],
     "2022": [
-      "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2022stocks.xlsx"
+      "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2022stocks.xlsx"
     ],
     "2023": [
-      "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2023stocks.xlsx"
+      "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2023stocks.xlsx"
     ],
     "2024": [
-      "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2024stocks.xlsx"
+      "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2024stocks.xlsx"
     ],
     "2025": [
-      "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2025stocks.xlsx"
+      "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2025stocks.xlsx"
     ]
   },
   "selected_file_per_year": {
-    "2020": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2020stocks.xlsx",
-    "2021": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2021stocks.xlsx",
-    "2022": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2022stocks.xlsx",
-    "2023": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2023stocks.xlsx",
-    "2024": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2024stocks.xlsx",
-    "2025": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2025stocks.xlsx"
+    "2020": "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2020stocks.xlsx",
+    "2021": "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2021stocks.xlsx",
+    "2022": "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2022stocks.xlsx",
+    "2023": "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2023stocks.xlsx",
+    "2024": "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2024stocks.xlsx",
+    "2025": "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2025stocks.xlsx"
   },
   "duplicate_years": {},
   "rows_per_file": {
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2020stocks.xlsx": 40,
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2021stocks.xlsx": 40,
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2022stocks.xlsx": 40,
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2023stocks.xlsx": 40,
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2024stocks.xlsx": 40,
-    "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/3.Datasets/2025stocks.xlsx": 40
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2020stocks.xlsx": 40,
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2021stocks.xlsx": 40,
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2022stocks.xlsx": 40,
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2023stocks.xlsx": 40,
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2024stocks.xlsx": 40,
+    "/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2025stocks.xlsx": 40
   },
   "ticker_coverage_per_year": {
     "2020": 40,
@@ -798,7 +822,7 @@
     }
   ],
   "ambiguous_columns": [],
-  "output_file": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/data/trusted_raw/financials/candidate_from_yearly_snapshots.csv",
+  "output_file": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/financials/candidate_from_yearly_snapshots.csv",
   "output_rows": 240,
   "ticker_year_coverage": {
     "2020": 40,

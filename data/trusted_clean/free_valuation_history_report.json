@@ -12,15 +12,15 @@
     "rows_with_price": 226,
     "total_rows": 240,
     "yahoo_meta": {
-      "attempted": 40,
-      "yahoo_ok": 40,
-      "from_cache": 0,
+      "attempted": 0,
+      "yahoo_ok": 0,
+      "from_cache": 40,
       "from_manual": 0,
       "failed": []
     }
   },
-  "shares_status": "missing",
-  "shares_template_path": "data/trusted_raw/shares_outstanding_manual_template.csv",
+  "shares_status": "manual",
+  "shares_template_path": null,
   "financial_dependency_coverage": {
     "net_income": 240,
     "equity": 240,
@@ -28,29 +28,45 @@
     "net_debt": 240
   },
   "target_column_status": {
-    "market_cap": "missing",
-    "enterprise_value": "missing",
-    "pe": "missing",
-    "pb": "missing",
-    "ev_ebitda": "missing"
+    "market_cap": "accepted",
+    "enterprise_value": "accepted",
+    "pe": "accepted",
+    "pb": "accepted",
+    "ev_ebitda": "accepted"
   },
   "usable_values_by_column": {
-    "market_cap": 0,
-    "enterprise_value": 0,
-    "pe": 0,
-    "pb": 0,
-    "ev_ebitda": 0
+    "market_cap": 104,
+    "enterprise_value": 86,
+    "pe": 85,
+    "pb": 86,
+    "ev_ebitda": 81
   },
-  "columns_entering_candidate": [],
+  "columns_entering_candidate": [
+    "market_cap",
+    "enterprise_value",
+    "pe",
+    "pb",
+    "ev_ebitda"
+  ],
   "rejection_summary": {
     "market_cap": {
-      "missing_shares": 240,
-      "missing_price": 14
+      "missing_price": 14,
+      "missing_shares": 135
     },
-    "enterprise_value": {},
-    "pe": {},
-    "pb": {},
-    "ev_ebitda": {}
+    "enterprise_value": {
+      "suspect_2024_net_debt": 18
+    },
+    "pe": {
+      "non_positive_net_income": 14,
+      "absurd_value": 5
+    },
+    "pb": {
+      "suspect_2024_equity": 18
+    },
+    "ev_ebitda": {
+      "missing_enterprise_value": 18,
+      "absurd_value": 5
+    }
   },
   "coverage_by_year": {
     "2020": 40,
@@ -61,7 +77,7 @@
     "2025": 40
   },
   "feature_count_before": 27,
-  "feature_count_after_if_accepted": 27,
+  "feature_count_after_if_accepted": 32,
   "candidate_csv": "data/trusted_raw/financials/free_valuation_history_candidate.csv",
   "limitations": "Shares outstanding is the binding gap: without a real per-ticker-year share count (KAP/company reports), market_cap cannot be computed and all derived ratios stay null. Yahoo provides only year-end PRICE freely, not historical shares. 2024 equity/net_debt are misaligned and were rejected, not imputed.",
   "not_investment_advice": true

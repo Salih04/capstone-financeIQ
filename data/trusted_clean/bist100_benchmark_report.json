@@ -23,5 +23,5 @@
     "yfinance unavailable/failed: No module named 'yfinance'",
     "source=yahoo_chart_api"
   ],
-  "output": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/gallant-cartwright-ee6e85/data/trusted_raw/bist100_benchmark_returns.csv"
+  "output": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/bist100_benchmark_returns.csv"
 }
