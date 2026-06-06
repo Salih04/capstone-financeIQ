@@ -113,10 +113,16 @@ def test_data_quality_context_distinguishes_sources(state):
     assert "pe" in cy["frozen_valuation_columns"]
 
 
-def test_no_frozen_valuation_in_model_features(state):
+def test_no_raw_or_leakage_valuation_in_model_features(state):
+    """Old-snapshot valuation names + leakage forbidden; free-derived valuation
+    (market_cap, enterprise_value, pe_ratio, pb_ratio, ev_ebitda) is allowed."""
     feats = set((state["quality"] or {}).get("feature_columns", []))
-    for c in ("pe", "pb", "ev_ebitda", "market_cap", "market_capitalization", "enterprise_value"):
-        assert c not in feats
+    forbidden = ("pe", "pb", "market_capitalization", "price", "day_return", "period_return",
+                 "volume", "return_1w", "return_1m", "return_3m", "return_6m", "return_ytd",
+                 "return_1y", "return_3y", "return_5y", "shares_outstanding", "year_end_close")
+    for c in forbidden:
+        assert c not in feats, f"forbidden raw/leakage column {c} must not be a feature"
+    assert not ({"pe", "pe_ratio"} <= feats) and not ({"pb", "pb_ratio"} <= feats)
 
 
 def test_diagnostics_has_business_interpretation(state):

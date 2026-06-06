@@ -72,9 +72,23 @@ def test_candidate_columns_numeric(report):
         assert pd.api.types.is_numeric_dtype(df[c]), f"{c} is not numeric"
 
 
+# Raw / old-snapshot / leakage columns that must NEVER be model features.
+# NOTE: free-DERIVED valuation (market_cap, enterprise_value, pe_ratio, pb_ratio,
+# ev_ebitda) IS allowed once the free valuation builder produces it — it is NOT
+# listed here. Only the old snapshot names (pe, pb, market_capitalization) and raw
+# price/return/volume/shares are forbidden.
+RAW_OR_LEAKAGE_FORBIDDEN = (
+    "pe", "pb", "market_capitalization",                       # old frozen snapshot names
+    "price", "day_return", "period_return", "volume",          # leakage: price/volume
+    "return_1w", "return_1m", "return_3m", "return_6m",
+    "return_ytd", "return_1y", "return_3y", "return_5y",       # leakage: returns
+    "shares_outstanding", "year_end_close",                    # raw inputs, not features
+)
+
+
 def test_modeling_features_grew_only_with_validated_fields():
-    """If the modeling dataset was rebuilt, income features are present and no raw
-    frozen valuation column is a feature."""
+    """Income features present; no raw/old-snapshot/leakage column is a feature.
+    Free-derived valuation (pe_ratio/pb_ratio/market_cap/...) is allowed."""
     quality = REPO / "data" / "trusted_clean" / "data_quality_report.json"
     if not quality.is_file():
         pytest.skip("modeling dataset not built")
@@ -83,6 +97,6 @@ def test_modeling_features_grew_only_with_validated_fields():
     # validated income/profitability features entered the model
     assert {"revenue", "ebitda", "net_income", "roe", "roa"} & feats, \
         "expected corrected income/profitability features in the model"
-    # raw frozen valuation must never be a feature
-    for c in ("pe", "pb", "ev_ebitda", "market_cap", "market_capitalization", "enterprise_value"):
-        assert c not in feats, f"frozen valuation {c} must not be a feature"
+    # raw / old-snapshot / leakage columns must never be features
+    for c in RAW_OR_LEAKAGE_FORBIDDEN:
+        assert c not in feats, f"forbidden raw/leakage column {c} must not be a feature"

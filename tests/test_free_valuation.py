@@ -124,12 +124,29 @@ def test_2024_balance_block_rejected(monkeypatch, tmp_path):
 
 @pytest.mark.skipif(not (REPO / "data" / "trusted_clean" / "data_quality_report.json").is_file(),
                     reason="pipeline not built")
-def test_no_frozen_valuation_in_features_after_builder():
+def test_no_raw_or_leakage_valuation_in_features():
+    """Old-snapshot valuation names + raw price/return/volume/shares must never be
+    features. Free-DERIVED valuation (market_cap, enterprise_value, pe_ratio,
+    pb_ratio, ev_ebitda) IS allowed and, when the builder accepted it, expected."""
     import json
     q = json.loads((REPO / "data" / "trusted_clean" / "data_quality_report.json").read_text())
     feats = set(q.get("feature_columns", []))
-    for c in ("pe", "pb", "ev_ebitda", "market_cap", "market_capitalization", "enterprise_value"):
-        assert c not in feats   # never frozen valuation as a feature
-    # year-end price / shares must never be features (no leakage)
-    for c in ("year_end_close", "price", "shares_outstanding"):
-        assert c not in feats
+
+    # forbidden: old snapshot names + leakage (NOT the free-derived names)
+    forbidden = ("pe", "pb", "market_capitalization", "price", "day_return", "period_return",
+                 "volume", "return_1w", "return_1m", "return_3m", "return_6m", "return_ytd",
+                 "return_1y", "return_3y", "return_5y", "shares_outstanding", "year_end_close")
+    for c in forbidden:
+        assert c not in feats, f"forbidden raw/leakage column {c} must not be a feature"
+
+    # no pe + pe_ratio (or pb + pb_ratio) duplication
+    assert not ({"pe", "pe_ratio"} <= feats), "pe and pe_ratio must not both be features"
+    assert not ({"pb", "pb_ratio"} <= feats), "pb and pb_ratio must not both be features"
+
+    # if the free valuation builder accepted columns, they should be in the model
+    sd = q.get("source_distinction", {}) or {}
+    entering = set((sd.get("free_valuation_builder", {}) or {}).get("columns_entering_candidate", []))
+    derived = {"market_cap", "enterprise_value", "pe_ratio", "pb_ratio", "ev_ebitda"}
+    expected = {("pe_ratio" if c == "pe" else "pb_ratio" if c == "pb" else c) for c in entering} & derived
+    for c in expected:
+        assert c in feats, f"accepted free-derived valuation {c} should be a model feature"
