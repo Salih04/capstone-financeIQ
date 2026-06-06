@@ -241,6 +241,34 @@ def load_benchmark(cfg: PipelineConfig) -> pd.DataFrame | None:
 # --------------------------------------------------------------------------- #
 # Manual real financial-history merge
 # --------------------------------------------------------------------------- #
+def _manual_col_status(df: pd.DataFrame, col: str,
+                       min_nonnull: int = 2, min_varying_frac: float = 0.5) -> str:
+    """Sparse-aware acceptance status for an added manual column.
+
+    Returns "varying" (accept), or a rejection reason:
+      * all_null              — no non-null values at all
+      * insufficient_history  — too few non-null values, or no ticker has >=2
+                                non-null years (cannot prove it varies over time)
+      * frozen_across_years   — tickers WITH multi-year history repeat one value
+    Nulls are ignored throughout, so a legitimately sparse-but-varying column
+    (e.g. free-derived valuation) is accepted; a repeated snapshot is rejected.
+    """
+    s = pd.to_numeric(df[col], errors="coerce")
+    nonnull = s.notna()
+    if not nonnull.any():
+        return "all_null"
+    if int(nonnull.sum()) < min_nonnull:
+        return "insufficient_history"
+    sub = df.loc[nonnull, ["ticker"]].assign(_v=s[nonnull])
+    per_ticker_unique = sub.groupby("ticker")["_v"].nunique()
+    multi = per_ticker_unique[sub.groupby("ticker")["_v"].size() >= 2]
+    if len(multi) == 0:
+        # every ticker has at most one non-null year -> cannot show time variation
+        return "insufficient_history"
+    varying_frac = float((multi > 1).mean())
+    return "varying" if varying_frac >= min_varying_frac else "frozen_across_years"
+
+
 def merge_manual_financials(cfg: PipelineConfig, df: pd.DataFrame, base_features: set[str]) -> pd.DataFrame:
     """Merge real per-year history from data/trusted_raw/financials/ if present.
 
@@ -286,18 +314,20 @@ def merge_manual_financials(cfg: PipelineConfig, df: pd.DataFrame, base_features
         else:
             added.append(c)  # new column, already merged in
 
-    # Accept added manual columns only if they vary across years and aren't all-null.
-    var = classify_variability(df[["ticker", "year", *added]]) if added else {"varying": [], "frozen": []}
+    # Accept added manual columns using a SPARSE-AWARE frozen check. A manual
+    # column (e.g. free-derived valuation) may be legitimately sparse: only some
+    # tickers/years have a value. It must NOT be rejected as "frozen" merely
+    # because many ticker-years are missing. Evaluate variation ONLY among tickers
+    # that actually have >=2 non-null years; reject only if those genuinely repeat
+    # the same value (truly frozen) or there is too little history to validate.
     accepted, rejected = [], {}
     for c in added:
-        if df[c].isna().all():
-            rejected[c] = "all_null"
-            df = df.drop(columns=[c])
-        elif c in var["frozen"]:
-            rejected[c] = "frozen_across_years"
-            df = df.drop(columns=[c])
-        else:
+        status = _manual_col_status(df, c)
+        if status == "varying":
             accepted.append(c)
+        else:
+            rejected[c] = status
+            df = df.drop(columns=[c])
 
     cfg.manual_overrides = overrides
     cfg.manual_feature_columns = accepted

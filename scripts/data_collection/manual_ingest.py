@@ -79,7 +79,8 @@ _ALIAS_TO_CANON = {a: c for c, al in _CANON.items() for a in al}
 # Manual-source priority (lower = higher priority) for resolving expected overlap.
 _SOURCE_PRIORITY = {
     "corrected_yearly_financials_candidate.csv": 0,   # verified per-year income/profitability
-    "all_financials.csv": 1,
+    "free_valuation_history_candidate.csv": 1,        # free-derived valuation (price x shares)
+    "all_financials.csv": 2,
     "candidate_from_yearly_snapshots.csv": 5,         # legacy frozen snapshot evidence
 }
 
