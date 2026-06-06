@@ -1,0 +1,52 @@
+# Capital-EVENT shares outstanding (free valuation). NEVER fabricate.
+# One row per capital CHANGE. Stable capital 2020-2025 = a single 2020 row.
+# shares_outstanding MUST be TOTAL issued/paid-in shares, NOT free float.
+# Do NOT use 'Fiili Dolasimdaki Pay Tutari' (free float) as total shares.
+# For BIST, paid-in capital in TL == share count when nominal_value = 1 TL (document it).
+# capital_basis: issued_capital | paid_in_capital | share_count | unknown | free_float_only
+# confidence: high | medium | low
+#
+# Example only, do NOT use as real data:
+# TICKER,2020,1000000000,KAP company general info,stable issued capital,medium,issued_capital,1
+# TICKER,2023,2000000000,KAP capital increase disclosure,post-increase,high,issued_capital,1
+ticker,effective_year,shares_outstanding,source,notes,confidence,capital_basis,nominal_value
+AEFES,2020,,,,,issued_capital,1
+ARCLK,2020,,,,,issued_capital,1
+ASELS,2020,,,,,issued_capital,1
+ASTOR,2020,,,,,issued_capital,1
+BIMAS,2020,,,,,issued_capital,1
+BRSAN,2020,,,,,issued_capital,1
+BTCIM,2020,,,,,issued_capital,1
+CANTE,2020,,,,,issued_capital,1
+CCOLA,2020,,,,,issued_capital,1
+CIMSA,2020,,,,,issued_capital,1
+DOAS,2020,,,,,issued_capital,1
+DSTKF,2020,,,,,issued_capital,1
+ENKAI,2020,,,,,issued_capital,1
+EREGL,2020,,,,,issued_capital,1
+FROTO,2020,,,,,issued_capital,1
+GUBRF,2020,,,,,issued_capital,1
+HEKTS,2020,,,,,issued_capital,1
+KONTR,2020,,,,,issued_capital,1
+KRDMD,2020,,,,,issued_capital,1
+KUYAS,2020,,,,,issued_capital,1
+MAVI,2020,,,,,issued_capital,1
+MGROS,2020,,,,,issued_capital,1
+MIATK,2020,,,,,issued_capital,1
+OYAKC,2020,,,,,issued_capital,1
+PASEU,2020,,,,,issued_capital,1
+PETKM,2020,,,,,issued_capital,1
+PGSUS,2020,,,,,issued_capital,1
+SASA,2020,,,,,issued_capital,1
+SISE,2020,,,,,issued_capital,1
+TAVHL,2020,,,,,issued_capital,1
+TCELL,2020,,,,,issued_capital,1
+THYAO,2020,,,,,issued_capital,1
+TOASO,2020,,,,,issued_capital,1
+TRALT,2020,,,,,issued_capital,1
+TRMET,2020,,,,,issued_capital,1
+TSKB,2020,,,,,issued_capital,1
+TTKOM,2020,,,,,issued_capital,1
+TUPRS,2020,,,,,issued_capital,1
+TURSG,2020,,,,,issued_capital,1
+ULKER,2020,,,,,issued_capital,1

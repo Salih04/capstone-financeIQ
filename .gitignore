@@ -60,3 +60,8 @@ research_agent_training/eval_results.md
 research_agent_training/failure_cases.jsonl
 research_agent_training/failure_augmented_dataset.jsonl
 research_agent_training/iterations/
+
+# shares-outstanding generated artifacts (expanded from the events file)
+data/trusted_raw/shares_outstanding_manual.csv
+data/trusted_clean/shares_outstanding_expansion_report.json
+data/trusted_clean/shares_outstanding_expansion_report.md

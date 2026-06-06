@@ -119,10 +119,14 @@ export default function DataQualityPage() {
               <RenderList items={fv.columns_entering_candidate} color="success" />
             </div>
           ) : (
-            <WarningCallout title="Shares outstanding required" tone="warn">
-              Year-end prices are collected free from Yahoo, but historical <b>shares outstanding</b> are not
-              freely available. Provide them (KAP / company reports) in <code>data/trusted_raw/shares_outstanding_manual.csv</code>,
-              then re-run <code>make valuation</code> — P/E, P/B and EV/EBITDA will be computed and can enter the model.
+            <WarningCallout title="Shares outstanding required (capital-event workflow)" tone="warn">
+              Year-end prices are collected free from Yahoo, but historical <b>shares outstanding</b> are not.
+              You no longer fill 240 rows — instead record only capital <b>changes</b> in
+              <code> data/trusted_raw/shares_outstanding_events.csv</code> (one row per capital increase; stable
+              capital = a single 2020 row), then run <code>make shares &amp;&amp; make valuation</code>. Use
+              <b> total issued / paid-in shares</b> (share count when nominal value is 1 TL) — <b>never free float</b>
+              (“Fiili Dolaşımdaki Pay Tutarı” understates total shares and is rejected). Then P/E, P/B and
+              EV/EBITDA are computed and can enter the model.
             </WarningCallout>
           )}
         </EvidencePanel>

@@ -1026,7 +1026,9 @@ def classify_intent(question: str) -> str:
                             "top ranked", "best stocks", "ranked highest")):
         return "top_ranked"
     if any(k in q for k in ("valuation", "p/e", " pe ", "p/b", " pb ", "ev/ebitda", "ev_ebitda",
-                            "market cap", "market_cap", "enterprise value", "calculate p", "fintables", "kap")):
+                            "market cap", "market_cap", "enterprise value", "calculate p", "fintables", "kap",
+                            "shares outstanding", "shares", "free float", "free-float", "fiili", "dolas",
+                            "issued capital", "paid-in", "paid in capital", "fill shares")):
         return "valuation"
     if any(k in q for k in ("why", "weak", "signal", "reliable", "edge", "backtest", "diagnostic")):
         return "diagnostics"
@@ -1132,6 +1134,26 @@ def _intent_answer(intent: str, question: str, state: dict, ticker: str | None) 
         attempted = fv.get("attempted")
         entered = fv.get("columns_entering_candidate") or []
         shares = fv.get("shares_status", "missing")
+        ql = (question or "").lower()
+        # free-float / how-to-fill sub-questions get a specific, correct answer
+        if any(k in ql for k in ("free float", "free-float", "fiili", "dolas")):
+            ans = ("No — 'Fiili Dolasimdaki Pay Tutari' (free float) is only the publicly-traded portion and "
+                   "understates total shares, so it must NOT be used for market cap. Market cap needs TOTAL "
+                   "issued / paid-in shares (or total share count). Free-float rows are tagged "
+                   "capital_basis=free_float_only and rejected by the builder.")
+            return {"answer": ans, "data_used": {"source": "shares workflow", "year": None, "rows_used": 0,
+                    "fields_used": ["capital_basis", "shares_outstanding"]}, "warnings": warns, "limitations": lims}
+        if any(k in ql for k in ("how do i fill", "fill shares", "shares outstanding", "issued capital",
+                                 "paid-in", "paid in capital", "how to fill")):
+            ans = ("Fill shares via the capital-EVENT file, not 240 manual rows: edit "
+                   "data/trusted_raw/shares_outstanding_events.csv with ONE row per capital CHANGE "
+                   "(ticker, effective_year, total issued/paid-in shares, source, confidence, "
+                   "capital_basis=issued_capital, nominal_value=1). Stable capital = a single 2020 row. "
+                   "Run `make shares` to carry events forward to every year, then `make valuation`. Use total "
+                   "issued/paid-in capital (share count when nominal value is 1 TL) — never free float.")
+            return {"answer": ans, "data_used": {"source": "shares workflow", "year": None, "rows_used": 0,
+                    "fields_used": ["effective_year", "shares_outstanding", "capital_basis"]},
+                    "warnings": warns, "limitations": lims}
         if not attempted:
             ans = ("Valuation columns (P/E, P/B, EV/EBITDA, market cap, enterprise value) are not available "
                    "yet. The old Fintables snapshot repeated one value across years and was rejected. A free "

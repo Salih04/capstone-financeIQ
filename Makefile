@@ -1,6 +1,6 @@
 .PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research \
 	inspect-quarterly research-agent-dataset research-agent-check full-research-agent ingest-corrected-yearly \
-	prices valuation \
+	prices valuation shares \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration
@@ -73,10 +73,16 @@ ingest-corrected-yearly:
 prices:
 	PYTHONPATH=. python -m scripts.data_collection.build_free_valuation_history --prices-only
 
+# Expand capital-EVENT rows into per-ticker-year shares outstanding (carry-forward).
+# Generates an events template if missing; never crashes.
+shares:
+	PYTHONPATH=. python -m scripts.data_collection.expand_shares_outstanding_events
+
 # Build free-data valuation candidate (market_cap/pe/pb/ev/ev_ebitda) from
 # Yahoo prices + manual shares + validated financials. Generates a shares
 # template and reports honestly if shares are missing (never crashes).
 valuation:
+	$(MAKE) shares
 	PYTHONPATH=. python -m scripts.data_collection.build_free_valuation_history
 
 # Build the T->T+1 modeling dataset + validation report.

@@ -183,31 +183,43 @@ def _rel(path: Path) -> str:
 
 # --------------------------------------------------------------------------- #
 def ensure_shares_template(tickers: list[str]) -> bool:
-    """Write a manual shares template if the real manual file is absent. Returns
-    True if a real manual file exists."""
+    """Write a manual shares template (per ticker-year) if the real manual file is
+    absent. The preferred workflow is the capital-EVENT file (fewer rows); this
+    full template stays as a fallback. Returns True if a real manual file exists."""
     if SHARES_MANUAL.is_file():
         return True
     SHARES_TEMPLATE.parent.mkdir(parents=True, exist_ok=True)
-    lines = ["# Manual shares-outstanding source for free valuation. NEVER fabricate.",
-             "# Fill REAL shares outstanding per ticker-year from KAP/company reports.",
-             "# A stable share count may repeat across years — document it in 'notes'.",
-             "ticker,year,shares_outstanding,source,notes"]
+    lines = [
+        "# Manual shares-outstanding fallback (per ticker-year). NEVER fabricate.",
+        "# PREFERRED: use the capital-EVENT file instead "
+        "(data/trusted_raw/shares_outstanding_events.csv) and run `make shares`.",
+        "# shares_outstanding MUST be TOTAL issued/paid-in shares, NOT free float.",
+        "# A stable share count may repeat across years — document it in 'notes'.",
+        "# capital_basis: issued_capital | paid_in_capital | share_count | unknown | free_float_only",
+        "ticker,year,shares_outstanding,source,notes,confidence,capital_basis,nominal_value",
+    ]
     for t in tickers:
         for y in YEARS:
-            lines.append(f"{t},{y},,,")
-    SHARES_TEMPLATE.write_text("\n".join(lines) + "\n")
+            lines.append(f"{t},{y},,,,,issued_capital,1")
+    SHARES_TEMPLATE.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return False
 
 
 def load_shares() -> tuple[pd.DataFrame | None, str]:
+    """Load TOTAL shares outstanding. free_float_only rows are rejected (free float
+    is not total shares and would understate market cap)."""
     if not SHARES_MANUAL.is_file():
         return None, "missing"
     try:
         df = pd.read_csv(SHARES_MANUAL, comment="#")
         df["ticker"] = df["ticker"].astype(str).str.upper()
         df["shares_outstanding"] = pd.to_numeric(df["shares_outstanding"], errors="coerce")
+        if "capital_basis" in df.columns:
+            df = df[df["capital_basis"].astype(str).str.lower() != "free_float_only"]
         df = df.dropna(subset=["shares_outstanding"])
         df = df[df["shares_outstanding"] > 0]
+        if df.empty:
+            return None, "empty"
         return df[["ticker", "year", "shares_outstanding"]], "manual"
     except Exception:
         return None, "unreadable"
@@ -232,6 +244,15 @@ def _load_financials() -> pd.DataFrame:
 def build(log=print) -> dict:
     tickers = _tickers()
     prices, price_meta = collect_year_end_prices(tickers, log=log)
+    # If the per-year manual file is missing but a capital-EVENT file exists, expand
+    # events -> manual first (the user-friendly path: enter changes, not 240 rows).
+    events = RAW / "shares_outstanding_events.csv"
+    if not SHARES_MANUAL.is_file() and events.is_file():
+        try:
+            from scripts.data_collection import expand_shares_outstanding_events as EXP
+            EXP.expand(log=log)
+        except Exception as exc:  # noqa - never crash valuation on expansion error
+            log(f"[valuation] event expansion failed: {exc}")
     have_shares = ensure_shares_template(tickers)
     shares, shares_status = load_shares()
     fin = _load_financials()
