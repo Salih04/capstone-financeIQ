@@ -18,7 +18,7 @@ all out-of-sample numbers as noisy and overfitting-prone.
 | test_2023 | elasticnet            | ml       | 125.51 | 158.36 |      0.144 |              0.4 |                  108.89 |                  44.38 |              0.6  |
 | test_2023 | lasso                 | ml       | 138.02 | 191.07 |      0.126 |              0.2 |                   82.19 |                  44.38 |              0.6  |
 | test_2023 | linear_regression     | ml       | 142.31 | 196.36 |      0.105 |              0.2 |                   82.19 |                  44.38 |              0.55 |
-| test_2023 | random_forest         | ml       | 143.37 | 204.04 |     -0.12  |              0   |                   14.63 |                  44.38 |              0.6  |
+| test_2023 | random_forest         | ml       | 143.45 | 204.09 |     -0.114 |              0   |                   14.63 |                  44.38 |              0.6  |
 | test_2023 | baseline_equal_weight | baseline |  82.63 | 132.24 |     -0.331 |              0   |                   14.89 |                  44.38 |              0.35 |
 | test_2023 | baseline_rank_score   | baseline |  82.63 | 132.24 |     -0.331 |              0   |                   14.89 |                  44.38 |              0.35 |
 
@@ -32,7 +32,7 @@ all out-of-sample numbers as noisy and overfitting-prone.
 | test_2024 | elasticnet            | ml       |  95.11 | 116.69 |     -0.012 |              0.2 |                   26.22 |                   35.4 |              0.55 |
 | test_2024 | lasso                 | ml       | 105.74 | 136.51 |     -0.083 |              0.2 |                   19.95 |                   35.4 |              0.45 |
 | test_2024 | linear_regression     | ml       | 110.38 | 141.25 |     -0.089 |              0.2 |                   19.95 |                   35.4 |              0.5  |
-| test_2024 | random_forest         | ml       | 103.91 | 148.74 |     -0.262 |              0   |                   -8.9  |                   35.4 |              0.4  |
+| test_2024 | random_forest         | ml       | 104.1  | 149.27 |     -0.257 |              0   |                   -8.9  |                   35.4 |              0.4  |
 
 ## test_2025
 
@@ -43,5 +43,5 @@ all out-of-sample numbers as noisy and overfitting-prone.
 | test_2025 | baseline_equal_weight | baseline |  35.19 |  75.76 |      0.087 |              0.4 |                   60.23 |                   1.64 |              0.55 |
 | test_2025 | baseline_rank_score   | baseline |  35.19 |  75.76 |      0.087 |              0.4 |                   60.23 |                   1.64 |              0.55 |
 | test_2025 | ridge                 | ml       | 103.68 | 112.57 |      0.078 |              0   |                   10.89 |                   1.64 |              0.45 |
-| test_2025 | random_forest         | ml       | 107.99 | 122.66 |     -0.129 |              0.4 |                  107.21 |                   1.64 |              0.4  |
+| test_2025 | random_forest         | ml       | 107.94 | 123.02 |     -0.137 |              0.4 |                  107.21 |                   1.64 |              0.4  |
 | test_2025 | elasticnet            | ml       | 103.51 | 111.57 |     -0.148 |              0.2 |                   43.83 |                   1.64 |              0.4  |

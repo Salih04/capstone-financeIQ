@@ -21,7 +21,7 @@
   },
   "shares_status": "manual",
   "corrected_balance_sheet_2024": {
-    "present": true,
+    "present": false,
     "tickers_corrected": 0,
     "tickers": []
   },

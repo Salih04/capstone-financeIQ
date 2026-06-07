@@ -1,241 +1,241 @@
 ticker,year,shares_outstanding,source,notes,confidence,capital_basis,nominal_value,status
-AEFES,2020,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1,carried_forward
-AEFES,2021,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1,carried_forward
-AEFES,2022,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1,carried_forward
-AEFES,2023,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1,carried_forward
-AEFES,2024,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1,carried_forward
-AEFES,2025,5921052630.0,user provided merged capital research,2025 900 percent bonus issue,medium,issued_capital,1,carried_forward
-ARCLK,2020,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1,carried_forward
-ARCLK,2021,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1,carried_forward
-ARCLK,2022,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1,carried_forward
-ARCLK,2023,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1,carried_forward
-ARCLK,2024,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1,carried_forward
-ARCLK,2025,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1,carried_forward
-ASELS,2020,2280000000.0,user provided merged capital research,2020 year-end capital after 100 percent bonus issue,medium,issued_capital,1,carried_forward
-ASELS,2021,2280000000.0,user provided merged capital research,2020 year-end capital after 100 percent bonus issue,medium,issued_capital,1,carried_forward
-ASELS,2022,2280000000.0,user provided merged capital research,2020 year-end capital after 100 percent bonus issue,medium,issued_capital,1,carried_forward
-ASELS,2023,4560000000.0,user provided merged capital research,2023 100 percent bonus issue; included because earlier research had specific SPK/KAP timing,low,issued_capital,1,carried_forward
-ASELS,2024,4560000000.0,user provided merged capital research,2023 100 percent bonus issue; included because earlier research had specific SPK/KAP timing,low,issued_capital,1,carried_forward
-ASELS,2025,4560000000.0,user provided merged capital research,2023 100 percent bonus issue; included because earlier research had specific SPK/KAP timing,low,issued_capital,1,carried_forward
-ASTOR,2020,200000000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1,carried_forward
-ASTOR,2021,850000000.0,user provided merged capital research,2021 pre-IPO internal capital increase,medium,issued_capital,1,carried_forward
-ASTOR,2022,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1,carried_forward
-ASTOR,2023,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1,carried_forward
-ASTOR,2024,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1,carried_forward
-ASTOR,2025,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1,carried_forward
-BIMAS,2020,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1,carried_forward
-BIMAS,2021,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1,carried_forward
-BIMAS,2022,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1,carried_forward
-BIMAS,2023,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1,carried_forward
-BIMAS,2024,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1,carried_forward
-BIMAS,2025,600000000.0,user provided merged capital research,capital reduction to 600m; 2026 bonus issue excluded from 2020-2025 model,low,issued_capital,1,carried_forward
-BRSAN,2020,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1,carried_forward
-BRSAN,2021,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1,carried_forward
-BRSAN,2022,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1,carried_forward
-BRSAN,2023,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1,carried_forward
-BRSAN,2024,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1,carried_forward
-BRSAN,2025,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1,carried_forward
-BTCIM,2020,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1,carried_forward
-BTCIM,2021,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1,carried_forward
-BTCIM,2022,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1,carried_forward
-BTCIM,2023,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1,carried_forward
-BTCIM,2024,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1,carried_forward
-BTCIM,2025,5580000000.0,user provided merged capital research,2025 3000 percent bonus issue,medium,issued_capital,1,carried_forward
-CANTE,2020,252410000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1,carried_forward
-CANTE,2021,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1,carried_forward
-CANTE,2022,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1,carried_forward
-CANTE,2023,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1,carried_forward
-CANTE,2024,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1,carried_forward
-CANTE,2025,7000000000.0,user provided merged capital research,capital reached 7bn by 2025/2026 process; exact effective year should be checked,low,issued_capital,1,carried_forward
-CCOLA,2020,254370782.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-CCOLA,2021,254370782.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-CCOLA,2022,254370782.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-CCOLA,2023,254370782.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-CCOLA,2024,2798078602.0,user provided merged capital research,2024 1000 percent bonus issue,medium,issued_capital,1,carried_forward
-CCOLA,2025,2798078602.0,user provided merged capital research,2024 1000 percent bonus issue,medium,issued_capital,1,carried_forward
-CIMSA,2020,135084442.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1,carried_forward
-CIMSA,2021,135084442.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1,carried_forward
-CIMSA,2022,135084442.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1,carried_forward
-CIMSA,2023,945591094.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1,carried_forward
-CIMSA,2024,945591094.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1,carried_forward
-CIMSA,2025,945591094.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1,carried_forward
-DOAS,2020,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-DOAS,2021,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-DOAS,2022,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-DOAS,2023,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-DOAS,2024,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-DOAS,2025,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-DSTKF,2020,50000000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1,carried_forward
-DSTKF,2021,50000000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1,carried_forward
-DSTKF,2022,190000000.0,user provided merged capital research,2022 pre-IPO capital increase,low,issued_capital,1,carried_forward
-DSTKF,2023,250000000.0,user provided merged capital research,2023 pre-IPO internal capital increase,medium,issued_capital,1,carried_forward
-DSTKF,2024,250000000.0,user provided merged capital research,2023 pre-IPO internal capital increase,medium,issued_capital,1,carried_forward
-DSTKF,2025,333333333.0,user provided merged capital research,2025 IPO capital after new share issue,medium,issued_capital,1,carried_forward
-ENKAI,2020,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1,carried_forward
-ENKAI,2021,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1,carried_forward
-ENKAI,2022,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1,carried_forward
-ENKAI,2023,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1,carried_forward
-ENKAI,2024,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1,carried_forward
-ENKAI,2025,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1,carried_forward
-EREGL,2020,3500000000.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-EREGL,2021,3500000000.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-EREGL,2022,3500000000.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-EREGL,2023,3500000000.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-EREGL,2024,7000000000.0,user provided merged capital research,2024 100 percent bonus issue,medium,issued_capital,1,carried_forward
-EREGL,2025,7000000000.0,user provided merged capital research,2024 100 percent bonus issue,medium,issued_capital,1,carried_forward
-FROTO,2020,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1,carried_forward
-FROTO,2021,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1,carried_forward
-FROTO,2022,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1,carried_forward
-FROTO,2023,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1,carried_forward
-FROTO,2024,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1,carried_forward
-FROTO,2025,3509100000.0,user provided merged capital research,2025 900 percent bonus issue,medium,issued_capital,1,carried_forward
-GUBRF,2020,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1,carried_forward
-GUBRF,2021,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1,carried_forward
-GUBRF,2022,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1,carried_forward
-GUBRF,2023,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1,carried_forward
-GUBRF,2024,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1,carried_forward
-GUBRF,2025,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1,carried_forward
-HEKTS,2020,860000000.0,user provided merged capital research,issued capital before 2022 capital increases,medium,issued_capital,1,carried_forward
-HEKTS,2021,860000000.0,user provided merged capital research,issued capital before 2022 capital increases,medium,issued_capital,1,carried_forward
-HEKTS,2022,2530000000.0,user provided merged capital research,2022 paid plus bonus capital increase,medium,issued_capital,1,carried_forward
-HEKTS,2023,2530000000.0,user provided merged capital research,2022 paid plus bonus capital increase,medium,issued_capital,1,carried_forward
-HEKTS,2024,8430000000.0,user provided merged capital research,2024 paid capital increase,medium,issued_capital,1,carried_forward
-HEKTS,2025,8430000000.0,user provided merged capital research,2024 paid capital increase,medium,issued_capital,1,carried_forward
-KONTR,2020,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1,carried_forward
-KONTR,2021,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1,carried_forward
-KONTR,2022,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1,carried_forward
-KONTR,2023,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1,carried_forward
-KONTR,2024,650000000.0,user provided merged capital research,2024 paid plus bonus capital increase,medium,issued_capital,1,carried_forward
-KONTR,2025,1300000000.0,user provided merged capital research,2025 paid capital increase; verify final registration,medium,issued_capital,1,carried_forward
-KRDMD,2020,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1,carried_forward
-KRDMD,2021,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1,carried_forward
-KRDMD,2022,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1,carried_forward
-KRDMD,2023,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1,carried_forward
-KRDMD,2024,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1,carried_forward
-KRDMD,2025,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1,carried_forward
-KUYAS,2020,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1,carried_forward
-KUYAS,2021,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1,carried_forward
-KUYAS,2022,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1,carried_forward
-KUYAS,2023,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1,carried_forward
-KUYAS,2024,400000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1,carried_forward
-KUYAS,2025,400000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1,carried_forward
-MAVI,2020,49657000.0,user provided merged capital research,2020-2021 capital before later bonus issues,medium,issued_capital,1,carried_forward
-MAVI,2021,49657000.0,user provided merged capital research,2020-2021 capital before later bonus issues,medium,issued_capital,1,carried_forward
-MAVI,2022,99314000.0,user provided merged capital research,2022 100 percent bonus issue,medium,issued_capital,1,carried_forward
-MAVI,2023,198628000.0,user provided merged capital research,2023 100 percent bonus issue,medium,issued_capital,1,carried_forward
-MAVI,2024,397256000.0,user provided merged capital research,2024 100 percent bonus issue,medium,issued_capital,1,carried_forward
-MAVI,2025,794512000.0,user provided merged capital research,2025 100 percent bonus issue,medium,issued_capital,1,carried_forward
-MGROS,2020,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-MGROS,2021,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-MGROS,2022,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-MGROS,2023,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-MGROS,2024,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-MGROS,2025,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-MIATK,2020,30000000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1,carried_forward
-MIATK,2021,38000000.0,user provided merged capital research,IPO period capital; no 2020 row because listed later,medium,issued_capital,1,carried_forward
-MIATK,2022,38000000.0,user provided merged capital research,IPO period capital; no 2020 row because listed later,medium,issued_capital,1,carried_forward
-MIATK,2023,494000000.0,user provided merged capital research,2023 1200 percent bonus issue,medium,issued_capital,1,carried_forward
-MIATK,2024,494000000.0,user provided merged capital research,2023 1200 percent bonus issue,medium,issued_capital,1,carried_forward
-MIATK,2025,494000000.0,user provided merged capital research,2023 1200 percent bonus issue,medium,issued_capital,1,carried_forward
-OYAKC,2020,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-OYAKC,2021,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-OYAKC,2022,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-OYAKC,2023,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-OYAKC,2024,4861655783.0,user provided merged capital research,2024 289.99999 percent bonus issue,medium,issued_capital,1,carried_forward
-OYAKC,2025,4861655783.0,user provided merged capital research,2024 289.99999 percent bonus issue,medium,issued_capital,1,carried_forward
-PASEU,2020,168000000.0,user provided merged capital research,base capital before 2024 bonus issue; listed-year history should be checked,low,issued_capital,1,carried_forward
-PASEU,2021,168000000.0,user provided merged capital research,base capital before 2024 bonus issue; listed-year history should be checked,low,issued_capital,1,carried_forward
-PASEU,2022,168000000.0,user provided merged capital research,base capital before 2024 bonus issue; listed-year history should be checked,low,issued_capital,1,carried_forward
-PASEU,2023,168000000.0,user provided merged capital research,base capital before 2024 bonus issue; listed-year history should be checked,low,issued_capital,1,carried_forward
-PASEU,2024,672000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1,carried_forward
-PASEU,2025,672000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1,carried_forward
-PETKM,2020,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1,carried_forward
-PETKM,2021,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1,carried_forward
-PETKM,2022,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1,carried_forward
-PETKM,2023,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1,carried_forward
-PETKM,2024,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1,carried_forward
-PETKM,2025,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1,carried_forward
-PGSUS,2020,102299707.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-PGSUS,2021,102299707.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-PGSUS,2022,102299707.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-PGSUS,2023,102299707.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-PGSUS,2024,500000000.0,user provided merged capital research,2024 388.75995 percent bonus issue,medium,issued_capital,1,carried_forward
-PGSUS,2025,500000000.0,user provided merged capital research,2024 388.75995 percent bonus issue,medium,issued_capital,1,carried_forward
-SASA,2020,830000000.0,user provided merged capital research,issued capital in 2020 annual report,medium,issued_capital,1,carried_forward
-SASA,2021,1110000000.0,user provided merged capital research,capital shown in 2021 report,medium,issued_capital,1,carried_forward
-SASA,2022,2240000000.0,user provided merged capital research,2022 100 percent bonus issue,medium,issued_capital,1,carried_forward
-SASA,2023,5295959799.1,user provided merged capital research,2023 130 percent bonus issue proposal/result; verify final registered amount,medium,issued_capital,1,carried_forward
-SASA,2024,5295959799.1,user provided merged capital research,2023 130 percent bonus issue proposal/result; verify final registered amount,medium,issued_capital,1,carried_forward
-SASA,2025,5295959799.1,user provided merged capital research,2023 130 percent bonus issue proposal/result; verify final registered amount,medium,issued_capital,1,carried_forward
-SISE,2020,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1,carried_forward
-SISE,2021,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1,carried_forward
-SISE,2022,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1,carried_forward
-SISE,2023,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1,carried_forward
-SISE,2024,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1,carried_forward
-SISE,2025,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1,carried_forward
-TAVHL,2020,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TAVHL,2021,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TAVHL,2022,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TAVHL,2023,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TAVHL,2024,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TAVHL,2025,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TCELL,2020,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TCELL,2021,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TCELL,2022,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TCELL,2023,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TCELL,2024,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TCELL,2025,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-THYAO,2020,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-THYAO,2021,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-THYAO,2022,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-THYAO,2023,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-THYAO,2024,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-THYAO,2025,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TOASO,2020,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TOASO,2021,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TOASO,2022,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TOASO,2023,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TOASO,2024,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TOASO,2025,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TRALT,2020,152500000.0,user provided merged capital research,former KOZAL; stable before 2023 bonus issue,medium,issued_capital,1,carried_forward
-TRALT,2021,152500000.0,user provided merged capital research,former KOZAL; stable before 2023 bonus issue,medium,issued_capital,1,carried_forward
-TRALT,2022,152500000.0,user provided merged capital research,former KOZAL; stable before 2023 bonus issue,medium,issued_capital,1,carried_forward
-TRALT,2023,3202500000.0,user provided merged capital research,2023 2000 percent bonus issue,medium,issued_capital,1,carried_forward
-TRALT,2024,3202500000.0,user provided merged capital research,2023 2000 percent bonus issue,medium,issued_capital,1,carried_forward
-TRALT,2025,3202500000.0,user provided merged capital research,2023 2000 percent bonus issue,medium,issued_capital,1,carried_forward
-TRMET,2020,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TRMET,2021,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TRMET,2022,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TRMET,2023,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TRMET,2024,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TRMET,2025,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TSKB,2020,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1,carried_forward
-TSKB,2021,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1,carried_forward
-TSKB,2022,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1,carried_forward
-TSKB,2023,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1,carried_forward
-TSKB,2024,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1,carried_forward
-TSKB,2025,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1,carried_forward
-TTKOM,2020,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TTKOM,2021,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TTKOM,2022,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TTKOM,2023,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TTKOM,2024,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TTKOM,2025,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-TUPRS,2020,275256514.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1,carried_forward
-TUPRS,2021,275256514.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1,carried_forward
-TUPRS,2022,275256514.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1,carried_forward
-TUPRS,2023,1926795598.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1,carried_forward
-TUPRS,2024,1926795598.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1,carried_forward
-TUPRS,2025,1926795598.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1,carried_forward
-TURSG,2020,1161523363.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-TURSG,2021,1161523363.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-TURSG,2022,1161523363.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-TURSG,2023,1161523363.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1,carried_forward
-TURSG,2024,5000000000.0,user provided merged capital research,2024 330.47 percent bonus issue,medium,issued_capital,1,carried_forward
-TURSG,2025,10000000000.0,user provided merged capital research,2025 100 percent bonus issue,medium,issued_capital,1,carried_forward
-ULKER,2020,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-ULKER,2021,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-ULKER,2022,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-ULKER,2023,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-ULKER,2024,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
-ULKER,2025,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1,carried_forward
+AEFES,2020,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+AEFES,2021,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+AEFES,2022,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+AEFES,2023,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+AEFES,2024,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+AEFES,2025,5921052630.0,user provided merged capital research,2025 900 percent bonus issue,medium,issued_capital,1.0,carried_forward
+ARCLK,2020,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1.0,carried_forward
+ARCLK,2021,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1.0,carried_forward
+ARCLK,2022,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1.0,carried_forward
+ARCLK,2023,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1.0,carried_forward
+ARCLK,2024,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1.0,carried_forward
+ARCLK,2025,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1.0,carried_forward
+ASELS,2020,2280000000.0,user provided merged capital research,2020 year-end capital after 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
+ASELS,2021,2280000000.0,user provided merged capital research,2020 year-end capital after 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
+ASELS,2022,2280000000.0,user provided merged capital research,2020 year-end capital after 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
+ASELS,2023,4560000000.0,user provided merged capital research,2023 100 percent bonus issue; included because earlier research had specific SPK/KAP timing,low,issued_capital,1.0,carried_forward
+ASELS,2024,4560000000.0,user provided merged capital research,2023 100 percent bonus issue; included because earlier research had specific SPK/KAP timing,low,issued_capital,1.0,carried_forward
+ASELS,2025,4560000000.0,user provided merged capital research,2023 100 percent bonus issue; included because earlier research had specific SPK/KAP timing,low,issued_capital,1.0,carried_forward
+ASTOR,2020,,,,,,,missing_prior_event
+ASTOR,2021,,,,,,,missing_prior_event
+ASTOR,2022,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1.0,carried_forward
+ASTOR,2023,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1.0,carried_forward
+ASTOR,2024,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1.0,carried_forward
+ASTOR,2025,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1.0,carried_forward
+BIMAS,2020,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1.0,carried_forward
+BIMAS,2021,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1.0,carried_forward
+BIMAS,2022,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1.0,carried_forward
+BIMAS,2023,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1.0,carried_forward
+BIMAS,2024,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1.0,carried_forward
+BIMAS,2025,600000000.0,user provided merged capital research,capital reduction to 600m; 2026 bonus issue excluded from 2020-2025 model,low,issued_capital,1.0,carried_forward
+BRSAN,2020,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1.0,carried_forward
+BRSAN,2021,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1.0,carried_forward
+BRSAN,2022,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1.0,carried_forward
+BRSAN,2023,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1.0,carried_forward
+BRSAN,2024,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1.0,carried_forward
+BRSAN,2025,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1.0,carried_forward
+BTCIM,2020,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+BTCIM,2021,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+BTCIM,2022,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+BTCIM,2023,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+BTCIM,2024,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+BTCIM,2025,5580000000.0,user provided merged capital research,2025 3000 percent bonus issue,medium,issued_capital,1.0,carried_forward
+CANTE,2020,,,,,,,missing_prior_event
+CANTE,2021,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1.0,carried_forward
+CANTE,2022,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1.0,carried_forward
+CANTE,2023,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1.0,carried_forward
+CANTE,2024,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1.0,carried_forward
+CANTE,2025,7000000000.0,user provided merged capital research,capital reached 7bn by 2025/2026 process; exact effective year should be checked,low,issued_capital,1.0,carried_forward
+CCOLA,2020,254370782.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+CCOLA,2021,254370782.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+CCOLA,2022,254370782.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+CCOLA,2023,254370782.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+CCOLA,2024,2798078602.0,user provided merged capital research,2024 1000 percent bonus issue,medium,issued_capital,1.0,carried_forward
+CCOLA,2025,2798078602.0,user provided merged capital research,2024 1000 percent bonus issue,medium,issued_capital,1.0,carried_forward
+CIMSA,2020,135084442.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
+CIMSA,2021,135084442.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
+CIMSA,2022,135084442.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
+CIMSA,2023,945591094.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1.0,carried_forward
+CIMSA,2024,945591094.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1.0,carried_forward
+CIMSA,2025,945591094.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1.0,carried_forward
+DOAS,2020,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+DOAS,2021,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+DOAS,2022,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+DOAS,2023,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+DOAS,2024,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+DOAS,2025,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+DSTKF,2020,,,,,,,missing_prior_event
+DSTKF,2021,,,,,,,missing_prior_event
+DSTKF,2022,,,,,,,missing_prior_event
+DSTKF,2023,,,,,,,missing_prior_event
+DSTKF,2024,,,,,,,missing_prior_event
+DSTKF,2025,333333333.0,user provided merged capital research,2025 IPO capital after new share issue; no earlier rows because company was private,medium,issued_capital,1.0,carried_forward
+ENKAI,2020,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1.0,carried_forward
+ENKAI,2021,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1.0,carried_forward
+ENKAI,2022,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1.0,carried_forward
+ENKAI,2023,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1.0,carried_forward
+ENKAI,2024,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1.0,carried_forward
+ENKAI,2025,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1.0,carried_forward
+EREGL,2020,3500000000.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+EREGL,2021,3500000000.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+EREGL,2022,3500000000.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+EREGL,2023,3500000000.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+EREGL,2024,7000000000.0,user provided merged capital research,2024 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
+EREGL,2025,7000000000.0,user provided merged capital research,2024 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
+FROTO,2020,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+FROTO,2021,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+FROTO,2022,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+FROTO,2023,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+FROTO,2024,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
+FROTO,2025,3509100000.0,user provided merged capital research,2025 900 percent bonus issue,medium,issued_capital,1.0,carried_forward
+GUBRF,2020,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
+GUBRF,2021,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
+GUBRF,2022,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
+GUBRF,2023,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
+GUBRF,2024,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
+GUBRF,2025,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
+HEKTS,2020,860000000.0,user provided merged capital research,issued capital before 2022 capital increases,medium,issued_capital,1.0,carried_forward
+HEKTS,2021,860000000.0,user provided merged capital research,issued capital before 2022 capital increases,medium,issued_capital,1.0,carried_forward
+HEKTS,2022,2530000000.0,user provided merged capital research,2022 paid plus bonus capital increase,medium,issued_capital,1.0,carried_forward
+HEKTS,2023,2530000000.0,user provided merged capital research,2022 paid plus bonus capital increase,medium,issued_capital,1.0,carried_forward
+HEKTS,2024,8430000000.0,user provided merged capital research,2024 paid capital increase,medium,issued_capital,1.0,carried_forward
+HEKTS,2025,8430000000.0,user provided merged capital research,2024 paid capital increase,medium,issued_capital,1.0,carried_forward
+KONTR,2020,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1.0,carried_forward
+KONTR,2021,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1.0,carried_forward
+KONTR,2022,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1.0,carried_forward
+KONTR,2023,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1.0,carried_forward
+KONTR,2024,650000000.0,user provided merged capital research,2024 paid plus bonus capital increase,medium,issued_capital,1.0,carried_forward
+KONTR,2025,1300000000.0,user provided merged capital research,2025 paid capital increase; verify final registration,medium,issued_capital,1.0,carried_forward
+KRDMD,2020,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1.0,carried_forward
+KRDMD,2021,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1.0,carried_forward
+KRDMD,2022,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1.0,carried_forward
+KRDMD,2023,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1.0,carried_forward
+KRDMD,2024,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1.0,carried_forward
+KRDMD,2025,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1.0,carried_forward
+KUYAS,2020,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1.0,carried_forward
+KUYAS,2021,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1.0,carried_forward
+KUYAS,2022,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1.0,carried_forward
+KUYAS,2023,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1.0,carried_forward
+KUYAS,2024,400000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1.0,carried_forward
+KUYAS,2025,400000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1.0,carried_forward
+MAVI,2020,,,,,,,missing_prior_event
+MAVI,2021,,,,,,,missing_prior_event
+MAVI,2022,,,,,,,missing_prior_event
+MAVI,2023,,,,,,,missing_prior_event
+MAVI,2024,,,,,,,missing_prior_event
+MAVI,2025,,,,,,,missing_prior_event
+MGROS,2020,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+MGROS,2021,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+MGROS,2022,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+MGROS,2023,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+MGROS,2024,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+MGROS,2025,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+MIATK,2020,,,,,,,missing_prior_event
+MIATK,2021,38000000.0,user provided merged capital research,IPO period capital; no 2020 row because listed later,medium,issued_capital,1.0,carried_forward
+MIATK,2022,38000000.0,user provided merged capital research,IPO period capital; no 2020 row because listed later,medium,issued_capital,1.0,carried_forward
+MIATK,2023,494000000.0,user provided merged capital research,2023 1200 percent bonus issue,medium,issued_capital,1.0,carried_forward
+MIATK,2024,494000000.0,user provided merged capital research,2023 1200 percent bonus issue,medium,issued_capital,1.0,carried_forward
+MIATK,2025,494000000.0,user provided merged capital research,2023 1200 percent bonus issue,medium,issued_capital,1.0,carried_forward
+OYAKC,2020,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+OYAKC,2021,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+OYAKC,2022,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+OYAKC,2023,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+OYAKC,2024,4861655783.0,user provided merged capital research,2024 289.99999 percent bonus issue,medium,issued_capital,1.0,carried_forward
+OYAKC,2025,4861655783.0,user provided merged capital research,2024 289.99999 percent bonus issue,medium,issued_capital,1.0,carried_forward
+PASEU,2020,168000000.0,user provided merged capital research,base capital before 2024 bonus issue; listed-year history should be checked,low,issued_capital,1.0,carried_forward
+PASEU,2021,168000000.0,user provided merged capital research,base capital before 2024 bonus issue; listed-year history should be checked,low,issued_capital,1.0,carried_forward
+PASEU,2022,168000000.0,user provided merged capital research,base capital before 2024 bonus issue; listed-year history should be checked,low,issued_capital,1.0,carried_forward
+PASEU,2023,168000000.0,user provided merged capital research,base capital before 2024 bonus issue; listed-year history should be checked,low,issued_capital,1.0,carried_forward
+PASEU,2024,672000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1.0,carried_forward
+PASEU,2025,672000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1.0,carried_forward
+PETKM,2020,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1.0,carried_forward
+PETKM,2021,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1.0,carried_forward
+PETKM,2022,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1.0,carried_forward
+PETKM,2023,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1.0,carried_forward
+PETKM,2024,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1.0,carried_forward
+PETKM,2025,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1.0,carried_forward
+PGSUS,2020,102299707.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+PGSUS,2021,102299707.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+PGSUS,2022,102299707.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+PGSUS,2023,102299707.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+PGSUS,2024,500000000.0,user provided merged capital research,2024 388.75995 percent bonus issue,medium,issued_capital,1.0,carried_forward
+PGSUS,2025,500000000.0,user provided merged capital research,2024 388.75995 percent bonus issue,medium,issued_capital,1.0,carried_forward
+SASA,2020,830000000.0,user provided merged capital research,issued capital in 2020 annual report,medium,issued_capital,1.0,carried_forward
+SASA,2021,1110000000.0,user provided merged capital research,capital shown in 2021 report,medium,issued_capital,1.0,carried_forward
+SASA,2022,2240000000.0,user provided merged capital research,2022 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
+SASA,2023,5295959799.1,user provided merged capital research,2023 130 percent bonus issue proposal/result; verify final registered amount,medium,issued_capital,1.0,carried_forward
+SASA,2024,5295959799.1,user provided merged capital research,2023 130 percent bonus issue proposal/result; verify final registered amount,medium,issued_capital,1.0,carried_forward
+SASA,2025,5295959799.1,user provided merged capital research,2023 130 percent bonus issue proposal/result; verify final registered amount,medium,issued_capital,1.0,carried_forward
+SISE,2020,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
+SISE,2021,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
+SISE,2022,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
+SISE,2023,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
+SISE,2024,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
+SISE,2025,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
+TAVHL,2020,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TAVHL,2021,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TAVHL,2022,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TAVHL,2023,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TAVHL,2024,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TAVHL,2025,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TCELL,2020,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TCELL,2021,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TCELL,2022,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TCELL,2023,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TCELL,2024,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TCELL,2025,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+THYAO,2020,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+THYAO,2021,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+THYAO,2022,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+THYAO,2023,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+THYAO,2024,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+THYAO,2025,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TOASO,2020,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TOASO,2021,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TOASO,2022,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TOASO,2023,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TOASO,2024,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TOASO,2025,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TRALT,2020,,,,,,,missing_prior_event
+TRALT,2021,,,,,,,missing_prior_event
+TRALT,2022,,,,,,,missing_prior_event
+TRALT,2023,,,,,,,missing_prior_event
+TRALT,2024,,,,,,,missing_prior_event
+TRALT,2025,,,,,,,missing_prior_event
+TRMET,2020,,,,,,,missing_prior_event
+TRMET,2021,,,,,,,missing_prior_event
+TRMET,2022,,,,,,,missing_prior_event
+TRMET,2023,,,,,,,missing_prior_event
+TRMET,2024,,,,,,,missing_prior_event
+TRMET,2025,,,,,,,missing_prior_event
+TSKB,2020,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1.0,carried_forward
+TSKB,2021,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1.0,carried_forward
+TSKB,2022,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1.0,carried_forward
+TSKB,2023,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1.0,carried_forward
+TSKB,2024,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1.0,carried_forward
+TSKB,2025,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1.0,carried_forward
+TTKOM,2020,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TTKOM,2021,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TTKOM,2022,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TTKOM,2023,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TTKOM,2024,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TTKOM,2025,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TUPRS,2020,275256514.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
+TUPRS,2021,275256514.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
+TUPRS,2022,275256514.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
+TUPRS,2023,1926795598.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1.0,carried_forward
+TUPRS,2024,1926795598.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1.0,carried_forward
+TUPRS,2025,1926795598.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1.0,carried_forward
+TURSG,2020,1161523363.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+TURSG,2021,1161523363.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+TURSG,2022,1161523363.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+TURSG,2023,1161523363.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
+TURSG,2024,5000000000.0,user provided merged capital research,2024 330.47 percent bonus issue,medium,issued_capital,1.0,carried_forward
+TURSG,2025,10000000000.0,user provided merged capital research,2025 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
+ULKER,2020,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+ULKER,2021,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+ULKER,2022,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+ULKER,2023,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+ULKER,2024,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+ULKER,2025,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward

@@ -24,7 +24,7 @@
 
 ## Manual financial history
 - Present: **True**
-- Files: ['candidate_from_yearly_snapshots.csv', 'corrected_balance_sheet_2024.csv', 'corrected_yearly_financials_candidate.csv', 'free_valuation_history_candidate.csv']
+- Files: ['candidate_from_yearly_snapshots.csv', 'corrected_yearly_financials_candidate.csv', 'free_valuation_history_candidate.csv']
 - Rows ingested: 240
 - Accepted as features: ['gross_margin', 'ebitda_margin', 'net_margin', 'roe', 'roa', 'revenue', 'gross_profit', 'operating_income', 'ebitda', 'net_income', 'market_cap', 'enterprise_value', 'pe_ratio', 'pb_ratio', 'ev_ebitda']
 - Overrides from snapshot: {}
@@ -39,7 +39,7 @@
 - Old snapshot rejected but corrected accepted: ['ebitda', 'gross_profit', 'net_income', 'operating_income', 'revenue', 'roa', 'roe']
 - Still missing / rejected valuation: ['enterprise_value', 'ev_ebitda', 'ev_sales', 'market_capitalization', 'pb', 'pe', 'peg_ratio']
 - 2024 misaligned columns rejected: ['current_assets', 'ebitda_growth', 'equity', 'financial_debt_ratio', 'gross_profit_growth', 'leverage_ratio', 'long_term_liabilities', 'net_debt', 'net_income_growth', 'non_current_assets', 'operating_income_growth', 'revenue_growth', 'short_term_liabilities', 'total_assets', 'working_capital']
-- 2024 balance sheet corrected: yes (0 rows)
+- 2024 balance sheet corrected: no (0 rows)
 - Leakage columns rejected: ['price', 'period_return', 'day_return', 'volume', 'return_1w', 'return_1m', 'return_3m', 'return_6m', 'return_ytd', 'return_1y', 'return_3y', 'return_5y']
 
 > Some names (revenue, ebitda, roe, ...) appear as BOTH rejected and accepted because the OLD snapshot source repeated one value across years (rejected), while the CORRECTED yearly source genuinely changes year by year (accepted and now used by the model).

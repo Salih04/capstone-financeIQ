@@ -72,9 +72,9 @@
     "random_forest": {
       "kind": "ml",
       "n": 40,
-      "mae": 143.37,
-      "rmse": 204.04,
-      "spearman": -0.12,
+      "mae": 143.45,
+      "rmse": 204.09,
+      "spearman": -0.114,
       "precision_at_5": 0.0,
       "top_bucket_avg_return": 14.63,
       "median_actual_return": 44.38,

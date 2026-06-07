@@ -185,7 +185,7 @@
       "return_5y"
     ],
     "balance_2024_correction": {
-      "present": true,
+      "present": false,
       "rows_corrected": 0,
       "tickers": []
     },
@@ -562,7 +562,6 @@
   "manual_financials": {
     "files": [
       "candidate_from_yearly_snapshots.csv",
-      "corrected_balance_sheet_2024.csv",
       "corrected_yearly_financials_candidate.csv",
       "free_valuation_history_candidate.csv"
     ],
@@ -603,20 +602,7 @@
       "validation_notes"
     ],
     "misaligned_columns_rejected": [],
-    "all_null_columns_rejected": [
-      "total_assets",
-      "current_assets",
-      "non_current_assets",
-      "short_term_liabilities",
-      "long_term_liabilities",
-      "total_equity",
-      "working_capital",
-      "net_debt",
-      "current_ratio",
-      "leverage_ratio",
-      "financial_debt_ratio",
-      "net_debt_to_ebitda"
-    ],
+    "all_null_columns_rejected": [],
     "source_note": "Multiple manual sources detected. Corrected yearly source was prioritized for income/profitability fields; legacy snapshot source only filled fields it uniquely provided. This overlap is expected, not an error.",
     "issues": [],
     "present": true,
