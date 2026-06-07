@@ -8,9 +8,9 @@ Terminal" frontend. No paid APIs, no synthetic/fabricated data, no scrapers.
 > **Capstone status: complete.** The pipeline is rigorous and transparent. The
 > honest finding is that the model shows **no reliable predictive edge** on ~40
 > stocks/year (walk-forward Spearman ≈ 0). That is a defensible negative result,
-> not a bug — see `TASK_STATE.md`.
+> not a bug see `TASK_STATE.md`.
 
-**Validated features: 32** — balance-sheet + growth (reference), real per-year
+**Validated features: 32** balance-sheet + growth (reference), real per-year
 income/profitability (corrected yearly: revenue, margins, ROE, ROA, …), and
 free-derived valuation (market_cap, enterprise_value, pe_ratio, pb_ratio,
 ev_ebitda). Old frozen-snapshot valuation and price/return leakage are rejected.
@@ -82,7 +82,7 @@ Endpoints (`/research/summary`, `/research/company/{ticker}`,
 
 ### Run with / without an LLM
 ```bash
-# No LLM (default) — deterministic fallback, always works:
+# No LLM (default) deterministic fallback, always works:
 export RESEARCH_LLM_PROVIDER=none
 
 # LM Studio (OpenAI-compatible):
@@ -95,7 +95,7 @@ export RESEARCH_LLM_PROVIDER=ollama
 export RESEARCH_LLM_BASE_URL=http://localhost:11434/api/chat
 export RESEARCH_LLM_MODEL=qwen2.5:3b-instruct
 ```
-Any LLM error falls back to the deterministic path — it cannot break the pipeline.
+Any LLM error falls back to the deterministic path it cannot break the pipeline.
 
 ### Training preparation (no training here)
 ```bash
@@ -103,7 +103,7 @@ make research-agent-dataset     # instruction JSONL from real reports (sample co
 ```
 See `research_agent_training/` (`mlx_training_plan.md`, `prompt_policy.md`,
 `evaluation_rubric.md`, `schema.json`). LLM output is **never** written back into
-the modeling dataset. Research-support only — not investment advice.
+the modeling dataset. Research-support only not investment advice.
 
 ## Trusted data source (legacy reference)
 
@@ -125,7 +125,7 @@ and loaded into the `yearly_stocks` Postgres table (one row per ticker-year).
 The data contract lives in [`2.backend/app/trusted_data.py`](2.backend/app/trusted_data.py):
 column map, required/optional columns, percent vs. monetary fields, safe numeric
 parsing (BOM, thousands separators, negatives), and validation. Missing values
-stay null — they are never invented.
+stay null they are never invented.
 
 ### Pipeline commands
 
@@ -198,7 +198,7 @@ alembic upgrade head        # head includes 20260406_0006 (yearly_stocks)
 | Var | Purpose |
 |---|---|
 | `DATABASE_URL` | Postgres connection string |
-| `SECRET_KEY` | JWT signing key. **Not committed.** If unset, a random per-process key is generated (JWTs reset on restart) — set it explicitly in production. |
+| `SECRET_KEY` | JWT signing key. **Not committed.** If unset, a random per-process key is generated (JWTs reset on restart) set it explicitly in production. |
 | `TRUSTED_DATASETS_DIR` | Dir of trusted XLSX (default `3.Datasets/`) |
 | `TRUSTED_OUT_DIR` | Output dir for generated CSVs (default `data/trusted/`) |
 | `TRUSTED_COMBINED_CSV` | Combined CSV path used by the loader |
@@ -209,11 +209,11 @@ No real secrets are committed. `.env` is gitignored.
 
 Everything non-trusted is in [`unnecessary/`](unnecessary/README.md):
 
-- **Finnhub** — removed entirely (API key assumed leaked).
-- **News API / news page** — removed (not essential, was Finnhub-backed).
-- **Synthetic generator, seeders, KAP scraper, xlsx-into-quarterly importer** — quarantined.
-- **Old quarterly-CSV workflow** (`quarterly_fundamentals_2025.csv`, `load_trusted_fundamentals.py`) — retired in favor of the yearly XLSX pipeline.
-- **Hardcoded secrets** — the `SECRET_KEY` and `NEWS_API_KEY` defaults are gone.
+- **Finnhub** removed entirely (API key assumed leaked).
+- **News API / news page** removed (not essential, was Finnhub-backed).
+- **Synthetic generator, seeders, KAP scraper, xlsx-into-quarterly importer** quarantined.
+- **Old quarterly-CSV workflow** (`quarterly_fundamentals_2025.csv`, `load_trusted_fundamentals.py`) retired in favor of the yearly XLSX pipeline.
+- **Hardcoded secrets** the `SECRET_KEY` and `NEWS_API_KEY` defaults are gone.
 
 ## Known limitations (accepted)
 
@@ -222,7 +222,7 @@ Everything non-trusted is in [`unnecessary/`](unnecessary/README.md):
   treat scores as research support, not investment advice.
 - **Shares outstanding is manual.** No free historical source exists, so market_cap
   (and the valuation ratios derived from it) require the capital-event file. Until
-  supplied for a ticker, those values stay null — never fabricated.
+  supplied for a ticker, those values stay null never fabricated.
 - **2024 vendor export was column-misaligned.** Handled via the manual
   `corrected_balance_sheet_2024.csv` (shape-validated, 2024-only override); an
   upstream-clean export would still be preferable.
