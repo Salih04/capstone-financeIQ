@@ -151,6 +151,11 @@ automatically (see `2.backend/Dockerfile` CMD).
 ## Run with Docker
 
 ```bash
+export RESEARCH_LLM_PROVIDER=lmstudio
+export RESEARCH_LLM_BASE_URL=http://127.0.0.1:1234/v1/chat/completions
+export RESEARCH_LLM_MODEL=qwen3-30b-a3b-claude-4.5-opus-high-reasoning-2507-abliterated-uncensored-v2
+export RESEARCH_LLM_TIMEOUT=60
+export RESEARCH_SCORE_LLM_WEIGHT=0.15
 docker compose up --build
 ```
 
