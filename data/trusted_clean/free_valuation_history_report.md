@@ -12,9 +12,9 @@ Reconstruct missing valuation columns from FREE sources (no Fintables). Research
 |---|---|---|---|
 | market_cap | year_end_close × shares_outstanding | accepted | 208 |
 | pe | market_cap / net_income | accepted | 168 |
-| pb | market_cap / equity | accepted | 172 |
-| enterprise_value | market_cap + net_debt | accepted | 172 |
-| ev_ebitda | enterprise_value / ebitda | accepted | 159 |
+| pb | market_cap / equity | accepted | 208 |
+| enterprise_value | market_cap + net_debt | accepted | 208 |
+| ev_ebitda | enterprise_value / ebitda | accepted | 192 |
 
 ## Columns entering the model candidate
 
@@ -23,10 +23,8 @@ market_cap, enterprise_value, pe, pb, ev_ebitda
 ## Rejection summary
 
 - **market_cap**: missing_price=14, missing_shares=27
-- **enterprise_value**: suspect_2024_net_debt=36
 - **pe**: non_positive_net_income=35, absurd_value=5
-- **pb**: suspect_2024_equity=36
-- **ev_ebitda**: missing_enterprise_value=36, non_positive_ebitda=7, absurd_value=6
+- **ev_ebitda**: non_positive_ebitda=9, absurd_value=7
 
 ## Limitation
 
