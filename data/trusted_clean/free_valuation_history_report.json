@@ -20,6 +20,11 @@
     }
   },
   "shares_status": "manual",
+  "corrected_balance_sheet_2024": {
+    "present": true,
+    "tickers_corrected": 0,
+    "tickers": []
+  },
   "shares_template_path": null,
   "financial_dependency_coverage": {
     "net_income": 240,
@@ -35,11 +40,11 @@
     "ev_ebitda": "accepted"
   },
   "usable_values_by_column": {
-    "market_cap": 104,
-    "enterprise_value": 86,
-    "pe": 85,
-    "pb": 86,
-    "ev_ebitda": 81
+    "market_cap": 208,
+    "enterprise_value": 172,
+    "pe": 168,
+    "pb": 172,
+    "ev_ebitda": 159
   },
   "columns_entering_candidate": [
     "market_cap",
@@ -51,21 +56,22 @@
   "rejection_summary": {
     "market_cap": {
       "missing_price": 14,
-      "missing_shares": 135
+      "missing_shares": 27
     },
     "enterprise_value": {
-      "suspect_2024_net_debt": 18
+      "suspect_2024_net_debt": 36
     },
     "pe": {
-      "non_positive_net_income": 14,
+      "non_positive_net_income": 35,
       "absurd_value": 5
     },
     "pb": {
-      "suspect_2024_equity": 18
+      "suspect_2024_equity": 36
     },
     "ev_ebitda": {
-      "missing_enterprise_value": 18,
-      "absurd_value": 5
+      "missing_enterprise_value": 36,
+      "non_positive_ebitda": 7,
+      "absurd_value": 6
     }
   },
   "coverage_by_year": {
