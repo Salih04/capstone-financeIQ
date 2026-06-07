@@ -55,6 +55,7 @@ PRICES_MANUAL = RAW / "prices" / "year_end_prices_manual.csv"
 SHARES_MANUAL = RAW / "shares_outstanding_manual.csv"
 SHARES_TEMPLATE = RAW / "shares_outstanding_manual_template.csv"
 CANDIDATE = RAW / "financials" / "free_valuation_history_candidate.csv"
+CORRECTED_BS_2024 = RAW / "financials" / "corrected_balance_sheet_2024.csv"
 REPORT_JSON = CLEAN / "free_valuation_history_report.json"
 REPORT_MD = CLEAN / "free_valuation_history_report.md"
 
@@ -225,8 +226,30 @@ def load_shares() -> tuple[pd.DataFrame | None, str]:
         return None, "unreadable"
 
 
+def load_corrected_bs_2024() -> set[str]:
+    """Tickers whose 2024 equity AND net_debt are present (money-shaped) in the
+    manual correction file. Returns the set of tickers with usable 2024 values."""
+    if not CORRECTED_BS_2024.is_file():
+        return set()
+    try:
+        df = pd.read_csv(CORRECTED_BS_2024, comment="#")
+    except Exception:
+        return set()
+    df.columns = [str(c).strip().lower() for c in df.columns]
+    if not {"ticker", "year", "equity", "net_debt"}.issubset(df.columns):
+        return set()
+    df["ticker"] = df["ticker"].astype(str).str.upper().str.strip()
+    df = df[pd.to_numeric(df["year"], errors="coerce") == 2024]
+    eq = pd.to_numeric(df["equity"], errors="coerce")
+    nd = pd.to_numeric(df["net_debt"], errors="coerce")
+    # money-shaped: equity magnitude must look like money, not a ratio
+    ok = eq.notna() & nd.notna() & (eq.abs() >= 1000)
+    return set(df.loc[ok, "ticker"])
+
+
 def _load_financials() -> pd.DataFrame:
-    """net_income, equity, ebitda, net_debt from the validated modeling dataset."""
+    """net_income, equity, ebitda, net_debt from the validated modeling dataset,
+    with 2024 equity/net_debt overridden by the manual correction file where valid."""
     cols = ["ticker", "year", "net_income", "equity", "ebitda", "net_debt"]
     df = pd.read_csv(MODELING_CSV)
     have = [c for c in cols if c in df.columns]
@@ -237,6 +260,21 @@ def _load_financials() -> pd.DataFrame:
             f[c] = pd.to_numeric(f[c], errors="coerce")
         else:
             f[c] = np.nan
+    # override 2024 equity/net_debt from the corrected balance-sheet file
+    if CORRECTED_BS_2024.is_file():
+        try:
+            c = pd.read_csv(CORRECTED_BS_2024, comment="#")
+            c.columns = [str(x).strip().lower() for x in c.columns]
+            c["ticker"] = c["ticker"].astype(str).str.upper().str.strip()
+            c = c[pd.to_numeric(c["year"], errors="coerce") == 2024]
+            for fld in ("equity", "net_debt"):
+                if fld in c.columns:
+                    m = {t: v for t, v in zip(c["ticker"], pd.to_numeric(c[fld], errors="coerce"))
+                         if pd.notna(v) and abs(v) >= 1000}
+                    mask = (f["year"] == 2024) & f["ticker"].isin(m)
+                    f.loc[mask, fld] = f.loc[mask, "ticker"].map(m)
+        except Exception:
+            pass
     return f
 
 
@@ -256,6 +294,7 @@ def build(log=print) -> dict:
     have_shares = ensure_shares_template(tickers)
     shares, shares_status = load_shares()
     fin = _load_financials()
+    corrected_bs_2024 = load_corrected_bs_2024()   # tickers with usable corrected 2024 equity/net_debt
 
     base = pd.DataFrame([(t, y) for t in tickers for y in YEARS], columns=["ticker", "year"])
     base = base.merge(prices[["ticker", "year", "year_end_close", "source"]].rename(columns={"source": "source_price"}),
@@ -290,8 +329,9 @@ def build(log=print) -> dict:
             if mc <= 0:
                 mc = None; rej("market_cap", "non_positive"); notes.append("market_cap_non_positive")
 
-        # 2024 balance-sheet block is misaligned -> distrust equity/net_debt for 2024
-        bs_2024_suspect = (y == 2024)
+        # 2024 balance-sheet block is misaligned -> distrust equity/net_debt for 2024,
+        # UNLESS a valid manual correction (corrected_balance_sheet_2024.csv) supplies it.
+        bs_2024_suspect = (y == 2024) and (r["ticker"] not in corrected_bs_2024)
 
         if mc is not None:
             # P/E
@@ -382,6 +422,11 @@ def build(log=print) -> dict:
             "yahoo_meta": price_meta,
         },
         "shares_status": shares_status,
+        "corrected_balance_sheet_2024": {
+            "present": CORRECTED_BS_2024.is_file(),
+            "tickers_corrected": len(corrected_bs_2024),
+            "tickers": sorted(corrected_bs_2024),
+        },
         "shares_template_path": _rel(SHARES_TEMPLATE) if not have_shares else None,
         "financial_dependency_coverage": {
             c: int(pd.to_numeric(base[c], errors="coerce").notna().sum())

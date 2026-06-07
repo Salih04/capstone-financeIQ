@@ -82,6 +82,21 @@ def _source_distinction() -> dict:
             mis = sorted((j.get("misalignment_2024_evidence") or {}).keys())
         except Exception:
             pass
+    corrected_bs = {"present": False, "rows_corrected": 0, "tickers": []}
+    cbs = P.RAW_DIR / "financials" / "corrected_balance_sheet_2024.csv"
+    if cbs.is_file():
+        try:
+            import pandas as _pd
+            c = _pd.read_csv(cbs, comment="#")
+            c.columns = [str(x).strip().lower() for x in c.columns]
+            eq = _pd.to_numeric(c.get("equity"), errors="coerce")
+            valid = c[(eq.notna()) & (eq.abs() >= 1000)] if "equity" in c.columns else c.iloc[0:0]
+            corrected_bs = {"present": True, "rows_corrected": int(len(valid)),
+                            "tickers": sorted(valid["ticker"].astype(str).str.upper().unique())
+                            if "ticker" in valid.columns else []}
+        except Exception:
+            corrected_bs = {"present": True, "rows_corrected": 0, "tickers": []}
+
     free_val = {}
     if FREE_VALUATION_REPORT.is_file():
         try:
@@ -99,6 +114,7 @@ def _source_distinction() -> dict:
         "still_rejected_valuation_columns": froz or STILL_MISSING_VALUATION,
         "rejected_2024_misaligned_columns": mis,
         "rejected_leakage_columns": LEAKAGE_FIELDS,
+        "balance_2024_correction": corrected_bs,
         "free_valuation_builder": free_val or {"attempted": False},
         "old_snapshot_rejected_but_corrected_accepted": [c for c in acc if c in
             ("revenue", "ebitda", "net_income", "roe", "roa", "gross_profit", "operating_income")],
@@ -218,6 +234,8 @@ def _write_md(r: dict) -> None:
                   f"- Old snapshot rejected but corrected accepted: {sd.get('old_snapshot_rejected_but_corrected_accepted', [])}",
                   f"- Still missing / rejected valuation: {sd.get('still_rejected_valuation_columns', [])}",
                   f"- 2024 misaligned columns rejected: {sd.get('rejected_2024_misaligned_columns', [])}",
+                  f"- 2024 balance sheet corrected: {'yes' if (sd.get('balance_2024_correction', {}) or {}).get('present') else 'no'}"
+                  f" ({(sd.get('balance_2024_correction', {}) or {}).get('rows_corrected', 0)} rows)",
                   f"- Leakage columns rejected: {sd.get('rejected_leakage_columns', [])}",
                   "", f"> {sd.get('source_note', '')}", ""]
     lines += ["## Frozen reference columns EXCLUDED from features (unreliable snapshot)",

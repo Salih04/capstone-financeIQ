@@ -33,6 +33,8 @@ export default function DataQualityPage() {
   const accCorrected = sd.accepted_corrected_yearly_columns || cy.accepted_columns || []
   const missingVal = sd.still_rejected_valuation_columns || cy.frozen_valuation_columns || []
   const mis2024 = sd.rejected_2024_misaligned_columns || cy.misalignment_2024_columns || []
+  const bs2024 = sd.balance_2024_correction || {}
+  const bs2024Fixed = bs2024.present && (bs2024.rows_corrected || 0) > 0
   const oldSnapshot = d.frozen_columns || ctx.rejected_frozen_columns || []
   const featureCount = ctx.feature_count
 
@@ -44,7 +46,7 @@ export default function DataQualityPage() {
         <MetricCard label="Features used by model" value={asText(featureCount)} tone="good" sub="change year to year" />
         <MetricCard label="Newly accepted" value={asText(accCorrected.length)} tone="good" sub="corrected income/profit" />
         <MetricCard label="Still missing valuation" value={asText(missingVal.length)} tone="warn" sub="repeated snapshot" />
-        <MetricCard label="2024 file issue" value={mis2024.length ? 'Detected' : 'None'} tone={mis2024.length ? 'warn' : 'good'} sub="columns shifted" />
+        <MetricCard label="2024 balance sheet" value={bs2024Fixed ? 'Corrected' : mis2024.length ? 'Issue detected' : 'OK'} tone={bs2024Fixed ? 'good' : mis2024.length ? 'warn' : 'good'} sub={bs2024Fixed ? `${bs2024.rows_corrected} rows fixed` : 'columns shifted'} />
         <MetricCard label="Market benchmark" value={bench.excess_outperform_targets_enabled ? 'Available' : 'Missing'} tone={bench.excess_outperform_targets_enabled ? 'good' : 'warn'} sub="BIST100" />
       </div>
 
@@ -88,17 +90,28 @@ export default function DataQualityPage() {
         </WarningCallout>
       </EvidencePanel>
 
-      {/* Section E — 2024 file issue */}
-      {mis2024.length > 0 && (
+      {/* Section E — 2024 balance sheet: corrected (green) or still-issue (amber) */}
+      {bs2024Fixed ? (
+        <EvidencePanel title="E · 2024 balance sheet corrected" tone="good"
+          sub={`Manual correction applied for ${bs2024.rows_corrected} ticker(s) (corrected_balance_sheet_2024.csv)`}>
+          <p style={{ fontSize: 12.5, color: 'var(--text-2)', margin: 0, lineHeight: 1.55 }}>
+            The 2024 export had shifted balance-sheet columns. Real 2024 values were supplied manually
+            (money as money, ratios as ratios) and override only the 2024 balance-sheet fields. P/B,
+            enterprise value and EV/EBITDA for those tickers are recomputed from the corrected equity / net debt.
+          </p>
+          {(bs2024.tickers || []).length ? <RenderList items={bs2024.tickers} color="success" /> : null}
+        </EvidencePanel>
+      ) : mis2024.length > 0 ? (
         <EvidencePanel title="E · 2024 export alignment issue" tone="warn"
           sub="Some balance-sheet fields in the 2024 file appear shifted into the wrong columns">
           <RenderList items={mis2024} color="warning" empty="none" />
           <p style={{ fontSize: 12, color: 'var(--text-3)', margin: 0, lineHeight: 1.5 }}>
             Rather than guessing or filling these values, the affected 2024 cells were rejected. The model never
-            sees shifted/misaligned numbers.
+            sees shifted/misaligned numbers. Supply real 2024 values via
+            <code> data/trusted_raw/financials/corrected_balance_sheet_2024.csv</code> to fix this.
           </p>
         </EvidencePanel>
-      )}
+      ) : null}
 
       {/* Free valuation builder status */}
       {fv.attempted && (

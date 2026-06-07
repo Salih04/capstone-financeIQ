@@ -47,6 +47,11 @@ _CANON: dict[str, list[str]] = {
     "total_equity": ["total_equity", "equity", "shareholders_equity"],
     "working_capital": ["working_capital"],
     "net_debt": ["net_debt"],
+    # balance-sheet ratios (override only via corrected 2024 file)
+    "current_ratio": ["current_ratio"],
+    "leverage_ratio": ["leverage_ratio"],
+    "financial_debt_ratio": ["financial_debt_ratio"],
+    "net_debt_to_ebitda": ["net_debt_to_ebitda", "net_debt_ebitda"],
     # valuation
     "market_cap": ["market_cap", "market_capitalization"],
     "enterprise_value": ["enterprise_value", "ev"],
@@ -71,6 +76,10 @@ OVERRIDE_MAP = {
     "long_term_liabilities": "long_term_liabilities",
     "working_capital": "working_capital",
     "net_debt": "net_debt",
+    "current_ratio": "current_ratio",
+    "leverage_ratio": "leverage_ratio",
+    "financial_debt_ratio": "financial_debt_ratio",
+    "net_debt_to_ebitda": "net_debt_to_ebitda",
 }
 MANUAL_NUMERIC = set(_CANON.keys())
 _ALIAS_TO_CANON = {a: c for c, al in _CANON.items() for a in al}
@@ -78,6 +87,7 @@ _ALIAS_TO_CANON = {a: c for c, al in _CANON.items() for a in al}
 
 # Manual-source priority (lower = higher priority) for resolving expected overlap.
 _SOURCE_PRIORITY = {
+    "corrected_balance_sheet_2024.csv": 0,            # manual 2024 balance-sheet correction
     "corrected_yearly_financials_candidate.csv": 0,   # verified per-year income/profitability
     "free_valuation_history_candidate.csv": 1,        # free-derived valuation (price x shares)
     "all_financials.csv": 2,
@@ -137,6 +147,33 @@ def _coerce_numeric(series: pd.Series) -> tuple[pd.Series, float]:
     return num, failed / denom
 
 
+# Money fields (TL magnitudes) vs ratio fields, for the corrected 2024 file.
+_MONEY_FIELDS = {"total_assets", "current_assets", "non_current_assets",
+                 "short_term_liabilities", "long_term_liabilities", "equity",
+                 "working_capital", "net_debt"}
+_RATIO_FIELDS = {"current_ratio", "leverage_ratio", "financial_debt_ratio", "net_debt_to_ebitda"}
+_MONEY_MIN_ABS = 1_000.0      # a money cell below this looks like a ratio (shifted)
+_RATIO_MAX_ABS = 10_000.0     # a ratio cell above this looks like a money magnitude
+
+
+def _enforce_money_ratio_shape(out: pd.DataFrame, name: str, rep: ManualReport) -> pd.DataFrame:
+    for c in list(out.columns):
+        if c in ("ticker", "year"):
+            continue
+        v = pd.to_numeric(out[c], errors="coerce")
+        if c in _MONEY_FIELDS:
+            bad = v.notna() & (v.abs() < _MONEY_MIN_ABS)   # ratio sitting in money slot
+        elif c in _RATIO_FIELDS:
+            bad = v.notna() & (v.abs() > _RATIO_MAX_ABS)    # money sitting in ratio slot
+        else:
+            continue
+        nbad = int(bad.sum())
+        if nbad:
+            out.loc[bad, c] = pd.NA
+            rep.issues.append(f"{name}: {nbad} {c} cell(s) failed money/ratio shape check (nulled)")
+    return out
+
+
 def _read_one(path: Path, rep: ManualReport, strict: bool) -> pd.DataFrame | None:
     try:
         df = pd.read_csv(path, comment="#")
@@ -192,6 +229,12 @@ def _read_one(path: Path, rep: ManualReport, strict: bool) -> pd.DataFrame | Non
                 continue
             continue
         out[canon] = num
+
+    # Corrected 2024 balance sheet: enforce money-vs-ratio shape so a shifted file
+    # cannot poison the dataset. Money fields must look like money (large), ratio
+    # fields like ratios (small); offending cells are nulled (never imputed).
+    if path.name.lower() == "corrected_balance_sheet_2024.csv":
+        out = _enforce_money_ratio_shape(out, path.name, rep)
 
     # duplicate ticker-year within file
     dup = out.duplicated(["ticker", "year"]).sum()
