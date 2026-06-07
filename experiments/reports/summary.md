@@ -38,10 +38,10 @@ all out-of-sample numbers as noisy and overfitting-prone.
 
 | split     | model                 | kind     |    mae |   rmse |   spearman |   precision_at_5 |   top_bucket_avg_return |   median_actual_return |   directional_acc |
 |:----------|:----------------------|:---------|-------:|-------:|-----------:|-----------------:|------------------------:|-----------------------:|------------------:|
-| test_2025 | linear_regression     | ml       | 159.92 | 201.39 |      0.308 |              0.2 |                   34.53 |                   1.64 |              0.55 |
-| test_2025 | lasso                 | ml       | 113.08 | 132.01 |      0.225 |              0.2 |                   26.6  |                   1.64 |              0.55 |
-| test_2025 | baseline_equal_weight | baseline |  35.19 |  75.76 |      0.087 |              0.4 |                   60.23 |                   1.64 |              0.55 |
-| test_2025 | baseline_rank_score   | baseline |  35.19 |  75.76 |      0.087 |              0.4 |                   60.23 |                   1.64 |              0.55 |
-| test_2025 | ridge                 | ml       | 103.68 | 112.57 |      0.078 |              0   |                   10.89 |                   1.64 |              0.45 |
-| test_2025 | random_forest         | ml       | 107.94 | 123.02 |     -0.137 |              0.4 |                  107.21 |                   1.64 |              0.4  |
-| test_2025 | elasticnet            | ml       | 103.51 | 111.57 |     -0.148 |              0.2 |                   43.83 |                   1.64 |              0.4  |
+| test_2025 | linear_regression     | ml       | 119.32 | 148.12 |      0.032 |              0   |                   25.05 |                   1.64 |              0.45 |
+| test_2025 | baseline_equal_weight | baseline |  35.2  |  75.78 |     -0.034 |              0.2 |                   42.96 |                   1.64 |              0.45 |
+| test_2025 | baseline_rank_score   | baseline |  35.2  |  75.78 |     -0.034 |              0.2 |                   42.96 |                   1.64 |              0.45 |
+| test_2025 | lasso                 | ml       | 111.59 | 130.48 |     -0.114 |              0   |                    4.42 |                   1.64 |              0.4  |
+| test_2025 | ridge                 | ml       | 107.18 | 121.39 |     -0.173 |              0   |                   -3.57 |                   1.64 |              0.45 |
+| test_2025 | random_forest         | ml       | 109.54 | 128.48 |     -0.244 |              0.2 |                   74.56 |                   1.64 |              0.4  |
+| test_2025 | elasticnet            | ml       | 104.56 | 116.13 |     -0.29  |              0   |                   -3.57 |                   1.64 |              0.4  |
