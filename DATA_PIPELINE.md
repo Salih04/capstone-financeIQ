@@ -1,5 +1,13 @@
 # Data pipeline — T → T+1 modeling dataset
 
+> **Current state (2026-06): 32 validated features.** Full run is
+> `make full-research` (extract → benchmark → ingest-corrected-yearly → valuation →
+> data → experiments). Added since the original write-up: corrected per-year
+> income/profitability (17→27), free valuation reconstruction (Yahoo year-end price ×
+> manual shares → market_cap/P-E/P-B/EV/EV-EBITDA, 27→32), capital-event shares
+> (`make shares`), and a 2024 balance-sheet manual correction. Acceptance is
+> sparse-aware; frozen-snapshot and price/return leakage stay rejected.
+
 Goal: study whether **year-T** financial metrics relate to **year-(T+1)**
 realized stock return for BIST companies. Research/educational only — **not
 investment advice.**

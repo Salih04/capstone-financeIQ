@@ -3,6 +3,12 @@
 How FinanceIQ scores BIST stocks and validates those scores against realized
 performance. Written to be honest about what the scores can and cannot do.
 
+> **Honest result (2026-06):** with 32 validated features (incl. real income/
+> profitability and free-reconstructed valuation) the walk-forward signal is still
+> **weak/unstable** — mean Spearman ≈ 0 and ML does not consistently beat a simple
+> baseline on ~40 stocks/year. Scores are research support, **not** investment advice.
+> Hybrid research score = 0.65·ML + 0.20·confidence + 0.15·LLM, components always shown.
+
 ## Data
 
 Single trusted source: the 2020–2025 yearly dataset

@@ -2,6 +2,45 @@
 
 All notable changes to FinanceIQ, most recent first.
 
+## [3.1.0] — 2026-06 — Research Terminal + honest T→T+1 research system
+
+### Added
+- **T→T+1 modeling pipeline** (`make data` / `scripts.data_collection`) — leakage-safe
+  year-T features → year-(T+1) realized return. Validated `modeling_dataset_2020_2025.csv`
+  + `data_quality_report.{json,md}`; no fabrication, frozen-snapshot columns excluded.
+- **Corrected yearly financials** — real per-year income/profitability (revenue,
+  gross/operating income, EBITDA, net income, margins, ROE, ROA): **17 → 27 features**.
+- **BIST100 benchmark** (Yahoo, free) → excess-return / outperform-BIST100 targets.
+- **Free valuation builder** (`make valuation`) — reconstructs market_cap, enterprise_value,
+  pe_ratio, pb_ratio, ev_ebitda from free Yahoo year-end price × manual shares × validated
+  financials. No Fintables Pro. **27 → 32 features** once shares are supplied.
+- **Capital-event shares workflow** (`make shares`) — record only capital CHANGES in
+  `shares_outstanding_events.csv`; carried forward per year. Free-float rejected for market cap.
+- **2024 balance-sheet correction** (`corrected_balance_sheet_2024.csv`) — money/ratio
+  shape-validated; overrides only 2024 balance-sheet fields; recomputes P/B, EV, EV/EBITDA.
+- **Research Agent** (`/research/*`, `/research-agent`) — explainable hybrid score
+  (0.65·ML + 0.20·confidence + 0.15·LLM), decision-support verdict, grounded intents
+  (benchmark outperformers, top-ranked, data-quality, valuation), optional LM Studio/Ollama
+  with robust JSON repair and deterministic fallback. Never investment advice.
+- **Research Terminal frontend** — redesigned dashboard, data-quality (source distinction),
+  experiments, benchmark, companies pages; business-friendly copy.
+- **AutoResearch training prep** (`research_agent_training/`) — dataset generate/validate/
+  evaluate/iterate. No training, no model downloads, no paid APIs.
+
+### Changed
+- Sparse-aware manual-feature acceptance (sparse-but-varying accepted; frozen/leakage rejected).
+- Walk-forward experiments report an honest verdict: no reliable predictive edge yet.
+
+### Fixed
+- Research Agent `/ask` 500 (numpy int64 serialization); Score Explorer stale benchmark text;
+  Forecasting filters (union of cohort + uploaded fundamentals) + friendly errors + re-clickable actions.
+
+### Notes
+- Honest finding: model signal remains weak/unstable (~40 stocks/year). The deliverable is a
+  rigorous, transparent pipeline + honest negative result, not alpha.
+
+---
+
 ## [Unreleased / HEAD] — 2026-05-31
 
 No unreleased changes beyond HEAD.

@@ -1,5 +1,13 @@
 # Data requirements & manual ingestion
 
+> **Update (2026-06):** Most of what this doc asked for is now ingested. Real
+> per-year income/profitability are accepted (corrected yearly files); valuation is
+> reconstructed for free (Yahoo year-end price × manual shares). Remaining manual
+> inputs: **shares outstanding** via the capital-event file
+> (`data/trusted_raw/shares_outstanding_events.csv`, run `make shares`) and **2024
+> balance-sheet** fixes via `data/trusted_raw/financials/corrected_balance_sheet_2024.csv`.
+> With these supplied the dataset reaches **32 validated features**.
+
 The automated pipeline produces a valid T→T+1 **structure** and **real next-year
 return targets**, but the year-T **fundamentals are provisional** (only the
 genuinely-varying balance-sheet / leverage / growth columns from the reference

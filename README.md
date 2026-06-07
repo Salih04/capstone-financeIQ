@@ -1,8 +1,19 @@
 # FinanceIQ
 
-Forecasting and comparison platform for BIST stocks, driven by a single trusted
-local dataset: the **2020–2025 yearly stock XLSX files**. No external APIs, no
-synthetic data, no scrapers.
+An honest, leakage-safe **T→T+1 equity-research system** for 40 BIST companies
+(2020–2025): a validated modeling dataset, a BIST100 benchmark, a free-data
+valuation reconstruction, an explainable hybrid research agent, and a "Research
+Terminal" frontend. No paid APIs, no synthetic/fabricated data, no scrapers.
+
+> **Capstone status: complete.** The pipeline is rigorous and transparent. The
+> honest finding is that the model shows **no reliable predictive edge** on ~40
+> stocks/year (walk-forward Spearman ≈ 0). That is a defensible negative result,
+> not a bug — see `TASK_STATE.md`.
+
+**Validated features: 32** — balance-sheet + growth (reference), real per-year
+income/profitability (corrected yearly: revenue, margins, ROE, ROA, …), and
+free-derived valuation (market_cap, enterprise_value, pe_ratio, pb_ratio,
+ev_ebitda). Old frozen-snapshot valuation and price/return leakage are rejected.
 
 ## Architecture
 
@@ -32,14 +43,25 @@ The correct **T → T+1** modeling dataset (year-T features → year-(T+1) reali
 return) is built by a separate, validated pipeline:
 
 ```bash
-make data        # or: PYTHONPATH=. python -m scripts.data_collection.build_all
+make full-research        # full pipeline: extract → benchmark → corrected yearly
+                          #   → free valuation → build → experiments
+# or individual stages:
+make shares               # expand capital-event shares → per-year (carry-forward)
+make valuation            # free valuation: Yahoo price × shares × financials → ratios
+make data                 # build + validate the T→T+1 modeling dataset
 ```
 
 Outputs in `data/trusted_clean/` (`modeling_dataset_2020_2025.csv`,
-`data_quality_report.json/.md`, `data_dictionary.md`). See **[DATA_PIPELINE.md](DATA_PIPELINE.md)**
-and **[DATA_REQUIREMENTS.md](DATA_REQUIREMENTS.md)**. Real income-statement/valuation
-history must be ingested manually (see DATA_REQUIREMENTS) for true prediction;
-the current targets are real, the year-T fundamentals are provisional.
+`data_quality_report.json/.md`, `free_valuation_history_report.*`,
+`corrected_yearly_ingestion_report.*`, `data_dictionary.md`). See
+**[DATA_PIPELINE.md](DATA_PIPELINE.md)** and **[DATA_REQUIREMENTS.md](DATA_REQUIREMENTS.md)**.
+
+Real per-year income/profitability is now ingested (corrected yearly files) and
+valuation is reconstructed for free from Yahoo year-end price × manual shares
+outstanding. Supply shares via the capital-event file
+(`data/trusted_raw/shares_outstanding_events.csv`) and 2024 fixes via
+`data/trusted_raw/financials/corrected_balance_sheet_2024.csv`. Targets are real;
+no value is fabricated or imputed.
 
 ## Research Assistant (local-LLM-assisted)
 
@@ -188,18 +210,22 @@ Everything non-trusted is in [`unnecessary/`](unnecessary/README.md):
 - **Old quarterly-CSV workflow** (`quarterly_fundamentals_2025.csv`, `load_trusted_fundamentals.py`) — retired in favor of the yearly XLSX pipeline.
 - **Hardcoded secrets** — the `SECRET_KEY` and `NEWS_API_KEY` defaults are gone.
 
-## Known limitations
+## Known limitations (accepted)
 
-- **Forecasting engine still reads the legacy `quarterly_fundamentals` /
-  `winner_cohort_rows` tables.** The trusted yearly data now lives in
-  `yearly_stocks`; wiring the scoring/forecasting engine onto it is the next
-  integration step (the data layer is ready; the contract maps 1:1 to the
-  features it needs). Until then, forecasting returns clear empty/insufficient
-  results rather than fabricated ones.
-- **No winner/target labels** ship with the trusted data. Supervised scoring
-  must not be presented as trained until real labels are provided. No labels are
-  generated or inferred.
-- The dataset is **yearly**, not quarterly. Period selection is a year
-  (2020–2025); year-over-year and multi-year comparisons use only data up to the
-  selected year (no future-year leakage — enforced in `validate_trusted_data`).
+- **No reliable predictive edge.** With ~40 stocks/year the walk-forward signal is
+  weak/unstable and ML does not beat a simple baseline. This is the honest result;
+  treat scores as research support, not investment advice.
+- **Shares outstanding is manual.** No free historical source exists, so market_cap
+  (and the valuation ratios derived from it) require the capital-event file. Until
+  supplied for a ticker, those values stay null — never fabricated.
+- **2024 vendor export was column-misaligned.** Handled via the manual
+  `corrected_balance_sheet_2024.csv` (shape-validated, 2024-only override); an
+  upstream-clean export would still be preferable.
+- **Forecasting (legacy `/forecasting`)** is functional: `/forecasting/filters`
+  unions cohort + uploaded fundamentals, actions return friendly errors (never raw
+  500) and stay re-clickable. It remains a separate legacy tool from the Research
+  Terminal.
+- Dataset is **yearly**; the quarterly Fintables exports are a frozen snapshot and
+  are excluded (see `make inspect-quarterly`). No future-year leakage (enforced in
+  `validate.py`).
 ```

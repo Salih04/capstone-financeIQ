@@ -2,15 +2,24 @@
 
 ## What it is
 
-FinanceIQ is a capstone project: a web-based forecasting and stock-scoring platform for BIST (Borsa Istanbul) equities. Users upload yearly winner cohort Excel files (2020–2025), upload quarterly fundamental CSVs, train sector-specific scoring models, generate stock rankings, and evaluate model stability via rolling time-based cross-validation.
+FinanceIQ is a capstone project: an honest, leakage-safe **T→T+1 equity-research
+system** for 40 BIST (Borsa Istanbul) companies, 2020–2025. It builds a validated
+modeling dataset (year-T features → year-(T+1) realized return), a BIST100 benchmark,
+a free-data valuation reconstruction, walk-forward experiments, an explainable hybrid
+research agent (optional local LLM), and a "Research Terminal" frontend. A legacy
+sector-forecasting tool remains available at `/forecasting`.
+
+**Status: complete.** Honest finding: no reliable predictive edge on ~40 stocks/year
+— a rigorous pipeline + transparent negative result, not alpha. See `TASK_STATE.md`.
 
 ## Goals
 
-- Rank BIST stocks within a sector/year using real financial fundamentals (no synthetic data)
-- Surface explainable scores — each stock's score traces back to weighted financial parameters
-- Support multiple scoring "model types" (scoring, xgboost, arima, prophet, dbscan, gmm) on top of one unified parameter-scoring pipeline
-- Provide rolling time-CV evaluation (rank stability + overlap@K) to validate model generalization
-- Show news/AI insights, portfolio optimization suggestions, and data health monitoring
+- Build a leakage-safe T→T+1 dataset from real data only (no synthetic, no fabrication)
+- Reconstruct missing valuation (market_cap, P/E, P/B, EV, EV/EBITDA) from FREE sources
+  (Yahoo year-end price × manual shares × validated financials) instead of paid APIs
+- Evaluate honestly via walk-forward CV vs a simple baseline (report weak signal as-is)
+- Provide explainable, bounded research support — never investment advice
+- Keep every accepted/rejected column traceable to its source and reason
 
 ## Users
 
