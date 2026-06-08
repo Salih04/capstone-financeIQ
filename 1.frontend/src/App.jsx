@@ -5,7 +5,6 @@ import SearchPage from './pages/SearchPage'
 import CompanyPage from './pages/CompanyPage'
 import ScoreResultPage from './pages/ScoreResultPage'
 import ComparePage from './pages/ComparePage'
-import ReportsPage from './pages/ReportsPage'
 import AdminPage from './pages/AdminPage'
 import ValidationLabPage from './pages/ValidationLabPage'
 import DataHealthPage from './pages/DataHealthPage'
@@ -42,7 +41,7 @@ export default function App() {
       <Route path="/companies/:id" element={<Protected><CompanyPage /></Protected>} />
       <Route path="/score-runs/:id" element={<Protected><ScoreResultPage /></Protected>} />
       <Route path="/compare" element={<Protected><ComparePage /></Protected>} />
-      <Route path="/reports" element={<Protected><ReportsPage /></Protected>} />
+      <Route path="/reports" element={<Navigate to="/dashboard" replace />} />
       <Route path="/admin" element={<Protected><AdminPage /></Protected>} />
       <Route path="/validation" element={<Protected><ValidationLabPage /></Protected>} />
       <Route path="/data-health" element={<Protected><DataHealthPage /></Protected>} />

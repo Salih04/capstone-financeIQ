@@ -116,11 +116,16 @@ CONTENT RULES:
 - Do NOT give investment advice. Never output buy, sell, hold, al, sat, or tut.
 - Do NOT output a price target or an exact expected return unless that exact value is in the context.
 - The structured ML pipeline is the primary predictor; your llm_research_score is only a bounded support
-  signal in [0,1], distinct from the ML score, confidence score and final research score.
+  signal in [0,1], distinct from the ML score, confidence score and final research score. Set it to a
+  genuine value in (0,1] reflecting how well the supplied evidence supports the company/answer; use 0 ONLY
+  when the context truly gives you nothing to assess.
+- If the context includes "grounded_answer", treat it as the verified factual baseline: keep its facts
+  (tickers, years, numbers) and write a clearer, well-structured explanation around them. Never contradict it.
 - ALWAYS surface the relevant limitations actually present in the context: small sample size, frozen
   valuation/profitability data, missing real historical financials, weak/unstable backtest metrics, and
   a missing benchmark ONLY if benchmark_available is false.
-- Keep summary and reasoning concise (1-3 sentences each).
+- "summary" = 2-4 sentence plain-English answer. "reasoning" = the supporting evidence from the project
+  data (cite the relevant metrics/years). Keep both grounded and free of hype.
 - This is research support, NOT investment advice.
 Output JSON only."""
 
@@ -790,10 +795,13 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
         "not_investment_advice": True,
     }
     llm_err = None if not fallback else "no LLM provider or unparseable output; deterministic fallback used"
+    llm_used = not fallback
     return {
         "ticker": ctx["ticker"], "context": ctx, "ml": ml, "confidence": conf,
         "llm": llm_out, "score": score, "decision_support": ds,
         "provider_used": cfg["provider"], "fallback_used": fallback,
+        "mode": "llm" if llm_used else "fallback", "llm_used": llm_used,
+        "model": cfg["model"] if llm_used else None,
         "diagnostics": provider_diagnostics(cfg, cfg["provider"], fallback, llm_err),
         "disclaimer": NOT_ADVICE, "not_investment_advice": True,
     }
@@ -1259,23 +1267,31 @@ def answer_research_question(question: str, ticker: str | None = None,
 
     warns = (det or {}).get("warnings") or _company_warnings(state)
     lims = (det or {}).get("limitations") or _limitations(warns)
+    llm_used = (llm_result is not None) and (not fallback)
     if llm_result is None:
         llm_result = _coerce_llm_result({
             "llm_research_score": None, "llm_confidence": confidence_score(state)["confidence_level"],
             "summary": (det or {}).get("answer") or _general_summary(ctx["summary"]),
-            "reasoning": "Derived deterministically from validated project data.",
+            "reasoning": "Generated from validated project reports (AI assistant not used for this answer).",
             "warnings": warns, "limitations": lims,
         })
 
-    # The headline answer is ALWAYS the grounded deterministic one for known intents
-    # (the LLM may not invent tickers/returns); LLM adds bounded explanation only.
-    answer = (det or {}).get("answer")
-    if not answer:
-        answer = _human_answer(llm_result)
+    grounded = (det or {}).get("answer")    # exact facts (tickers/returns) when present
+    # Fact-bearing intents keep the exact grounded headline; the AI adds interpretation.
+    # Explanatory intents let the AI phrase the headline (richer, still grounded in context).
+    FACT_INTENTS = {"benchmark_outperformers", "top_ranked", "benchmark_status"}
+    if llm_used and intent not in FACT_INTENTS and (llm_result.get("summary") or "").strip():
+        answer = llm_result["summary"]
+    else:
+        answer = grounded or _human_answer(llm_result)
 
     return {
         "answer": answer,
+        "grounded_answer": grounded,
         "intent": intent,
+        "mode": "llm" if llm_used else "fallback",
+        "llm_used": llm_used,
+        "model": cfg["model"] if llm_used else None,
         "data_used": (det or {}).get("data_used", {"source": "validated reports", "year": None,
                       "rows_used": 0, "fields_used": []}),
         "llm_result": llm_result,

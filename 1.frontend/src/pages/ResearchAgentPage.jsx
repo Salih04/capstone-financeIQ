@@ -80,11 +80,10 @@ export default function ResearchAgentPage() {
   const sc = ready ? (score.score || {}) : {}
   const llm = (score && score.llm) || {}
 
-  // agent status — provider/fallback surface from last call, else defaults
+  // agent status — reflect the ACTUAL last call (llm vs fallback)
   const lastMeta = (ready && score) || answer || {}
-  const provider = lastMeta.provider_used ?? 'none'
-  const fallback = lastMeta.fallback_used
-  const isFallback = provider === 'none' || fallback
+  const aiUsed = lastMeta.llm_used === true
+  const isFallback = !aiUsed
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
@@ -221,7 +220,7 @@ export default function ResearchAgentPage() {
                   {du.source ? <SignalBadge tone="info">source: {asText(du.source)}{du.year ? ` · ${asText(du.year)}` : ''}</SignalBadge> : null}
                   <SignalBadge tone="bad">Not investment advice</SignalBadge>
                 </div>
-                <ProviderLine provider={answer.provider_used} fallback={answer.fallback_used} diag={answer.diagnostics} />
+                <ModeLine answer={answer} />
               </div>
             )
           })()}
@@ -252,13 +251,16 @@ export default function ResearchAgentPage() {
   )
 }
 
-function ProviderLine({ provider, fallback, diag }) {
-  const fb = provider === 'none' || fallback
+function ModeLine({ answer }) {
+  const used = answer?.llm_used
+  const model = answer?.model || answer?.diagnostics?.configured_model
   return (
-    <div style={{ fontSize: 10.5, color: 'var(--text-4)' }}>
-      {fb
-        ? 'Generated from validated project reports.'
-        : `AI-assisted (${asText(diag?.configured_model || provider)}), grounded in validated data.`}
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 600,
+      color: used ? 'var(--success-light)' : 'var(--info)' }}>
+      <span style={{ width: 6, height: 6, borderRadius: '50%', background: used ? 'var(--success)' : 'var(--info)' }} />
+      {used
+        ? `AI assisted${model ? ` · ${asText(model)}` : ''} · grounded in validated project data`
+        : 'AI unavailable — generated from validated reports'}
     </div>
   )
 }

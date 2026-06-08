@@ -83,10 +83,10 @@ export default function ResearchPage() {
   const weak = terminal?.diag?.weak_backtest
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1180 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 22, maxWidth: 1320, margin: '0 auto', padding: '4px 6px' }}>
       <SectionHeader
-        title="Score Explorer — Score vs Realized Performance"
-        sub="Fundamental Score is explanatory, not financial advice. Same-year correlation ≠ future prediction."
+        title="Score Explorer — Research Score vs Realized Performance"
+        sub="The score is explanatory, not advice. Same-year alignment is diagnostic; the model target is next-year performance."
         icon={FlaskConical}
         actions={
           <select value={year || ''} onChange={(e) => setYear(Number(e.target.value))}
@@ -98,7 +98,7 @@ export default function ResearchPage() {
 
       {/* Current validated status strip (overrides any stale artifact) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(155px,1fr))', gap: 12 }}>
-        <MetricCard label="Validated features" value={featureCount ?? '—'} tone="good" sub="changed 17 → 27" />
+        <MetricCard label="Validated features" value={featureCount ?? '—'} tone="good" sub="grew 17 → 32" />
         <MetricCard label="BIST100 benchmark" value={benchOk ? 'Available' : 'Missing'} tone={benchOk ? 'good' : 'warn'} sub="excess/outperform enabled" />
         <MetricCard label="Corrected financials" value={correctedLoaded ? 'Loaded' : 'Pending'} tone={correctedLoaded ? 'good' : 'warn'} sub="income & profitability" />
         <MetricCard label="Model signal" value={weak ? 'Weak' : 'OK'} tone={weak ? 'bad' : 'good'} sub="still unstable" />
@@ -123,11 +123,16 @@ export default function ResearchPage() {
         <StatCard label="Companies this year" value={overview?.count ?? '—'} sub={`BIST100: ${overview?.bist100_return != null ? pct(overview.bist100_return) : (benchOk ? 'available' : 'missing')}`} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.3fr) minmax(0, 1fr)', gap: 16 }}>
+      <div style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.55, padding: '0 2px' }}>
+        This is <b style={{ color: 'var(--text-2)' }}>diagnostic</b>. The score exists for every year, but how
+        well it aligned with realized returns changes by year — a weak or negative year is normal, not a broken score.
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: 20 }}>
         {/* Scatter */}
         <Card>
           <SectionHeader title={`Score vs Realized Return — ${year || ''}`} sub="Each dot = one company. Selected highlighted." />
-          <div style={{ height: 360 }}>
+          <div style={{ height: 400, marginTop: 6 }}>
             <ResponsiveContainer>
               <ScatterChart margin={{ top: 10, right: 20, bottom: 30, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />

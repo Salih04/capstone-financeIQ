@@ -21,9 +21,8 @@ const NAV_SECTIONS = [
     ],
   },
   {
-    label: 'Reports & Tools',
+    label: 'Tools',
     items: [
-      { path: '/reports', icon: FileText, label: 'Reports' },
       { path: '/forecasting', icon: BrainCircuit, label: 'Forecasting · experimental' },
     ],
   },
@@ -276,7 +275,16 @@ export default function Sidebar({ collapsed, onToggle }) {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/')
+  // exact match, or a detail sub-route — but NOT when a more specific nav item
+  // also prefixes the path (so /research never lights up on /research/companies).
+  const ALL_NAV_PATHS = NAV_SECTIONS.flatMap(s => s.items.map(i => i.path))
+  const isActive = (path) => {
+    const p = location.pathname
+    if (p === path) return true
+    if (!p.startsWith(path + '/')) return false
+    const moreSpecific = ALL_NAV_PATHS.some(np => np !== path && np.startsWith(path + '/') && (p === np || p.startsWith(np + '/')))
+    return !moreSpecific
+  }
   const hasRole = (roles) => !roles || roles.includes(user?.role)
 
   const handleLogout = () => {
@@ -327,52 +335,6 @@ export default function Sidebar({ collapsed, onToggle }) {
           )
         })}
 
-        {/* Ask AI — routes to the AI Research Assistant */}
-        <div style={{ padding: collapsed ? '12px 6px' : '12px 8px' }}>
-          <Link
-            to="/research-agent"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: collapsed ? 'center' : 'flex-start',
-              gap: 10,
-              padding: collapsed ? '10px' : '11px 14px',
-              borderRadius: 12,
-              background: 'linear-gradient(135deg, rgba(244,176,74,0.14), rgba(85,194,195,0.10))',
-              border: '1px solid rgba(244,176,74,0.30)',
-              textDecoration: 'none',
-              transition: 'all 0.2s',
-              cursor: 'pointer',
-              boxShadow: '0 0 14px rgba(244,176,74,0.12)',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(244,176,74,0.24), rgba(85,194,195,0.16))'
-              e.currentTarget.style.borderColor = 'rgba(244,176,74,0.5)'
-              e.currentTarget.style.boxShadow = '0 0 22px rgba(244,176,74,0.28)'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(244,176,74,0.14), rgba(85,194,195,0.10))'
-              e.currentTarget.style.borderColor = 'rgba(244,176,74,0.30)'
-              e.currentTarget.style.boxShadow = '0 0 14px rgba(244,176,74,0.12)'
-            }}
-            title={collapsed ? 'Ask AI' : undefined}
-          >
-            <div style={{
-              width: 28, height: 28, borderRadius: 9, flexShrink: 0,
-              background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(244,176,74,0.3)',
-            }}>
-              <Sparkles size={14} color="#fff" />
-            </div>
-            {!collapsed && (
-              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
-                <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--primary-hover)' }}>Ask AI</span>
-                <span style={{ fontSize: 10, color: 'var(--text-3)' }}>Research assistant</span>
-              </div>
-            )}
-          </Link>
-        </div>
       </nav>
 
       {/* Collapse toggle */}

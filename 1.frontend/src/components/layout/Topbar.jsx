@@ -250,34 +250,6 @@ export default function Topbar({ sidebarCollapsed }) {
         )}
       </div>
 
-      {/* Quick actions */}
-      <div style={s.quickActions}>
-        <button
-          style={{ ...s.qaBtn, background: 'rgba(244,176,74,0.08)', borderColor: 'rgba(244,176,74,0.35)', color: 'var(--primary)' }}
-          onClick={() => navigate('/research-agent')}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,176,74,0.18)'; e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary-hover)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(244,176,74,0.08)'; e.currentTarget.style.borderColor = 'rgba(244,176,74,0.35)'; e.currentTarget.style.color = 'var(--primary)' }}
-        >
-          <Sparkles size={13} /> Ask AI
-        </button>
-        <button
-          style={s.qaBtn}
-          onClick={() => navigate('/compare')}
-          onMouseEnter={e => { e.currentTarget.style.background = 'var(--primary-subtle)'; e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary-hover)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.borderColor = 'var(--border-strong)'; e.currentTarget.style.color = 'var(--text-2)' }}
-        >
-          <GitCompare size={13} /> Compare
-        </button>
-        <button
-          style={s.qaBtn}
-          onClick={() => navigate('/reports')}
-          onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-hover)'; e.currentTarget.style.color = 'var(--text-1)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text-2)' }}
-        >
-          <FileBarChart2 size={13} /> Reports
-        </button>
-      </div>
-
       {/* Spacer */}
       <div style={{ flex: 1 }} />
 
@@ -356,10 +328,10 @@ export default function Topbar({ sidebarCollapsed }) {
             )}
             <div style={{ padding: '8px 14px', borderTop: '1px solid var(--border)', textAlign: 'center' }}>
               <button
-                onClick={() => { navigate('/reports'); setNotifOpen(false) }}
+                onClick={() => { navigate('/research/companies'); setNotifOpen(false) }}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', fontSize: 12, fontWeight: 600, padding: 0 }}
               >
-                View all reports →
+                View companies →
               </button>
             </div>
           </div>

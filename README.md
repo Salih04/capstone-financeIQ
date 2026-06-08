@@ -152,10 +152,8 @@ automatically (see `2.backend/Dockerfile` CMD).
 
 ```bash
 export RESEARCH_LLM_PROVIDER=lmstudio
-export RESEARCH_LLM_BASE_URL=http://host.docker.internal:1234/v1/chat/completions
+export RESEARCH_LLM_BASE_URL=http://localhost:1234/v1/chat/completions
 export RESEARCH_LLM_MODEL=qwen2.5-3b-instruct
-export RESEARCH_LLM_TIMEOUT_SECONDS=60
-export RESEARCH_SCORE_LLM_WEIGHT=0.30
 docker compose up --build
 ```
 
