@@ -41,6 +41,21 @@ export default function DashboardPage() {
         <MetricCard label="Model signal" value={weak ? 'Weak' : 'OK'} tone={weak ? 'bad' : 'good'} sub={`Spearman ${asText(dgx.mean_spearman)}`} />
       </div>
 
+      {/* Capstone verdict banner */}
+      <div style={{ background: 'linear-gradient(135deg, rgba(58,199,139,0.10), rgba(85,194,195,0.06))',
+        border: '1px solid var(--border-strong)', borderLeft: '3px solid var(--success)',
+        borderRadius: 'var(--radius-lg)', padding: '16px 18px' }}>
+        <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--success-light)', textTransform: 'uppercase', letterSpacing: 1 }}>Capstone verdict</div>
+        <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-1)', marginTop: 4 }}>
+          Pipeline complete & validated — reliable predictive edge not demonstrated.
+        </div>
+        <p style={{ fontSize: 12.5, color: 'var(--text-2)', margin: '6px 0 0', lineHeight: 1.55 }}>
+          A leakage-safe T→T+1 research system with {asText(ctx.feature_count)} validated features, BIST100
+          benchmark and free valuation reconstruction. The honest finding: on ~40 stocks/year the model
+          shows no reliable edge — a rigorous, transparent negative result, not a flaw.
+        </p>
+      </div>
+
       {/* Reality check + next action */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px,1fr))', gap: 16 }}>
         <RealityCheckCard
@@ -48,21 +63,21 @@ export default function DashboardPage() {
           items={[
             { tone: 'good', text: 'T→T+1 pipeline is valid with real next-year return targets.' },
             { tone: 'good', text: `BIST100 benchmark available (${asText(bench?.source)}) → excess / outperform targets enabled.` },
-            { tone: 'bad', text: 'Historical valuation / profitability columns are a frozen snapshot — rejected.' },
-            { tone: 'warn', text: 'Predictive skill is currently weak / unstable.' },
-            { tone: 'info', text: 'Real per-year historical financials required to unlock signal.' },
+            { tone: 'good', text: `${asText(ctx.feature_count)} validated features incl. real income/profitability + reconstructed valuation.` },
+            { tone: 'warn', text: 'Predictive skill is honestly weak / unstable on this universe.' },
+            { tone: 'info', text: 'A larger universe / longer history is the realistic path to a stronger signal.' },
           ]}
         />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ background: 'linear-gradient(135deg, var(--primary-subtle), transparent)',
             border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: 18 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: 0.6 }}>Next action</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: 0.6 }}>Explore with AI</div>
             <p style={{ fontSize: 13.5, color: 'var(--text-2)', marginTop: 8, lineHeight: 1.55 }}>
-              Supply real per-year valuation / profitability history, then re-run the pipeline. The 17
-              balance-sheet & growth features alone do not show a reliable edge.
+              Ask the research assistant in plain English — “Which companies outperformed BIST100 in 2025?”,
+              “Explain ASELS’s score.” Every answer is grounded in the validated data.
             </p>
-            <button onClick={() => nav('/data-quality')} style={ctaBtn}>
-              Open Data Quality evidence <ArrowRight size={15} />
+            <button onClick={() => nav('/research-agent')} style={ctaBtn}>
+              Open AI Research Assistant <ArrowRight size={15} />
             </button>
           </div>
           <div style={{ fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600, textAlign: 'center' }}>{NOT_ADVICE}</div>
@@ -74,7 +89,7 @@ export default function DashboardPage() {
         <div style={sectionTitle}>Research Terminal</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(215px,1fr))', gap: 12 }}>
           {[
-            ['Research Agent', Bot, '/research-agent', 'Hybrid ML + local LLM insight'],
+            ['AI Research Assistant', Bot, '/research-agent', 'Ask in plain English · grounded answers'],
             ['Companies', Building2, '/research/companies', 'Company-level research scores'],
             ['Experiments', FlaskConical, '/experiments', 'Walk-forward · benchmark targets'],
             ['Data Quality', Database, '/data-quality', 'Frozen columns · leakage · evidence'],

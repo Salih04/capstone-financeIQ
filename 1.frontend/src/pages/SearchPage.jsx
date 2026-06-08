@@ -193,7 +193,7 @@ export default function SearchPage() {
             <p style={{ fontSize: 14, color: 'var(--text-3)', margin: 0 }}>Search and explore all financial entities in the database</p>
           </div>
           <button
-            onClick={() => navigate('/ai-search')}
+            onClick={() => navigate('/research-agent')}
             style={{
               display: 'flex', alignItems: 'center', gap: 8,
               background: 'linear-gradient(135deg, rgba(0,245,212,0.12), rgba(99,102,241,0.12))',

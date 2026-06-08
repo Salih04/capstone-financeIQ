@@ -15,6 +15,23 @@ const TARGET_LABELS = {
 const label = (t) => TARGET_LABELS[t] || t
 const naNum = (v, d) => (v === null || v === undefined || Number.isNaN(Number(v))) ? 'N/A' : formatNumber(v, d)
 
+// internal split/model IDs -> end-user friendly labels
+const splitLabel = (s) => {
+  const m = String(s || '').match(/(20\d{2})/)
+  return m ? `${m[1]} evaluation` : asTextSafe(s)
+}
+const MODEL_LABELS = {
+  baseline_equal_weight: 'Equal-weight baseline',
+  baseline_rank_score: 'Simple ranking baseline',
+  linear_regression: 'Linear regression',
+  ridge: 'Ridge regression',
+  lasso: 'Lasso regression',
+  elasticnet: 'Elastic net',
+  random_forest: 'Random forest',
+}
+const modelLabel = (m) => MODEL_LABELS[m] || String(m || '').replace(/_/g, ' ')
+const asTextSafe = (v) => (v === null || v === undefined || v === '') ? '—' : String(v)
+
 export default function ExperimentsPage() {
   const [exp, setExp] = useState(null)
   const [target, setTarget] = useState('next_year_return_pct')
@@ -35,20 +52,19 @@ export default function ExperimentsPage() {
   }, [byTarget, primaryLb, target])
 
   const columns = [
-    { key: 'split', label: 'Split' },
+    { key: 'split', label: 'Evaluated on' },
     { key: 'model', label: 'Model' },
-    { key: 'kind', label: 'Kind' },
-    { key: 'mae', label: 'MAE', align: 'right' },
-    { key: 'rmse', label: 'RMSE', align: 'right' },
-    { key: 'spearman', label: 'Spearman', align: 'right' },
-    { key: 'precision_at_5', label: 'P@5', align: 'right' },
-    { key: 'directional_acc', label: 'Dir.Acc', align: 'right' },
+    { key: 'kind', label: 'Type' },
+    { key: 'spearman', label: 'Rank correlation', align: 'right' },
+    { key: 'precision_at_5', label: 'Top-5 hit rate', align: 'right' },
+    { key: 'directional_acc', label: 'Direction accuracy', align: 'right' },
   ]
 
   const renderCell = (c, r) => {
-    if (c.key === 'kind') return <SignalBadge tone={r.__baseline ? 'info' : 'accent'}>{asText(r.kind)}</SignalBadge>
+    if (c.key === 'split') return splitLabel(r.split)
+    if (c.key === 'model') return modelLabel(r.model)
+    if (c.key === 'kind') return <SignalBadge tone={r.__baseline ? 'info' : 'accent'}>{r.__baseline ? 'baseline' : 'model'}</SignalBadge>
     if (c.key === 'spearman' || c.key === 'directional_acc' || c.key === 'precision_at_5') return naNum(r[c.key], 3)
-    if (c.key === 'mae' || c.key === 'rmse') return naNum(r[c.key], 1)
     return asText(r[c.key])
   }
 
@@ -57,8 +73,8 @@ export default function ExperimentsPage() {
       <SectionHeader title="Experiments — walk-forward backtest" sub="Honest out-of-sample evaluation · benchmark-aware targets" icon={FlaskConical} />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(165px,1fr))', gap: 12 }}>
-        <MetricCard label="Primary target" value="Raw return" mono={false} sub="next_year_return_pct" />
-        <MetricCard label="Mean Spearman" value={naNum(diag.mean_spearman, 3)} tone={weak ? 'bad' : 'good'} sub="rank correlation" />
+        <MetricCard label="Target" value="Next-year return" mono={false} sub="evaluated out-of-sample" />
+        <MetricCard label="Mean rank correlation" value={naNum(diag.mean_spearman, 3)} tone={weak ? 'bad' : 'good'} sub="≈0 = no edge" />
         <MetricCard label="Signal quality" value={weak ? 'Weak' : 'OK'} tone={weak ? 'bad' : 'good'} mono={false} />
         <MetricCard label="ML beats baseline" value={diag.ml_beats_baseline_consistently ? 'Yes' : 'No'} tone={diag.ml_beats_baseline_consistently ? 'good' : 'bad'} mono={false} />
         <MetricCard label="Sample" value={diag.small_sample ? 'Small' : 'OK'} tone="warn" mono={false} sub="~40 stocks/year" />
@@ -101,10 +117,10 @@ export default function ExperimentsPage() {
       <Collapsible label="What these metrics mean">
         <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: 16 }}>
           <Bullets size={12.5} items={[
-            'Spearman — rank correlation of predicted vs realized next-year return. Near 0 = no edge. N/A = constant predictions.',
-            'P@5 — of the top-5 predicted, how many were truly top-5. ≈0.2 is random.',
-            'Dir.Acc — above/below-median direction match. ≈0.5 is a coin flip.',
-            'Baseline — equal-weight rank score; ML must beat it consistently to add value (it does not here).',
+            'Rank correlation — how well predicted ranking matches realized next-year return. Near 0 = no edge. N/A = constant predictions.',
+            'Top-5 hit rate — of the top-5 predicted, how many were truly top-5. ≈0.2 is random.',
+            'Direction accuracy — above/below-median direction match. ≈0.5 is a coin flip.',
+            'Baseline — a simple equal-weight/ranking model; the ML models must beat it consistently to add value (they do not here).',
           ]} />
         </div>
       </Collapsible>

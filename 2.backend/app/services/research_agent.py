@@ -90,6 +90,7 @@ def get_config() -> dict:
         "provider": provider, "base_url": base,
         "model": os.environ.get("RESEARCH_LLM_MODEL", "local-model"),
         "timeout": _env_float("RESEARCH_LLM_TIMEOUT_SECONDS", 15.0),
+        "max_tokens": int(_env_float("RESEARCH_LLM_MAX_TOKENS", 700)),
         "weights": {"ml": w_ml, "confidence": w_conf, "llm": w_llm},
     }
 
@@ -486,6 +487,14 @@ def _limitations(warns: list[str]) -> list[str]:
 # --------------------------------------------------------------------------- #
 # LLM provider abstraction (PHASE 3) — fails safe
 # --------------------------------------------------------------------------- #
+def _strip_think(text: str) -> str:
+    """Remove <think>...</think> reasoning blocks some models emit."""
+    if not text:
+        return text
+    import re
+    return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL | re.IGNORECASE).strip()
+
+
 def _http_post_json(url: str, payload: dict, timeout: float) -> dict:
     req = urllib.request.Request(
         url, data=json.dumps(payload).encode(),
@@ -506,14 +515,15 @@ def call_local_llm(messages: list[dict], cfg: dict | None = None) -> dict:
                        "options": {"temperature": 0.2}}
             data = _http_post_json(cfg["base_url"], payload, timeout)
             return {"ok": True, "provider": "ollama",
-                    "content": data.get("message", {}).get("content", "")}
+                    "content": _strip_think(data.get("message", {}).get("content", ""))}
         except Exception as exc:  # noqa
             return {"ok": False, "provider": "ollama", "error": str(exc)}
     # ---- LM Studio / OpenAI-compatible primary ----------------------------
     try:
-        payload = {"model": cfg["model"], "messages": messages, "temperature": 0.2}
+        payload = {"model": cfg["model"], "messages": messages, "temperature": 0.2,
+                   "max_tokens": int(cfg.get("max_tokens", 700))}
         data = _http_post_json(cfg["base_url"], payload, timeout)
-        content = data["choices"][0]["message"]["content"]
+        content = _strip_think(data["choices"][0]["message"]["content"])
         return {"ok": True, "provider": cfg["provider"], "content": content}
     except Exception as primary_exc:  # noqa - try LM Studio native endpoint
         try:
@@ -525,7 +535,7 @@ def call_local_llm(messages: list[dict], cfg: dict | None = None) -> dict:
             data = _http_post_json(alt, {"model": cfg["model"], "system_prompt": sys_txt,
                                          "input": usr_txt}, timeout)
             content = data["output"][0]["content"] if isinstance(data.get("output"), list) else data.get("content", "")
-            return {"ok": True, "provider": cfg["provider"], "content": content, "endpoint": "native"}
+            return {"ok": True, "provider": cfg["provider"], "content": _strip_think(content), "endpoint": "native"}
         except Exception as alt_exc:  # noqa
             return {"ok": False, "provider": cfg["provider"], "error": f"{primary_exc} | alt: {alt_exc}"}
 
@@ -626,8 +636,18 @@ def composite_score(ml_score, confidence_score_v, llm_research_score, cfg: dict 
     cfg = cfg or get_config()
     w = cfg["weights"]
     notes = []
-    comps = {"ml": (ml_score, w["ml"]), "confidence": (confidence_score_v, w["conf"] if "conf" in w else w["confidence"]),
-             "llm": (llm_research_score, w["llm"])}
+    # The LLM contributes ONLY when it returns a meaningful score in (0,1]. A null
+    # or exactly-0 value means "AI evidence unavailable" (small models often emit 0
+    # when unsure) — its weight is redistributed to ML + confidence instead of
+    # dragging the final score down. Bounded weight => the LLM can never dominate.
+    llm_available = isinstance(llm_research_score, (int, float)) and 0.0 < float(llm_research_score) <= 1.0
+    llm_for_calc = float(llm_research_score) if llm_available else None
+    if not llm_available:
+        notes.append("AI evidence unavailable -> LLM weight redistributed to ML + confidence")
+
+    comps = {"ml": (ml_score, w["ml"]),
+             "confidence": (confidence_score_v, w["confidence"]),
+             "llm": (llm_for_calc, w["llm"])}
     # redistribute weight of any null component across present ones
     present = {k: (v, wt) for k, (v, wt) in comps.items() if v is not None}
     if ml_score is None:
@@ -637,7 +657,8 @@ def composite_score(ml_score, confidence_score_v, llm_research_score, cfg: dict 
     return {
         "ml_score": ml_score,
         "confidence_score": confidence_score_v,
-        "llm_research_score": llm_research_score,
+        "llm_research_score": llm_for_calc,          # null when unavailable (UI shows "unavailable")
+        "llm_support_available": llm_available,
         "final_research_score": final,
         "partial_score": ml_score is None,
         "weights_used": {"ml": w["ml"], "confidence": w["confidence"], "llm": w["llm"]},
@@ -748,9 +769,15 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
     score = {
         "ticker": ctx["ticker"], "year": ctx["latest_year"],
         "score_source": ml.get("score_source"), "target_name": ml.get("target_name"),
-        "model_name": ml.get("model_name"), "ml_rank": ml.get("ml_rank"),
+        "model_name": ml.get("model_name"),
+        "ml_score_label": "Fundamental ranking model",
+        "confidence_label": "Data confidence",
+        "llm_support_label": "AI evidence support",
+        "final_label": "Final research score",
+        "ml_rank": ml.get("ml_rank"),
         "ml_score": comp["ml_score"], "confidence_score": comp["confidence_score"],
         "llm_research_score": comp["llm_research_score"],
+        "llm_support_available": comp["llm_support_available"],
         "final_research_score": comp["final_research_score"],
         "partial_score": comp["partial_score"], "weights_used": comp["weights_used"],
         "confidence_level": conf["confidence_level"], "confidence_reasons": conf["confidence_reasons"],

@@ -12,19 +12,19 @@ const NAV_SECTIONS = [
     label: 'Research Terminal',
     items: [
       { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-      { path: '/research-agent', icon: Bot, label: 'Research Agent' },
+      { path: '/research-agent', icon: Bot, label: 'AI Research Assistant' },
       { path: '/research/companies', icon: Building2, label: 'Companies' },
       { path: '/experiments', icon: FlaskConical, label: 'Experiments' },
+      { path: '/research', icon: Sparkles, label: 'Score Explorer' },
       { path: '/data-quality', icon: Database, label: 'Data Quality' },
       { path: '/benchmark', icon: LineChart, label: 'Benchmark' },
     ],
   },
   {
-    label: 'Legacy / Tools',
+    label: 'Reports & Tools',
     items: [
-      { path: '/forecasting', icon: BrainCircuit, label: 'Forecasting' },
-      { path: '/research', icon: Sparkles, label: 'Score Explorer' },
       { path: '/reports', icon: FileText, label: 'Reports' },
+      { path: '/forecasting', icon: BrainCircuit, label: 'Forecasting · experimental' },
     ],
   },
   {
@@ -327,55 +327,49 @@ export default function Sidebar({ collapsed, onToggle }) {
           )
         })}
 
-        {/* AI Search prominent button */}
+        {/* Ask AI — routes to the AI Research Assistant */}
         <div style={{ padding: collapsed ? '12px 6px' : '12px 8px' }}>
           <Link
-            to="/ai-search"
+            to="/research-agent"
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: collapsed ? 'center' : 'flex-start',
               gap: 10,
-              padding: collapsed ? '10px' : '10px 14px',
+              padding: collapsed ? '10px' : '11px 14px',
               borderRadius: 12,
-              background: isActive('/ai-search')
-                ? 'linear-gradient(135deg, rgba(244,176,74,0.2), rgba(85,194,195,0.15))'
-                : 'linear-gradient(135deg, rgba(244,176,74,0.08), rgba(85,194,195,0.06))',
-              border: '1px solid rgba(244,176,74,0.25)',
+              background: 'linear-gradient(135deg, rgba(244,176,74,0.14), rgba(85,194,195,0.10))',
+              border: '1px solid rgba(244,176,74,0.30)',
               textDecoration: 'none',
               transition: 'all 0.2s',
               cursor: 'pointer',
-              boxShadow: isActive('/ai-search') ? '0 0 16px rgba(244,176,74,0.2)' : '0 0 8px rgba(244,176,74,0.08)',
+              boxShadow: '0 0 14px rgba(244,176,74,0.12)',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(244,176,74,0.2), rgba(85,194,195,0.15))'
-              e.currentTarget.style.borderColor = 'rgba(244,176,74,0.4)'
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(244,176,74,0.25)'
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(244,176,74,0.24), rgba(85,194,195,0.16))'
+              e.currentTarget.style.borderColor = 'rgba(244,176,74,0.5)'
+              e.currentTarget.style.boxShadow = '0 0 22px rgba(244,176,74,0.28)'
             }}
             onMouseLeave={e => {
-              if (!isActive('/ai-search')) {
-                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(244,176,74,0.08), rgba(85,194,195,0.06))'
-                e.currentTarget.style.borderColor = 'rgba(244,176,74,0.25)'
-                e.currentTarget.style.boxShadow = '0 0 8px rgba(244,176,74,0.08)'
-              }
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(244,176,74,0.14), rgba(85,194,195,0.10))'
+              e.currentTarget.style.borderColor = 'rgba(244,176,74,0.30)'
+              e.currentTarget.style.boxShadow = '0 0 14px rgba(244,176,74,0.12)'
             }}
-            title={collapsed ? 'AI Search' : undefined}
+            title={collapsed ? 'Ask AI' : undefined}
           >
             <div style={{
-              width: 26, height: 26, borderRadius: 8, flexShrink: 0,
+              width: 28, height: 28, borderRadius: 9, flexShrink: 0,
               background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 2px 8px rgba(244,176,74,0.3)',
             }}>
-              <Sparkles size={13} color="#fff" />
+              <Sparkles size={14} color="#fff" />
             </div>
             {!collapsed && (
-              <>
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--primary-hover)', flex: 1 }}>AI Search</span>
-                <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-3)', fontFamily: 'var(--font-mono)', background: 'rgba(244,176,74,0.1)', borderRadius: 4, padding: '1px 5px' }}>
-                  {navigator.platform?.includes('Mac') ? '⌘' : '⌃'}K
-                </span>
-              </>
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--primary-hover)' }}>Ask AI</span>
+                <span style={{ fontSize: 10, color: 'var(--text-3)' }}>Research assistant</span>
+              </div>
             )}
           </Link>
         </div>

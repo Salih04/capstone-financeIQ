@@ -8,7 +8,6 @@ import ComparePage from './pages/ComparePage'
 import ReportsPage from './pages/ReportsPage'
 import AdminPage from './pages/AdminPage'
 import ValidationLabPage from './pages/ValidationLabPage'
-import AISearchPage from './pages/AISearchPage'
 import DataHealthPage from './pages/DataHealthPage'
 import LabelingLabPage from './pages/LabelingLabPage'
 import ForecastingPage from './pages/ForecastingPage'
@@ -39,7 +38,7 @@ export default function App() {
       <Route path="/dashboard" element={<Protected><DashboardPage /></Protected>} />
       <Route path="/companies" element={<Protected><SearchPage /></Protected>} />
       <Route path="/search" element={<Navigate to="/companies" replace />} />
-      <Route path="/ai-search" element={<Protected><AISearchPage /></Protected>} />
+      <Route path="/ai-search" element={<Navigate to="/research-agent" replace />} />
       <Route path="/companies/:id" element={<Protected><CompanyPage /></Protected>} />
       <Route path="/score-runs/:id" element={<Protected><ScoreResultPage /></Protected>} />
       <Route path="/compare" element={<Protected><ComparePage /></Protected>} />

@@ -189,7 +189,7 @@ export default function Topbar({ sidebarCollapsed }) {
           onKeyDown={e => {
             if (e.key === 'Escape') { setSearchOpen(false); setSearchQuery('') }
             if (e.key === 'Enter' && searchQuery.trim()) {
-              navigate(`/ai-search?q=${encodeURIComponent(searchQuery.trim())}`)
+              navigate(`/research-agent?q=${encodeURIComponent(searchQuery.trim())}`)
               setSearchOpen(false)
               setSearchQuery('')
             }
@@ -238,13 +238,13 @@ export default function Topbar({ sidebarCollapsed }) {
               onMouseEnter={e => e.currentTarget.style.background = 'rgba(244,176,74,0.1)'}
               onMouseLeave={e => e.currentTarget.style.background = 'rgba(244,176,74,0.04)'}
               onClick={() => {
-                navigate(`/ai-search?q=${encodeURIComponent(searchQuery)}`)
+                navigate(`/research-agent?q=${encodeURIComponent(searchQuery)}`)
                 setSearchOpen(false)
                 setSearchQuery('')
               }}
             >
               <Sparkles size={12} />
-              Advanced AI Search for "{searchQuery}"
+              Ask AI about "{searchQuery}"
             </div>
           </div>
         )}
@@ -254,11 +254,11 @@ export default function Topbar({ sidebarCollapsed }) {
       <div style={s.quickActions}>
         <button
           style={{ ...s.qaBtn, background: 'rgba(244,176,74,0.08)', borderColor: 'rgba(244,176,74,0.35)', color: 'var(--primary)' }}
-          onClick={() => navigate('/ai-search')}
+          onClick={() => navigate('/research-agent')}
           onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,176,74,0.18)'; e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary-hover)' }}
           onMouseLeave={e => { e.currentTarget.style.background = 'rgba(244,176,74,0.08)'; e.currentTarget.style.borderColor = 'rgba(244,176,74,0.35)'; e.currentTarget.style.color = 'var(--primary)' }}
         >
-          <Sparkles size={13} /> AI Search
+          <Sparkles size={13} /> Ask AI
         </button>
         <button
           style={s.qaBtn}

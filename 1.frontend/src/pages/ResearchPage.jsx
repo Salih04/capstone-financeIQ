@@ -117,9 +117,9 @@ export default function ResearchPage() {
 
       {/* Model-quality strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
-        <StatCard label="Mean Spearman (all years)" value={v ? fmt(v.mean_spearman, 3) : '—'} sub="score vs same-year return" />
-        <StatCard label="Years score worked" value={v ? (v.years_score_worked.join(', ') || 'none') : '—'} />
-        <StatCard label="Years score failed" value={v ? (v.years_score_failed.join(', ') || 'none') : '—'} />
+        <StatCard label="Mean rank correlation (all years)" value={v ? fmt(v.mean_spearman, 3) : '—'} sub="score vs same-year return" />
+        <StatCard label="Years score aligned with returns" value={v ? (v.years_score_worked.join(', ') || 'none') : '—'} sub="positive relationship" />
+        <StatCard label="Years with weak / negative relationship" value={v ? (v.years_score_failed.join(', ') || 'none') : '—'} sub="diagnostic, not a failure" />
         <StatCard label="Companies this year" value={overview?.count ?? '—'} sub={`BIST100: ${overview?.bist100_return != null ? pct(overview.bist100_return) : (benchOk ? 'available' : 'missing')}`} />
       </div>
 

@@ -7,7 +7,10 @@ performance. Written to be honest about what the scores can and cannot do.
 > profitability and free-reconstructed valuation) the walk-forward signal is still
 > **weak/unstable** — mean Spearman ≈ 0 and ML does not consistently beat a simple
 > baseline on ~40 stocks/year. Scores are research support, **not** investment advice.
-> Hybrid research score = 0.65·ML + 0.20·confidence + 0.15·LLM, components always shown.
+> Hybrid research score = 0.65·ML + 0.20·confidence + 0.15·AI-evidence, components always shown.
+> The AI-evidence term contributes ONLY when the local model returns a meaningful score
+> in (0,1]; a null/zero value means "AI evidence unavailable" and its weight is
+> redistributed to ML + confidence (the AI can never drag or dominate the final score).
 
 ## Data
 

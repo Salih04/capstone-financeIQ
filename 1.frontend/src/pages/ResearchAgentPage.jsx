@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Bot, Search, RefreshCw, ShieldCheck, Cpu } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { Bot, Search, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react'
 import api from '../api/client'
 import { SectionHeader, GhostButton } from '../components/ui'
 import {
@@ -27,6 +28,21 @@ export default function ResearchAgentPage() {
   const [answer, setAnswer] = useState(null)
   const [askLoading, setAskLoading] = useState(false)
   const [askErr, setAskErr] = useState(null)
+  const [params] = useSearchParams()
+
+  // prefill question from ?q= (Topbar "Ask AI" / search)
+  useEffect(() => {
+    const q = params.get('q')
+    if (q) setQuestion(q)
+  }, [params])
+
+  const EXAMPLES = [
+    'Which companies outperformed BIST100 in 2025?',
+    'Why is ASELS on the watchlist?',
+    'Explain THYAO’s score in plain English.',
+    'Compare ASELS and FROTO by profitability and valuation.',
+    'Why is the model signal weak?',
+  ]
 
   const loadAll = useCallback(() => {
     setLoadErr(null)
@@ -73,12 +89,12 @@ export default function ResearchAgentPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
       <SectionHeader
-        title="FinanceIQ Research Agent"
-        sub="Hybrid ML + constrained local LLM research support"
+        title="AI Research Assistant"
+        sub="Ask in plain English — grounded in validated project data"
         icon={Bot}
         actions={
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <SignalBadge tone="bad">Not investment advice</SignalBadge>
+            <SignalBadge tone="info">Research score, not advice</SignalBadge>
             <GhostButton icon={RefreshCw} onClick={loadAll}>Reload</GhostButton>
           </div>
         }
@@ -90,26 +106,25 @@ export default function ResearchAgentPage() {
       <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: 16,
         display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <span style={{ width: 40, height: 40, borderRadius: 11, background: 'var(--primary-subtle)', color: 'var(--primary)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Cpu size={20} /></span>
+          <span style={{ width: 40, height: 40, borderRadius: 11, background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 10px rgba(244,176,74,0.3)' }}><Sparkles size={20} /></span>
           <div>
-            <div style={{ fontSize: 13.5, fontWeight: 700 }}>LLM research layer</div>
-            <div style={{ fontSize: 11.5, color: 'var(--text-3)' }}>Decision-support only · numerical predictor stays the ML model</div>
+            <div style={{ fontSize: 13.5, fontWeight: 800 }}>FinanceIQ Research Copilot</div>
+            <div style={{ fontSize: 11.5, color: 'var(--text-3)' }}>Explains the validated data — the numbers stay the ML model’s</div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <SignalBadge tone={isFallback ? 'warn' : 'good'}>{isFallback ? 'Deterministic fallback mode' : 'Connected to LM Studio'}</SignalBadge>
+          <SignalBadge tone={isFallback ? 'info' : 'good'}>{isFallback ? 'Validated data mode' : 'AI assistance enabled'}</SignalBadge>
           <SignalBadge tone="good"><ShieldCheck size={12} /> safety mode active</SignalBadge>
         </div>
       </div>
 
-      {/* Plain-language provider explanation */}
+      {/* Plain-language explanation (no debug wording) */}
       <div style={{ fontSize: 12, color: 'var(--text-3)', background: 'var(--surface-1)',
         border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '9px 12px', lineHeight: 1.5 }}>
         {isFallback
-          ? <>The backend is using <b style={{ color: 'var(--warning-light)' }}>deterministic fallback</b> — answers come from validated reports only.
-              If you run Docker and want LM Studio, set <code>RESEARCH_LLM_BASE_URL</code> to <code>http://host.docker.internal:1234/v1/chat/completions</code> (inside a container <code>localhost</code> is the container itself, not your Mac).</>
-          : <>Connected to <b style={{ color: 'var(--success-light)' }}>LM Studio</b> — the assistant phrases answers, but tickers and numbers always come from validated project data.</>}
+          ? <>Running in <b style={{ color: 'var(--info)' }}>validated data mode</b> — answers are generated directly from the validated project reports. Connect a local model (LM Studio) to add AI phrasing; the figures stay the same either way.</>
+          : <>AI assistance is <b style={{ color: 'var(--success-light)' }}>enabled</b> — the assistant phrases answers, but every ticker, score and number comes from validated project data. Nothing is invented.</>}
       </div>
 
       {/* Dataset KPIs */}
@@ -123,8 +138,8 @@ export default function ResearchAgentPage() {
 
       {/* Score lookup + Ask */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px,1fr))', gap: 16 }}>
-        {/* Company score lookup */}
-        <EvidencePanel title="Company score lookup" sub="Hybrid ML + confidence + LLM support" tone="accent">
+        {/* Company score lookup — analyst scorecard */}
+        <EvidencePanel title="Company scorecard" sub="Fundamental ranking + data confidence + AI evidence" tone="accent">
           <div style={{ display: 'flex', gap: 8 }}>
             <input value={ticker} onChange={e => setTicker(e.target.value)} placeholder="ticker (e.g. ASELS)"
               onKeyDown={e => e.key === 'Enter' && loadScore()} style={inputS} />
@@ -136,32 +151,48 @@ export default function ResearchAgentPage() {
             <>
               <div style={{ display: 'flex', gap: 8, alignItems: 'baseline' }}>
                 <span style={{ fontSize: 16, fontWeight: 800 }}>{asText(sc.ticker || score.ticker)}</span>
-                <span style={{ fontSize: 12, color: 'var(--text-3)' }}>year {asText(sc.year)}</span>
+                <span style={{ fontSize: 12, color: 'var(--text-3)' }}>latest year {asText(sc.year)}</span>
               </div>
               <ScoreBreakdown items={[
-                { label: 'ML score', value: sc.ml_score, tone: 'info', sub: asText(sc.score_source) },
-                { label: 'Confidence score', value: sc.confidence_score, tone: 'info', sub: asText(sc.confidence_level || conf.confidence_level) },
-                { label: 'LLM support score', value: sc.llm_research_score, tone: 'info' },
-                { label: 'Final research score', value: sc.final_research_score, tone: 'accent', emphasis: true },
+                { label: sc.ml_score_label || 'Fundamental ranking model', value: sc.ml_score, tone: 'info', sub: 'rank of validated year-T features' },
+                { label: sc.confidence_label || 'Data confidence', value: sc.confidence_score, tone: 'info', sub: asText(sc.confidence_level || conf.confidence_level) },
+                { label: sc.final_label || 'Final research score', value: sc.final_research_score, tone: 'accent', emphasis: true },
               ]} />
+              {/* AI evidence support — only when meaningful */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
+                <Sparkles size={13} color="var(--secondary)" />
+                <span style={{ color: 'var(--text-3)', fontWeight: 700 }}>AI evidence support</span>
+                {sc.llm_support_available
+                  ? <SignalBadge tone="info">{formatNumber(sc.llm_research_score, 2)}</SignalBadge>
+                  : <span style={{ color: 'var(--text-3)' }}>unavailable — score uses fundamentals + data confidence</span>}
+              </div>
               {sc.decision_support_verdict && (
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 11.5, color: 'var(--text-3)', fontWeight: 700 }}>Decision support</span>
+                    <span style={{ fontSize: 11.5, color: 'var(--text-3)', fontWeight: 700 }}>Decision status</span>
                     <DecisionVerdict verdict={sc.decision_support_verdict} />
                   </div>
                   {sc.blocking_limitations?.length ? <Bullets tone="warn" size={12} items={sc.blocking_limitations} /> : null}
                 </div>
               )}
+              <div style={{ fontSize: 11, color: 'var(--text-3)', borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+                Final = 0.65·fundamentals + 0.20·data confidence + 0.15·AI evidence (AI weight redistributed when unavailable).
+                This is a research score, not a buy/sell recommendation.
+              </div>
             </>
           )}
         </EvidencePanel>
 
         {/* Ask */}
-        <EvidencePanel title="Ask the research assistant" sub="Grounded, specific answers from validated project data" tone="info">
+        <EvidencePanel title="Ask the assistant" sub="Plain-English answers, grounded in validated project data" tone="info">
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {EXAMPLES.map((ex, i) => (
+              <button key={i} onClick={() => setQuestion(ex)} style={chipBtn} title="Use this prompt">{ex}</button>
+            ))}
+          </div>
           <input value={askTicker} onChange={e => setAskTicker(e.target.value)} placeholder="ticker (optional)" style={inputS} />
           <textarea value={question} onChange={e => setQuestion(e.target.value)} rows={3}
-            placeholder="e.g. Which stocks beat BIST100? · Why is the signal weak? · What columns were rejected?"
+            placeholder="Ask anything about the validated data…"
             style={{ ...inputS, width: '100%', resize: 'vertical' }} />
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={ask} disabled={askLoading || !question.trim()}
@@ -178,12 +209,18 @@ export default function ResearchAgentPage() {
             const r = answer.llm_result || {}
             const du = answer.data_used || {}
             return (
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {answer.intent ? <SignalBadge tone="neutral">intent: {asText(answer.intent)}</SignalBadge> : null}
-                <p style={{ whiteSpace: 'pre-wrap', fontSize: 13, color: 'var(--text-1)', margin: 0, lineHeight: 1.55, fontWeight: 600 }}>{asText(answer.answer)}</p>
-                {r.reasoning ? <p style={{ fontSize: 12, color: 'var(--text-3)', margin: 0, lineHeight: 1.5 }}>{asText(r.reasoning)}</p> : null}
-                {(answer.warnings?.length) ? <div><div style={lbl('var(--warning-light)')}>Notes</div><Bullets tone="warn" size={12} items={hw(answer.warnings)} /></div> : null}
-                {(du.source) ? <div style={{ fontSize: 11, color: 'var(--text-3)' }}>Data used: {asText(du.source)}{du.year ? ` · year ${asText(du.year)}` : ''}{du.rows_used ? ` · ${asText(du.rows_used)} rows` : ''}</div> : null}
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div>
+                  <div style={lbl('var(--text-2)')}>Summary</div>
+                  <p style={{ whiteSpace: 'pre-wrap', fontSize: 13, color: 'var(--text-1)', margin: 0, lineHeight: 1.6, fontWeight: 600 }}>{asText(answer.answer)}</p>
+                </div>
+                {r.reasoning ? <div><div style={lbl('var(--text-3)')}>Evidence</div><p style={{ fontSize: 12.5, color: 'var(--text-2)', margin: 0, lineHeight: 1.55 }}>{asText(r.reasoning)}</p></div> : null}
+                {(answer.warnings?.length) ? <div><div style={lbl('var(--warning-light)')}>Risks & limitations</div><Bullets tone="warn" size={12} items={hw(answer.warnings)} /></div> : null}
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                  {answer.intent ? <SignalBadge tone="neutral">{String(answer.intent).replace(/_/g, ' ')}</SignalBadge> : null}
+                  {du.source ? <SignalBadge tone="info">source: {asText(du.source)}{du.year ? ` · ${asText(du.year)}` : ''}</SignalBadge> : null}
+                  <SignalBadge tone="bad">Not investment advice</SignalBadge>
+                </div>
                 <ProviderLine provider={answer.provider_used} fallback={answer.fallback_used} diag={answer.diagnostics} />
               </div>
             )
@@ -193,8 +230,7 @@ export default function ResearchAgentPage() {
 
       {/* Explanation panel — only when a score is loaded */}
       {ready && (
-        <EvidencePanel title="Explanation" tone="info"
-          footer={`provider: ${asText(score.provider_used)} · fallback: ${asText(score.fallback_used)} · ${NOT_ADVICE}`}>
+        <EvidencePanel title="Explanation" tone="info" footer={NOT_ADVICE}>
           {llm.summary && <p style={{ fontSize: 13, color: 'var(--text-2)', margin: 0, lineHeight: 1.55 }}>{asText(llm.summary)}</p>}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px,1fr))', gap: 14 }}>
             <div>
@@ -219,15 +255,17 @@ export default function ResearchAgentPage() {
 function ProviderLine({ provider, fallback, diag }) {
   const fb = provider === 'none' || fallback
   return (
-    <div style={{ fontSize: 11, color: 'var(--text-3)' }}>
+    <div style={{ fontSize: 10.5, color: 'var(--text-4)' }}>
       {fb
-        ? 'LLM unavailable; answer generated from validated reports only.'
-        : `Connected to LM Studio (${asText(diag?.configured_model || provider)}).`}
+        ? 'Generated from validated project reports.'
+        : `AI-assisted (${asText(diag?.configured_model || provider)}), grounded in validated data.`}
     </div>
   )
 }
 
 const lbl = (c) => ({ fontSize: 11.5, fontWeight: 700, color: c, marginBottom: 6 })
+const chipBtn = { background: 'var(--surface-1)', color: 'var(--text-2)', border: '1px solid var(--border-strong)',
+  borderRadius: 999, padding: '5px 11px', fontSize: 11.5, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }
 const ghostBtn = { background: 'transparent', color: 'var(--text-2)', border: '1px solid var(--border-strong)',
   borderRadius: 'var(--radius-md)', padding: '9px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }
 const inputS = { background: 'var(--surface-1)', color: 'var(--text-1)', border: '1px solid var(--border-strong)',
