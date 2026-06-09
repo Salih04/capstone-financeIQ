@@ -8,6 +8,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY 2.backend/ .
 COPY data/ /data/
 COPY 3.Datasets/ /3.Datasets/
+COPY experiments/ /experiments/
+COPY research_agent_training/ /research_agent_training/
 
 ENV TRUSTED_OUT_DIR=/data/trusted
 ENV TRUSTED_COMBINED_CSV=/data/trusted/stocks_2020_2025.csv
