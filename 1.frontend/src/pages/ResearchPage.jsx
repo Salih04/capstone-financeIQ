@@ -17,8 +17,7 @@ import {
 } from 'lucide-react'
 import api from '../api/client'
 import { researchApi } from '../api/researchApi'
-import { Card, SectionHeader, StatCard, EmptyState, ScoreBadge, Chip } from '../components/ui'
-import { MetricCard } from '../utils/safeRender'
+import { Card, EmptyState, Chip } from '../components/ui'
 
 const fmt = (v, d = 1) => (v === null || v === undefined || Number.isNaN(v) ? '—' : Number(v).toFixed(d))
 const pct = (v) => (v === null || v === undefined ? '—' : `${Number(v).toFixed(1)}%`)
@@ -455,7 +454,7 @@ const styles = {
   page: {
     maxWidth: 1480,
     margin: '0 auto',
-    padding: '28px 34px 64px',
+    padding: 'clamp(16px, 2vw, 28px) clamp(12px, 2.4vw, 34px) 64px',
     display: 'flex',
     flexDirection: 'column',
     gap: 22,
@@ -523,7 +522,7 @@ const styles = {
   },
   heroStats: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
     gap: 14,
   },
   heroStat: {
@@ -574,7 +573,7 @@ const styles = {
   },
   qualityGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
     gap: 16,
   },
   insightCard: {
@@ -621,7 +620,7 @@ const styles = {
   },
   mainGrid: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(0, 1.35fr) minmax(380px, 0.75fr)',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))',
     gap: 22,
     alignItems: 'stretch',
   },
@@ -676,7 +675,7 @@ const styles = {
     marginLeft: 8,
   },
   chartBox: {
-    height: 480,
+    height: 540,
     padding: '2px 14px 18px',
   },
   tooltip: {
@@ -867,7 +866,7 @@ const styles = {
   },
   companyCardActive: {
     borderColor: 'rgba(251, 176, 64, 0.65)',
-    boxShadow: '0 16px 45px rgba(251, 176, 64, 0.10)',
+    boxShadow: '0 18px 52px rgba(251, 176, 64, 0.16), inset 0 1px 0 rgba(255,255,255,0.08)',
     background: 'linear-gradient(180deg, rgba(251, 176, 64, 0.12), rgba(15, 23, 42, 0.78))',
   },
   companyCardTop: {

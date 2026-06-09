@@ -93,11 +93,11 @@ export function MetricCard({ label, value, sub, tone, mono = true }) {
   const color = toneColor(tone)
   const accent = tone ? toneColor(tone) : 'var(--border-strong)'
   return (
-    <div style={{ position: 'relative', background: 'var(--surface-2)', border: '1px solid var(--border-strong)',
-      borderRadius: 'var(--radius-lg)', padding: '13px 15px', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', background: 'linear-gradient(180deg, rgba(17,30,48,0.82), rgba(10,18,30,0.72))', border: '1px solid var(--border-strong)',
+      borderRadius: 'var(--radius-lg)', padding: '16px 17px', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', backdropFilter: 'blur(18px)' }}>
       <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, background: accent, opacity: tone ? 0.9 : 0.25 }} />
       <div style={{ fontSize: 10.5, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.7, fontWeight: 700 }}>{label}</div>
-      <div style={{ fontSize: 20, fontWeight: 800, color, marginTop: 3, lineHeight: 1.1,
+      <div style={{ fontSize: 23, fontWeight: 900, color, marginTop: 5, lineHeight: 1.1,
         fontVariantNumeric: mono ? 'tabular-nums' : 'normal' }}>
         {typeof value === 'object' ? asText(value) : value}
       </div>

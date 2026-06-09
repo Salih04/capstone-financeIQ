@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Search, Bell, Sun, Moon, ChevronDown, Zap, GitCompare, FileBarChart2, X, Sparkles } from 'lucide-react'
+import { Search, Bell, Sun, Moon, X, Sparkles } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../api/client'
 
@@ -10,7 +10,8 @@ const s = {
     top: 0,
     right: 0,
     height: 'var(--topbar-h)',
-    background: 'var(--surface-1)',
+    background: 'rgba(7,17,31,0.86)',
+    backdropFilter: 'blur(18px)',
     borderBottom: '1px solid var(--border)',
     display: 'flex',
     alignItems: 'center',

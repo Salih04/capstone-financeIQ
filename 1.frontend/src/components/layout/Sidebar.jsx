@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import {
-  LayoutDashboard, Building2, GitCompare, FileText,
+  LayoutDashboard, Building2,
   ShieldCheck, Activity, Tag, FlaskConical, ChevronLeft, Database, LineChart,
-  ChevronRight, LogOut, User, Settings, Bot, Sparkles, BrainCircuit, TrendingUp,
+  ChevronRight, LogOut, Bot, Sparkles, BrainCircuit, TrendingUp,
 } from 'lucide-react'
 
 const NAV_SECTIONS = [
@@ -43,7 +43,8 @@ const s = {
     top: 0,
     left: 0,
     height: '100vh',
-    background: 'var(--surface-1)',
+    background: 'linear-gradient(180deg, rgba(7,17,31,0.96), rgba(3,7,18,0.96))',
+    backdropFilter: 'blur(20px)',
     borderRight: '1px solid var(--border)',
     display: 'flex',
     flexDirection: 'column',
@@ -121,8 +122,9 @@ const s = {
     overflow: 'hidden',
   },
   itemActive: {
-    background: 'var(--primary-subtle)',
+    background: 'linear-gradient(90deg, rgba(245,177,76,0.16), rgba(57,230,208,0.08))',
     color: 'var(--primary-hover)',
+    border: '1px solid rgba(245,177,76,0.18)',
   },
   itemHover: {
     background: 'var(--surface-hover)',
@@ -305,7 +307,7 @@ export default function Sidebar({ collapsed, onToggle }) {
         {!collapsed && (
           <div>
           <div style={s.logoText}>FinanceIQ</div>
-          <div style={s.logoSub}>Success DNA</div>
+          <div style={s.logoSub}>Research Terminal</div>
           </div>
         )}
       </Link>

@@ -187,12 +187,14 @@ export function Card({ children, style: extraStyle, hoverable }) {
   return (
     <div
       style={{
-        background: 'var(--surface-2)',
+        background: 'linear-gradient(180deg, rgba(17,30,48,0.82), rgba(10,18,30,0.72))',
         border: `1px solid ${hovered && hoverable ? 'var(--border-bright)' : 'var(--border-strong)'}`,
         borderRadius: 'var(--radius-lg)',
         overflow: 'hidden',
-        transition: 'border-color 0.15s, box-shadow 0.15s',
-        boxShadow: hovered && hoverable ? 'var(--shadow-sm)' : 'none',
+        transition: 'border-color 0.15s, box-shadow 0.15s, transform 0.15s',
+        boxShadow: hovered && hoverable ? 'var(--shadow-glow)' : 'var(--shadow-sm)',
+        backdropFilter: 'blur(18px)',
+        transform: hovered && hoverable ? 'translateY(-2px)' : 'none',
         ...extraStyle,
       }}
       onMouseEnter={() => hoverable && setHovered(true)}
