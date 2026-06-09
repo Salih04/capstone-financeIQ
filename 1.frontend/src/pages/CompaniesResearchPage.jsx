@@ -13,6 +13,12 @@ function statusOf(score) {
   return { label: 'Low confidence', tone: 'bad' }
 }
 
+function toNullableNumber(value) {
+  if (value === null || value === undefined || value === '') return null
+  const n = Number(value)
+  return Number.isFinite(n) ? n : null
+}
+
 export default function CompaniesResearchPage() {
   const nav = useNavigate()
   const [data, setData] = useState(null)
@@ -24,14 +30,43 @@ export default function CompaniesResearchPage() {
     researchApi.benchmark().then(r => setBench(r.data))
   }, [])
 
-  const all = useMemo(() => (data?.companies || []).slice()
-    .sort((a, b) => (a.ml_rank ?? 1e9) - (b.ml_rank ?? 1e9)), [data])
-  const rows = useMemo(() =>
-    q ? all.filter(c => c.ticker.toLowerCase().includes(q.toLowerCase())) : all, [all, q])
+  const all = useMemo(() => {
+    return (data?.companies || [])
+      .map(c => ({
+        ...c,
+        ml_score: toNullableNumber(c.ml_score),
+        ml_rank: toNullableNumber(c.ml_rank),
+      }))
+      .slice()
+      .sort((a, b) => {
+        const ar = a.ml_rank ?? 1e9
+        const br = b.ml_rank ?? 1e9
+        return ar - br
+      })
+  }, [data])
 
-  const scores = all.map(c => c.ml_score).filter(v => v != null)
-  const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null
-  const top = all.find(c => c.ml_rank === 1) || all[0]
+  const rows = useMemo(() => {
+    const query = q.trim().toLowerCase()
+    return query
+      ? all.filter(c => String(c.ticker || '').toLowerCase().includes(query))
+      : all
+  }, [all, q])
+
+  const scoredCompanies = useMemo(() => {
+    return all.filter(c => c.ml_score != null)
+  }, [all])
+
+  const scores = useMemo(() => {
+    return scoredCompanies.map(c => c.ml_score)
+  }, [scoredCompanies])
+
+  const avg = scores.length
+    ? scores.reduce((a, b) => a + b, 0) / scores.length
+    : null
+
+  const top = scoredCompanies.length
+    ? [...scoredCompanies].sort((a, b) => b.ml_score - a.ml_score)[0]
+    : null
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 22, maxWidth: 1320, margin: '0 auto', padding: '4px 6px' }}>
@@ -70,7 +105,12 @@ export default function CompaniesResearchPage() {
         <MetricCard label="Companies" value={asText(data?.count)} tone="info" sub="research universe" />
         <MetricCard label="Latest year" value={asText(data?.year)} sub="most recent features" />
         <MetricCard label="Average score" value={avg != null ? formatNumber(avg, 2) : '—'} sub="fundamental rank (0–1)" />
-        <MetricCard label="Top-ranked" value={asText(top?.ticker)} tone="good" sub={`score ${formatNumber(top?.ml_score, 2)}`} />
+        <MetricCard
+          label="Top-ranked"
+          value={top ? asText(top.ticker) : '—'}
+          tone={top ? 'good' : 'neutral'}
+          sub={top ? `score ${formatNumber(top.ml_score, 2)}` : 'score —'}
+        />
         <MetricCard label="Benchmark" value={bench?.available ? 'Available' : 'Missing'} tone={bench?.available ? 'good' : 'warn'} sub="BIST100 context" />
       </div>
 
@@ -92,6 +132,8 @@ export default function CompaniesResearchPage() {
 
 function CompanyCard({ c, st, onClick }) {
   const [hover, setHover] = useState(false)
+  const hasScore = c.ml_score != null
+
   return (
     <div onClick={onClick} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       style={{ cursor: 'pointer', background: 'var(--surface-2)',
@@ -105,15 +147,15 @@ function CompanyCard({ c, st, onClick }) {
           <span style={{ fontSize: 11.5, color: 'var(--text-3)' }}>{asText(c.year)}</span>
         </div>
         <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', background: 'var(--surface-3)',
-          borderRadius: 999, padding: '2px 9px' }}>#{asText(c.ml_rank)}</span>
+          borderRadius: 999, padding: '2px 9px' }}>#{hasScore ? asText(c.ml_rank) : '—'}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
         <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--primary)', fontVariantNumeric: 'tabular-nums' }}>
-          {formatNumber(c.ml_score, 2)}
+          {hasScore ? formatNumber(c.ml_score, 2) : '—'}
         </span>
         <span style={{ fontSize: 11, color: 'var(--text-3)' }}>research score</span>
       </div>
-      <MiniBar value={(c.ml_score ?? 0) * 100} max={100} tone="accent" />
+      <MiniBar value={hasScore ? c.ml_score * 100 : 0} max={100} tone="accent" />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
         <SignalBadge tone={st.tone}>{st.label}</SignalBadge>
         <span style={{ fontSize: 11, color: 'var(--text-3)' }}>benchmark-aware</span>
