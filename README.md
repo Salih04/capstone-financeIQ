@@ -82,13 +82,19 @@ Endpoints (`/research/summary`, `/research/company/{ticker}`,
 
 ### Run with / without an LLM
 ```bash
-# No LLM (default) deterministic fallback, always works:
+# No LLM deterministic fallback, always works:
 export RESEARCH_LLM_PROVIDER=none
 
-# LM Studio (OpenAI-compatible):
+# OpenRouter (OpenAI-compatible):
+export RESEARCH_LLM_PROVIDER=openrouter
+export RESEARCH_LLM_BASE_URL=https://openrouter.ai/api/v1/chat/completions
+export RESEARCH_LLM_MODEL=openai/gpt-oss-120b:free
+export OPENAI_API_KEY=your-openrouter-key
+
+# LM Studio (legacy local option):
 export RESEARCH_LLM_PROVIDER=lmstudio
 export RESEARCH_LLM_BASE_URL=http://localhost:1234/v1/chat/completions
-export RESEARCH_LLM_MODEL=your-model
+export RESEARCH_LLM_MODEL=your-local-model
 
 # Ollama:
 export RESEARCH_LLM_PROVIDER=ollama
@@ -151,9 +157,10 @@ automatically (see `2.backend/Dockerfile` CMD).
 ## Run with Docker
 
 ```bash
-export RESEARCH_LLM_PROVIDER=lmstudio
-export RESEARCH_LLM_BASE_URL=http://localhost:1234/v1/chat/completions
-export RESEARCH_LLM_MODEL=qwen2.5-3b-instruct
+export RESEARCH_LLM_PROVIDER=openrouter
+export RESEARCH_LLM_BASE_URL=https://openrouter.ai/api/v1/chat/completions
+export RESEARCH_LLM_MODEL=openai/gpt-oss-120b:free
+export OPENAI_API_KEY=your-openrouter-key
 docker compose up --build
 ```
 
@@ -200,6 +207,9 @@ Docker volumes created before Alembic are stamped once, then upgraded normally.
 |---|---|
 | `DATABASE_URL` | Postgres connection string |
 | `SECRET_KEY` | JWT signing key. **Not committed.** If unset, a random per-process key is generated (JWTs reset on restart) set it explicitly in production. |
+| `OPENROUTER_API_KEY` / `OPENAI_API_KEY` | OpenRouter API key for AI research support |
+| `RESEARCH_LLM_PROVIDER` | `openrouter`, `lmstudio`, `ollama`, or `none` |
+| `RESEARCH_LLM_MODEL` | Chat model id (default `openai/gpt-oss-120b:free` for OpenRouter) |
 | `TRUSTED_DATASETS_DIR` | Dir of trusted XLSX (default `3.Datasets/`) |
 | `TRUSTED_OUT_DIR` | Output dir for generated CSVs (default `data/trusted/`) |
 | `TRUSTED_COMBINED_CSV` | Combined CSV path used by the loader |

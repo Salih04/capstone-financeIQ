@@ -1,9 +1,9 @@
-"""Research-agent service: constrained, local-LLM-assisted research support.
+"""Research-agent service: constrained, LLM-assisted research support.
 
 The structured ML pipeline stays the primary numeric model. This layer only
 READS validated structured evidence and produces cautious, bounded research
-support: deterministic summaries + scores always, optional local-LLM commentary
-when a provider is configured. It never predicts prices/returns, never gives
+support: deterministic summaries + scores always, optional LLM commentary when
+a provider is configured. It never predicts prices/returns, never gives
 buy/sell/hold, never fabricates facts, and never writes back into any dataset.
 
 Composite (weights configurable via env):
@@ -80,17 +80,31 @@ def _env_float(name: str, default: float) -> float:
 
 def get_config() -> dict:
     provider = os.environ.get("RESEARCH_LLM_PROVIDER", "none").lower()
-    base = os.environ.get("RESEARCH_LLM_BASE_URL") or (
-        "http://localhost:1234/v1/chat/completions" if provider == "lmstudio"
-        else "http://localhost:11434/api/chat" if provider == "ollama" else "")
+    if provider in {"openrouter", "openai"}:
+        default_base = "https://openrouter.ai/api/v1/chat/completions"
+    elif provider == "lmstudio":
+        default_base = "http://localhost:1234/v1/chat/completions"
+    elif provider == "ollama":
+        default_base = "http://localhost:11434/api/chat"
+    else:
+        default_base = ""
+    base = os.environ.get("RESEARCH_LLM_BASE_URL") or default_base
     w_ml = _env_float("RESEARCH_SCORE_ML_WEIGHT", 0.65)
     w_conf = _env_float("RESEARCH_SCORE_CONFIDENCE_WEIGHT", 0.20)
     w_llm = _env_float("RESEARCH_SCORE_LLM_WEIGHT", 0.15)
+    default_model = (
+        "openai/gpt-oss-120b:free"
+        if provider in {"openrouter", "openai"}
+        else "local-model"
+    )
     return {
         "provider": provider, "base_url": base,
-        "model": os.environ.get("RESEARCH_LLM_MODEL", "local-model"),
+        "model": os.environ.get("RESEARCH_LLM_MODEL", default_model),
         "timeout": _env_float("RESEARCH_LLM_TIMEOUT_SECONDS", 15.0),
         "max_tokens": int(_env_float("RESEARCH_LLM_MAX_TOKENS", 700)),
+        "api_key": os.environ.get("OPENROUTER_API_KEY") or os.environ.get("OPENAI_API_KEY"),
+        "http_referer": os.environ.get("OPENROUTER_HTTP_REFERER", "http://localhost:3000"),
+        "app_title": os.environ.get("OPENROUTER_APP_TITLE", "FinanceIQ"),
         "weights": {"ml": w_ml, "confidence": w_conf, "llm": w_llm},
     }
 
@@ -500,12 +514,24 @@ def _strip_think(text: str) -> str:
     return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL | re.IGNORECASE).strip()
 
 
-def _http_post_json(url: str, payload: dict, timeout: float) -> dict:
+def _http_post_json(url: str, payload: dict, timeout: float, headers: dict | None = None) -> dict:
+    req_headers = {"Content-Type": "application/json"}
+    if headers:
+        req_headers.update(headers)
     req = urllib.request.Request(
         url, data=json.dumps(payload).encode(),
-        headers={"Content-Type": "application/json"}, method="POST")
+        headers=req_headers, method="POST")
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode())
+
+
+def _openrouter_headers(cfg: dict) -> dict:
+    headers = {
+        "Authorization": f"Bearer {cfg['api_key']}",
+        "HTTP-Referer": cfg.get("http_referer") or "http://localhost:3000",
+        "X-Title": cfg.get("app_title") or "FinanceIQ",
+    }
+    return {k: v for k, v in headers.items() if v}
 
 
 def call_local_llm(messages: list[dict], cfg: dict | None = None) -> dict:
@@ -523,6 +549,18 @@ def call_local_llm(messages: list[dict], cfg: dict | None = None) -> dict:
                     "content": _strip_think(data.get("message", {}).get("content", ""))}
         except Exception as exc:  # noqa
             return {"ok": False, "provider": "ollama", "error": str(exc)}
+    # ---- OpenRouter / OpenAI-compatible -----------------------------------
+    if cfg["provider"] in {"openrouter", "openai"}:
+        if not cfg.get("api_key"):
+            return {"ok": False, "provider": cfg["provider"], "error": "missing OPENROUTER_API_KEY or OPENAI_API_KEY"}
+        try:
+            payload = {"model": cfg["model"], "messages": messages, "temperature": 0.2,
+                       "max_tokens": int(cfg.get("max_tokens", 700))}
+            data = _http_post_json(cfg["base_url"], payload, timeout, headers=_openrouter_headers(cfg))
+            content = _strip_think(data["choices"][0]["message"]["content"])
+            return {"ok": True, "provider": "openrouter", "content": content}
+        except Exception as exc:  # noqa
+            return {"ok": False, "provider": "openrouter", "error": str(exc)}
     # ---- LM Studio / OpenAI-compatible primary ----------------------------
     try:
         payload = {"model": cfg["model"], "messages": messages, "temperature": 0.2,

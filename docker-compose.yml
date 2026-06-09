@@ -32,13 +32,16 @@ services:
       TRUSTED_DATASETS_DIR: /app/3.Datasets
       TRUSTED_OUT_DIR: /app/data/trusted
       TRUSTED_COMBINED_CSV: /app/data/trusted/stocks_2020_2025.csv
-      # Research-agent LLM (optional). From inside a container, localhost is the
-      # container itself — use host.docker.internal to reach LM Studio on the Mac
-      # host. Falls back to deterministic answers if unreachable (never fabricates).
-      RESEARCH_LLM_PROVIDER: ${RESEARCH_LLM_PROVIDER:-none}
-      RESEARCH_LLM_BASE_URL: ${RESEARCH_LLM_BASE_URL:-http://host.docker.internal:1234/v1/chat/completions}
-      RESEARCH_LLM_MODEL: ${RESEARCH_LLM_MODEL:-qwen2.5-3b-instruct}
+      # Research-agent LLM (optional). OpenRouter uses OPENROUTER_API_KEY or
+      # OPENAI_API_KEY and falls back to deterministic answers if unreachable.
+      RESEARCH_LLM_PROVIDER: ${RESEARCH_LLM_PROVIDER:-openrouter}
+      RESEARCH_LLM_BASE_URL: ${RESEARCH_LLM_BASE_URL:-https://openrouter.ai/api/v1/chat/completions}
+      RESEARCH_LLM_MODEL: ${RESEARCH_LLM_MODEL:-openai/gpt-oss-120b:free}
       RESEARCH_LLM_TIMEOUT_SECONDS: ${RESEARCH_LLM_TIMEOUT_SECONDS:-120}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENROUTER_HTTP_REFERER: ${OPENROUTER_HTTP_REFERER:-http://localhost:3000}
+      OPENROUTER_APP_TITLE: ${OPENROUTER_APP_TITLE:-FinanceIQ}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:

@@ -1,7 +1,7 @@
-"""Research-agent API — constrained, local-LLM-assisted research support.
+"""Research-agent API - constrained, LLM-assisted research support.
 
 Reads validated pipeline evidence only. Deterministic fallback always works;
-local LLM (LM Studio / Ollama) is optional and fails safe. Never investment advice.
+OpenRouter/local LLM support is optional and fails safe. Never investment advice.
 """
 
 from __future__ import annotations
