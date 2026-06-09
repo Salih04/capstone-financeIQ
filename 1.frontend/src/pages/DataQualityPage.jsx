@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Database, Mail } from 'lucide-react'
-import { SectionHeader, Chip } from '../components/ui'
+import { Database, Mail, ShieldCheck, Sparkles } from 'lucide-react'
+import { Chip } from '../components/ui'
 import { researchApi } from '../api/researchApi'
 import {
-  MetricCard, RenderList, WarningCallout, CollapsibleJson, EvidencePanel, Bullets, asText,
+  MetricCard, RenderList, WarningCallout, CollapsibleJson, EvidencePanel, SignalBadge, asText,
 } from '../utils/safeRender'
 
 const GROUP_LABEL = {
@@ -40,7 +40,29 @@ export default function DataQualityPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
-      <SectionHeader title="Data Quality & Integrity" sub="Which financial data the model uses, and why — for stakeholders and the data provider" icon={Database} />
+      <section style={styles.hero}>
+        <div>
+          <div style={styles.kicker}><Sparkles size={15} /> Integrity Dashboard</div>
+          <h1 style={styles.title}>Data quality is the core strength of FinanceIQ.</h1>
+          <p style={styles.subtitle}>
+            This audit separates accepted year-varying features from rejected frozen snapshots, documents
+            corrected yearly financials, and explains why leakage-safe modeling rejects future information.
+          </p>
+          <div style={styles.badges}>
+            <SignalBadge tone="good"><ShieldCheck size={12} /> Leakage controls active</SignalBadge>
+            <SignalBadge tone="good">{asText(featureCount)} validated features</SignalBadge>
+            <SignalBadge tone={bench.excess_outperform_targets_enabled ? 'good' : 'warn'}>BIST100 {bench.excess_outperform_targets_enabled ? 'available' : 'missing'}</SignalBadge>
+          </div>
+        </div>
+        <div style={styles.auditCard}>
+          <Database size={22} color="var(--primary)" />
+          <div style={styles.auditTitle}>Audit Rule</div>
+          <p style={styles.auditText}>
+            Green means accepted and used. Amber means useful but incomplete or requiring correction.
+            Red is reserved for true rejected inputs such as frozen snapshots or leakage fields.
+          </p>
+        </div>
+      </section>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(155px,1fr))', gap: 12 }}>
         <MetricCard label="Features used by model" value={asText(featureCount)} tone="good" sub="change year to year" />
@@ -178,4 +200,72 @@ export default function DataQualityPage() {
       </div>
     </div>
   )
+}
+
+const styles = {
+  hero: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+    gap: 18,
+    alignItems: 'stretch',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-lg)',
+    background: 'linear-gradient(135deg, rgba(58,199,139,0.13), rgba(244,176,74,0.08) 44%, var(--surface-2))',
+    padding: 24,
+  },
+  kicker: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 7,
+    color: 'var(--primary-hover)',
+    background: 'var(--primary-subtle)',
+    border: '1px solid rgba(244,176,74,0.25)',
+    borderRadius: 999,
+    padding: '5px 11px',
+    fontSize: 12,
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: 0.7,
+  },
+  title: {
+    margin: '14px 0 8px',
+    color: 'var(--text-1)',
+    fontSize: 'clamp(2rem, 5vw, 3.35rem)',
+    lineHeight: 1,
+    fontWeight: 900,
+    maxWidth: 820,
+  },
+  subtitle: {
+    color: 'var(--text-2)',
+    fontSize: 14.5,
+    lineHeight: 1.65,
+    margin: 0,
+    maxWidth: 740,
+  },
+  badges: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 16,
+  },
+  auditCard: {
+    background: 'rgba(8,15,26,0.54)',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-md)',
+    padding: 18,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 9,
+  },
+  auditTitle: {
+    color: 'var(--text-1)',
+    fontSize: 18,
+    fontWeight: 900,
+  },
+  auditText: {
+    color: 'var(--text-2)',
+    fontSize: 12.8,
+    lineHeight: 1.6,
+    margin: 0,
+  },
 }

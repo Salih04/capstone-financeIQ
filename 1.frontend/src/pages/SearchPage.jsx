@@ -1,10 +1,17 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, LayoutGrid, List, Building2, ChevronRight, Sparkles, ArrowUpDown, Bot, Filter } from 'lucide-react'
+import {
+  Building2,
+  ChevronRight,
+  Filter,
+  LayoutGrid,
+  List,
+  Search,
+  Sparkles,
+} from 'lucide-react'
 import api from '../api/client'
-import { SectionHeader, ScoreBadge, GhostButton, Card, EmptyState, Skeleton } from '../components/ui'
+import { Card, EmptyState, Skeleton } from '../components/ui'
 
-// AI keyword → sector_code mapping
 const AI_SECTOR_MAP = {
   banking: ['BANKACILIK'], bank: ['BANKACILIK'],
   energy: ['ENERJI', 'PETROKIMYA'], oil: ['PETROKIMYA', 'ENERJI'], petroleum: ['PETROKIMYA'],
@@ -37,8 +44,8 @@ const SECTOR_LABELS = {
 }
 
 const formatSectorCode = (value) => {
-  if (!value) return ''
-  return String(value)
+  if (!value) return 'Unclassified'
+  return SECTOR_LABELS[value] || String(value)
     .replace(/_/g, ' ')
     .toLowerCase()
     .replace(/\b\w/g, (m) => m.toUpperCase())
@@ -48,82 +55,14 @@ const parseAISectors = (query) => {
   const lower = query.toLowerCase()
   const sectors = []
   const keywords = []
-  for (const [kw, codes] of Object.entries(AI_SECTOR_MAP)) {
-    if (lower.includes(kw)) {
-      codes.forEach(c => { if (!sectors.includes(c)) sectors.push(c) })
-      if (!keywords.includes(kw)) keywords.push(kw)
-    }
-  }
+  Object.entries(AI_SECTOR_MAP).forEach(([kw, codes]) => {
+    if (!lower.includes(kw)) return
+    codes.forEach((code) => {
+      if (!sectors.includes(code)) sectors.push(code)
+    })
+    if (!keywords.includes(kw)) keywords.push(kw)
+  })
   return { sectors, keywords }
-}
-
-function CompanyCard({ company, onClick }) {
-  const [h, setH] = useState(false)
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        background: h ? 'var(--surface-3)' : 'var(--surface-2)',
-        border: `1px solid ${h ? 'var(--border-bright)' : 'var(--border-strong)'}`,
-        borderRadius: 'var(--radius-lg)',
-        padding: '18px 20px',
-        cursor: 'pointer',
-        transition: 'all 0.14s',
-        transform: h ? 'translateY(-2px)' : 'none',
-        boxShadow: h ? 'var(--shadow-md)' : 'none',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-      onMouseEnter={() => setH(true)}
-      onMouseLeave={() => setH(false)}
-    >
-      {/* Accent gradient top strip */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: h ? 'linear-gradient(90deg, var(--primary), #6366f1)' : 'transparent', transition: 'background 0.2s' }} />
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-        <div style={{
-          width: 40, height: 40, borderRadius: 12,
-          background: 'linear-gradient(135deg, rgba(0,245,212,0.12), var(--surface-3))',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'var(--primary-hover)', fontWeight: 800, fontSize: 12,
-        }}>
-          {company.ticker?.substring(0, 2)}
-        </div>
-        {company.sector_code && (
-          <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--primary)', background: 'rgba(0,245,212,0.08)', borderRadius: 5, padding: '3px 8px', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-            {SECTOR_LABELS[company.sector_code] || formatSectorCode(company.sector_code)}
-          </span>
-        )}
-      </div>
-      <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--primary-hover)', letterSpacing: '-0.3px' }}>{company.ticker}</div>
-      <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{company.company_name}</div>
-      <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 4, color: 'var(--primary)', fontSize: 12, fontWeight: 600 }}>
-        View Profile <ChevronRight size={12} />
-      </div>
-    </div>
-  )
-}
-
-function CompanyRow({ company, onClick }) {
-  const [h, setH] = useState(false)
-  return (
-    <tr
-      onClick={onClick}
-      style={{ cursor: 'pointer', background: h ? 'var(--surface-3)' : 'transparent', transition: 'background 0.12s' }}
-      onMouseEnter={() => setH(true)}
-      onMouseLeave={() => setH(false)}
-    >
-      <td style={{ padding: '12px 16px', fontWeight: 700, color: 'var(--primary-hover)', fontSize: 14 }}>{company.ticker}</td>
-      <td style={{ padding: '12px 16px', color: 'var(--text-2)', fontSize: 13.5 }}>{company.company_name}</td>
-      <td style={{ padding: '12px 16px' }}>
-        {company.sector_code ? (
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)', background: 'rgba(0,245,212,0.08)', borderRadius: 5, padding: '3px 9px' }}>{SECTOR_LABELS[company.sector_code] || formatSectorCode(company.sector_code)}</span>
-        ) : <span style={{ color: 'var(--text-4)' }}>—</span>}
-      </td>
-      <td style={{ padding: '12px 16px', textAlign: 'right' }}>
-        <ChevronRight size={14} style={{ color: 'var(--text-4)' }} />
-      </td>
-    </tr>
-  )
 }
 
 export default function SearchPage() {
@@ -135,37 +74,42 @@ export default function SearchPage() {
   const [sectorFilter, setSectorFilter] = useState(null)
   const navigate = useNavigate()
 
-  // Derived AI filter from current query
   const aiParsed = query.trim().length > 1 ? parseAISectors(query) : { sectors: [], keywords: [] }
 
-  const availableSectors = useMemo(() =>
-    [...new Set(results.map(c => c.sector_code).filter(Boolean))].sort(),
-    [results]
+  const availableSectors = useMemo(
+    () => [...new Set(results.map((c) => c.sector_code).filter(Boolean))].sort(),
+    [results],
   )
 
+  const sectorCounts = useMemo(() => {
+    const counts = {}
+    results.forEach((c) => {
+      if (c.sector_code) counts[c.sector_code] = (counts[c.sector_code] || 0) + 1
+    })
+    return counts
+  }, [results])
+
   const displayResults = useMemo(() => {
-    let r = [...results]
-    if (aiParsed.sectors.length > 0) {
-      r = r.filter(c => aiParsed.sectors.includes(c.sector_code))
-    }
-    if (sectorFilter) {
-      r = r.filter(c => c.sector_code === sectorFilter)
-    }
-    if (sortBy === 'name') r.sort((a, b) => (a.ticker || '').localeCompare(b.ticker || ''))
-    else if (sortBy === 'name-desc') r.sort((a, b) => (b.ticker || '').localeCompare(a.ticker || ''))
-    else if (sortBy === 'sector') r.sort((a, b) => (a.sector_code || '').localeCompare(b.sector_code || ''))
-    return r
+    let rows = [...results]
+    if (aiParsed.sectors.length > 0) rows = rows.filter((c) => aiParsed.sectors.includes(c.sector_code))
+    if (sectorFilter) rows = rows.filter((c) => c.sector_code === sectorFilter)
+    if (sortBy === 'name') rows.sort((a, b) => (a.ticker || '').localeCompare(b.ticker || ''))
+    if (sortBy === 'name-desc') rows.sort((a, b) => (b.ticker || '').localeCompare(a.ticker || ''))
+    if (sortBy === 'sector') rows.sort((a, b) => (a.sector_code || '').localeCompare(b.sector_code || ''))
+    return rows
   }, [results, aiParsed.sectors, sectorFilter, sortBy])
 
   const search = useCallback(async (q) => {
     setLoading(true)
     try {
       const url = q.length >= 1
-      ? `/companies?q=${encodeURIComponent(q)}&limit=200`
-      : '/companies?limit=200'
+        ? `/companies?q=${encodeURIComponent(q)}&limit=200`
+        : '/companies?limit=200'
       const { data } = await api.get(url)
-      setResults(data)
-    } catch { /* ignore */ } finally {
+      setResults(Array.isArray(data) ? data : [])
+    } catch {
+      setResults([])
+    } finally {
       setLoading(false)
     }
   }, [])
@@ -175,241 +119,512 @@ export default function SearchPage() {
     return () => clearTimeout(t)
   }, [query, search])
 
-  const sectorCounts = useMemo(() => {
-    const map = {}
-    results.forEach(c => {
-      if (c.sector_code) map[c.sector_code] = (map[c.sector_code] || 0) + 1
-    })
-    return map
-  }, [results])
-
   return (
-    <div style={{ maxWidth: 1200 }}>
-      {/* ── Header with stats ── */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 20 }}>
+    <div style={styles.page}>
+      <section style={styles.hero}>
+        <div style={styles.heroTop}>
           <div>
-            <h1 style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--text-1)', letterSpacing: '-0.5px', margin: '0 0 4px' }}>Companies</h1>
-            <p style={{ fontSize: 14, color: 'var(--text-3)', margin: 0 }}>Search and explore all financial entities in the database</p>
-          </div>
-          <button
-            onClick={() => navigate('/research-agent')}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              background: 'linear-gradient(135deg, rgba(0,245,212,0.12), rgba(99,102,241,0.12))',
-              border: '1px solid rgba(0,245,212,0.3)',
-              borderRadius: 12, padding: '10px 18px', cursor: 'pointer',
-              transition: 'all 0.15s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.transform = 'translateY(-1px)' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,245,212,0.3)'; e.currentTarget.style.transform = 'none' }}
-          >
-            <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Bot size={12} color="#fff" />
+            <div style={styles.kicker}>
+              <Building2 size={15} />
+              Company Directory
             </div>
-            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--primary-hover)' }}>AI Search</span>
-            <span style={{ fontSize: 11, color: 'var(--text-3)', fontFamily: 'monospace', background: 'var(--surface-3)', borderRadius: 4, padding: '1px 6px' }}>
-              {navigator.platform?.includes('Mac') ? '⌘' : 'Ctrl'}+K
-            </span>
-          </button>
+            <h1 style={styles.title}>Research Universe</h1>
+            <p style={styles.subtitle}>
+              Search BIST companies by ticker, company name, or sector keyword. This directory routes
+              to company profiles; research scoring lives in the dedicated Companies research page.
+            </p>
+          </div>
+
+          <div style={styles.searchBox}>
+            <Search size={17} style={styles.searchIcon} />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search ticker, name, or sector..."
+              style={styles.searchInput}
+            />
+            {aiParsed.keywords.length > 0 && (
+              <span style={styles.aiChip}><Sparkles size={11} /> Sector match</span>
+            )}
+          </div>
         </div>
 
-        {/* Stats strip */}
         {!loading && results.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 0 }}>
-            <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: '14px 18px' }}>
-              <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.7, color: 'var(--text-3)', marginBottom: 4 }}>Total Companies</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--primary)', fontVariantNumeric: 'tabular-nums' }}>{results.length}</div>
-            </div>
-            <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: '14px 18px' }}>
-              <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.7, color: 'var(--text-3)', marginBottom: 4 }}>Sectors</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--info)', fontVariantNumeric: 'tabular-nums' }}>{availableSectors.length}</div>
-            </div>
-            <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: '14px 18px' }}>
-              <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.7, color: 'var(--text-3)', marginBottom: 4 }}>Showing</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--success)', fontVariantNumeric: 'tabular-nums' }}>{displayResults.length}</div>
-            </div>
+          <div style={styles.kpiGrid}>
+            <HeroMetric label="Total Companies" value={results.length} />
+            <HeroMetric label="Sectors" value={availableSectors.length} />
+            <HeroMetric label="Showing" value={displayResults.length} />
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Toolbar */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: 1, maxWidth: 440 }}>
-          <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-3)', pointerEvents: 'none' }} />
-          <input
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Search by ticker, name, or sector keyword..."
-            style={{
-              width: '100%', boxSizing: 'border-box',
-              background: 'var(--surface-2)',
-              border: '1.5px solid var(--border-strong)',
-              borderRadius: 'var(--radius-md)',
-              padding: '10px 14px 10px 38px',
-              color: 'var(--text-1)',
-              fontSize: 13.5,
-              outline: 'none',
-              transition: 'border-color 0.15s, box-shadow 0.15s',
-            }}
-            onFocus={e => { e.target.style.borderColor = 'var(--primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(0,245,212,0.08)' }}
-            onBlur={e => { e.target.style.borderColor = 'var(--border-strong)'; e.target.style.boxShadow = 'none' }}
-          />
-          {aiParsed.keywords.length > 0 && (
-            <span style={{
-              position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-              display: 'flex', alignItems: 'center', gap: 4,
-              fontSize: 10, fontWeight: 700, color: 'var(--primary)',
-              background: 'var(--primary-subtle)', borderRadius: 5, padding: '2px 7px',
-              pointerEvents: 'none',
-            }}>
-              <Sparkles size={9} /> AI
-            </span>
-          )}
-        </div>
-
-        {/* Sort */}
-        <select
-          value={sortBy}
-          onChange={e => setSortBy(e.target.value)}
-          style={{
-            fontSize: 12, fontWeight: 600, padding: '8px 10px', borderRadius: 'var(--radius-md)',
-            border: '1.5px solid var(--border-strong)', background: 'var(--surface-2)',
-            color: 'var(--text-2)', cursor: 'pointer', outline: 'none',
-          }}
-        >
-          <option value="name">Sort: A → Z</option>
-          <option value="name-desc">Sort: Z → A</option>
-          <option value="sector">Sort: Sector</option>
-        </select>
-
-        {/* View toggle */}
-        <div style={{ display: 'flex', gap: 4, background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-md)', padding: 3 }}>
-          {[['grid', LayoutGrid], ['list', List]].map(([mode, Icon]) => (
-            <button
-              key={mode}
-              onClick={() => setViewMode(mode)}
-              style={{
-                border: 'none', borderRadius: 8,
-                background: viewMode === mode ? 'var(--surface-hover)' : 'transparent',
-                color: viewMode === mode ? 'var(--text-1)' : 'var(--text-3)',
-                padding: '6px 9px', cursor: 'pointer', display: 'flex', alignItems: 'center',
-                transition: 'background 0.12s, color 0.12s',
-              }}
-            >
-              <Icon size={15} />
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Sector filter chips ── */}
-      {!loading && availableSectors.length > 0 && (
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: aiParsed.keywords.length > 0 ? 10 : 16, alignItems: 'center' }}>
-          <Filter size={12} style={{ color: 'var(--text-3)', marginRight: 2 }} />
+      <section style={styles.toolbar}>
+        <div style={styles.filterRow}>
+          <Filter size={14} style={{ color: 'var(--text-3)' }} />
           <button
             onClick={() => setSectorFilter(null)}
-            style={{
-              fontSize: 11, fontWeight: 600, padding: '4px 12px', borderRadius: 20,
-              border: `1.5px solid ${!sectorFilter ? 'var(--primary)' : 'var(--border-strong)'}`,
-              background: !sectorFilter ? 'rgba(0,245,212,0.1)' : 'transparent',
-              color: !sectorFilter ? 'var(--primary)' : 'var(--text-3)',
-              cursor: 'pointer', transition: 'all 0.12s',
-            }}
+            style={chipStyle(!sectorFilter)}
           >
             All ({results.length})
           </button>
-          {availableSectors.map(code => {
-            const active = sectorFilter === code
-            const label = SECTOR_LABELS[code] || code
-            return (
+          {availableSectors.map((code) => (
+            <button
+              key={code}
+              onClick={() => setSectorFilter(sectorFilter === code ? null : code)}
+              style={chipStyle(sectorFilter === code)}
+            >
+              {formatSectorCode(code)} ({sectorCounts[code] || 0})
+            </button>
+          ))}
+        </div>
+
+        <div style={styles.controls}>
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={styles.select}>
+            <option value="name">Sort: A to Z</option>
+            <option value="name-desc">Sort: Z to A</option>
+            <option value="sector">Sort: Sector</option>
+          </select>
+          <div style={styles.segment}>
+            {[['grid', LayoutGrid], ['list', List]].map(([mode, Icon]) => (
               <button
-                key={code}
-                onClick={() => setSectorFilter(active ? null : code)}
-                style={{
-                  fontSize: 11, fontWeight: 600, padding: '4px 12px', borderRadius: 20,
-                  border: `1.5px solid ${active ? 'var(--primary)' : 'var(--border-strong)'}`,
-                  background: active ? 'rgba(0,245,212,0.1)' : 'transparent',
-                  color: active ? 'var(--primary)' : 'var(--text-3)',
-                  cursor: 'pointer', transition: 'all 0.12s',
-                }}
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                title={mode === 'grid' ? 'Grid view' : 'List view'}
+                style={segmentButton(viewMode === mode)}
               >
-                {label} ({sectorCounts[code] || 0})
+                <Icon size={16} />
               </button>
-            )
-          })}
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {aiParsed.keywords.length > 0 && (
+        <div style={styles.interpretation}>
+          <Sparkles size={14} />
+          Detected sector intent from "{aiParsed.keywords.join(', ')}"; showing matching companies only.
         </div>
       )}
 
-      {/* AI interpretation banner */}
-      {!loading && aiParsed.keywords.length > 0 && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16,
-          background: 'rgba(0,245,212,0.06)', border: '1px solid rgba(0,245,212,0.22)',
-          borderRadius: 'var(--radius-md)', padding: '8px 14px',
-        }}>
-          <Sparkles size={13} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-          <span style={{ fontSize: 12.5, color: 'var(--text-2)' }}>
-            <strong style={{ color: 'var(--primary)' }}>AI Search</strong>
-            {' '}— detected <strong>{aiParsed.keywords.join(', ')}</strong> · showing {displayResults.length} {displayResults.length === 1 ? 'company' : 'companies'} in matching sector{aiParsed.sectors.length > 1 ? 's' : ''}
-          </span>
-          {displayResults.length === 0 && results.length > 0 && (
-            <span style={{ fontSize: 11, color: 'var(--text-3)', marginLeft: 6 }}>(no sector match — showing all {results.length})</span>
-          )}
-        </div>
-      )}
-
-      {/* Loading skeletons */}
       {loading && (
         viewMode === 'grid' ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
-            {[...Array(8)].map((_, i) => <Skeleton key={i} width="100%" height={130} radius={14} />)}
+          <div style={styles.grid}>
+            {[...Array(8)].map((_, i) => <Skeleton key={i} width="100%" height={156} radius={12} />)}
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {[...Array(6)].map((_, i) => <Skeleton key={i} width="100%" height={44} radius={10} />)}
+          <div style={styles.listSkeleton}>
+            {[...Array(6)].map((_, i) => <Skeleton key={i} width="100%" height={54} radius={10} />)}
           </div>
         )
       )}
 
-      {/* Grid view */}
       {!loading && viewMode === 'grid' && displayResults.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
-          {displayResults.map(c => (
-            <CompanyCard key={c.id} company={c} onClick={() => navigate(`/companies/${c.id}`)} />
+        <div style={styles.grid}>
+          {displayResults.map((company) => (
+            <CompanyCard
+              key={company.id}
+              company={company}
+              onClick={() => navigate(`/companies/${company.id}`)}
+            />
           ))}
         </div>
       )}
 
-      {/* Table view */}
       {!loading && viewMode === 'list' && displayResults.length > 0 && (
-        <Card>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <Card style={{ overflowX: 'auto' }}>
+          <table style={styles.table}>
             <thead>
-              <tr style={{ background: 'var(--surface-3)' }}>
-                <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.8 }}>Ticker</th>
-                <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.8 }}>Company</th>
-                <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.8 }}>Sector</th>
-                <th style={{ padding: '10px 16px', width: 40 }} />
+              <tr>
+                <th style={th}>Ticker</th>
+                <th style={th}>Company</th>
+                <th style={th}>Sector</th>
+                <th style={{ ...th, width: 44 }} />
               </tr>
             </thead>
             <tbody>
-              {displayResults.map(c => (
-                <CompanyRow key={c.id} company={c} onClick={() => navigate(`/companies/${c.id}`)} />
+              {displayResults.map((company) => (
+                <CompanyRow
+                  key={company.id}
+                  company={company}
+                  onClick={() => navigate(`/companies/${company.id}`)}
+                />
               ))}
             </tbody>
           </table>
         </Card>
       )}
 
-      {/* Empty state */}
       {!loading && displayResults.length === 0 && (
         <EmptyState
           icon={Building2}
-          title={sectorFilter ? `No companies in ${SECTOR_LABELS[sectorFilter] || sectorFilter}` : query ? `No results for "${query}"` : 'No companies found'}
-          sub={sectorFilter ? 'Try selecting a different sector filter.' : query ? 'Try a different ticker or company name.' : 'Add companies to the database to get started.'}
+          title={sectorFilter ? `No companies in ${formatSectorCode(sectorFilter)}` : query ? `No results for "${query}"` : 'No companies found'}
+          sub={sectorFilter ? 'Try another sector filter.' : query ? 'Try another ticker, company name, or sector keyword.' : 'Add companies to the database to get started.'}
         />
       )}
     </div>
   )
+}
+
+function HeroMetric({ label, value }) {
+  return (
+    <div style={styles.heroMetric}>
+      <div style={styles.metricLabel}>{label}</div>
+      <div style={styles.metricValue}>{value}</div>
+    </div>
+  )
+}
+
+function CompanyCard({ company, onClick }) {
+  const [hover, setHover] = useState(false)
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{ ...styles.companyCard, ...(hover ? styles.companyCardHover : {}) }}
+    >
+      <div style={styles.cardAccent} />
+      <div style={styles.companyTop}>
+        <div style={styles.logoMark}>{company.ticker?.slice(0, 2) || '--'}</div>
+        <span style={styles.sectorBadge}>{formatSectorCode(company.sector_code)}</span>
+      </div>
+      <div style={styles.ticker}>{company.ticker}</div>
+      <div style={styles.companyName}>{company.company_name}</div>
+      <div style={styles.cardFooter}>
+        <span>Open Profile</span>
+        <ChevronRight size={14} />
+      </div>
+    </button>
+  )
+}
+
+function CompanyRow({ company, onClick }) {
+  const [hover, setHover] = useState(false)
+  return (
+    <tr
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{ cursor: 'pointer', background: hover ? 'var(--surface-3)' : 'transparent' }}
+    >
+      <td style={tdTicker}>{company.ticker}</td>
+      <td style={td}>{company.company_name}</td>
+      <td style={td}><span style={styles.sectorBadge}>{formatSectorCode(company.sector_code)}</span></td>
+      <td style={{ ...td, textAlign: 'right' }}><ChevronRight size={15} style={{ color: 'var(--text-3)' }} /></td>
+    </tr>
+  )
+}
+
+const chipStyle = (active) => ({
+  border: `1px solid ${active ? 'var(--primary)' : 'var(--border-strong)'}`,
+  background: active ? 'var(--primary-subtle)' : 'transparent',
+  color: active ? 'var(--primary-hover)' : 'var(--text-2)',
+  borderRadius: 999,
+  padding: '5px 12px',
+  fontSize: 11.5,
+  fontWeight: 700,
+  cursor: 'pointer',
+})
+
+const segmentButton = (active) => ({
+  width: 34,
+  height: 32,
+  border: 0,
+  borderRadius: 7,
+  background: active ? 'var(--surface-hover)' : 'transparent',
+  color: active ? 'var(--text-1)' : 'var(--text-3)',
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+})
+
+const th = {
+  padding: '11px 16px',
+  textAlign: 'left',
+  fontSize: 11,
+  fontWeight: 800,
+  color: 'var(--text-3)',
+  textTransform: 'uppercase',
+  letterSpacing: 0.7,
+  borderBottom: '1px solid var(--border)',
+}
+
+const td = {
+  padding: '13px 16px',
+  color: 'var(--text-2)',
+  fontSize: 13.5,
+  borderBottom: '1px solid var(--border)',
+}
+
+const tdTicker = {
+  ...td,
+  fontWeight: 800,
+  color: 'var(--primary-hover)',
+  fontVariantNumeric: 'tabular-nums',
+}
+
+const styles = {
+  page: {
+    maxWidth: 1240,
+    margin: '0 auto',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 18,
+  },
+  hero: {
+    position: 'relative',
+    overflow: 'hidden',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-lg)',
+    background: 'linear-gradient(135deg, rgba(58,199,139,0.10), rgba(85,194,195,0.08) 42%, var(--surface-2))',
+    padding: 24,
+  },
+  heroTop: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+    gap: 20,
+    alignItems: 'end',
+  },
+  kicker: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 7,
+    color: 'var(--primary-hover)',
+    background: 'var(--primary-subtle)',
+    border: '1px solid rgba(244,176,74,0.25)',
+    borderRadius: 999,
+    padding: '5px 11px',
+    fontSize: 12,
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: 0.7,
+  },
+  title: {
+    margin: '12px 0 6px',
+    color: 'var(--text-1)',
+    fontSize: 'clamp(2rem, 5vw, 3.35rem)',
+    lineHeight: 1,
+    fontWeight: 900,
+  },
+  subtitle: {
+    color: 'var(--text-2)',
+    fontSize: 14.5,
+    lineHeight: 1.65,
+    maxWidth: 720,
+    margin: 0,
+  },
+  searchBox: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: 14,
+    color: 'var(--text-3)',
+    pointerEvents: 'none',
+  },
+  searchInput: {
+    width: '100%',
+    background: 'rgba(8,15,26,0.58)',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-md)',
+    padding: '13px 112px 13px 42px',
+    color: 'var(--text-1)',
+    fontSize: 14,
+    outline: 'none',
+    boxSizing: 'border-box',
+  },
+  aiChip: {
+    position: 'absolute',
+    right: 10,
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 5,
+    color: 'var(--primary-hover)',
+    background: 'var(--primary-subtle)',
+    borderRadius: 999,
+    padding: '4px 9px',
+    fontSize: 11,
+    fontWeight: 800,
+  },
+  kpiGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+    gap: 12,
+    marginTop: 22,
+  },
+  heroMetric: {
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-md)',
+    padding: '13px 14px',
+  },
+  metricLabel: {
+    color: 'var(--text-3)',
+    fontSize: 10.5,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    fontWeight: 800,
+  },
+  metricValue: {
+    color: 'var(--text-1)',
+    fontSize: 24,
+    lineHeight: 1.1,
+    fontWeight: 900,
+    marginTop: 3,
+  },
+  toolbar: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    gap: 12,
+    alignItems: 'flex-start',
+    flexWrap: 'wrap',
+  },
+  filterRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 7,
+    flexWrap: 'wrap',
+    flex: 1,
+  },
+  controls: {
+    display: 'flex',
+    gap: 8,
+    alignItems: 'center',
+  },
+  select: {
+    fontSize: 12,
+    fontWeight: 700,
+    padding: '8px 10px',
+    borderRadius: 'var(--radius-md)',
+    border: '1px solid var(--border-strong)',
+    background: 'var(--surface-2)',
+    color: 'var(--text-2)',
+    cursor: 'pointer',
+    outline: 'none',
+  },
+  segment: {
+    display: 'flex',
+    gap: 3,
+    background: 'var(--surface-2)',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-md)',
+    padding: 3,
+  },
+  interpretation: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    color: 'var(--primary-hover)',
+    background: 'var(--primary-subtle)',
+    border: '1px solid rgba(244,176,74,0.22)',
+    borderRadius: 'var(--radius-md)',
+    padding: '9px 12px',
+    fontSize: 12.5,
+    fontWeight: 700,
+    width: 'fit-content',
+    maxWidth: '100%',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))',
+    gap: 14,
+  },
+  listSkeleton: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+  },
+  companyCard: {
+    position: 'relative',
+    textAlign: 'left',
+    background: 'var(--surface-2)',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-lg)',
+    padding: 18,
+    minHeight: 156,
+    overflow: 'hidden',
+    cursor: 'pointer',
+    transition: 'border-color .15s, transform .12s, box-shadow .15s, background .15s',
+    color: 'inherit',
+    font: 'inherit',
+  },
+  companyCardHover: {
+    borderColor: 'var(--border-bright)',
+    transform: 'translateY(-2px)',
+    boxShadow: 'var(--shadow-sm)',
+    background: 'var(--surface-3)',
+  },
+  cardAccent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    background: 'linear-gradient(90deg, var(--primary), var(--secondary))',
+  },
+  companyTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  logoMark: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    background: 'var(--primary-subtle)',
+    color: 'var(--primary-hover)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 12,
+    fontWeight: 900,
+  },
+  sectorBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    borderRadius: 999,
+    background: 'var(--surface-3)',
+    color: 'var(--text-2)',
+    border: '1px solid var(--border)',
+    padding: '3px 9px',
+    fontSize: 11,
+    fontWeight: 800,
+    maxWidth: '100%',
+  },
+  ticker: {
+    marginTop: 14,
+    color: 'var(--text-1)',
+    fontSize: 22,
+    lineHeight: 1,
+    fontWeight: 900,
+  },
+  companyName: {
+    marginTop: 7,
+    minHeight: 34,
+    color: 'var(--text-3)',
+    fontSize: 12.5,
+    lineHeight: 1.35,
+    overflow: 'hidden',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+  },
+  cardFooter: {
+    marginTop: 14,
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+    color: 'var(--primary-hover)',
+    fontSize: 12,
+    fontWeight: 800,
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+  },
 }

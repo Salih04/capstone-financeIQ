@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Building2, Search } from 'lucide-react'
-import { SectionHeader } from '../components/ui'
+import { Search, ShieldCheck, Sparkles } from 'lucide-react'
 import { researchApi } from '../api/researchApi'
 import { MetricCard, MiniBar, SignalBadge, formatNumber, asText, NOT_ADVICE } from '../utils/safeRender'
 
@@ -36,17 +35,35 @@ export default function CompaniesResearchPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 22, maxWidth: 1320, margin: '0 auto', padding: '4px 6px' }}>
-      <SectionHeader title="Research Universe"
-        sub={`${asText(data?.count)} BIST companies · latest research year ${asText(data?.year)}`}
-        icon={Building2}
-        actions={
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: 'var(--surface-2)',
-            border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-md)', padding: '7px 12px' }}>
-            <Search size={15} color="var(--text-3)" />
-            <input value={q} onChange={e => setQ(e.target.value)} placeholder="search ticker…"
-              style={{ background: 'transparent', color: 'var(--text-1)', border: 0, outline: 'none', fontSize: 13.5, width: 150 }} />
+      <section style={styles.hero}>
+        <div>
+          <div style={styles.kicker}><Sparkles size={15} /> Research Universe</div>
+          <h1 style={styles.title}>Ranked company cards for the validated BIST universe.</h1>
+          <p style={styles.subtitle}>
+            Latest-year research scores for {asText(data?.count)} selected companies. Scores summarize
+            validated year-end features for diagnostic research support, not buy or sell advice.
+          </p>
+          <div style={styles.badges}>
+            <SignalBadge tone="good"><ShieldCheck size={12} /> Leakage-safe context</SignalBadge>
+            <SignalBadge tone={bench?.available ? 'good' : 'warn'}>BIST100 {bench?.available ? 'available' : 'missing'}</SignalBadge>
+            <SignalBadge tone="bad">Not investment advice</SignalBadge>
           </div>
-        } />
+        </div>
+
+        <div style={styles.searchPanel}>
+          <div style={styles.searchLabel}>Find Company</div>
+          <div style={styles.searchBox}>
+            <Search size={16} color="var(--text-3)" />
+            <input
+              value={q}
+              onChange={e => setQ(e.target.value)}
+              placeholder="Search ticker..."
+              style={styles.searchInput}
+            />
+          </div>
+          <p style={styles.searchHint}>Open any card for company-level evidence and score explanation.</p>
+        </div>
+      </section>
 
       {/* KPI strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: 14 }}>
@@ -103,4 +120,90 @@ function CompanyCard({ c, st, onClick }) {
       </div>
     </div>
   )
+}
+
+const styles = {
+  hero: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+    gap: 18,
+    alignItems: 'end',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-lg)',
+    background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(58,199,139,0.08) 44%, var(--surface-2))',
+    padding: 24,
+  },
+  kicker: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 7,
+    color: 'var(--primary-hover)',
+    background: 'var(--primary-subtle)',
+    border: '1px solid rgba(244,176,74,0.25)',
+    borderRadius: 999,
+    padding: '5px 11px',
+    fontSize: 12,
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: 0.7,
+  },
+  title: {
+    margin: '14px 0 8px',
+    color: 'var(--text-1)',
+    fontSize: 'clamp(2rem, 5vw, 3.35rem)',
+    lineHeight: 1,
+    fontWeight: 900,
+    maxWidth: 820,
+  },
+  subtitle: {
+    color: 'var(--text-2)',
+    fontSize: 14.5,
+    lineHeight: 1.65,
+    margin: 0,
+    maxWidth: 740,
+  },
+  badges: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 16,
+  },
+  searchPanel: {
+    background: 'rgba(8,15,26,0.54)',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-md)',
+    padding: 16,
+  },
+  searchLabel: {
+    color: 'var(--text-3)',
+    fontSize: 11,
+    fontWeight: 900,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 8,
+  },
+  searchBox: {
+    display: 'flex',
+    gap: 9,
+    alignItems: 'center',
+    background: 'var(--surface-1)',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-md)',
+    padding: '10px 12px',
+  },
+  searchInput: {
+    flex: 1,
+    minWidth: 0,
+    background: 'transparent',
+    color: 'var(--text-1)',
+    border: 0,
+    outline: 'none',
+    fontSize: 13.5,
+  },
+  searchHint: {
+    color: 'var(--text-3)',
+    fontSize: 12,
+    lineHeight: 1.45,
+    margin: '10px 0 0',
+  },
 }

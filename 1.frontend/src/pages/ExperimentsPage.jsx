@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { FlaskConical } from 'lucide-react'
-import { SectionHeader } from '../components/ui'
+import { Activity, BarChart3, FlaskConical, ShieldCheck, Sparkles, TrendingDown } from 'lucide-react'
 import { researchApi } from '../api/researchApi'
 import {
   MetricCard, WarningCallout, CompactTable, SignalBadge, Collapsible, Bullets,
@@ -8,7 +7,7 @@ import {
 } from '../utils/safeRender'
 
 const TARGET_LABELS = {
-  next_year_return_pct: 'Raw return',
+  next_year_return_pct: 'Next-year return',
   next_year_excess_return_vs_bist100: 'Excess vs BIST100',
   next_year_outperform_bist100: 'Outperform BIST100',
 }
@@ -18,7 +17,7 @@ const naNum = (v, d) => (v === null || v === undefined || Number.isNaN(Number(v)
 // internal split/model IDs -> end-user friendly labels
 const splitLabel = (s) => {
   const m = String(s || '').match(/(20\d{2})/)
-  return m ? `${m[1]} evaluation` : asTextSafe(s)
+  return m ? `${m[1]} Backtest` : asTextSafe(s)
 }
 const MODEL_LABELS = {
   baseline_equal_weight: 'Equal-weight baseline',
@@ -51,6 +50,11 @@ export default function ExperimentsPage() {
     return base.map(r => ({ ...r, __baseline: r.kind === 'baseline' }))
   }, [byTarget, primaryLb, target])
 
+  const bestRow = rows
+    .filter(r => r.kind !== 'baseline')
+    .slice()
+    .sort((a, b) => (Number(b.spearman) || -1e9) - (Number(a.spearman) || -1e9))[0]
+
   const columns = [
     { key: 'split', label: 'Evaluated on' },
     { key: 'model', label: 'Model' },
@@ -70,19 +74,45 @@ export default function ExperimentsPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
-      <SectionHeader title="Experiments — walk-forward backtest" sub="Honest out-of-sample evaluation · benchmark-aware targets" icon={FlaskConical} />
+      <section style={styles.hero}>
+        <div>
+          <div style={styles.kicker}><Sparkles size={15} /> Walk-forward Backtests</div>
+          <h1 style={styles.title}>Experiments show weak signal, not a broken system.</h1>
+          <p style={styles.subtitle}>
+            Each split evaluates whether year-T features rank next-year outcomes better than simple baselines.
+            Current evidence is honest: small sample, unstable relationships, no reliable predictive edge.
+          </p>
+          <div style={styles.heroBadges}>
+            <SignalBadge tone="good"><ShieldCheck size={12} /> Leakage-safe targets</SignalBadge>
+            <SignalBadge tone="info">{label(target)}</SignalBadge>
+            <SignalBadge tone="bad">Research support only</SignalBadge>
+          </div>
+        </div>
+        <div style={styles.verdictCard}>
+          <TrendingDown size={22} color="var(--warning)" />
+          <div style={styles.verdictLabel}>Experiment Verdict</div>
+          <div style={styles.verdictTitle}>{diag.ml_beats_baseline_consistently ? 'ML adds signal' : 'ML does not beat baseline consistently'}</div>
+          <p style={styles.verdictText}>{asText(exp?.verdict)}</p>
+        </div>
+      </section>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(165px,1fr))', gap: 12 }}>
-        <MetricCard label="Target" value="Next-year return" mono={false} sub="evaluated out-of-sample" />
+        <MetricCard label="Selected target" value={label(target)} mono={false} sub="evaluated out-of-sample" />
         <MetricCard label="Mean rank correlation" value={naNum(diag.mean_spearman, 3)} tone={weak ? 'bad' : 'good'} sub="≈0 = no edge" />
         <MetricCard label="Signal quality" value={weak ? 'Weak' : 'OK'} tone={weak ? 'bad' : 'good'} mono={false} />
         <MetricCard label="ML beats baseline" value={diag.ml_beats_baseline_consistently ? 'Yes' : 'No'} tone={diag.ml_beats_baseline_consistently ? 'good' : 'bad'} mono={false} />
-        <MetricCard label="Sample" value={diag.small_sample ? 'Small' : 'OK'} tone="warn" mono={false} sub="~40 stocks/year" />
+        <MetricCard label="Sample" value={diag.small_sample ? 'Small' : 'OK'} tone="warn" mono={false} sub="about 40 stocks/year" />
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px,1fr))', gap: 14 }}>
+        <Insight icon={Activity} title="Target in focus" value={label(target)} sub="User-selectable evaluation outcome" />
+        <Insight icon={BarChart3} title="Best ML row" value={bestRow ? modelLabel(bestRow.model) : 'No model row'} sub={bestRow ? `${splitLabel(bestRow.split)} · Spearman ${naNum(bestRow.spearman, 3)}` : 'Leaderboard unavailable'} />
+        <Insight icon={FlaskConical} title="Baseline meaning" value="Simple comparator" sub="ML must beat simple ranking consistently to matter" />
       </div>
 
       <WarningCallout title="No reliable predictive edge yet" tone="bad">
-        {asText(exp?.verdict)} With ~40 stocks per year, single-split spikes are noise, not skill —
-        trust the baselines over the ML model on the current feature set.
+        {asText(exp?.verdict)} With about 40 stocks per year, single-split spikes are noise, not skill.
+        Baselines remain the correct benchmark for judging model value.
       </WarningCallout>
 
       {exp?.interpretation_business?.length ? (
@@ -109,8 +139,8 @@ export default function ExperimentsPage() {
       </div>
 
       <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: 16 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 700, marginBottom: 4 }}>Leaderboard — {label(target)}</div>
-        <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginBottom: 12 }}>Baseline rows shaded · ML must beat baseline to matter</div>
+        <div style={{ fontSize: 13.5, fontWeight: 800, marginBottom: 4 }}>Detailed leaderboard - {label(target)}</div>
+        <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginBottom: 12 }}>Baseline rows shaded. Treat detailed rows as diagnostics, not ranking advice.</div>
         <CompactTable columns={columns} rows={rows} highlight={r => r.__baseline} renderCell={renderCell} empty="No rows for this target." />
       </div>
 
@@ -130,6 +160,19 @@ export default function ExperimentsPage() {
   )
 }
 
+function Insight({ icon: Icon, title, value, sub }) {
+  return (
+    <div style={styles.insight}>
+      <span style={styles.insightIcon}><Icon size={18} /></span>
+      <div>
+        <div style={styles.insightTitle}>{title}</div>
+        <div style={styles.insightValue}>{value}</div>
+        <div style={styles.insightSub}>{sub}</div>
+      </div>
+    </div>
+  )
+}
+
 function EvidenceNote() {
   return (
     <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', padding: 16 }}>
@@ -141,4 +184,118 @@ function EvidenceNote() {
       </p>
     </div>
   )
+}
+
+const styles = {
+  hero: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+    gap: 18,
+    alignItems: 'stretch',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-lg)',
+    background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))',
+    padding: 24,
+  },
+  kicker: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 7,
+    color: 'var(--primary-hover)',
+    background: 'var(--primary-subtle)',
+    border: '1px solid rgba(244,176,74,0.25)',
+    borderRadius: 999,
+    padding: '5px 11px',
+    fontSize: 12,
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: 0.7,
+  },
+  title: {
+    margin: '14px 0 8px',
+    color: 'var(--text-1)',
+    fontSize: 'clamp(2rem, 5vw, 3.35rem)',
+    lineHeight: 1,
+    fontWeight: 900,
+    maxWidth: 820,
+  },
+  subtitle: {
+    color: 'var(--text-2)',
+    fontSize: 14.5,
+    lineHeight: 1.65,
+    margin: 0,
+    maxWidth: 740,
+  },
+  heroBadges: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 16,
+  },
+  verdictCard: {
+    background: 'rgba(8,15,26,0.54)',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-md)',
+    padding: 18,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+  },
+  verdictLabel: {
+    color: 'var(--warning-light)',
+    fontSize: 11,
+    fontWeight: 900,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  verdictTitle: {
+    color: 'var(--text-1)',
+    fontSize: 18,
+    lineHeight: 1.25,
+    fontWeight: 900,
+  },
+  verdictText: {
+    color: 'var(--text-2)',
+    fontSize: 12.5,
+    lineHeight: 1.55,
+    margin: 0,
+  },
+  insight: {
+    display: 'flex',
+    gap: 12,
+    background: 'var(--surface-2)',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-lg)',
+    padding: 16,
+  },
+  insightIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    background: 'var(--primary-subtle)',
+    color: 'var(--primary-hover)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  insightTitle: {
+    color: 'var(--text-3)',
+    fontSize: 11,
+    fontWeight: 900,
+    textTransform: 'uppercase',
+    letterSpacing: 0.7,
+  },
+  insightValue: {
+    color: 'var(--text-1)',
+    fontSize: 16,
+    fontWeight: 900,
+    marginTop: 3,
+  },
+  insightSub: {
+    color: 'var(--text-3)',
+    fontSize: 12,
+    lineHeight: 1.4,
+    marginTop: 2,
+  },
 }
