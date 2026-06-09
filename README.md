@@ -168,6 +168,33 @@ The trusted dataset is mounted (`./3.Datasets`) and loaded on boot. Paths inside
 the container are set via `TRUSTED_DATASETS_DIR`, `TRUSTED_OUT_DIR`,
 `TRUSTED_COMBINED_CSV` in `docker-compose.yml`.
 
+## Deploy frontend on Vercel
+
+Vercel deploys the React frontend only. The FastAPI backend must be running on a
+public URL (Railway, Render, Fly.io, a VPS, or another host). If `VITE_API_URL`
+is missing, the browser posts login requests to the Vercel static site at
+`/api/auth/login`, which returns `405 Method Not Allowed`.
+
+Set these Vercel environment variables, then redeploy:
+
+```bash
+VITE_API_URL=https://your-backend-domain
+```
+
+Backend environment must include:
+
+```bash
+OPENAI_API_KEY=your-openrouter-key
+RESEARCH_LLM_PROVIDER=openrouter
+RESEARCH_LLM_MODEL=openai/gpt-oss-120b:free
+```
+
+Quick check:
+
+```bash
+curl https://your-backend-domain/health
+```
+
 ## Local development
 
 ### Backend

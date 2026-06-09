@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const configuredApiUrl = import.meta.env.VITE_API_URL
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: configuredApiUrl || '/api',
 })
 
 api.interceptors.request.use((config) => {
@@ -13,6 +15,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
+    if (!configuredApiUrl && err.response?.status === 405) {
+      err.response.data = {
+        detail: 'Backend API is not connected. Set VITE_API_URL in Vercel to your deployed backend URL, then redeploy.',
+      }
+    }
     if (err.response?.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
