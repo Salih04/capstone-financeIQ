@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { TrendingUp } from 'lucide-react'
+import { LineChart, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react'
 
 export default function LoginPage() {
   const { login, register } = useAuth()
@@ -62,15 +62,32 @@ export default function LoginPage() {
 
   return (
     <div style={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      minHeight: '100vh', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', alignItems: 'center',
+      gap: 28, padding: 28,
       background: 'var(--bg-deep)',
-      backgroundImage: 'radial-gradient(ellipse at 20% 30%, rgba(0,245,212,0.07) 0%, transparent 60%), radial-gradient(ellipse at 80% 70%, rgba(255,77,157,0.05) 0%, transparent 60%)',
+      backgroundImage: 'linear-gradient(135deg, rgba(244,176,74,0.10), transparent 38%), linear-gradient(315deg, rgba(85,194,195,0.08), transparent 42%)',
     }}>
-      {/* Card */}
+      <section style={{ maxWidth: 760 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--primary-hover)', background: 'var(--primary-subtle)', border: '1px solid rgba(244,176,74,0.25)', borderRadius: 999, padding: '6px 12px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.8 }}>
+          <Sparkles size={15} />
+          FinanceIQ Research Terminal
+        </div>
+        <h1 style={{ margin: '18px 0 10px', color: 'var(--text-1)', fontSize: 'clamp(2.4rem, 6vw, 4.5rem)', lineHeight: 1, fontWeight: 900 }}>
+          BIST research support with validated data discipline.
+        </h1>
+        <p style={{ color: 'var(--text-2)', fontSize: 15.5, lineHeight: 1.7, maxWidth: 650, margin: 0 }}>
+          Sign in to access company profiles, research scores, experiments, benchmark diagnostics, and the grounded AI assistant. Research support only; not investment advice.
+        </p>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 20 }}>
+          <span style={heroBadge}><ShieldCheck size={13} /> Leakage-safe methodology</span>
+          <span style={heroBadge}><LineChart size={13} /> BIST100 benchmark</span>
+        </div>
+      </section>
+
       <div style={{
-        background: 'var(--surface-1)', border: '1px solid var(--border-strong)',
+        background: 'rgba(15, 23, 42, 0.78)', border: '1px solid var(--border-strong)',
         borderRadius: 'var(--radius-xl)', padding: '2.5rem 2.25rem', width: 400,
-        boxShadow: 'var(--shadow-lg)',
+        maxWidth: '100%', boxSizing: 'border-box', boxShadow: 'var(--shadow-lg)',
       }}>
         {/* Brand */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
@@ -81,8 +98,8 @@ export default function LoginPage() {
             <TrendingUp size={20} color="#fff" />
           </div>
           <div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-1)' }}>StockScore</div>
-            <div style={{ fontSize: 11, color: 'var(--text-3)', letterSpacing: 0.5 }}>Financial Analytics Platform</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-1)' }}>FinanceIQ</div>
+            <div style={{ fontSize: 11, color: 'var(--text-3)', letterSpacing: 0.5 }}>Validated Research Terminal</div>
           </div>
         </div>
 
@@ -90,7 +107,7 @@ export default function LoginPage() {
           {mode === 'login' ? 'Welcome Back' : 'Create Account'}
         </h2>
         <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0, marginBottom: 24 }}>
-          {mode === 'login' ? 'Sign in to continue' : 'Get started in seconds'}
+          {mode === 'login' ? 'Sign in to continue' : 'Create access for the research terminal'}
         </p>
 
         <form onSubmit={handle}>
@@ -159,4 +176,17 @@ export default function LoginPage() {
       </div>
     </div>
   )
+}
+
+const heroBadge = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  background: 'rgba(255,255,255,0.04)',
+  border: '1px solid var(--border-strong)',
+  borderRadius: 999,
+  padding: '7px 11px',
+  color: 'var(--text-2)',
+  fontSize: 12,
+  fontWeight: 800,
 }

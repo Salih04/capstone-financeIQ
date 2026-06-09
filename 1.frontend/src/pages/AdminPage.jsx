@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Box, Users, ClipboardList, Plus, X, CheckCircle, Archive, Trash2, FlaskConical, ChevronDown, ChevronUp } from 'lucide-react'
+import { Box, Users, ClipboardList, Plus, X, CheckCircle, Archive, Trash2, FlaskConical, ChevronDown, ChevronUp, Settings, ShieldCheck, Sparkles } from 'lucide-react'
 import api from '../api/client'
 import { Card, Chip, GhostButton, SectionHeader, Skeleton, EmptyState } from '../components/ui'
 
@@ -92,7 +92,7 @@ function ModelCard({ model, onActivate, onArchive, onDelete, onRunValidation }) 
       {showDetails && model.metrics?.length > 0 && (
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
           <div style={{ fontSize: 11, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
-            Metrik Ağırlıkları
+            Metric Weights
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 6 }}>
             {model.metrics.map(m => (
@@ -108,6 +108,11 @@ function ModelCard({ model, onActivate, onArchive, onDelete, onRunValidation }) 
   )
 }
 
+const adminHero = { border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))', padding: 24, marginBottom: 24 }
+const heroKicker = { display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--primary-hover)', background: 'var(--primary-subtle)', border: '1px solid rgba(244,176,74,0.25)', borderRadius: 999, padding: '5px 11px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.7 }
+const heroTitle = { margin: '14px 0 8px', color: 'var(--text-1)', fontSize: 'clamp(2rem, 5vw, 3.25rem)', lineHeight: 1, fontWeight: 900, maxWidth: 820 }
+const heroSub = { color: 'var(--text-2)', fontSize: 14.5, lineHeight: 1.65, margin: 0, maxWidth: 760 }
+const heroBadge = { display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-strong)', borderRadius: 999, padding: '6px 10px', color: 'var(--text-2)', fontSize: 12, fontWeight: 800 }
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('models')
   const [models, setModels] = useState([])
@@ -178,11 +183,15 @@ export default function AdminPage() {
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1.5rem' }}>
-      {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-1)', margin: 0, marginBottom: 4 }}>Admin Panel</h1>
-        <p style={{ fontSize: 14, color: 'var(--text-3)', margin: 0 }}>Model Registry · User Management · Audit Log</p>
-      </div>
+      <section style={adminHero}>
+        <div style={heroKicker}><Sparkles size={15} /> Admin Console</div>
+        <h1 style={heroTitle}>Model registry, users, and audit controls.</h1>
+        <p style={heroSub}>Operational workspace for governance tasks. Keep active models, user roles, and validation events traceable.</p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
+          <span style={heroBadge}><Settings size={13} /> Registry control</span>
+          <span style={heroBadge}><ShieldCheck size={13} /> Audit trail</span>
+        </div>
+      </section>
 
       {/* Toast */}
       {msg && (
@@ -331,4 +340,3 @@ export default function AdminPage() {
     </div>
   )
 }
-

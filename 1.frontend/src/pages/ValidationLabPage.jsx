@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { FlaskConical, Play, BarChart3, Clock, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react'
+import { FlaskConical, Play, BarChart3, Clock, TrendingUp, TrendingDown, AlertCircle, ShieldCheck, Sparkles } from 'lucide-react'
 import api from '../api/client'
-import { Card, GhostButton, Skeleton, EmptyState, SectionHeader } from '../components/ui'
+import { Card, EmptyState } from '../components/ui'
 
 const inputS = {
   background: 'var(--surface-1)',
@@ -32,6 +32,11 @@ function MetricCard({ label, value, good }) {
   )
 }
 
+const validationHero = { border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))', padding: 24, marginBottom: 20 }
+const heroKicker = { display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--primary-hover)', background: 'var(--primary-subtle)', border: '1px solid rgba(244,176,74,0.25)', borderRadius: 999, padding: '5px 11px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.7 }
+const heroTitle = { margin: '14px 0 8px', color: 'var(--text-1)', fontSize: 'clamp(2rem, 5vw, 3.25rem)', lineHeight: 1, fontWeight: 900, maxWidth: 820 }
+const heroSub = { color: 'var(--text-2)', fontSize: 14.5, lineHeight: 1.65, margin: 0, maxWidth: 760 }
+const heroBadge = { display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-strong)', borderRadius: 999, padding: '6px 10px', color: 'var(--text-2)', fontSize: 12, fontWeight: 800 }
 function MetricsGrid({ result }) {
   const acc = result.accuracy
   const f1 = result.f1
@@ -185,11 +190,12 @@ export default function ValidationLabPage() {
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: '2rem 1.5rem' }}>
-      <SectionHeader
-        icon={<FlaskConical size={20} />}
-        title="Validation Lab"
-        subtitle="Time-split model validation — training/test metrics and feature importance"
-      />
+      <section style={validationHero}>
+        <div style={heroKicker}><Sparkles size={15} /> Validation Lab</div>
+        <h1 style={heroTitle}>Time-split validation for model governance.</h1>
+        <p style={heroSub}>Run train/test validation, inspect calibration, and review feature importance. Metrics are diagnostic, not investment claims.</p>
+        <span style={heroBadge}><ShieldCheck size={13} /> Leakage-aware evaluation</span>
+      </section>
 
       {msg && (
         <div style={{

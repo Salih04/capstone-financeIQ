@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Activity, AlertTriangle, CheckCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react'
+import { Activity, AlertTriangle, CheckCircle, Clock, ChevronDown, ChevronUp, Database, Sparkles } from 'lucide-react'
 import api from '../api/client'
 import { Card, Skeleton, EmptyState, SectionHeader } from '../components/ui'
 
@@ -26,6 +26,11 @@ function StatusBadge({ status }) {
   )
 }
 
+const healthHero = { border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(58,199,139,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))', padding: 24, marginBottom: 24 }
+const heroKicker = { display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--primary-hover)', background: 'var(--primary-subtle)', border: '1px solid rgba(244,176,74,0.25)', borderRadius: 999, padding: '5px 11px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.7 }
+const heroTitle = { margin: '14px 0 8px', color: 'var(--text-1)', fontSize: 'clamp(2rem, 5vw, 3.25rem)', lineHeight: 1, fontWeight: 900, maxWidth: 820 }
+const heroSub = { color: 'var(--text-2)', fontSize: 14.5, lineHeight: 1.65, margin: 0, maxWidth: 760 }
+const heroBadge = { display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-strong)', borderRadius: 999, padding: '6px 10px', color: 'var(--text-2)', fontSize: 12, fontWeight: 800 }
 function SeverityBadge({ severity }) {
   const st = SEVERITY_STYLE[severity] || SEVERITY_STYLE.info
   return (
@@ -80,11 +85,12 @@ export default function DataHealthPage() {
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1.5rem' }}>
-      {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-1)', margin: 0, marginBottom: 4 }}>Data Health</h1>
-        <p style={{ fontSize: 14, color: 'var(--text-3)', margin: 0 }}>Data pipeline monitoring · Quality issues · Ingestion history</p>
-      </div>
+      <section style={healthHero}>
+        <div style={heroKicker}><Sparkles size={15} /> Data Operations</div>
+        <h1 style={heroTitle}>Pipeline health and ingestion history.</h1>
+        <p style={heroSub}>Monitor data jobs, issue severity, and stale companies without mixing operational alerts with research conclusions.</p>
+        <span style={heroBadge}><Database size={13} /> Audit workflow</span>
+      </section>
 
       {/* API error banner */}
       {apiError && (
@@ -270,4 +276,3 @@ export default function DataHealthPage() {
     </div>
   )
 }
-

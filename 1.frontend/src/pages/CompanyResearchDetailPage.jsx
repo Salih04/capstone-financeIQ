@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Building2 } from 'lucide-react'
-import { SectionHeader, EmptyState, GhostButton } from '../components/ui'
+import { ArrowLeft, Building2, ShieldCheck, Sparkles } from 'lucide-react'
+import { EmptyState, GhostButton } from '../components/ui'
 import { researchApi } from '../api/researchApi'
 import {
   ScoreBreakdown, EvidencePanel, RenderList, Bullets, CollapsibleJson, SignalBadge,
@@ -30,12 +30,26 @@ export default function CompanyResearchDetailPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1080 }}>
-      <SectionHeader
-        title={`${asText(ticker).toUpperCase()} — research snapshot`}
-        sub={`Latest year ${asText(ctx.latest_year)} · ${ctx.is_inference_row ? 'inference-only (no target)' : 'has next-year target'}`}
-        icon={Building2}
-        actions={<GhostButton icon={ArrowLeft} onClick={() => nav('/research/companies')}>Companies</GhostButton>}
-      />
+      <section style={styles.hero}>
+        <div>
+          <div style={styles.kicker}><Sparkles size={15} /> Company Research Snapshot</div>
+          <h1 style={styles.title}>{asText(ticker).toUpperCase()}</h1>
+          <p style={styles.subtitle}>
+            Latest year {asText(ctx.latest_year)} · {ctx.is_inference_row ? 'inference-only row with no realized target yet' : 'historical row with next-year target available'}.
+            Score is diagnostic research support, not investment advice.
+          </p>
+          <div style={styles.badges}>
+            <SignalBadge tone="good"><ShieldCheck size={12} /> Validated data</SignalBadge>
+            <SignalBadge tone="bad">Not investment advice</SignalBadge>
+          </div>
+        </div>
+        <div style={styles.actionPanel}>
+          <Building2 size={22} color="var(--primary)" />
+          <div style={styles.panelTitle}>Research context</div>
+          <div style={styles.panelText}>Hybrid score combines validated features, data confidence, and available AI evidence.</div>
+          <GhostButton icon={ArrowLeft} onClick={() => nav('/research/companies')}>Companies</GhostButton>
+        </div>
+      </section>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px,1fr))', gap: 16 }}>
         {/* Score breakdown */}
@@ -108,4 +122,24 @@ export default function CompanyResearchDetailPage() {
       <CollapsibleJson label="View raw response (debug)" value={{ detail, score }} />
     </div>
   )
+}
+
+const styles = {
+  hero: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+    gap: 18,
+    alignItems: 'stretch',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 'var(--radius-lg)',
+    background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))',
+    padding: 24,
+  },
+  kicker: { display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--primary-hover)', background: 'var(--primary-subtle)', border: '1px solid rgba(244,176,74,0.25)', borderRadius: 999, padding: '5px 11px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.7 },
+  title: { margin: '14px 0 8px', color: 'var(--text-1)', fontSize: 'clamp(2.2rem, 6vw, 4rem)', lineHeight: 1, fontWeight: 900 },
+  subtitle: { color: 'var(--text-2)', fontSize: 14.5, lineHeight: 1.65, margin: 0, maxWidth: 720 },
+  badges: { display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 16 },
+  actionPanel: { background: 'rgba(8,15,26,0.54)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-md)', padding: 18, display: 'flex', flexDirection: 'column', gap: 10 },
+  panelTitle: { color: 'var(--text-1)', fontSize: 18, fontWeight: 900 },
+  panelText: { color: 'var(--text-2)', fontSize: 12.8, lineHeight: 1.55 },
 }

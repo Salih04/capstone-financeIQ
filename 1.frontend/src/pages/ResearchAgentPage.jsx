@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Bot, Search, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react'
 import api from '../api/client'
-import { SectionHeader, GhostButton } from '../components/ui'
+import { GhostButton } from '../components/ui'
 import {
   MetricCard, EvidencePanel, ScoreBreakdown, SignalBadge, Bullets,
   WarningCallout, DecisionVerdict, humanizeWarning, asText, formatNumber, NOT_ADVICE,
@@ -87,17 +87,26 @@ export default function ResearchAgentPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
-      <SectionHeader
-        title="AI Research Assistant"
-        sub="Ask in plain English — grounded in validated project data"
-        icon={Bot}
-        actions={
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <section style={agentHero}>
+        <div>
+          <div style={heroKicker}><Sparkles size={15} /> AI Research Assistant</div>
+          <h1 style={heroTitle}>Ask questions grounded in validated project data.</h1>
+          <p style={heroSub}>
+            The assistant explains scores, BIST100 outcomes, weak-signal diagnostics, and company evidence.
+            It does not invent LLM usage and never gives investment advice.
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
             <SignalBadge tone="info">Research score, not advice</SignalBadge>
-            <GhostButton icon={RefreshCw} onClick={loadAll}>Reload</GhostButton>
+            <SignalBadge tone="good"><ShieldCheck size={12} /> Grounded data</SignalBadge>
           </div>
-        }
-      />
+        </div>
+        <div style={heroPanel}>
+          <Bot size={22} color="var(--primary)" />
+          <div style={{ color: 'var(--text-1)', fontSize: 18, fontWeight: 900 }}>Assistant status</div>
+          <div style={{ color: 'var(--text-2)', fontSize: 12.8, lineHeight: 1.55 }}>Reload project context before presenting or testing local LLM mode.</div>
+          <GhostButton icon={RefreshCw} onClick={loadAll}>Reload</GhostButton>
+        </div>
+      </section>
 
       {loadErr && <WarningCallout title="Failed to load agent status" tone="bad">{asText(loadErr)}</WarningCallout>}
 
@@ -266,6 +275,11 @@ function ModeLine({ answer }) {
 }
 
 const lbl = (c) => ({ fontSize: 11.5, fontWeight: 700, color: c, marginBottom: 6 })
+const agentHero = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 18, alignItems: 'stretch', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))', padding: 24 }
+const heroKicker = { display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--primary-hover)', background: 'var(--primary-subtle)', border: '1px solid rgba(244,176,74,0.25)', borderRadius: 999, padding: '5px 11px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.7 }
+const heroTitle = { margin: '14px 0 8px', color: 'var(--text-1)', fontSize: 'clamp(2rem, 5vw, 3.35rem)', lineHeight: 1, fontWeight: 900, maxWidth: 820 }
+const heroSub = { color: 'var(--text-2)', fontSize: 14.5, lineHeight: 1.65, margin: 0, maxWidth: 740 }
+const heroPanel = { background: 'rgba(8,15,26,0.54)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-md)', padding: 18, display: 'flex', flexDirection: 'column', gap: 10 }
 const chipBtn = { background: 'var(--surface-1)', color: 'var(--text-2)', border: '1px solid var(--border-strong)',
   borderRadius: 999, padding: '5px 11px', fontSize: 11.5, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }
 const ghostBtn = { background: 'transparent', color: 'var(--text-2)', border: '1px solid var(--border-strong)',

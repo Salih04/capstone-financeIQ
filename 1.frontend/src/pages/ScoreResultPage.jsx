@@ -268,13 +268,10 @@ export default function ScoreResultPage() {
       </button>
 
       {/* ── Hero Score Card ── */}
-      <Card style={{ padding: '2rem', textAlign: 'center', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
-        <div style={{
-          position: 'absolute', top: -40, right: -40, width: 200, height: 200,
-          borderRadius: '50%', background: band.color, opacity: 0.04, pointerEvents: 'none'
-        }} />
+      <Card style={{ padding: '2rem', textAlign: 'center', marginBottom: 20, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(244,176,74,0.10), var(--surface-2))' }}>
+        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: band.color }} />
         <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>
-          Analysis Result
+          Diagnostic Score Result
         </div>
         {/* Company identity */}
         {company && (
@@ -317,7 +314,7 @@ export default function ScoreResultPage() {
         </div>
         <div style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 20 }}>
           <span style={{ background: 'var(--surface-3)', borderRadius: 'var(--radius-sm)', padding: '2px 8px' }}>
-            Dönem: {run.period}
+            Period: {run.period}
           </span>
           {' · '}
           <span>Scoring Summary</span>
@@ -331,7 +328,7 @@ export default function ScoreResultPage() {
             <div style={{ fontSize: '1.4rem', fontWeight: 700, color: band.color, fontVariantNumeric: 'tabular-nums' }}>
               {run.success_probability != null ? `${(run.success_probability * 100).toFixed(1)}%` : '—'}
             </div>
-            <div style={{ fontSize: 11, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>Success Probability</div>
+            <div style={{ fontSize: 11, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>Model Probability</div>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-1)', fontVariantNumeric: 'tabular-nums' }}>
@@ -461,7 +458,7 @@ export default function ScoreResultPage() {
         </Card>
       )}
 
-      {/* ── AI Insights ── */}
+      {/* ── Analyst Notes ── */}
       {(() => {
         const aiInsights = generateAIInsights(run)
         if (!aiInsights.length) return null
@@ -470,10 +467,10 @@ export default function ScoreResultPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
               <Sparkles size={16} style={{ color: 'var(--info)' }} />
               <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--info)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                AI Insights
+                Analyst Notes
               </span>
               <span style={{ fontSize: 11, color: 'var(--text-3)', marginLeft: 4, background: 'var(--surface-2)', borderRadius: 20, padding: '2px 8px' }}>
-                Algorithmic analysis
+                Deterministic explanation
               </span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

@@ -220,8 +220,8 @@ export default function ComparePage() {
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       {/* Header */}
-      <div style={{ marginBottom: 24, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, var(--surface-2), rgba(244,176,74,0.08))', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-xl)', padding: '28px 32px' }}>
-        <div style={{ position: 'absolute', top: -60, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(85,194,195,0.12), transparent)', pointerEvents: 'none' }} />
+      <div style={{ marginBottom: 24, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-xl)', padding: '28px 32px' }}>
+        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: 'linear-gradient(180deg, var(--primary), var(--secondary))' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6, position: 'relative' }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, rgba(244,176,74,0.2), rgba(85,194,195,0.12))', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(244,176,74,0.25)' }}>
             <GitCompare size={18} color="var(--primary)" />
@@ -231,7 +231,7 @@ export default function ComparePage() {
               Company Comparison
             </h1>
             <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>
-              Pick 2–8 companies and score them with the same settings and period
+              Pick 2-8 companies for diagnostic comparison with identical settings and period. Research support only.
             </p>
           </div>
         </div>
@@ -246,7 +246,7 @@ export default function ComparePage() {
         )}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 20, alignItems: 'start' }}>
         {/* Left: company list */}
         <div>
           {/* Selected chips */}

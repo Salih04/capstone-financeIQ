@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BrainCircuit, Upload, Play, ListOrdered, Info } from 'lucide-react'
+import { BrainCircuit, Upload, Play, ListOrdered, Info, ShieldCheck, Sparkles } from 'lucide-react'
 import api from '../api/client'
-import { Card, EmptyState, SectionHeader } from '../components/ui'
+import { Card, EmptyState } from '../components/ui'
 
 const PRESET_FILES = [
   '2020stocks.xlsx',
@@ -216,11 +216,17 @@ export default function ForecastingPage() {
 
   return (
     <div style={{ maxWidth: 1150, margin: '0 auto', padding: '2rem 1.5rem' }}>
-      <SectionHeader
-        icon={<BrainCircuit size={20} />}
-        title="Success DNA Forecasting"
-        subtitle="Winner-only forecasting for your provided 2020-2025 stock lists"
-      />
+      <section style={forecastHero}>
+        <div style={heroKicker}><Sparkles size={15} /> Experimental Forecasting</div>
+        <h1 style={heroTitle}>Legacy forecasting tools, clearly marked as experimental.</h1>
+        <p style={heroSub}>
+          Import winner files, train parameter profiles, and run ranking experiments. This page supports exploration only and must not be read as production prediction or investment advice.
+        </p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
+          <span style={heroBadge}><BrainCircuit size={13} /> Experimental</span>
+          <span style={heroBadge}><ShieldCheck size={13} /> Diagnostic output</span>
+        </div>
+      </section>
 
       {msg && (
         <div style={{ marginBottom: 14, fontSize: 13, color: 'var(--text-2)', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '9px 12px' }}>
@@ -228,7 +234,7 @@ export default function ForecastingPage() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 16, marginBottom: 16 }}>
         <Card style={{ padding: '1rem' }}>
            <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>Step 1: Import Winner Files</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -448,7 +454,7 @@ export default function ForecastingPage() {
         </Card>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 16 }}>
         <Card style={{ padding: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <ListOrdered size={15} style={{ color: 'var(--primary)' }} />
@@ -571,10 +577,10 @@ export default function ForecastingPage() {
             <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: 12 }}>
               <thead>
                 <tr>
-                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Kategori</th>
-                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Oran</th>
-                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Formul</th>
-                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Islev</th>
+                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Category</th>
+                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Ratio</th>
+                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Formula</th>
+                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Purpose</th>
                 </tr>
               </thead>
               <tbody>
@@ -594,3 +600,9 @@ export default function ForecastingPage() {
     </div>
   )
 }
+
+const forecastHero = { border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))', padding: 24, marginBottom: 18 }
+const heroKicker = { display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--primary-hover)', background: 'var(--primary-subtle)', border: '1px solid rgba(244,176,74,0.25)', borderRadius: 999, padding: '5px 11px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.7 }
+const heroTitle = { margin: '14px 0 8px', color: 'var(--text-1)', fontSize: 'clamp(2rem, 5vw, 3.25rem)', lineHeight: 1, fontWeight: 900, maxWidth: 860 }
+const heroSub = { color: 'var(--text-2)', fontSize: 14.5, lineHeight: 1.65, margin: 0, maxWidth: 780 }
+const heroBadge = { display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-strong)', borderRadius: 999, padding: '6px 10px', color: 'var(--text-2)', fontSize: 12, fontWeight: 800 }

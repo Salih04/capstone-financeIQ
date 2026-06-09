@@ -448,13 +448,12 @@ export default function CompanyPage() {
 
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, var(--surface-2), rgba(244,176,74,0.1))',
+        background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))',
         border: '1px solid var(--border-strong)',
         borderRadius: 'var(--radius-xl)', padding: '28px 32px', marginBottom: 24,
         position: 'relative', overflow: 'hidden',
       }}>
-        {/* Decorative gradient orb */}
-        <div style={{ position: 'absolute', top: -60, right: -60, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(85,194,195,0.12), transparent)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: 'linear-gradient(180deg, var(--primary), var(--secondary))' }} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, position: 'relative' }}>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
             <div style={{
@@ -507,7 +506,7 @@ export default function CompanyPage() {
 
       {/* Key metrics strip */}
       {metrics.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12, marginBottom: 24 }}>
           {[
               { label: 'ROA', value: fmt(latestMetric?.roa, true), color: 'var(--success)', icon: TrendingUp, raw: latestMetric?.roa },
               { label: 'ROE', value: fmt(latestMetric?.roe, true), color: 'var(--primary)', icon: Activity, raw: latestMetric?.roe },
@@ -568,7 +567,7 @@ export default function CompanyPage() {
                         <div style={{ fontSize: 11, color: scoreColor, fontWeight: 600 }}>checks passed</div>
                       </div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10 }}>
                       {healthChecks.map(c => (
                         <div key={c.label} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: 'var(--surface-3)', borderRadius: 10 }}>
                           <div style={{ width: 20, height: 20, borderRadius: '50%', background: c.pass ? 'rgba(43,217,127,0.15)' : 'rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, flexShrink: 0 }}>
@@ -756,7 +755,7 @@ export default function CompanyPage() {
         <Card style={{ padding: 28, maxWidth: 480 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-1)', marginBottom: 4 }}>Run Scoring Analysis</div>
           <p style={{ color: 'var(--text-3)', fontSize: 13.5, marginBottom: 22, lineHeight: 1.5 }}>
-            Select a period and scoring preset to compute a financial health score for {company.ticker}.
+            Select a period and scoring preset to compute a diagnostic financial health score for {company.ticker}. This is research support, not investment advice.
           </p>
 
           {metrics.length === 0 ? (
