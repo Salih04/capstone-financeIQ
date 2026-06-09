@@ -170,6 +170,7 @@ cd 2.backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env          # set DATABASE_URL and SECRET_KEY
+alembic upgrade head
 python -m scripts.load_trusted_yearly
 uvicorn app.main:app --reload --port 8000
 ```
@@ -190,6 +191,8 @@ alembic upgrade head        # head includes 20260406_0006 (yearly_stocks)
 ```
 
 `create_all` on startup is a safety net for fresh DBs; Alembic owns the schema.
+Docker startup runs Alembic automatically before trusted data loading. Existing
+Docker volumes created before Alembic are stamped once, then upgraded normally.
 
 ## Environment variables
 
@@ -200,6 +203,8 @@ alembic upgrade head        # head includes 20260406_0006 (yearly_stocks)
 | `TRUSTED_DATASETS_DIR` | Dir of trusted XLSX (default `3.Datasets/`) |
 | `TRUSTED_OUT_DIR` | Output dir for generated CSVs (default `data/trusted/`) |
 | `TRUSTED_COMBINED_CSV` | Combined CSV path used by the loader |
+| `RUN_DB_MIGRATIONS` | Run Alembic on Docker startup (`1` default, set `0` to skip) |
+| `LOAD_TRUSTED_DATA` | Load trusted yearly data on Docker startup (`1` default, set `0` to skip) |
 
 No real secrets are committed. `.env` is gitignored.
 
