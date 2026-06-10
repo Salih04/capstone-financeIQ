@@ -1,110 +1,160 @@
-# yfinance Pilot Expansion Report
+# yfinance BIST100 Pilot — Data Quality Report
 
-**Date:** 2026-06-10  
-**Status:** Pilot integrated into TRAINING dataset only. Public dataset unchanged (40 tickers).
+> yfinance (unofficial Yahoo Finance) — NOT official KAP/IFRS data. KAP cross-check recommended (kap.borsaistanbul.com). Training use only. Not investment advice.
 
----
-
-## Data Source Caveat
-
-> ⚠️ Data sourced from **yfinance (unofficial Yahoo Finance wrapper)**.  
-> This is NOT official KAP/IFRS data. Values may differ from official filings.  
-> **KAP cross-check is strongly recommended** before trusting these figures for any decision.  
-> Reference: [kap.borsaistanbul.com](https://kap.borsaistanbul.com)
-
----
-
-## Cleaning Summary
+## Summary
 
 | Metric | Value |
 |---|---|
-| Raw rows (from collector) | 40 |
-| Rows dropped (all-empty financial core) | 4 |
-| Clean rows retained | 36 |
-| Tickers retained | 9 |
-| Years retained | 2022, 2023, 2024, 2025 |
-| Core fields all non-null | ✅ (revenue, net_income, total_assets, equity, roe, roa) |
+| Raw rows | 183 |
+| Rows retained (clean) | 163 |
+| Rows dropped | 20 |
+| Tickers in raw | 41 |
+| Tickers in clean | 41 |
 
-### Rows dropped and why
+## Retained tickers
+
+| Ticker | Years | revenue | net_income | total_assets | equity | roe | roa |
+|---|---|---|---|---|---|---|---|
+| AGESA | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| AGHOL | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| AKBNK | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| AKENR | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| AKSA | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| AKSEN | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| ALARK | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| ALBRK | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| ANHYT | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| BERA | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| CEMTS | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| DEVA | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| DOHOL | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| EGEEN | [2021, 2022, 2023] | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 |
+| EKGYO | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| ENJSA | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| GARAN | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| HALKB | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| ISCTR | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| ISGYO | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| KCHOL | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| KRVGD | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| LOGO | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| MPARK | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| NETAS | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| NTGAZ | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| ODAS | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| OTKAR | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| PRKME | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| RGYAS | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| SAHOL | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| SELEC | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| SKBNK | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| SMRTG | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| SOKM | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| TBORG | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| ULUSE | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| VAKBN | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| VESTL | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| YKBNK | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+| ZOREN | [2022, 2023, 2024, 2025] | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 | 4/4 |
+
+## Dropped rows
 
 | Ticker | Year | Reason |
 |---|---|---|
-| Various | 2021 | All-empty financial rows (yfinance coverage absent for 2021) |
-| — | 2020 | No data available from yfinance for BIST stocks at FY2020 |
+| AGESA | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| AKBNK | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| AKSA | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| ALARK | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| BERA | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| DOHOL | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| ENJSA | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| ISCTR | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| KCHOL | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| KRVGD | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| MPARK | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| NETAS | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| NTGAZ | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| PRKME | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| RGYAS | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| SOKM | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| ULUSE | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| VAKBN | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| VESTL | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
+| YKBNK | 2021 | missing: ['revenue', 'net_income', 'total_assets', 'equity'], no roe/roa |
 
-The raw collector produced some 2021 stub rows with all-null financials. These were dropped by the cleaning filter:
-- Keep only rows where `revenue`, `net_income`, `total_assets`, `equity` are all non-null
-- AND at least one of `roe`, `roa` is non-null
+## Field coverage (clean rows)
 
-No values were imputed. No data was fabricated.
+| Column | Non-null rows | Total rows | Coverage |
+|---|---|---|---|
+| revenue | 163 | 163 | 100% |
+| gross_profit | 119 | 163 | 73% |
+| operating_income | 119 | 163 | 73% |
+| net_income | 163 | 163 | 100% |
+| ebitda | 118 | 163 | 72% |
+| total_assets | 163 | 163 | 100% |
+| current_assets | 119 | 163 | 73% |
+| non_current_assets | 119 | 163 | 73% |
+| short_term_liabilities | 119 | 163 | 73% |
+| long_term_liabilities | 119 | 163 | 73% |
+| equity | 163 | 163 | 100% |
+| working_capital | 119 | 163 | 73% |
+| net_debt | 97 | 163 | 60% |
+| roe | 163 | 163 | 100% |
+| roa | 163 | 163 | 100% |
+| gross_margin | 119 | 163 | 73% |
+| net_margin | 163 | 163 | 100% |
+| ebitda_margin | 118 | 163 | 72% |
 
----
+## Year coverage per ticker (clean)
 
-## Retained Tickers and Year Coverage
+- **AGESA**: [2022, 2023, 2024, 2025]
+- **AGHOL**: [2022, 2023, 2024, 2025]
+- **AKBNK**: [2022, 2023, 2024, 2025]
+- **AKENR**: [2022, 2023, 2024, 2025]
+- **AKSA**: [2022, 2023, 2024, 2025]
+- **AKSEN**: [2022, 2023, 2024, 2025]
+- **ALARK**: [2022, 2023, 2024, 2025]
+- **ALBRK**: [2022, 2023, 2024, 2025]
+- **ANHYT**: [2022, 2023, 2024, 2025]
+- **BERA**: [2022, 2023, 2024, 2025]
+- **CEMTS**: [2022, 2023, 2024, 2025]
+- **DEVA**: [2022, 2023, 2024, 2025]
+- **DOHOL**: [2022, 2023, 2024, 2025]
+- **EGEEN**: [2021, 2022, 2023]
+- **EKGYO**: [2022, 2023, 2024, 2025]
+- **ENJSA**: [2022, 2023, 2024, 2025]
+- **GARAN**: [2022, 2023, 2024, 2025]
+- **HALKB**: [2022, 2023, 2024, 2025]
+- **ISCTR**: [2022, 2023, 2024, 2025]
+- **ISGYO**: [2022, 2023, 2024, 2025]
+- **KCHOL**: [2022, 2023, 2024, 2025]
+- **KRVGD**: [2022, 2023, 2024, 2025]
+- **LOGO**: [2022, 2023, 2024, 2025]
+- **MPARK**: [2022, 2023, 2024, 2025]
+- **NETAS**: [2022, 2023, 2024, 2025]
+- **NTGAZ**: [2022, 2023, 2024, 2025]
+- **ODAS**: [2022, 2023, 2024, 2025]
+- **OTKAR**: [2022, 2023, 2024, 2025]
+- **PRKME**: [2022, 2023, 2024, 2025]
+- **RGYAS**: [2022, 2023, 2024, 2025]
+- **SAHOL**: [2022, 2023, 2024, 2025]
+- **SELEC**: [2022, 2023, 2024, 2025]
+- **SKBNK**: [2022, 2023, 2024, 2025]
+- **SMRTG**: [2022, 2023, 2024, 2025]
+- **SOKM**: [2022, 2023, 2024, 2025]
+- **TBORG**: [2022, 2023, 2024, 2025]
+- **ULUSE**: [2022, 2023, 2024, 2025]
+- **VAKBN**: [2022, 2023, 2024, 2025]
+- **VESTL**: [2022, 2023, 2024, 2025]
+- **YKBNK**: [2022, 2023, 2024, 2025]
+- **ZOREN**: [2022, 2023, 2024, 2025]
 
-| Ticker | Company | Sector | Years Retained | yfinance Coverage | Notes |
-|---|---|---|---|---|---|
-| AKSA | Aksa Akrilik | Chemicals | 2022, 2023, 2024, 2025 | FY2022+ | Non-bank; comparable |
-| AKSEN | Aksa Enerji | Energy | 2022, 2023, 2024, 2025 | FY2022+ | Non-bank |
-| DOHOL | Doğan Holding | Conglomerate | 2022, 2023, 2024, 2025 | FY2022+ | Mixed sector |
-| EKGYO | Emlak Konut GYO | Real Estate | 2022, 2023, 2024, 2025 | FY2022+ | REIT structure |
-| KCHOL | Koç Holding | Conglomerate | 2022, 2023, 2024, 2025 | FY2022+ | Multi-sector |
-| ODAS | Odaş Elektrik | Energy | 2022, 2023, 2024, 2025 | FY2022+ | Non-bank |
-| SAHOL | Sabancı Holding | Conglomerate | 2022, 2023, 2024, 2025 | FY2022+ | Multi-sector |
-| SMRTG | Smart Güneş Enerjisi | Energy | 2022, 2023, 2024, 2025 | FY2022+ | Non-bank |
-| VESTL | Vestel Elektronik | Consumer Electronics | 2022, 2023, 2024, 2025 | FY2022+ | Non-bank |
+## Caveats
 
-### Missing years per ticker
-
-All 9 tickers are missing FY2020 and FY2021. yfinance typically provides BIST fundamentals from FY2022 only.
-
----
-
-## Return Targets
-
-Return targets (`next_year_return_pct`) for pilot tickers are derived from **Yahoo Chart API year-end prices** (adjclose), not from the reference file `stocks_2020_2025.csv`.
-
-| Feature year | Target year | Status |
-|---|---|---|
-| 2022 | 2023 | ✅ Derived from Yahoo prices (adjclose 2022→2023) |
-| 2023 | 2024 | ✅ Derived from Yahoo prices (adjclose 2023→2024) |
-| 2024 | 2025 | ✅ Derived from Yahoo prices (adjclose 2024→2025) |
-| 2025 | 2026 | `is_inference_row=True` — no future prices available |
-
-Cross-sectional ranks/percentiles for pilot tickers are computed within the pilot cohort only. They are NOT merged into the public_40 cross-section.
-
----
-
-## Universe Impact
-
-| Universe | Before | After |
-|---|---|---|
-| Public (frontend inference) | 40 tickers | **40 tickers (unchanged)** |
-| Training (experiments only) | 40 tickers | **49 tickers** |
-| Training-only tickers | 0 | 9 (AKSA, AKSEN, DOHOL, EKGYO, KCHOL, ODAS, SAHOL, SMRTG, VESTL) |
-
-Pilot tickers have `is_public_universe=false` — they will **never** appear in frontend endpoints.
-
----
-
-## Files
-
-| File | Description |
-|---|---|
-| `data/trusted_raw/financials/bist100_yfinance_candidate_clean.csv` | Cleaned pilot financials (36 rows × 22 cols) |
-| `data/config/universe_training_bist100.csv` | Updated with 9 pilot tickers |
-| `data/trusted_clean/modeling_dataset_2020_2025.csv` | Augmented with pilot rows (appended only) |
-| `data/trusted_clean/modeling_dataset_training_2020_2025.csv` | Training split — 49 tickers |
-| `data/trusted_clean/modeling_dataset_public_2020_2025.csv` | Public split — 40 tickers (unchanged) |
-
----
-
-## Limitations (accepted)
-
-- FY2020 and FY2021 unavailable — only 3 training years (2022–2024) per pilot ticker
-- Data from yfinance, not official KAP IFRS filings
-- Cross-sectional ranks computed separately from public_40 cohort
-- Banks excluded from pilot (GARAN, AKBNK, etc. have non-comparable IS structure)
-- Conglomerates (KCHOL, SAHOL, DOHOL) consolidated across many sectors
-
-*Experimental research. Not investment advice. KAP cross-check recommended.*
+- yfinance is an unofficial scraper. Values may differ from KAP IFRS filings.
+- EBITDA is approximated as operating_income + depreciation where available.
+- FY2020 and FY2021 are typically unavailable for most BIST stocks via yfinance.
+- Bank tickers (is_bank=true in bist100_candidates.csv): revenue = net interest income;
+  gross_profit and EBITDA are undefined. Ratios not comparable with non-banks.
+- These rows are training-only. They never appear in frontend (public_40) endpoints.

@@ -13,6 +13,9 @@
 # Do NOT add tickers here without verified financial statements.
 # is_public_universe=false tickers will NEVER appear in frontend endpoints.
 #
+# yfinance pilot expansion — training-only, is_public_universe=false
+# Source: yfinance (unofficial Yahoo Finance). KAP cross-check recommended.
+# Coverage: FY2022+ only. FY2020-2021 not available.
 ticker,is_public_universe,is_training_universe,notes
 AEFES,true,true,public_40
 ARCLK,true,true,public_40
@@ -54,15 +57,46 @@ TTKOM,true,true,public_40
 TUPRS,true,true,public_40
 TURSG,true,true,public_40
 ULKER,true,true,public_40
-# yfinance pilot expansion — training-only, is_public_universe=false
+# yfinance training-only tickers — is_public_universe=false
 # Source: yfinance (unofficial Yahoo Finance). KAP cross-check recommended.
-# Coverage: FY2022+ only. FY2020-2021 not available.
+AGESA,false,true,yfinance_unofficial_expansion
+AGHOL,false,true,yfinance_unofficial_expansion
+AKBNK,false,true,yfinance_unofficial_expansion
+AKENR,false,true,yfinance_unofficial_expansion
 AKSA,false,true,yfinance_unofficial_pilot
 AKSEN,false,true,yfinance_unofficial_pilot
+ALARK,false,true,yfinance_unofficial_expansion
+ALBRK,false,true,yfinance_unofficial_expansion
+ANHYT,false,true,yfinance_unofficial_expansion
+BERA,false,true,yfinance_unofficial_expansion
+CEMTS,false,true,yfinance_unofficial_expansion
+DEVA,false,true,yfinance_unofficial_expansion
 DOHOL,false,true,yfinance_unofficial_pilot
+EGEEN,false,true,yfinance_unofficial_expansion
 EKGYO,false,true,yfinance_unofficial_pilot
+ENJSA,false,true,yfinance_unofficial_expansion
+GARAN,false,true,yfinance_unofficial_expansion
+HALKB,false,true,yfinance_unofficial_expansion
+ISCTR,false,true,yfinance_unofficial_expansion
+ISGYO,false,true,yfinance_unofficial_expansion
 KCHOL,false,true,yfinance_unofficial_pilot
+KRVGD,false,true,yfinance_unofficial_expansion
+LOGO,false,true,yfinance_unofficial_expansion
+MPARK,false,true,yfinance_unofficial_expansion
+NETAS,false,true,yfinance_unofficial_expansion
+NTGAZ,false,true,yfinance_unofficial_expansion
 ODAS,false,true,yfinance_unofficial_pilot
+OTKAR,false,true,yfinance_unofficial_expansion
+PRKME,false,true,yfinance_unofficial_expansion
+RGYAS,false,true,yfinance_unofficial_expansion
 SAHOL,false,true,yfinance_unofficial_pilot
+SELEC,false,true,yfinance_unofficial_expansion
+SKBNK,false,true,yfinance_unofficial_expansion
 SMRTG,false,true,yfinance_unofficial_pilot
+SOKM,false,true,yfinance_unofficial_expansion
+TBORG,false,true,yfinance_unofficial_expansion
+ULUSE,false,true,yfinance_unofficial_expansion
+VAKBN,false,true,yfinance_unofficial_expansion
 VESTL,false,true,yfinance_unofficial_pilot
+YKBNK,false,true,yfinance_unofficial_expansion
+ZOREN,false,true,yfinance_unofficial_expansion

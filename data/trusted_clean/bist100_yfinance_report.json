@@ -1,5 +1,5 @@
 {
-  "pilot_tickers_integrated": [
+  "collected_tickers": [
     "AGESA",
     "AGHOL",
     "AKBNK",
@@ -42,56 +42,11 @@
     "YKBNK",
     "ZOREN"
   ],
-  "pilot_tickers_skipped_already_present": [],
-  "pilot_rows_added": 163,
-  "final_dataset_rows": 403,
-  "final_dataset_tickers": 81,
-  "existing_tickers": 40,
-  "return_coverage": {
-    "AGESA": 3,
-    "AGHOL": 3,
-    "AKBNK": 3,
-    "AKENR": 3,
-    "AKSA": 3,
-    "AKSEN": 3,
-    "ALARK": 3,
-    "ALBRK": 3,
-    "ANHYT": 3,
-    "BERA": 3,
-    "CEMTS": 3,
-    "DEVA": 3,
-    "DOHOL": 3,
-    "EGEEN": 3,
-    "EKGYO": 3,
-    "ENJSA": 3,
-    "GARAN": 3,
-    "HALKB": 3,
-    "ISCTR": 3,
-    "ISGYO": 3,
-    "KCHOL": 3,
-    "KRVGD": 3,
-    "LOGO": 3,
-    "MPARK": 3,
-    "NETAS": 3,
-    "NTGAZ": 3,
-    "ODAS": 3,
-    "OTKAR": 3,
-    "PRKME": 3,
-    "RGYAS": 1,
-    "SAHOL": 3,
-    "SELEC": 3,
-    "SKBNK": 3,
-    "SMRTG": 3,
-    "SOKM": 3,
-    "TBORG": 3,
-    "ULUSE": 3,
-    "VAKBN": 3,
-    "VESTL": 3,
-    "YKBNK": 3,
-    "ZOREN": 3
-  },
-  "years_per_ticker": {
+  "ticker_count": 41,
+  "rows_written": 183,
+  "years_by_ticker": {
     "AGESA": [
+      2021,
       2022,
       2023,
       2024,
@@ -104,6 +59,7 @@
       2025
     ],
     "AKBNK": [
+      2021,
       2022,
       2023,
       2024,
@@ -116,6 +72,7 @@
       2025
     ],
     "AKSA": [
+      2021,
       2022,
       2023,
       2024,
@@ -128,6 +85,7 @@
       2025
     ],
     "ALARK": [
+      2021,
       2022,
       2023,
       2024,
@@ -146,6 +104,7 @@
       2025
     ],
     "BERA": [
+      2021,
       2022,
       2023,
       2024,
@@ -164,6 +123,7 @@
       2025
     ],
     "DOHOL": [
+      2021,
       2022,
       2023,
       2024,
@@ -181,6 +141,7 @@
       2025
     ],
     "ENJSA": [
+      2021,
       2022,
       2023,
       2024,
@@ -199,6 +160,7 @@
       2025
     ],
     "ISCTR": [
+      2021,
       2022,
       2023,
       2024,
@@ -211,12 +173,14 @@
       2025
     ],
     "KCHOL": [
+      2021,
       2022,
       2023,
       2024,
       2025
     ],
     "KRVGD": [
+      2021,
       2022,
       2023,
       2024,
@@ -229,18 +193,21 @@
       2025
     ],
     "MPARK": [
+      2021,
       2022,
       2023,
       2024,
       2025
     ],
     "NETAS": [
+      2021,
       2022,
       2023,
       2024,
       2025
     ],
     "NTGAZ": [
+      2021,
       2022,
       2023,
       2024,
@@ -259,12 +226,14 @@
       2025
     ],
     "PRKME": [
+      2021,
       2022,
       2023,
       2024,
       2025
     ],
     "RGYAS": [
+      2021,
       2022,
       2023,
       2024,
@@ -295,6 +264,7 @@
       2025
     ],
     "SOKM": [
+      2021,
       2022,
       2023,
       2024,
@@ -307,24 +277,28 @@
       2025
     ],
     "ULUSE": [
+      2021,
       2022,
       2023,
       2024,
       2025
     ],
     "VAKBN": [
+      2021,
       2022,
       2023,
       2024,
       2025
     ],
     "VESTL": [
+      2021,
       2022,
       2023,
       2024,
       2025
     ],
     "YKBNK": [
+      2021,
       2022,
       2023,
       2024,
@@ -337,13 +311,48 @@
       2025
     ]
   },
-  "source": "yfinance_unofficial",
-  "disclaimer": "yfinance pilot expansion \u2014 NOT official KAP/IFRS data. KAP cross-check recommended. Training only. Not investment advice.",
-  "caveats": [
-    "yfinance is unofficial. KAP cross-check recommended.",
-    "FY2020 and FY2021 not available for pilot tickers.",
-    "Pilot tickers are training-only (is_public_universe=false).",
-    "Cross-sectional ranks for pilot tickers computed within pilot cohort only.",
-    "Run split_universe_datasets to update training/public splits."
-  ]
+  "field_coverage_nonnull_rows": {
+    "revenue": 163,
+    "gross_profit": 119,
+    "operating_income": 119,
+    "net_income": 163,
+    "ebitda": 118,
+    "total_assets": 163,
+    "current_assets": 119,
+    "non_current_assets": 119,
+    "short_term_liabilities": 119,
+    "long_term_liabilities": 119,
+    "equity": 163,
+    "working_capital": 119,
+    "net_debt": 99,
+    "roe": 163,
+    "roa": 163,
+    "gross_margin": 119,
+    "net_margin": 163,
+    "ebitda_margin": 118
+  },
+  "bank_tickers_flagged": [
+    "AKBNK",
+    "ALBRK",
+    "GARAN",
+    "HALKB",
+    "ISCTR",
+    "SKBNK",
+    "VAKBN",
+    "YKBNK"
+  ],
+  "output_csv": "data/trusted_raw/financials/bist100_yfinance_candidate.csv",
+  "data_source": "yfinance_unofficial (Yahoo Finance fundamentals database)",
+  "data_source_url": "https://finance.yahoo.com",
+  "terms_note": "Yahoo Finance data is free for personal/educational use. Cross-check critical values against KAP (kap.borsaistanbul.com).",
+  "coverage_warning": "yfinance typically only provides FY2022+ for most BIST stocks. FY2020 and FY2021 rows will be NaN for many tickers.",
+  "next_steps": [
+    "1. Review bist100_yfinance_candidate.csv for data quality.",
+    "2. Add verified tickers to data/config/universe_training_bist100.csv (set is_training_universe=true).",
+    "3. Ensure those tickers also have annual return targets in data/trusted/stocks_2020_2025.csv (or run compute_bist100_returns).",
+    "4. Run: PYTHONPATH=. python -m scripts.data_collection.split_universe_datasets",
+    "5. Run: PYTHONPATH=. python -m scripts.data_collection.build_all",
+    "6. Training tickers > 40 confirms expansion succeeded."
+  ],
+  "expansion_not_complete": "Training universe expansion is NOT complete until new tickers have both (a) financial features AND (b) next-year return targets. Do not claim expanded training until tickers > 40 in the modeling dataset."
 }

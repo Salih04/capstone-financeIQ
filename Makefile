@@ -110,37 +110,8 @@ update-training-universe-yfinance:
 
 # Print universe counts and coverage for quick validation.
 validate-universe:
-	@python3 -c "\
-import csv, sys, os; \
-sys.path.insert(0, '.'); \
-pub=[r['ticker'] for r in csv.DictReader(open('data/config/universe_public_40.csv')) if not r['ticker'].startswith('#')]; \
-lines=[l for l in open('data/config/universe_training_bist100.csv') if not l.strip().startswith('#') and l.strip()]; \
-import io; import csv as csv2; \
-trn=[r['ticker'] for r in csv2.DictReader(io.StringIO('\n'.join(lines))) if str(r.get('is_training_universe','')).lower() in ('true','1','yes')]; \
-trn_only=[t for t in trn if t not in pub]; \
-print(f'Public tickers    : {len(pub)}'); \
-print(f'Training tickers  : {len(trn)}'); \
-print(f'Training-only     : {len(trn_only)} — {sorted(trn_only)}'); \
-"
-	@echo ""
-	@python3 -c "\
-import csv, sys, os, pathlib; \
-p = pathlib.Path('data/trusted_clean/modeling_dataset_training_2020_2025.csv'); \
-pp = pathlib.Path('data/trusted_clean/modeling_dataset_public_2020_2025.csv'); \
-base = pathlib.Path('data/trusted_clean/modeling_dataset_2020_2025.csv'); \
-def stats(path, label): \
-    if not path.exists(): print(f'{label}: NOT FOUND'); return; \
-    rows = list(csv.DictReader(open(path))); \
-    tickers = sorted(set(r['ticker'] for r in rows)); \
-    years = sorted(set(r['year'] for r in rows)); \
-    targets = sum(1 for r in rows if str(r.get('has_target','')).lower() in ('true','1')); \
-    yf = sum(1 for r in rows if 'yfinance' in str(r.get('universe_source',''))); \
-    print(f'{label}: {len(rows)} rows | {len(tickers)} tickers | years {years} | targets={targets} | yfinance_rows={yf}'); \
-stats(base, 'Base   '); stats(p, 'Train  '); stats(pp, 'Public '); \
-"
+	PYTHONPATH=. python scripts/data_collection/validate_universe.py
 
-# Guard: fail early if the pilot clean financials file is missing.
-# Run: make collect-bist100-financials, verify output, save as bist100_yfinance_candidate_clean.csv
 check-pilot-financials:
 	@test -f "data/trusted_raw/financials/bist100_yfinance_candidate_clean.csv" || \
 		{ echo ""; \

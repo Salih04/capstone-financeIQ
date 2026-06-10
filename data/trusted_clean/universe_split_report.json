@@ -1,9 +1,9 @@
 {
   "public_universe_count": 40,
-  "training_universe_count": 49,
-  "training_only_count": 9,
-  "training_dataset_rows": 276,
-  "training_dataset_tickers": 49,
+  "training_universe_count": 81,
+  "training_only_count": 41,
+  "training_dataset_rows": 403,
+  "training_dataset_tickers": 81,
   "public_dataset_rows": 240,
   "public_dataset_tickers": 40,
   "missing_from_training_data": [],
@@ -14,5 +14,5 @@
     "training": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_clean/modeling_dataset_training_2020_2025.csv",
     "public": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_clean/modeling_dataset_public_2020_2025.csv"
   },
-  "note": "Training universe has 9 extra tickers hidden from frontend endpoints."
+  "note": "Training universe has 41 extra tickers hidden from frontend endpoints."
 }
