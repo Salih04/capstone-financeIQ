@@ -54,3 +54,15 @@ TTKOM,true,true,public_40
 TUPRS,true,true,public_40
 TURSG,true,true,public_40
 ULKER,true,true,public_40
+# yfinance pilot expansion — training-only, is_public_universe=false
+# Source: yfinance (unofficial Yahoo Finance). KAP cross-check recommended.
+# Coverage: FY2022+ only. FY2020-2021 not available.
+AKSA,false,true,yfinance_unofficial_pilot
+AKSEN,false,true,yfinance_unofficial_pilot
+DOHOL,false,true,yfinance_unofficial_pilot
+EKGYO,false,true,yfinance_unofficial_pilot
+KCHOL,false,true,yfinance_unofficial_pilot
+ODAS,false,true,yfinance_unofficial_pilot
+SAHOL,false,true,yfinance_unofficial_pilot
+SMRTG,false,true,yfinance_unofficial_pilot
+VESTL,false,true,yfinance_unofficial_pilot

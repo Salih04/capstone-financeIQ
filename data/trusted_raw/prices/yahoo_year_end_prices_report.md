@@ -1,16 +1,16 @@
 # Yahoo Finance Year-End Prices Report
 
-**Generated:** 2026-06-09 17:52:25
+**Generated:** 2026-06-10 15:27:47
 **Parameters:**
 - Start Year: 2020
 - End Year: 2025
-- Tickers Count: 40
+- Tickers Count: 49
 
 ## Summary
-- **Total Records:** 240
-- **Successful:** 226
-- **Failed/Missing:** 14
-- **Skipped (API fetch):** 0 (Read from cache)
+- **Total Records:** 294
+- **Successful:** 278
+- **Failed/Missing:** 16
+- **Skipped (API fetch):** 240 (Read from cache)
 
 ## Errors & Missing Data
 | Ticker | Year | Error |
@@ -20,9 +20,11 @@
 | DSTKF | 2020 | Max retries reached |
 | MIATK | 2020 | Max retries reached |
 | PASEU | 2020 | Max retries reached |
+| SMRTG | 2020 | HTTP 400 (non-retryable) |
 | ASTOR | 2021 | Max retries reached |
 | DSTKF | 2021 | Max retries reached |
 | PASEU | 2021 | Max retries reached |
+| SMRTG | 2021 | HTTP 400 (non-retryable) |
 | ASTOR | 2022 | Max retries reached |
 | DSTKF | 2022 | Max retries reached |
 | PASEU | 2022 | Max retries reached |

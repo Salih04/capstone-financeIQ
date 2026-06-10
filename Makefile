@@ -1,6 +1,7 @@
 .PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research \
 	inspect-quarterly research-agent-dataset research-agent-check full-research-agent ingest-corrected-yearly \
 	prices valuation shares split-datasets build-company-contexts collect-bist100-financials \
+	integrate-pilot-tickers \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration
@@ -77,6 +78,16 @@ ingest-corrected-yearly:
 # Training expansion NOT complete until tickers > 40 and return targets added.
 collect-bist100-financials:
 	PYTHONPATH=. python scripts/data_collection/collect_bist100_financials_yfinance.py
+
+# Integrate yfinance pilot financials into the training dataset (training-only, no frontend impact).
+# Prerequisites: make data && make prices (with updated universe_training_bist100.csv)
+# After running: make split-datasets && make build-company-contexts
+integrate-pilot-tickers:
+	python scripts/fetch_yahoo_chart_prices.py \
+		--start-year 2020 --end-year 2025 \
+		--universe-csv data/config/universe_training_bist100.csv
+	PYTHONPATH=. python scripts/data_collection/integrate_pilot_tickers.py
+	PYTHONPATH=. python -m scripts.data_collection.split_universe_datasets
 
 # Collect free year-end prices from Yahoo (TICKER.IS) and cache them. No shares.
 prices:
