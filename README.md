@@ -2,8 +2,8 @@
 
 An honest, leakage-safe **T→T+1 equity-research system** for 40 public BIST companies
 (2020–2025), with an expanded 81-ticker internal training universe: a validated modeling dataset, a BIST100 benchmark, a free-data
-valuation reconstruction, an explainable hybrid research agent, and a "Research
-Terminal" frontend. No paid APIs, no synthetic/fabricated data, no scrapers.
+valuation reconstruction, an explainable hybrid research agent, and the Fable 5
+"Research Terminal" frontend. No paid APIs, no synthetic/fabricated data, no scrapers.
 
 > **Capstone status: complete.** The pipeline is rigorous and transparent. The
 > honest finding is that the model still shows **no reliable predictive edge** after
@@ -33,6 +33,34 @@ trusted XLSX files to CSV and loads them into Postgres on startup.
 | API Docs | http://localhost:8000/docs |
 
 Entry route: `/login`.
+
+## Fable 5 frontend
+
+FinanceIQ is no longer a generic capstone dashboard. The frontend is a dark
+research-terminal interface for BIST signal analysis: Bloomberg meets Linear,
+with the restraint of a scientific instrument. It uses deep ink surfaces, subtle
+grain/scanline texture, muted emerald for signal/positive states, oxidized
+copper/amber for weak or warning states, monospace data typography, tracked caps
+section labels, persistent right-side Signal Readout panels where applicable,
+and bottom caveat strips. The core product stance is: **"A weak signal, reported
+honestly."** Walk-forward IC ≈ 0 is shown as a core finding, not hidden.
+
+Implemented research surfaces:
+
+| Route | Concept | What it documents in the UI |
+|---|---|---|
+| `/dashboard` | Weak signal overview | Particle/noise field, BIST100 vs model comparison, feature intake, data quality, visible IC ≈ 0 signal-strength indicator. |
+| `/research-agent` | Research query instrument | "Query the signal. Distrust the answer."; intent selectors, restored free-text query, `POST /research/ask` preserved, instrument-style answer blocks, hybrid weights and AI/fallback status. |
+| `/research/companies` and `/companies` | Research map | "The universe, laid flat."; research score x-axis, coverage y-axis, sector-colored ticker nodes, search/filter dimming, map/table mode, real API first with demo fallback only. |
+| `/experiments` | Seismograph | Walk-forward folds around zero, equal-weight baseline shown honestly where it leads, flat IC trace treated as the finding, `researchApi.experiments()` preserved with demo fallback only. |
+| `/research` | Dissection table | Score Explorer route; composite score unfolds into feature/category detail; `/research/years`, `/research/scores`, `/research/company` behavior preserved with demo fallback only. |
+| `/data-quality` | Specimen archive | Accepted/rejected feature specimens, `LEAKAGE`/`FROZEN`/`ALL-NULL` stamps, `dataQuality()`, `summary()`, `frozenEvidence()` calls, progressive hydration to avoid false zero states. |
+| `/benchmark` | Tide chart | BIST100 vs model top basket as filled water bodies, 2022 +196% event on sign-preserving log scale, small IC markers, `researchApi.benchmark()` preserved. |
+| `/forecasting` | Signal tuner | Experimental pipeline using `GET /forecasting/options`, `POST /forecasting/train`, `POST /forecasting/run`, `GET /forecasting/explain/:ticker`; feature weights as a frequency spectrum, ranked results from noise, inference-only rows pulse amber. |
+
+Mock/demo data is fallback only where pages explicitly provide it; real API
+behavior is preserved. All copy is research support only and not investment
+advice.
 
 ## ⚠️ Data reliability & the modeling pipeline
 
@@ -76,7 +104,7 @@ no value is fabricated or imputed.
 A constrained research-support layer. The **structured ML pipeline stays the
 primary numerical model**; the LLM only reads validated structured evidence and
 produces cautious explanation + a bounded `llm_research_score` in [0,1]. It never
-predicts prices/returns, never gives buy/sell/hold, never fabricates facts.
+claims price/return certainty, gives investment advice, or fabricates facts.
 
 Hybrid score (weights configurable via env):
 ```
@@ -87,7 +115,8 @@ Components are always returned separately; `ml_score` may be null (partial score
 Endpoints (`/research/summary`, `/research/company/{ticker}`,
 `/research/company/{ticker}/score`, `/research/model-diagnostics`,
 `/research/data-quality`, `/research/ai-status`, `POST /research/ask`).
-Frontend page: `/research-agent`.
+Frontend page: `/research-agent`; legacy `/ai-search` redirects there. No
+`/ai-research-assistant` route is present in the current route map.
 
 ### Run with / without an LLM
 ```bash
@@ -278,10 +307,10 @@ Everything non-trusted is in [`unnecessary/`](unnecessary/README.md):
 - **2024 vendor export was column-misaligned.** Handled via the manual
   `corrected_balance_sheet_2024.csv` (shape-validated, 2024-only override); an
   upstream-clean export would still be preferable.
-- **Forecasting (legacy `/forecasting`)** is functional: `/forecasting/filters`
-  unions cohort + uploaded fundamentals, actions return friendly errors (never raw
-  500) and stay re-clickable. It remains a separate legacy tool from the Research
-  Terminal.
+- **Forecasting remains experimental.** The current `/forecasting` page uses the
+  CSV-backed options/train/run/explain pipeline and presents inference-only rows
+  as research support only. Legacy DB endpoints still exist, but the frontend
+  path does not depend on populated DB forecasting tables.
 - Dataset is **yearly**; the quarterly Fintables exports are a frozen snapshot and
   are excluded (see `make inspect-quarterly`). No future-year leakage (enforced in
   `validate.py`).

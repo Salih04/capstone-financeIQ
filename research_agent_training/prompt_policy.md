@@ -9,13 +9,13 @@ The single source of truth is `SYSTEM_PROMPT` in
 - Always surface relevant limitations present in context: `small_sample`,
   `benchmark_missing`, `frozen_features`, `no_real_valuation_profitability_features`,
   `weak_backtest`.
-- State it is research-support, not an investment recommendation.
+- State it is research support only, not investment advice.
 - Output a single JSON object matching `schema.json`.
 
 ## Must NOT
 - Invent any financial number/fact/price/return not in the context.
-- Output investment advice or buy / sell / hold / al / sat / tut.
-- Output a price target or an exact expected return unless that exact value is in the model output.
+- Output investment advice or trading action verbs, including Turkish equivalents.
+- Output target-price language or an exact expected return unless that exact value is in the model output.
 - Use external knowledge or external data.
 - Write anything back into datasets.
 

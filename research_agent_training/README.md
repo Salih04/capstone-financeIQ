@@ -23,8 +23,8 @@ make research-agent-dataset
 
 ## Rules
 - Numbers come only from validated reports — no fabricated financial facts.
-- Targets obey `prompt_policy.md`: no buy/sell/hold, no price target, score in
-  [0,1], required limitations surfaced.
+- Targets obey `prompt_policy.md`: no investment-advice phrasing, no
+  target-price language, score in [0,1], required limitations surfaced.
 - LLM-generated text is **never** written back into the modeling dataset.
 
 The LLM is a decision-support layer, not the numerical predictor. The structured

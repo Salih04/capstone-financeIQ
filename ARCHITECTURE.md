@@ -73,7 +73,7 @@ run_forecast(year, trained_weights, risk_level, user_type)
   └─ for each ticker: percentile rank per feature (within year) × weight = score
   └─ risk_level multiplier: low=0.85 / medium=1.0 / high=1.15
   └─ returns ranked items with ticker, score, confidence, top_parameters, warnings
-  └─ inference rows (2025) flagged; no buy/sell signals ever
+  └─ inference rows (2025) flagged; research support only
 
 explain_ticker(ticker, year)
   └─ returns top_features, bottom_features, missing_features, data_quality guardrails
@@ -120,27 +120,72 @@ forecast_evaluation_folds — one per fold
 
 ## Frontend — `1.frontend/src/`
 
+### Visual system
+
+Fable 5 turns the app into a dark BIST research terminal rather than a generic
+capstone dashboard. The design language is deep ink and graphite surfaces,
+subtle grain/scanlines, muted emerald for signal/positive states, oxidized
+copper/amber for weak/warning states, monospace data labels, tracked caps
+section headings, sharp instrument panels, and research-only caveats. It keeps
+the central finding visible: walk-forward IC ≈ 0 and no reliable weak ranking
+signal should be hidden.
+
 ### Route map
 
 ```
 /                → redirect /login
 /login           → LoginPage (public)
-/dashboard       → DashboardPage
-/companies       → SearchPage
+/dashboard       → DashboardPage  [particle field / weak-signal overview]
+/companies       → SearchPage  [research map entry]
+/search          → redirect /companies
+/ai-search       → redirect /research-agent
 /companies/:id   → CompanyPage
 /score-runs/:id  → ScoreResultPage
 /compare         → ComparePage
-/reports         → ReportsPage
+/reports         → redirect /dashboard
 /admin           → AdminPage
 /validation      → ValidationLabPage
-/ai-search       → AISearchPage
 /data-health     → DataHealthPage
 /labeling        → LabelingLabPage
-/forecasting     → ForecastingPage  [CSV pipeline: options → train → rank → explain]
+/forecasting     → ForecastingPage  [signal tuner: options → train → rank → explain]
 /forecasting/detail → ForecastingDetailPage
-/news            → NewsUpdatesPage
+/research        → ResearchPage  [Score Explorer / dissection table]
+/research-agent  → ResearchAgentPage  [research query instrument]
+/data-quality    → DataQualityPage  [specimen archive]
+/experiments     → ExperimentsPage  [seismograph]
+/benchmark       → BenchmarkPage  [tide chart]
+/research/companies → CompaniesResearchPage  [research map]
+/research/companies/:ticker → CompanyResearchDetailPage
 *                → redirect /dashboard
 ```
+
+### Research Terminal pages
+
+- `/dashboard` — "A weak signal, reported honestly."; particle/noise overview,
+  BIST100 vs model comparison, feature intake, data quality, and visible IC ≈ 0.
+- `/research-agent` — "Query the signal. Distrust the answer."; five intent
+  selectors (Benchmark Outperformers, Top Ranked, Data Quality Overview,
+  Valuation Screen, Model Diagnostics), restored free-text query, preserved
+  `POST /research/ask` body `{ question: "<query text>" }`, instrument-style
+  answer blocks, and hybrid/AI fallback status.
+- `/research/companies` and `/companies` — "The universe, laid flat."; research
+  score on x-axis, coverage on y-axis, sector-colored ticker nodes, search/filter
+  dimming without layout movement, map/table toggle, real API first and mock data
+  only as fallback/demo.
+- `/experiments` — seismograph traces around zero; equal-weight baseline can lead
+  where applicable; flat IC trace is presented as the finding.
+- `/research` — Score Explorer dissection table; composite diagnostic score
+  unfolds into feature/category detail while preserving `/research/years`,
+  `/research/scores`, and `/research/company`.
+- `/data-quality` — specimen archive for accepted/rejected features with
+  `LEAKAGE`, `FROZEN`, and `ALL-NULL` stamps; `dataQuality()`, `summary()`, and
+  `frozenEvidence()` hydrate progressively so accepted/rejected lists can render
+  before slower frozen evidence finishes.
+- `/benchmark` — tide chart with BIST100 vs model top basket as filled water
+  bodies, sign-preserving log scale for 2022 +196%, and small IC markers.
+- `/forecasting` — experimental signal tuner; feature weights render as a
+  frequency spectrum, ranked rows crystallize from noise, inference-only rows
+  pulse amber, and standby readout does not imply advice.
 
 ### ForecastingPage flow
 
@@ -149,7 +194,7 @@ mount → GET /forecasting/options (CSV-backed, no DB)
   └─ Step 1: set train_year_from/to, top_n → POST /forecasting/train
        └─ returns top_parameters with feature weights
   └─ Step 2: set forecast_year → POST /forecasting/run
-       └─ returns ranked tickers with scores (no buy/sell signals; experimental)
+       └─ returns ranked tickers with diagnostic scores (experimental)
   └─ click ticker → GET /forecasting/explain/{ticker}
        └─ score drivers, feature coverage, data quality warnings
 ```
@@ -158,7 +203,10 @@ All routes except `/login` wrapped in `<ProtectedRoute>` → `<AppShell>`.
 
 ### Auth
 
-JWT stored in localStorage. `ProtectedRoute` reads token; redirects to `/login` if absent. Token lifetime: 1440 min (24h).
+JWT stored in localStorage. `ProtectedRoute` reads token; redirects to `/login`
+if absent. Token lifetime: 1440 min (24h). Treat login as a restricted research
+workspace. Do not describe open public signup unless a deployment explicitly
+implements reviewer/user allowlisting.
 
 ---
 

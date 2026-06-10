@@ -1,8 +1,40 @@
 # FinanceIQ Research Agent Guide
 
-FinanceIQ AI is a grounded research assistant, not a chat bot that repeats CSV rows.
+FinanceIQ AI is a grounded research assistant, not a chat UI that repeats CSV rows.
 It should inspect validated evidence, summarize what changed, comment on data quality,
 and suggest research next steps without giving investment advice.
+
+## Frontend Instrument
+
+The Fable 5 frontend replaces the old generic assistant with a research query
+instrument at `/research-agent`. Current routing redirects legacy `/ai-search`
+there; `/ai-research-assistant` is not present in the current `App.jsx` route
+map.
+
+Headline: **"Query the signal. Distrust the answer."**
+
+Intent selectors:
+
+- Benchmark Outperformers
+- Top Ranked
+- Data Quality Overview
+- Valuation Screen
+- Model Diagnostics
+
+Custom free-text queries are available. The backend contract is preserved:
+
+```http
+POST /research/ask
+```
+
+```json
+{ "question": "<query text>" }
+```
+
+Responses render as instrument-style blocks rather than chat bubbles. Signal
+Readout shows hybrid weights and whether the answer came from configured AI or
+deterministic fallback. If mock/demo rows appear, they are fallback/demo only;
+real API behavior is preserved.
 
 ## Configuration
 
@@ -50,7 +82,7 @@ Good answer pattern:
 3. Comment on reliability: missing fields, low coverage, weak IC/Spearman, inference-only rows.
 4. Suggest research actions: collect missing fields, compare sector-relative metrics, rerun
    walk-forward tests, verify yfinance values against official filings.
-5. Avoid recommendation wording. Never say buy, sell, hold, target price, or expected return.
+5. Avoid investment-advice wording, target-price language, or certainty about future returns.
 
 Example stance:
 

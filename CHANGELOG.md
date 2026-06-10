@@ -4,11 +4,38 @@ All notable changes to FinanceIQ, most recent first.
 
 ## Unreleased
 
+### Added
+- **Fable 5 frontend documentation pass** — docs now describe the completed dark
+  research-terminal redesign: deep ink surfaces, subtle grain, muted emerald
+  signal states, oxidized copper/amber warning states, monospace data typography,
+  right-side Signal Readout panels, and persistent research-only caveats.
+- **Page concepts documented** — dashboard weak-signal overview, Research Agent
+  query instrument, Companies research map, Experiments seismograph, Score
+  Explorer dissection table, Data Quality specimen archive, Benchmark tide chart,
+  and Forecasting signal tuner.
+- **Secondary caveat strips documented** — CompanyPage, ComparePage,
+  ScoreResultPage, CompanyResearchDetailPage, and DataHealthPage use the shared
+  TerminalFx caveat grammar:
+  `● [page context] · Research only · Not investment advice`.
+
+### Changed
+- Research Agent docs now call out the preserved `POST /research/ask` contract
+  with body `{ question: "<query text>" }`, instrument-style response blocks,
+  five intent selectors, restored free-text query, hybrid weights, and
+  AI/fallback status.
+- Frontend route documentation now reflects the current Research Terminal route
+  map: `/research-agent`, `/research/companies`, `/experiments`, `/research`,
+  `/data-quality`, `/benchmark`, and `/forecasting`.
+- Mock/demo frontend data is documented as fallback only; real API behavior is
+  described as preserved.
+
 ### Fixed
 - Frontend page navigation now keeps already-loaded Research Terminal data in a
   lightweight in-memory session cache, so returning to data-quality,
   experiments, research, or companies pages no longer resets to full loading
   states during the same app session.
+  Cache lives in `1.frontend/src/utils/sessionCache.js`, uses a 5-minute TTL, and
+  hard refresh still fetches normally.
 
 ---
 
@@ -90,7 +117,7 @@ All notable changes to FinanceIQ, most recent first.
 ### Notes
 - Honest finding at this stage: model signal remained weak/unstable on the public
   40-stock universe. The deliverable is a rigorous, transparent pipeline + honest
-  negative result, not alpha.
+  negative result, not a trading-edge claim.
 
 ---
 
@@ -107,7 +134,7 @@ All notable changes to FinanceIQ, most recent first.
     `GET /forecasting/explain/{ticker}` — new CSV-backed endpoints alongside legacy.
   - `ForecastingPage.jsx` rewritten: options load on mount from CSV, Step 1 derives
     feature weights, Step 2 ranks stocks, click reveals explainability panel.
-    Dark research terminal style. No buy/sell signals. Clearly experimental.
+    Dark research terminal style. Research support only. Clearly experimental.
 - **Universe split + public/training separation** — `make split-datasets` produces
   `modeling_dataset_public_2020_2025.csv` (frontend, inference) and
   `modeling_dataset_training_2020_2025.csv` (experiments, walk-forward only).

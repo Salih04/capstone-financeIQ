@@ -8,10 +8,12 @@ expanded 81-ticker internal training universe. It builds a validated modeling
 dataset (year-T features → year-(T+1) realized return), a BIST100 benchmark,
 a free-data valuation reconstruction, walk-forward experiments, an explainable hybrid
 research agent (OpenRouter by default, local providers optional), a CSV-backed
-forecasting pipeline at `/forecasting`, and a "Research Terminal" frontend.
+forecasting pipeline at `/forecasting`, and the Fable 5 "Research Terminal"
+frontend.
 
 **Status: complete.** Honest finding: no reliable predictive edge after the
-expanded training run — a rigorous pipeline + transparent negative result, not alpha.
+expanded training run — a rigorous pipeline + transparent negative result, not
+a trading-edge claim.
 See `TASK_STATE.md`.
 
 ## Goals
@@ -22,6 +24,33 @@ See `TASK_STATE.md`.
 - Evaluate honestly via walk-forward CV vs a simple baseline (report weak signal as-is)
 - Provide explainable, bounded research support — never investment advice
 - Keep every accepted/rejected column traceable to its source and reason
+
+## Frontend direction
+
+The completed Fable 5 frontend is a dark research-terminal interface for BIST
+signal analysis, not a generic capstone dashboard. It uses deep ink surfaces,
+subtle grain/scanline texture, muted emerald signal states, oxidized
+copper/amber weak-signal states, monospace data typography, tracked caps labels,
+and persistent Signal Readout panels where useful. It does not use floating
+tooltips or investment-advice language. The weak result is part of the interface:
+walk-forward IC ≈ 0 is shown as a core finding.
+
+Key pages:
+
+| Route | Current concept | Data behavior |
+|---|---|---|
+| `/dashboard` | Particle field / weak signal overview; "A weak signal, reported honestly." | BIST100/model comparison, feature intake, data quality, visible IC ≈ 0. |
+| `/research-agent` | Research query instrument; "Query the signal. Distrust the answer." | Preserves `POST /research/ask` with `{ question: "<query text>" }`; five intent selectors plus free text; hybrid weights and AI/fallback status. |
+| `/research/companies`, `/companies` | Research map; "The universe, laid flat." | Real API data preserved; mock/demo data only fallback. X = research score, Y = coverage, sector-colored ticker nodes, map/table toggle. |
+| `/experiments` | Seismograph | Walk-forward folds trace around zero; equal-weight baseline can lead; flat IC trace is the finding. |
+| `/research` | Score Explorer / dissection table | Preserves `/research/years`, `/research/scores`, `/research/company`; composite score unfolds to feature/category detail. |
+| `/data-quality` | Specimen archive | Uses `dataQuality()`, `summary()`, `frozenEvidence()`; `LEAKAGE`/`FROZEN`/`ALL-NULL` stamps; avoids false accepted=0 loading states. |
+| `/benchmark` | Tide chart | Preserves `researchApi.benchmark()`; sign-preserving log scale keeps 2022 +196% readable; IC markers stay small. |
+| `/forecasting` | Signal tuner | Preserves options/train/run/explain pipeline; feature weights as frequency spectrum; inference-only rows pulse amber. |
+
+Session cache: `1.frontend/src/utils/sessionCache.js` is a lightweight in-memory
+cache used by Data Quality, Experiments, Research, and Search/Companies pages.
+TTL is 5 minutes; hard refresh fetches normally.
 
 ## Users
 

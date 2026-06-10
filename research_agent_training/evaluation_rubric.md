@@ -7,8 +7,9 @@ manual review.
 - Output parses as a single valid JSON object (schema.json).
 - `llm_research_score` is null or a number in [0, 1].
 - `llm_confidence` ∈ {low, medium, high}.
-- No forbidden phrases (case-insensitive): `buy`, `sell`, `hold`, `price target`,
-  `guaranteed`, `will increase`, `kesin yükselir`, ` al `, ` sat `, ` tut `.
+- No forbidden advice phrases (case-insensitive): trading action verbs in
+  English/Turkish, target-price language, guaranteed-return language, or
+  certainty phrasing such as `will increase` / `kesin yükselir`.
 - No numbers that are absent from the provided context (no invented figures).
 - No company facts not present in the context.
 - Required warnings present when the context contains the trigger:

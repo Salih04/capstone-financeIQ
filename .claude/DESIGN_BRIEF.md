@@ -20,6 +20,19 @@ The app now has a strong “Signal from noise / research terminal” visual syst
 - honest weak-signal language
 - research-only tone
 
+Completed Fable 5 page concepts:
+- `/dashboard` — particle field / weak signal overview; "A weak signal, reported honestly."
+- `/research-agent` — query instrument; "Query the signal. Distrust the answer."; five intent selectors and custom free-text query using `POST /research/ask`
+- `/research/companies` and `/companies` — research map; "The universe, laid flat."; research score × coverage, sector-colored nodes, dimming filters, map/table toggle
+- `/experiments` — seismograph; walk-forward traces around zero and flat IC as the finding
+- `/research` — Score Explorer dissection table; composite score unfolds into feature/category detail
+- `/data-quality` — specimen archive; accepted/rejected features with `LEAKAGE`, `FROZEN`, and `ALL-NULL` stamps
+- `/benchmark` — tide chart; BIST100 vs model water bodies, 2022 +196% sign-preserving log scale, small IC markers
+- `/forecasting` — experimental signal tuner; options/train/run/explain preserved, feature weights as spectrum, inference-only rows pulse amber
+
+Mock/demo data is fallback only where implemented; preserve real API calls. Keep
+walk-forward IC ≈ 0 visible when relevant.
+
 Your job is to redesign ONE requested page at a time so it feels like part of the same FinanceIQ research terminal.
 
 ## Scope
@@ -81,8 +94,8 @@ Avoid:
 - over-rounded generic cards
 - childish animations
 - fake decorative charts
-- buy/sell/hold language
-- investment recommendation language
+- investment-advice language
+- price-target or guaranteed-return language
 
 ## Technical constraints
 
@@ -129,13 +142,10 @@ Allowed:
 - no reliable predictive edge
 
 Avoid:
-- buy
-- sell
-- hold
-- recommendation
-- price target
+- trading action verbs
+- target-price claims
 - guaranteed
-- alpha promise
+- unearned edge promises
 
 ## Delivery
 
