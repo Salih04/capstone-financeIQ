@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Download, RotateCcw, GitCompare, TrendingUp, TrendingDown, Lightbulb, FileText, Sparkles, BrainCircuit } from 'lucide-react'
 import api from '../api/client'
 import { Card, GhostButton, ScoreBadge, getBand, Skeleton, Chip, SectionHeader } from '../components/ui'
+import TerminalFx from '../components/TerminalFx'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -143,14 +144,14 @@ function AdaptiveWeightsCard({ adaptiveInfo }) {
   if (!adaptiveInfo) return null
   const { sufficient_data, message, category_adjustments, periods_analyzed, companies_analyzed, sector_adjustment } = adaptiveInfo
   return (
-    <Card style={{ padding: '1.25rem', marginBottom: 20, borderColor: 'rgba(139,92,246,0.3)', background: 'rgba(139,92,246,0.03)' }}>
+    <Card style={{ padding: '1.25rem', marginBottom: 20, borderColor: 'rgba(168,103,75,0.3)', background: 'rgba(168,103,75,0.03)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <BrainCircuit size={15} style={{ color: '#8B5CF6' }} />
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#8B5CF6', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        <BrainCircuit size={15} style={{ color: '#A8674B' }} />
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#A8674B', textTransform: 'uppercase', letterSpacing: 0.5 }}>
           Adaptive Weight Analysis
         </span>
         {sufficient_data && (
-          <span style={{ fontSize: 11, background: 'rgba(139,92,246,0.12)', color: '#8B5CF6', borderRadius: 20, padding: '2px 8px' }}>
+          <span style={{ fontSize: 11, background: 'rgba(168,103,75,0.12)', color: '#A8674B', borderRadius: 20, padding: '2px 8px' }}>
             {periods_analyzed?.length} periods · {companies_analyzed} companies
           </span>
         )}
@@ -186,8 +187,8 @@ function AdaptiveWeightsCard({ adaptiveInfo }) {
             })}
           </div>
           {sector_adjustment && (
-            <div style={{ background: 'rgba(139,92,246,0.08)', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: 'var(--text-2)' }}>
-              <strong style={{ color: '#8B5CF6' }}>Sector Adjustment:</strong>{' '}
+            <div style={{ background: 'rgba(168,103,75,0.08)', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: 'var(--text-2)' }}>
+              <strong style={{ color: '#A8674B' }}>Sector Adjustment:</strong>{' '}
               {sector_adjustment.explanation}
             </div>
           )}
@@ -258,7 +259,8 @@ export default function ScoreResultPage() {
   const adaptiveWeightsInfo = richExplanation?.adaptive_weights || null
 
   return (
-    <div style={{ maxWidth: 860, margin: '0 auto', padding: '2rem 1.5rem' }}>
+    <div className="tfx tfx-enter" style={{ maxWidth: 860, margin: '0 auto', padding: '2rem 1.5rem' }}>
+      <TerminalFx />
       {/* Back */}
       <button
         onClick={() => navigate(`/companies/${run.company_id}`)}
@@ -268,10 +270,10 @@ export default function ScoreResultPage() {
       </button>
 
       {/* ── Hero Score Card ── */}
-      <Card style={{ padding: '2rem', textAlign: 'center', marginBottom: 20, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(244,176,74,0.10), var(--surface-2))' }}>
+      <Card style={{ padding: '2rem', textAlign: 'center', marginBottom: 20, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(200,163,90,0.10), var(--surface-2))' }}>
         <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: band.color }} />
-        <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>
-          Diagnostic Score Result
+        <div className="tfx-kicker" style={{ fontSize: 10.5, color: 'var(--text-3)', marginBottom: 8 }}>
+          DIAGNOSTIC SCORE READOUT
         </div>
         {/* Company identity */}
         {company && (
@@ -346,7 +348,7 @@ export default function ScoreResultPage() {
       </Card>
 
       {/* ── Score Methodology Box ── */}
-      <Card style={{ padding: '1.25rem', marginBottom: 20, borderColor: 'rgba(0,245,212,0.3)', background: 'rgba(0,245,212,0.03)' }}>
+      <Card style={{ padding: '1.25rem', marginBottom: 20, borderColor: 'rgba(77,165,131,0.3)', background: 'rgba(77,165,131,0.03)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <FileText size={15} style={{ color: 'var(--primary)' }} />
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -463,7 +465,7 @@ export default function ScoreResultPage() {
         const aiInsights = generateAIInsights(run)
         if (!aiInsights.length) return null
         return (
-          <Card style={{ padding: '1.25rem', marginBottom: 20, borderColor: 'rgba(0,245,212,0.3)', background: 'rgba(0,245,212,0.04)' }}>
+          <Card style={{ padding: '1.25rem', marginBottom: 20, borderColor: 'rgba(77,165,131,0.3)', background: 'rgba(77,165,131,0.04)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
               <Sparkles size={16} style={{ color: 'var(--info)' }} />
               <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--info)', textTransform: 'uppercase', letterSpacing: 0.5 }}>

@@ -12,65 +12,65 @@
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
       :root {
-        --bg-deep:      #030712;
-        --bg:           #07111F;
-        --surface-1:    rgba(12, 22, 36, 0.92);
-        --surface-2:    rgba(17, 30, 48, 0.82);
-        --surface-3:    rgba(28, 45, 68, 0.78);
-        --surface-hover:rgba(38, 60, 88, 0.82);
+        --bg-deep:      #080b0a;
+        --bg:           #0a0e0d;
+        --surface-1:    rgba(14, 20, 19, 0.92);
+        --surface-2:    rgba(18, 26, 24, 0.85);
+        --surface-3:    rgba(26, 36, 33, 0.80);
+        --surface-hover:rgba(33, 45, 41, 0.85);
 
-        --border:        rgba(148, 163, 184, 0.13);
-        --border-strong: rgba(148, 163, 184, 0.22);
-        --border-bright: rgba(125, 211, 252, 0.38);
+        --border:        rgba(200, 211, 202, 0.13);
+        --border-strong: rgba(200, 211, 202, 0.22);
+        --border-bright: rgba(200, 163, 90, 0.45);
 
-        --primary:        #F5B14C;
-        --primary-hover:  #FFD37A;
-        --primary-muted:  rgba(245,177,76,0.18);
-        --primary-glow:   rgba(245,177,76,0.26);
-        --primary-subtle: rgba(245,177,76,0.10);
+        --primary:        #C8A35A;
+        --primary-hover:  #DCBB74;
+        --primary-muted:  rgba(200,163,90,0.18);
+        --primary-glow:   rgba(200,163,90,0.26);
+        --primary-subtle: rgba(200,163,90,0.10);
 
-        --secondary:        #39E6D0;
-        --secondary-hover:  #7AF7EA;
-        --secondary-subtle: rgba(57,230,208,0.12);
-        --violet:           #8B5CF6;
-        --violet-subtle:    rgba(139,92,246,0.13);
+        --secondary:        #4DA583;
+        --secondary-hover:  #6DBD9D;
+        --secondary-subtle: rgba(77,165,131,0.12);
+        --violet:           #A8674B;
+        --violet-subtle:    rgba(168,103,75,0.13);
 
-        --success:        #3AC78B;
-        --success-light:  #58D7A2;
-        --success-muted:  rgba(58,199,139,0.18);
-        --success-subtle: rgba(58,199,139,0.09);
+        --success:        #4DA583;
+        --success-light:  #6DBD9D;
+        --success-muted:  rgba(77,165,131,0.18);
+        --success-subtle: rgba(77,165,131,0.09);
 
-        --warning:        #F2A95B;
-        --warning-light:  #F7BB78;
-        --warning-muted:  rgba(242,169,91,0.18);
-        --warning-subtle: rgba(242,169,91,0.09);
+        --warning:        #C8A35A;
+        --warning-light:  #DCBB74;
+        --warning-muted:  rgba(200,163,90,0.18);
+        --warning-subtle: rgba(200,163,90,0.09);
 
-        --danger:         #E97056;
-        --danger-light:   #F28C75;
-        --danger-muted:   rgba(233,112,86,0.18);
-        --danger-subtle:  rgba(233,112,86,0.09);
+        --danger:         #B95F44;
+        --danger-light:   #D08164;
+        --danger-muted:   rgba(185,95,68,0.18);
+        --danger-subtle:  rgba(185,95,68,0.09);
 
-        --info:           #55C2C3;
-        --info-subtle:    rgba(85,194,195,0.12);
+        --info:           #5A9A8C;
+        --info-subtle:    rgba(90,154,140,0.12);
 
-        --text-1: #F8FBFF;
-        --text-2: #C9D7EE;
-        --text-3: #8FA3C2;
-        --text-4: #4B5C77;
+        --text-1: #E8ECE6;
+        --text-2: #B7C2B8;
+        --text-3: #8A988C;
+        --text-4: #5D6B62;
 
         --font:      'Manrope', -apple-system, system-ui, sans-serif;
         --font-mono: 'IBM Plex Mono', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 
-        --radius-sm:  5px;
-        --radius-md:  12px;
-        --radius-lg:  18px;
-        --radius-xl:  26px;
-        --radius-2xl: 28px;
+        --radius-sm:  3px;
+        --radius-md:  6px;
+        --radius-lg:  10px;
+        --radius-xl:  14px;
+        --radius-2xl: 16px;
 
-        --shadow-sm:   0 10px 30px rgba(0,0,0,0.20);
-        --shadow-md:   0 18px 55px rgba(0,0,0,0.30);
-        --shadow-lg:   0 28px 90px rgba(0,0,0,0.42);
-        --shadow-glow: 0 0 34px rgba(57,230,208,0.16), 0 0 38px rgba(245,177,76,0.12);
+        --shadow-sm:   0 10px 30px rgba(0,0,0,0.25);
+        --shadow-md:   0 18px 55px rgba(0,0,0,0.35);
+        --shadow-lg:   0 28px 90px rgba(0,0,0,0.48);
+        --shadow-glow: 0 0 34px rgba(77,165,131,0.14), 0 0 38px rgba(200,163,90,0.10);
 
         --sidebar-w:    244px;
         --sidebar-coll: 68px;
@@ -132,15 +132,24 @@
 
       body {
         font-family: var(--font);
-        background: radial-gradient(circle at 14% 8%, rgba(245,177,76,0.13), transparent 34%),
-                    radial-gradient(circle at 88% 5%, rgba(57,230,208,0.12), transparent 32%),
-                    linear-gradient(180deg, #030712 0%, #07111F 45%, #050B16 100%),
+        background: radial-gradient(1100px 540px at 78% -8%, rgba(77,165,131,0.07), transparent 60%),
+                    radial-gradient(800px 500px at 8% 108%, rgba(168,103,75,0.06), transparent 60%),
+                    linear-gradient(165deg, #0b100f 0%, #0a0e0d 55%, #080b0a 100%),
                     var(--bg);
         color: var(--text-1);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         overflow-x: hidden;
         min-height: 100vh;
+      }
+
+      [data-theme="dark"] body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 9999;
+        background: repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 4px);
       }
 
       * {
@@ -158,7 +167,7 @@
       a { text-decoration: none; color: inherit; }
 
       .glass-panel {
-        background: linear-gradient(180deg, rgba(17,30,48,0.82), rgba(10,18,30,0.72));
+        background: linear-gradient(180deg, rgba(18,26,24,0.85), rgba(11,16,15,0.75));
         border: 1px solid var(--border-strong);
         box-shadow: var(--shadow-sm);
         backdrop-filter: blur(18px);
@@ -168,10 +177,10 @@
         position: relative;
         overflow: hidden;
         border: 1px solid var(--border-strong);
-        border-radius: 28px;
+        border-radius: 16px;
         background:
-          linear-gradient(135deg, rgba(245,177,76,0.16), rgba(57,230,208,0.09) 42%, rgba(17,30,48,0.88)),
-          radial-gradient(circle at 88% 12%, rgba(139,92,246,0.18), transparent 34%);
+          linear-gradient(135deg, rgba(200,163,90,0.14), rgba(77,165,131,0.08) 42%, rgba(18,26,24,0.88)),
+          radial-gradient(circle at 88% 12%, rgba(168,103,75,0.16), transparent 34%);
         box-shadow: var(--shadow-md);
         backdrop-filter: blur(18px);
       }
@@ -197,7 +206,11 @@
         box-shadow: var(--shadow-glow);
       }
     </style>
+<<<<<<< HEAD
     <script type="module" crossorigin src="/assets/index-B6EfDqCc.js"></script>
+=======
+    <script type="module" crossorigin src="/assets/index-Doc_wSe5.js"></script>
+>>>>>>> local/nice-chatelet-dce077
   </head>
   <body>
     <div id="root"></div>

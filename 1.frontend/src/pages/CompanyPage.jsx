@@ -10,6 +10,7 @@ import {
   SectionHeader, TabBar, Card, PrimaryButton, GhostButton,
   ChangeChip, Skeleton, ScoreBadge, Chip, EmptyState,
 } from '../components/ui'
+import TerminalFx from '../components/TerminalFx'
 
 const fmt = (v, pct = false) => {
   if (v == null) return '—'
@@ -309,7 +310,7 @@ export default function CompanyPage() {
 
   // ── Scoring Overlay ──────────────────────────────────────────────────────
   if (scoring) {
-    const band = scoreProgress >= 75 ? '#2BD97F' : scoreProgress >= 50 ? '#00F5D4' : scoreProgress >= 25 ? '#FFC857' : '#9ca3af'
+    const band = scoreProgress >= 75 ? '#4DA583' : scoreProgress >= 50 ? '#4DA583' : scoreProgress >= 25 ? '#C8A35A' : '#9ca3af'
     return (
       <div style={{
         position: 'fixed', inset: 0, zIndex: 999,
@@ -334,7 +335,7 @@ export default function CompanyPage() {
               <circle cx={48} cy={48} r={40} fill="none" stroke="var(--surface-3)" strokeWidth={6} />
               <circle
                 cx={48} cy={48} r={40} fill="none"
-                stroke="#00F5D4" strokeWidth={6}
+                stroke="#4DA583" strokeWidth={6}
                 strokeDasharray={`${2 * Math.PI * 40}`}
                 strokeDashoffset={`${2 * Math.PI * 40 * (1 - scoreProgress / 100)}`}
                 strokeLinecap="round"
@@ -363,7 +364,7 @@ export default function CompanyPage() {
             <div style={{
               height: '100%',
               width: `${scoreProgress}%`,
-              background: 'linear-gradient(90deg, #00B894, #00F5D4, #80FEE8)',
+              background: 'linear-gradient(90deg, #4DA583, #4DA583, #6DBD9D)',
               borderRadius: 4,
               transition: 'width 0.15s ease',
             }} />
@@ -392,10 +393,10 @@ export default function CompanyPage() {
                     width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 10, fontWeight: 700,
-                    background: done ? '#2BD97F' : active ? '#00F5D4' : 'var(--surface-3)',
+                    background: done ? '#4DA583' : active ? '#4DA583' : 'var(--surface-3)',
                     color: done || active ? '#fff' : 'var(--text-3)',
-                    border: active ? '2px solid #33F7DC' : 'none',
-                    boxShadow: active ? '0 0 10px rgba(0,245,212,0.5)' : 'none',
+                    border: active ? '2px solid #6DBD9D' : 'none',
+                    boxShadow: active ? '0 0 10px rgba(77,165,131,0.5)' : 'none',
                     transition: 'all 0.3s',
                   }}>
                     {done ? '✓' : i + 1}
@@ -435,7 +436,8 @@ export default function CompanyPage() {
   }
 
   return (
-    <div style={{ maxWidth: 1100 }}>
+    <div className="tfx tfx-enter" style={{ maxWidth: 1100 }}>
+      <TerminalFx />
       {/* Back */}
       <button
         onClick={() => navigate('/companies')}
@@ -448,20 +450,21 @@ export default function CompanyPage() {
 
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))',
+        background: 'linear-gradient(135deg, rgba(200,163,90,0.13), rgba(77,165,131,0.08) 44%, var(--surface-2))',
         border: '1px solid var(--border-strong)',
         borderRadius: 'var(--radius-xl)', padding: '28px 32px', marginBottom: 24,
         position: 'relative', overflow: 'hidden',
       }}>
         <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: 'linear-gradient(180deg, var(--primary), var(--secondary))' }} />
+        <div className="tfx-kicker" style={{ position: 'relative', display: 'inline-block', color: 'var(--text-3)', fontSize: 10.5, marginBottom: 12 }}>COMPANY DIAGNOSTIC COCKPIT</div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, position: 'relative' }}>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
             <div style={{
               width: 64, height: 64, borderRadius: 18,
-              background: 'linear-gradient(135deg, rgba(244,176,74,0.2), rgba(85,194,195,0.12))',
+              background: 'linear-gradient(135deg, rgba(200,163,90,0.2), rgba(77,165,131,0.12))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: 'var(--primary-hover)', fontWeight: 800, fontSize: 20, flexShrink: 0,
-              border: '1px solid rgba(244,176,74,0.25)',
+              border: '1px solid rgba(200,163,90,0.25)',
             }}>
               {company.ticker?.substring(0, 2)}
             </div>
@@ -556,7 +559,7 @@ export default function CompanyPage() {
                 const score = healthChecks.filter(c => c.pass).length
                 const scoreColor = score >= 3 ? 'var(--success)' : score >= 2 ? 'var(--warning)' : 'var(--danger-light)'
                 return (
-                  <Card style={{ padding: '20px 24px', marginBottom: 20, background: 'linear-gradient(135deg, var(--surface-2), rgba(0,245,212,0.03))' }}>
+                  <Card style={{ padding: '20px 24px', marginBottom: 20, background: 'linear-gradient(135deg, var(--surface-2), rgba(77,165,131,0.03))' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-1)', marginBottom: 2 }}>Financial Health Overview</div>
@@ -570,7 +573,7 @@ export default function CompanyPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10 }}>
                       {healthChecks.map(c => (
                         <div key={c.label} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: 'var(--surface-3)', borderRadius: 10 }}>
-                          <div style={{ width: 20, height: 20, borderRadius: '50%', background: c.pass ? 'rgba(43,217,127,0.15)' : 'rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, flexShrink: 0 }}>
+                          <div style={{ width: 20, height: 20, borderRadius: '50%', background: c.pass ? 'rgba(43,217,127,0.15)' : 'rgba(185,95,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, flexShrink: 0 }}>
                             {c.pass ? '✓' : '✗'}
                           </div>
                           <div>
@@ -783,11 +786,13 @@ export default function CompanyPage() {
                       <button
                         key={preset.key}
                         onClick={() => setSelectedPreset(preset.key)}
+                        className="tfx-chip"
+                        aria-pressed={active}
                         style={{
                           background: active ? 'var(--primary-subtle)' : 'var(--surface-3)',
-                          border: `1.5px solid ${active ? 'var(--primary)' : 'var(--border-strong)'}`,
-                          borderRadius: 10, padding: '10px 12px', cursor: 'pointer',
-                          textAlign: 'left', transition: 'all 0.14s',
+                          border: `1px solid ${active ? 'var(--primary)' : 'var(--border-strong)'}`,
+                          borderRadius: 3, padding: '10px 12px', cursor: 'pointer',
+                          textAlign: 'left',
                         }}
                       >
                         <div style={{ fontSize: 13, fontWeight: 700, color: active ? 'var(--primary-hover)' : 'var(--text-1)', marginBottom: 3 }}>{preset.label}</div>
@@ -801,12 +806,17 @@ export default function CompanyPage() {
               {/* Adaptive Weights Toggle */}
               <div
                 onClick={() => setUseAdaptiveWeights(v => !v)}
+                className="tfx-chip"
+                role="checkbox"
+                aria-checked={useAdaptiveWeights}
+                tabIndex={0}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setUseAdaptiveWeights(v => !v) } }}
                 style={{
                   display: 'flex', alignItems: 'flex-start', gap: 12,
-                  background: useAdaptiveWeights ? 'rgba(0,245,212,0.06)' : 'var(--surface-3)',
-                  border: `1.5px solid ${useAdaptiveWeights ? 'rgba(0,245,212,0.4)' : 'var(--border-strong)'}`,
-                  borderRadius: 10, padding: '12px 14px', cursor: 'pointer',
-                  marginBottom: 20, transition: 'all 0.15s',
+                  background: useAdaptiveWeights ? 'rgba(77,165,131,0.08)' : 'var(--surface-3)',
+                  border: `1px solid ${useAdaptiveWeights ? 'rgba(77,165,131,0.45)' : 'var(--border-strong)'}`,
+                  borderRadius: 3, padding: '12px 14px', cursor: 'pointer',
+                  marginBottom: 20,
                 }}
               >
                 <div style={{
