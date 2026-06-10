@@ -1,8 +1,7 @@
 # Experiment summary (benchmark-aware, walk-forward)
 
-Small expanded training data (81 tickers, 321 target rows), leakage-controlled.
-Treat all numbers as noisy. The expanded feature set improves the test bed, but
-does not establish a reliable predictive edge.
+Small data (~40 stocks/year), leakage-controlled. Treat all numbers as noisy.
+Features are largely a static snapshot; baselines usually match/beat ML.
 
 Additional reports: `feature_coverage.csv`, `feature_stability_summary.csv`, `coverage_impact.csv`.
 
