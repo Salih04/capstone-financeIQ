@@ -1,198 +1,256 @@
-# FinanceIQ — Frontend Rebuild Brief
-# For: Claude Opus 4.8 via Claude Code
-# Design system prompt: loaded via .claude/skills/
+# FinanceIQ Dashboard — Fable 5 Brief
+
+Single page only. Everything else is handled separately.
+
+Spend creativity on the visual system, not on touching many files.
+
+You are working on ONE screen only: the FinanceIQ dashboard at /dashboard.
+
+Do not redesign the whole app.
+Do not touch login.
+Do not touch backend/API wiring.
+Do not touch Forecasting, Research, Company Detail, Research Agent, Experiments, or Data Quality pages.
+Do not install new dependencies.
+Do not run build, lint, tests, or any long verification commands.
+I will verify manually.
+
+Build the dashboard as a self-contained React component that can later be adapted into the real app.
 
 ---
 
-## What this is
+## Context
 
-FinanceIQ is a capstone academic project: an honest, leakage-safe T→T+1
-equity-research system for 40 BIST (Borsa Istanbul) companies (2020–2025).
-It is NOT a trading platform, NOT investment advice. It is a rigorous research
-pipeline with a transparent negative result (no reliable predictive edge at
-~40 stocks/year) — and that honesty is a feature, not a weakness.
+FinanceIQ is a T→T+1 equity research system for 40 selected BIST stocks from 2020–2025.
 
-The frontend is being rebuilt from scratch. The existing React codebase is
-functional but visually generic. The goal is to make it look and feel like
-a professional, opinionated financial research terminal — Bloomberg meets
-a well-designed developer tool.
+The honest finding:
+Walk-forward Spearman / IC is approximately 0.
+There is no reliable predictive edge.
 
----
+This is not a failure. This is the core story.
 
-## Audience
+The dashboard must make the weak signal visible instead of hiding it.
 
-Academic capstone jury + international readers (MSc programs, internship
-reviewers). They are technical, they respect rigor, and they will notice
-if the UI looks like a default Tailwind template.
+This is research support only.
+It is not investment advice.
 
 ---
 
-## Visual direction (COMMITTED — do not re-propose)
+## Data
 
-**Dark terminal. Bloomberg meets Linear.**
+For this screen only, use this realistic mock data.
+API wiring comes later.
 
-- Background: near-black, not pure black. `#0a0a0f` base, `#111118` surfaces.
-- Accent: a single cold electric blue — `#2563eb` or tighter `#1d4ed8`. No warm tones.
-- Text: high-contrast white `#f8fafc` for primary, `#94a3b8` for secondary, `#475569` for muted.
-- Grid lines, table borders, chart axes: `#1e293b` — visible but never loud.
-- Monospace for numbers, tickers, scores. `JetBrains Mono` or `IBM Plex Mono`.
-- Sans for labels, headings: `Inter` or `DM Sans`.
-- Density: high. This is a research tool, not a landing page. Data earns space.
-- No gradients on data. No emoji. No rounded hero cards with drop shadows.
-- Micro-animations only: state transitions (200ms ease), skeleton loaders, value
-  changes (number tick-up on load). Nothing decorative.
+Do not invent extra fields unless they are purely visual and clearly derived from the mock data.
+
+js const MOCK = {   dataset: {     tickers: 40,     features: 32,     years: [2020, 2021, 2022, 2023, 2024, 2025],     inferenceYear: 2025   },   benchmark: [     { year: 2020, bist100: 28.4, model_top10: 31.2, spearman: 0.08 },     { year: 2021, bist100: 19.1, model_top10: 14.7, spearman: -0.11 },     { year: 2022, bist100: 196.3, model_top10: 188.9, spearman: -0.14 },     { year: 2023, bist100: 43.8, model_top10: 51.2, spearman: 0.03 },     { year: 2024, bist100: 31.2, model_top10: 38.7, spearman: 0.12 }   ],   topTickers: [     { ticker: "ASELS", score: 78.4, ml: 0.81, confidence: 0.74, coverage: 0.94 },     { ticker: "THYAO", score: 71.2, ml: 0.68, confidence: 0.79, coverage: 0.97 },     { ticker: "EREGL", score: 69.8, ml: 0.72, confidence: 0.65, coverage: 0.89 },     { ticker: "SISE",  score: 65.1, ml: 0.61, confidence: 0.71, coverage: 0.92 },     { ticker: "KCHOL", score: 61.4, ml: 0.58, confidence: 0.68, coverage: 0.78 }   ],   bottomTickers: [     { ticker: "TTKOM", score: 28.1, ml: 0.24, confidence: 0.31, coverage: 0.61 },     { ticker: "DOHOL", score: 24.7, ml: 0.21, confidence: 0.28, coverage: 0.44 },     { ticker: "SMRTG", score: 19.3, ml: 0.17, confidence: 0.22, coverage: 0.38 }   ],   dataQuality: {     accepted: 32,     rejected: 15,     leakageGuarded: 8,     frozenExcluded: 7   } } 
 
 ---
 
-## Language
+## Creative direction
 
-**English throughout.** All labels, copy, empty states, tooltips, error messages.
-API field names (Turkish tickers like ASELS, THYAO) stay as-is — they are data,
-not UI copy.
+This dashboard should feel like nothing else.
 
----
+Not Bloomberg.
+Not Linear.
+Not a generic SaaS dashboard.
+Not a crypto terminal.
+Not an admin panel.
 
-## Pages to build (multi-page full app)
+It should feel like a cinematic institutional research instrument.
 
-### 1. `/login`
-- Minimal. Full-viewport dark. FinanceIQ wordmark + tagline.
-- Tagline: "Equity research infrastructure for BIST. Honest signals, no fabrication."
-- Single form: email + password. JWT → localStorage on success.
-- No sign-up flow needed (capstone, not a product).
+Break conventions, but preserve meaning.
 
-### 2. `/dashboard`
-- The "nerve center." Shows the state of the entire research system at a glance.
-- Key panels:
-  - **Dataset status** — 40 tickers, 32 validated features, 2020–2025, walk-forward
-    Spearman ≈ 0 (show this honestly — it's a feature of the system)
-  - **Research signal** — latest hybrid scores (ML 0.65 + confidence 0.20 + LLM 0.15),
-    top 5 and bottom 5 tickers for the most recent year
-  - **Data quality badge** — features accepted vs rejected, frozen-snapshot columns
-    excluded, leakage guards active
-  - **Benchmark comparison** — BIST100 annual return vs top-10 model picks (small chart)
-  - **Quick nav** — Research Agent, Forecasting, Companies, Data Health
+Pick one direction and go all the way:
 
-### 3. `/research-agent`
-- The most important page. This is the hybrid research agent.
-- Layout: left panel = query/intent selector, right panel = structured result.
-- Intents: "Benchmark outperformers", "Top-ranked by ML score", "Data quality overview",
-  "Valuation screen", "Model diagnostics"
-- Result panel shows:
-  - Hybrid score breakdown (3 bars: ML / Confidence / LLM) — always decomposed
-  - Decision-support verdict (never "buy/sell/hold" — use "Strong signal / Weak signal /
-    Insufficient data")
-  - Top features driving the score (ranked, with effect sizes)
-  - Data quality warnings inline
-  - "Not investment advice" disclaimer — small, always present, never intrusive
+### A — Particle field
 
-### 4. `/forecasting`
-- CSV-backed pipeline (no DB required — reads modeling_dataset_public_2020_2025.csv).
-- 3-step flow with clear state:
-  - **Step 1: Configure training window** — year range selector, top_n parameter
-  - **Step 2: Review feature weights** — horizontal bar chart of top parameters
-    with weights. This is the "what the model learned" view.
-  - **Step 3: Run forecast** — ranked ticker table for selected year. Score, confidence,
-    top driving features per ticker. Click row → explainability panel slides in.
-- Inference rows (2025) clearly flagged: "Inference only — no return target available"
-- No buy/sell signals anywhere on this page.
+40 stocks as nodes on a canvas.
 
-### 5. `/companies`
-- Searchable, filterable table of the 40-ticker public universe.
-- Columns: Ticker, Sector, Latest Score, Score Trend (sparkline), Data Coverage %, BIST100 member
-- Click row → `/companies/:ticker` detail page
-- Detail page: financial metrics timeline (the 32 features), score history, feature
-  contribution breakdown, data quality per field.
+- X = ML score
+- Y = confidence
+- Size = data coverage
+- Color = score / return signal
+- Year control changes the field
+- Nodes animate between states
+- Hovering a node reveals detail in a dedicated panel
+- The Spearman ≈ 0 result appears as a signal-strength indicator that never fully stabilizes
 
-### 6. `/data-health`
-- The "honesty page." Shows what the pipeline accepted, rejected, and why.
-- Sections:
-  - Feature registry: 32 accepted features, categorized (balance-sheet, growth,
-    income/profitability, valuation), with source and year coverage
-  - Rejected columns: frozen-snapshot list, leakage-rejected list — shown explicitly
-  - Walk-forward results: Spearman per year, vs equal-weight baseline (honest chart,
-    not hidden)
-  - Data provenance: corrected yearly files, free valuation reconstruction, 2024
-    balance-sheet correction
+### B — Geological strata
+
+Each year is a horizontal data stratum.
+
+- 2025 at top, 2020 at bottom
+- Scroll means moving through time
+- Tickers sit inside each layer by score
+- Outperformance emits upward glow into the next layer
+- The random glow pattern visually explains why IC ≈ 0
+
+### C — Signal emerging from noise
+
+The page begins as static/noise.
+
+- Data crystallizes from noise as it loads
+- High-confidence tickers become crisp
+- Low-coverage tickers remain grainy
+- The Spearman chart never fully resolves
+- The dashboard feels like tuning a weak research signal from market noise
+
+Direction preference: C (Signal from noise) is the strongest fit 
+for a system that honestly reports weak signal. But if you see 
+something better, override this.
+
+### Or your own direction
+
+If you see a stronger idea, name it in one sentence and build it.
 
 ---
 
-## API contract (existing backend — do not change)
+## Required content
 
-The backend is FastAPI on `:8000`. These are the live endpoints to wire up:
+The dashboard must show:
 
-```
-GET  /forecasting/options          → trainable_years, feature_columns, ticker_count
-POST /forecasting/train            → top_parameters [{name, weight, rank}]
-POST /forecasting/run              → ranked items [{ticker, score, confidence, top_parameters}]
-GET  /forecasting/explain/{ticker} → top_features, bottom_features, missing_features
+1. Dataset summary:
+   - 40 BIST stocks
+   - 32 accepted features
+   - 2020–2025
+   - 2025 inference-only
 
-GET  /research/summary             → dataset overview
-GET  /research/company/{ticker}    → per-ticker research data
-GET  /research/company/{ticker}/score → hybrid score breakdown
-GET  /research/model-diagnostics   → walk-forward results
-GET  /research/data-quality        → feature registry + rejected columns
-POST /research/ask                 → {intent, ticker?, year?} → research response
+2. BIST100 vs Model Top 10 return comparison for 2020–2024
 
-GET  /companies                    → company list
-GET  /companies/{id}               → company detail
+3. Spearman / walk-forward IC per year
 
-POST /auth/login                   → {access_token}
-```
+4. Top 5 tickers by research score
 
-Base URL from env: `VITE_API_URL` (default `http://localhost:8000`).
+5. Bottom 3 tickers by research score
 
----
+6. Data quality:
+   - 32 accepted
+   - 15 rejected
+   - 8 leakage guarded
+   - 7 frozen excluded
 
-## Component system to establish first
+7. Always-visible caveat:
+   “Research only · Not investment advice”
 
-Before any page, establish these tokens and components. Run `design-system-extract`
-then `frontend-aesthetic-direction` to commit the system.
-
-**Tokens needed:**
-- Color scale (bg, surface, border, text-primary, text-secondary, text-muted, accent, accent-hover, positive, negative, warning)
-- Type scale (mono-xs through mono-lg, sans-sm through sans-xl)
-- Spacing scale (4px base)
-- Border radius (2px only — this is a terminal, not a consumer app)
-
-**Core components:**
-- `<MetricCard>` — label + value + optional delta + optional sparkline
-- `<ScoreBar>` — labeled horizontal bar, 0–100, with segment breakdown
-- `<TickerTable>` — sortable, with inline sparklines and score chips
-- `<FeatureWeight>` — horizontal bar for ML feature importance
-- `<DataQualityBadge>` — accepted/rejected/warning with count
-- `<ExplainPanel>` — slide-in from right, top/bottom features
-- `<StepFlow>` — 3-step wizard with state (idle / loading / complete / error)
-- `<HonestyBanner>` — "Research only. Not investment advice." — persistent, unobtrusive
+8. Clear statement:
+   “Walk-forward IC ≈ 0: weak predictive signal”
 
 ---
 
-## Skill chain to run (in order)
+## Interaction requirements
 
-1. `frontend-aesthetic-direction` — commit the token system (do NOT re-propose directions; dark terminal is committed above, use this skill to formalize the token file)
-2. `make-a-prototype` — build the full multi-page app with real navigation, loading states, and API wiring
-3. `ai-slop-check` — this is critical; no gradients, no rounded hero cards, no generic AI aesthetics
-4. `interaction-states-pass` — every button, every row, every input needs hover/focus/active/disabled
-5. `polish-pass` — final gate before delivery
+The screen must be interactive.
 
----
+Required:
+- Hovering a ticker/node/stratum updates a dedicated detail panel.
+- No floating tooltips.
+- Detail must appear in a fixed panel, morphing panel, or dedicated overlay.
+- Hover, active, and focus states for interactive elements.
+- A year selector or time interaction if it fits the chosen direction.
+- Loading-style entrance animation even though mock data is local.
 
-## What NOT to do
-
-- No hero sections with large illustrations
-- No "Why choose FinanceIQ?" marketing copy
-- No donut charts for portfolio allocation
-- No confetti or success animations
-- No fake data — if the API isn't connected, show skeleton loaders and "—" values
-- No fabricated tickers or scores in placeholder content
-- Never present scores as investment recommendations
-- Never hide the negative result (Spearman ≈ 0) — it's the honest finding; display it
+Do not use interaction only for decoration.
+Interaction should help the user understand weak signal, confidence, coverage, and research score.
 
 ---
 
-## The one design principle for this project
+## Visual requirements
 
-**Confidence through restraint.** Every pixel that isn't earning its place is
-undermining the credibility of the research. A capstone jury trusts a tool that
-shows its limitations more than one that oversells its results. The UI should feel
-like it was built by someone who understood the data deeply, not someone who
-styled a dashboard template.
+Use a bold, non-generic visual system.
+
+Acceptable ingredients:
+- canvas-like field
+- asymmetric layout
+- deep ink / graphite background
+- muted emerald / antique gold / oxidized copper accents
+- subtle grain/noise
+- scanlines
+- custom SVG shapes
+- unusual panels
+- non-grid placement
+- animated transitions
+- dense data surfaces
+
+Avoid:
+- card grid dashboard
+- generic KPI cards
+- fake decorative charts
+- random gradients
+- neon crypto aesthetic
+- huge empty hero
+- investment-advice language
+- buy/sell/hold wording
+- price targets
+
+---
+
+## Technical requirements
+
+Use React.
+
+Use existing dependencies if available.
+Recharts is acceptable if already installed.
+SVG/CSS/canvas are acceptable.
+
+Do not install packages.
+Do not run build.
+Do not run lint.
+Do not run tests.
+Do not run expensive verification.
+Do not modify unrelated files.
+
+No fake API calls.
+No backend changes.
+No unrelated pages.
+No dead code.
+No unused imports.
+No TODOs.
+No broken exports.
+
+The component must be easy to move into the real dashboard route later.
+
+Prefer:
+- one main component file,
+- local helper components inside the same file if needed,
+- colocated CSS only if the current project already supports it.
+
+If the repo already has a dashboard file, replace only that dashboard implementation.
+If not, create a clear standalone component file and tell me where it belongs.
+
+---
+
+## Copy rules
+
+Use careful research language.
+
+Allowed:
+- research signal
+- diagnostic score
+- ranking signal
+- weak signal
+- inference-only
+- historical evaluation
+- not investment advice
+- no reliable predictive edge
+
+Avoid:
+- buy
+- sell
+- hold
+- recommendation
+- price target
+- guaranteed
+- alpha promise
+
+---
+
+## Delivery
+
+Do not ask questions.
+Make a decision and build.
+
+Final response:
+1. Direction chosen and why, in one sentence.
+2. Files changed.
+3. How to view the screen.
+4. Anything I should manually verify.
