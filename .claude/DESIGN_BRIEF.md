@@ -1,106 +1,88 @@
-# FinanceIQ Shell + Login — Fable 5 Brief
+# FinanceIQ Page Redesign — Design System Brief
 
-Use the current `/dashboard` visual language as the source of truth.
+Use the current implemented FinanceIQ visual language as the source of truth.
 
-The dashboard now has a strong "Signal from noise / research terminal" visual system:
+Read these files first:
+- 1.frontend/src/pages/DashboardPage.jsx
+- 1.frontend/src/components/layout/Sidebar.jsx
+- 1.frontend/src/components/layout/Topbar.jsx
+- 1.frontend/src/pages/LoginPage.jsx
+- 1.frontend/index.html
+
+The app now has a strong “Signal from noise / research terminal” visual system:
 - deep ink / graphite background
 - subtle grain and scanlines
 - muted emerald, antique gold, oxidized copper accents
-- dense institutional research instrument feeling
-- non-generic terminal-like surfaces
+- sharp instrument-like panels
+- thin hairline borders
+- monospaced micro-labels
+- dense institutional research terminal feeling
 - honest weak-signal language
 - research-only tone
 
-Now extend this same visual system to the app shell and login experience.
+Your job is to redesign ONE requested page at a time so it feels like part of the same FinanceIQ research terminal.
 
 ## Scope
 
-You are working only on:
-- left navigation sidebar
-- horizontal topbar
-- login page
+Only edit the page explicitly requested in the user prompt.
 
-Allowed files:
-- 1.frontend/src/components/layout/Sidebar.jsx
-- 1.frontend/src/components/layout/Topbar.jsx
-- 1.frontend/src/components/layout/AppShell.jsx
-- 1.frontend/src/pages/LoginPage.jsx
-- 1.frontend/src/pages/DashboardPage.jsx only if a tiny alignment fix is necessary
+Allowed by default:
+- the requested page file only
 
-Do not touch:
+Do not edit:
 - backend
 - API clients
-- routing unless absolutely necessary
-- Forecasting
-- Research
-- Company Detail
-- Research Agent
-- Experiments
-- Data Quality
-- Benchmark
+- routing
+- DashboardPage.jsx
+- Sidebar.jsx
+- Topbar.jsx
+- AppShell.jsx
+- LoginPage.jsx
 - other pages
+
+Only touch shared shell/global files if the user explicitly allows it.
 
 ## Design goals
 
-Make the whole app feel like one FinanceIQ research terminal.
+Make the requested page feel like the same FinanceIQ research terminal.
 
-The sidebar should not feel like a generic SaaS menu.
-It should feel like an instrument/channel selector.
+The page should not feel like:
+- generic SaaS
+- admin template
+- crypto dashboard
+- random card grid
+- AI-generated UI
 
-The topbar should not feel like a generic admin search bar.
-It should feel integrated into the research terminal.
-
-The login page should feel like entering the FinanceIQ research terminal.
-It should be cinematic, but still clear and usable.
-
-## Requirements
-
-Sidebar:
-- Keep it vertical.
-- Preserve existing navigation behavior.
-- Preserve active route highlighting.
-- Use dashboard-like graphite surfaces, faint borders, muted gold/emerald accents.
-- Active item should feel like a selected research channel, not a rounded pill.
-- Keep labels readable.
-- Preserve icons if already used.
-- Keep collapse/logout behavior if present.
-
-Topbar:
-- Keep it horizontal.
-- Preserve existing search/user/settings behavior.
-- Make search field feel like terminal input / research query field.
-- Match dashboard visual language.
-- Do not overfill with decoration.
-
-Login:
-- Preserve all existing auth behavior and form logic.
-- Preserve email/password or magic-link flows exactly as currently implemented.
-- Make the page feel like entering a research terminal.
-- Use subtle noise/scanline/terminal styling.
-- Keep form accessible and clear.
-- Do not make it hard to read.
+It should feel like:
+- an institutional research instrument
+- a diagnostic terminal
+- a calibrated data surface
+- a serious weak-signal research tool
 
 ## Visual language
 
 Use:
-- deep ink / graphite
+- deep ink / graphite surfaces
 - muted emerald
 - antique gold
 - oxidized copper
 - subtle grain
-- thin instrument-like borders
-- monospaced micro-labels
-- dense but readable hierarchy
+- scanline-like texture where appropriate
+- thin instrument borders
+- monospaced labels
+- compact hierarchy
 - careful hover/focus states
+- dense but readable data layout
 
 Avoid:
-- neon crypto look
-- generic SaaS cards
+- neon colors
 - random gradients
-- huge empty hero
-- over-rounded AI-looking components
-- childish animation
-- investment-advice language
+- huge empty hero sections
+- over-rounded generic cards
+- childish animations
+- fake decorative charts
+- buy/sell/hold language
+- investment recommendation language
 
 ## Technical constraints
 
@@ -112,23 +94,39 @@ Do not run tests.
 Do not run long verification commands.
 
 Preserve existing behavior.
-No fake API calls.
+Preserve existing API calls.
+Preserve existing user flows.
+Preserve existing route behavior.
+Do not introduce fake API calls.
+Do not replace real data with mock data.
 No backend changes.
 No dead code.
 No unused imports.
 No TODOs.
 No broken exports.
 
+## Data and behavior rules
+
+If the page already fetches real data, keep that data flow.
+If the page has forms, preserve form logic.
+If the page has loading/error/empty states, preserve them and redesign them.
+If the page has buttons or actions, preserve their behavior.
+If the page exposes public stocks, keep the public universe limited to the selected 40 BIST companies.
+
 ## Copy rules
+
+Use careful research language.
 
 Allowed:
 - research terminal
 - research signal
-- diagnostic
+- diagnostic score
 - weak signal
 - historical evaluation
-- research only
+- inference-only
+- model evidence
 - not investment advice
+- no reliable predictive edge
 
 Avoid:
 - buy
@@ -142,7 +140,7 @@ Avoid:
 ## Delivery
 
 Do not ask questions.
-Make the changes directly.
+Make a decision and build only the requested page.
 
 Final response:
 1. Files changed.
