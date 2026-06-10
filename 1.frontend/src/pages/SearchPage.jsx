@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import api from '../api/client'
 import { Card, EmptyState, Skeleton } from '../components/ui'
+import TerminalFx from '../components/TerminalFx'
 
 const AI_SECTOR_MAP = {
   banking: ['BANKACILIK'], bank: ['BANKACILIK'],
@@ -120,13 +121,14 @@ export default function SearchPage() {
   }, [query, search])
 
   return (
-    <div style={styles.page}>
+    <div className="tfx tfx-enter" style={styles.page}>
+      <TerminalFx />
       <section style={styles.hero}>
         <div style={styles.heroTop}>
           <div>
-            <div style={styles.kicker}>
-              <Building2 size={15} />
-              Company Directory
+            <div className="tfx-kicker" style={styles.kicker}>
+              <Building2 size={13} />
+              COMPANY DIRECTORY
             </div>
             <h1 style={styles.title}>Research Universe</h1>
             <p style={styles.subtitle}>
@@ -163,6 +165,8 @@ export default function SearchPage() {
           <Filter size={14} style={{ color: 'var(--text-3)' }} />
           <button
             onClick={() => setSectorFilter(null)}
+            className="tfx-chip"
+            aria-pressed={!sectorFilter}
             style={chipStyle(!sectorFilter)}
           >
             All ({results.length})
@@ -171,6 +175,8 @@ export default function SearchPage() {
             <button
               key={code}
               onClick={() => setSectorFilter(sectorFilter === code ? null : code)}
+              className="tfx-chip"
+              aria-pressed={sectorFilter === code}
               style={chipStyle(sectorFilter === code)}
             >
               {formatSectorCode(code)} ({sectorCounts[code] || 0})
@@ -190,6 +196,8 @@ export default function SearchPage() {
                 key={mode}
                 onClick={() => setViewMode(mode)}
                 title={mode === 'grid' ? 'Grid view' : 'List view'}
+                className="tfx-tab"
+                aria-pressed={viewMode === mode}
                 style={segmentButton(viewMode === mode)}
               >
                 <Icon size={16} />
@@ -275,14 +283,12 @@ function HeroMetric({ label, value }) {
 }
 
 function CompanyCard({ company, onClick }) {
-  const [hover, setHover] = useState(false)
   return (
     <button
       type="button"
       onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{ ...styles.companyCard, ...(hover ? styles.companyCardHover : {}) }}
+      className="tfx-card"
+      style={styles.companyCard}
     >
       <div style={styles.cardAccent} />
       <div style={styles.companyTop}>
@@ -300,13 +306,12 @@ function CompanyCard({ company, onClick }) {
 }
 
 function CompanyRow({ company, onClick }) {
-  const [hover, setHover] = useState(false)
   return (
     <tr
       onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{ cursor: 'pointer', background: hover ? 'var(--surface-3)' : 'transparent' }}
+      onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-hover)' }}
+      onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+      style={{ cursor: 'pointer', background: 'transparent', transition: 'background 0.15s' }}
     >
       <td style={tdTicker}>{company.ticker}</td>
       <td style={td}>{company.company_name}</td>
@@ -320,10 +325,11 @@ const chipStyle = (active) => ({
   border: `1px solid ${active ? 'var(--primary)' : 'var(--border-strong)'}`,
   background: active ? 'var(--primary-subtle)' : 'transparent',
   color: active ? 'var(--primary-hover)' : 'var(--text-2)',
-  borderRadius: 999,
+  borderRadius: 2,
   padding: '5px 12px',
-  fontSize: 11.5,
-  fontWeight: 700,
+  fontFamily: 'var(--font-mono)',
+  fontSize: 11,
+  letterSpacing: '0.04em',
   cursor: 'pointer',
 })
 
@@ -331,9 +337,9 @@ const segmentButton = (active) => ({
   width: 34,
   height: 32,
   border: 0,
-  borderRadius: 7,
+  borderRadius: 2,
   background: active ? 'var(--surface-hover)' : 'transparent',
-  color: active ? 'var(--text-1)' : 'var(--text-3)',
+  color: active ? 'var(--primary)' : 'var(--text-3)',
   cursor: 'pointer',
   display: 'inline-flex',
   alignItems: 'center',
@@ -377,8 +383,9 @@ const styles = {
     position: 'relative',
     overflow: 'hidden',
     border: '1px solid var(--border-strong)',
+    borderLeft: '3px solid var(--secondary)',
     borderRadius: 'var(--radius-lg)',
-    background: 'linear-gradient(135deg, rgba(58,199,139,0.10), rgba(85,194,195,0.08) 42%, var(--surface-2))',
+    background: 'linear-gradient(135deg, rgba(77,165,131,0.10), rgba(200,163,90,0.06) 42%, var(--surface-2))',
     padding: 24,
   },
   heroTop: {
@@ -391,22 +398,20 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 7,
-    color: 'var(--primary-hover)',
-    background: 'var(--primary-subtle)',
-    border: '1px solid rgba(244,176,74,0.25)',
-    borderRadius: 999,
+    color: 'var(--text-3)',
+    background: 'rgba(10,14,13,0.5)',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 2,
     padding: '5px 11px',
-    fontSize: 12,
-    fontWeight: 800,
-    textTransform: 'uppercase',
-    letterSpacing: 0.7,
+    fontSize: 10.5,
   },
   title: {
     margin: '12px 0 6px',
     color: 'var(--text-1)',
-    fontSize: 'clamp(2rem, 5vw, 3.35rem)',
-    lineHeight: 1,
-    fontWeight: 900,
+    fontSize: 'clamp(1.9rem, 4.4vw, 3rem)',
+    lineHeight: 1.05,
+    letterSpacing: '-0.015em',
+    fontWeight: 650,
   },
   subtitle: {
     color: 'var(--text-2)',
@@ -428,12 +433,14 @@ const styles = {
   },
   searchInput: {
     width: '100%',
-    background: 'rgba(8,15,26,0.58)',
+    background: 'rgba(10,14,13,0.7)',
     border: '1px solid var(--border-strong)',
-    borderRadius: 'var(--radius-md)',
+    borderRadius: 2,
     padding: '13px 112px 13px 42px',
     color: 'var(--text-1)',
-    fontSize: 14,
+    fontFamily: 'var(--font-mono)',
+    fontSize: 13.5,
+    letterSpacing: '0.02em',
     outline: 'none',
     boxSizing: 'border-box',
   },
@@ -520,7 +527,7 @@ const styles = {
     gap: 8,
     color: 'var(--primary-hover)',
     background: 'var(--primary-subtle)',
-    border: '1px solid rgba(244,176,74,0.22)',
+    border: '1px solid rgba(200,163,90,0.22)',
     borderRadius: 'var(--radius-md)',
     padding: '9px 12px',
     fontSize: 12.5,
@@ -548,15 +555,8 @@ const styles = {
     minHeight: 156,
     overflow: 'hidden',
     cursor: 'pointer',
-    transition: 'border-color .15s, transform .12s, box-shadow .15s, background .15s',
     color: 'inherit',
     font: 'inherit',
-  },
-  companyCardHover: {
-    borderColor: 'var(--border-bright)',
-    transform: 'translateY(-2px)',
-    boxShadow: 'var(--shadow-sm)',
-    background: 'var(--surface-3)',
   },
   cardAccent: {
     position: 'absolute',

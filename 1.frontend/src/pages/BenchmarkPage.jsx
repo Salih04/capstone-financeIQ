@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { BarChart3, Sparkles, Target } from 'lucide-react'
 import { researchApi } from '../api/researchApi'
 import { MetricCard, EvidencePanel, Bullets, SignalBadge, formatPercent, asText } from '../utils/safeRender'
+import TerminalFx from '../components/TerminalFx'
 
 export default function BenchmarkPage() {
   const [b, setB] = useState(null)
@@ -12,10 +13,11 @@ export default function BenchmarkPage() {
   const maxAbs = Math.max(1, ...years.map(y => Math.abs(Number(returns[y]) || 0)))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
+    <div className="tfx tfx-enter" style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
+      <TerminalFx />
       <section style={styles.hero}>
         <div>
-          <div style={styles.kicker}><Sparkles size={15} /> Benchmark Layer</div>
+          <div className="tfx-kicker" style={styles.kicker}><Sparkles size={13} /> BENCHMARK INSTRUMENT</div>
           <h1 style={styles.title}>BIST100 turns raw returns into benchmark-aware targets.</h1>
           <p style={styles.subtitle}>
             Yearly index returns create excess-return and outperform-BIST100 labels for historical evaluation.
@@ -105,30 +107,29 @@ const styles = {
     gap: 18,
     alignItems: 'stretch',
     border: '1px solid var(--border-strong)',
+    borderLeft: '3px solid var(--secondary)',
     borderRadius: 'var(--radius-lg)',
-    background: 'linear-gradient(135deg, rgba(85,194,195,0.13), rgba(244,176,74,0.08) 44%, var(--surface-2))',
+    background: 'linear-gradient(135deg, rgba(77,165,131,0.12), rgba(200,163,90,0.07) 44%, var(--surface-2))',
     padding: 24,
   },
   kicker: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 7,
-    color: 'var(--primary-hover)',
-    background: 'var(--primary-subtle)',
-    border: '1px solid rgba(244,176,74,0.25)',
-    borderRadius: 999,
+    color: 'var(--text-3)',
+    background: 'rgba(10,14,13,0.5)',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 2,
     padding: '5px 11px',
-    fontSize: 12,
-    fontWeight: 800,
-    textTransform: 'uppercase',
-    letterSpacing: 0.7,
+    fontSize: 10.5,
   },
   title: {
     margin: '14px 0 8px',
     color: 'var(--text-1)',
-    fontSize: 'clamp(2rem, 5vw, 3.35rem)',
-    lineHeight: 1,
-    fontWeight: 900,
+    fontSize: 'clamp(1.9rem, 4.4vw, 3rem)',
+    lineHeight: 1.05,
+    letterSpacing: '-0.015em',
+    fontWeight: 650,
     maxWidth: 820,
   },
   subtitle: {
@@ -145,8 +146,9 @@ const styles = {
     marginTop: 16,
   },
   formulaCard: {
-    background: 'rgba(8,15,26,0.54)',
+    background: 'rgba(10,14,13,0.6)',
     border: '1px solid var(--border-strong)',
+    borderLeft: '3px solid var(--primary)',
     borderRadius: 'var(--radius-md)',
     padding: 18,
     display: 'flex',
@@ -155,16 +157,19 @@ const styles = {
   },
   formulaTitle: {
     color: 'var(--text-1)',
-    fontSize: 18,
-    fontWeight: 900,
+    fontFamily: 'var(--font-mono)',
+    fontSize: 15,
+    fontWeight: 600,
+    letterSpacing: '0.04em',
   },
   formulaLine: {
     color: 'var(--text-2)',
-    fontSize: 12.8,
+    fontFamily: 'var(--font-mono)',
+    fontSize: 11.5,
     lineHeight: 1.5,
     background: 'var(--surface-1)',
     border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-md)',
+    borderRadius: 2,
     padding: '9px 10px',
   },
   chartIcon: {

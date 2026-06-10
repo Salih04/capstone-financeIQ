@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { GitCompare, Play, X, ChevronRight, Trophy, Search, Filter, Zap } from 'lucide-react'
 import api from '../api/client'
 import { Card, getBand, Skeleton, EmptyState, GhostButton, SectionHeader } from '../components/ui'
+import TerminalFx from '../components/TerminalFx'
 const RANK_STYLES = [
-  { color: '#fbbf24', label: '1' },
+  { color: '#c8a35a', label: '1' },
   { color: 'var(--text-2)', label: '2' },
-  { color: '#cd7c3a', label: '3' },
+  { color: '#a8674b', label: '3' },
 ]
 
 const formatSectorCode = (value) => {
@@ -151,13 +152,14 @@ export default function ComparePage() {
 )
 
   return (
-    <div style={{ maxWidth: 1040, margin: '0 auto', padding: '2.5rem 1.75rem' }}>
+    <div className="tfx tfx-enter" style={{ maxWidth: 1040, margin: '0 auto', padding: '2.5rem 1.75rem' }}>
+      <TerminalFx />
 
       {/* ── Loading overlay ── */}
       {loading && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 999,
-          background: 'rgba(9,9,15,0.88)',
+          background: 'rgba(8,11,10,0.88)',
           backdropFilter: 'blur(6px)',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
@@ -166,9 +168,9 @@ export default function ComparePage() {
           {/* Glow ring */}
           <div style={{
             width: 88, height: 88, borderRadius: '50%', marginBottom: 28,
-            background: 'radial-gradient(circle, rgba(244,176,74,0.2) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(200,163,90,0.2) 0%, transparent 70%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 40px rgba(244,176,74,0.25)',
+            boxShadow: '0 0 40px rgba(200,163,90,0.25)',
           }}>
             <GitCompare size={36} color='var(--primary)' style={{ animation: 'spin 2s linear infinite' }} />
           </div>
@@ -189,8 +191,8 @@ export default function ComparePage() {
             <div style={{
               height: '100%', borderRadius: 99,
               width: `${progress}%`,
-              background: 'linear-gradient(90deg, rgba(244,176,74,0.6) 0%, #F4B04A 100%)',
-              boxShadow: '0 0 12px rgba(244,176,74,0.6)',
+              background: 'linear-gradient(90deg, rgba(200,163,90,0.6) 0%, #C8A35A 100%)',
+              boxShadow: '0 0 12px rgba(200,163,90,0.6)',
               transition: 'width 0.12s linear',
             }} />
           </div>
@@ -207,8 +209,8 @@ export default function ComparePage() {
             {selectedCompanies.map(c => (
               <div key={c.id} style={{
                 padding: '4px 12px', borderRadius: 99,
-                background: 'rgba(244,176,74,0.08)',
-                border: '1px solid rgba(244,176,74,0.25)',
+                background: 'rgba(200,163,90,0.08)',
+                border: '1px solid rgba(200,163,90,0.25)',
                 fontSize: 12, color: 'var(--primary)', fontWeight: 600,
               }}>
                 {c.ticker}
@@ -220,14 +222,15 @@ export default function ComparePage() {
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       {/* Header */}
-      <div style={{ marginBottom: 24, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-xl)', padding: '28px 32px' }}>
+      <div style={{ marginBottom: 24, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(200,163,90,0.13), rgba(77,165,131,0.08) 44%, var(--surface-2))', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-xl)', padding: '28px 32px' }}>
         <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: 'linear-gradient(180deg, var(--primary), var(--secondary))' }} />
+        <div className="tfx-kicker" style={{ position: 'relative', display: 'inline-block', color: 'var(--text-3)', fontSize: 10.5, marginBottom: 10 }}>SIGNAL COMPARISON CONSOLE</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6, position: 'relative' }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, rgba(244,176,74,0.2), rgba(85,194,195,0.12))', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(244,176,74,0.25)' }}>
+          <div style={{ width: 40, height: 40, borderRadius: 4, background: 'linear-gradient(135deg, rgba(200,163,90,0.2), rgba(77,165,131,0.12))', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(200,163,90,0.25)' }}>
             <GitCompare size={18} color="var(--primary)" />
           </div>
           <div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-1)', margin: 0, letterSpacing: '-0.3px' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-1)', margin: 0, letterSpacing: '-0.015em' }}>
               Company Comparison
             </h1>
             <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>
@@ -295,12 +298,14 @@ export default function ComparePage() {
               <Filter size={11} style={{ color: 'var(--text-3)' }} />
               <button
                 onClick={() => setSectorFilter(null)}
+                className="tfx-chip"
+                aria-pressed={!sectorFilter}
                 style={{
-                  fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 16,
-                  border: `1.5px solid ${!sectorFilter ? 'var(--primary)' : 'var(--border-strong)'}`,
-                  background: !sectorFilter ? 'rgba(0,245,212,0.1)' : 'transparent',
+                  fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.06em', padding: '3px 10px', borderRadius: 2,
+                  border: `1px solid ${!sectorFilter ? 'var(--primary)' : 'var(--border-strong)'}`,
+                  background: !sectorFilter ? 'rgba(200,163,90,0.12)' : 'transparent',
                   color: !sectorFilter ? 'var(--primary)' : 'var(--text-3)',
-                  cursor: 'pointer', transition: 'all 0.12s',
+                  cursor: 'pointer',
                 }}
               >
                 All
@@ -311,12 +316,14 @@ export default function ComparePage() {
                   <button
                     key={code}
                     onClick={() => setSectorFilter(active ? null : code)}
+                    className="tfx-chip"
+                    aria-pressed={active}
                     style={{
-                      fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 16,
-                      border: `1.5px solid ${active ? 'var(--primary)' : 'var(--border-strong)'}`,
-                      background: active ? 'rgba(0,245,212,0.1)' : 'transparent',
+                      fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.06em', padding: '3px 10px', borderRadius: 2,
+                      border: `1px solid ${active ? 'var(--primary)' : 'var(--border-strong)'}`,
+                      background: active ? 'rgba(200,163,90,0.12)' : 'transparent',
                       color: active ? 'var(--primary)' : 'var(--text-3)',
-                      cursor: 'pointer', transition: 'all 0.12s',
+                      cursor: 'pointer',
                     }}
                   >
                     {code}
@@ -414,7 +421,7 @@ export default function ComparePage() {
 
             {error && (
               <div style={{
-                background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)',
+                background: 'rgba(185,95,68,0.08)', border: '1px solid rgba(185,95,68,0.3)',
                 borderRadius: 'var(--radius-md)', padding: '8px 12px', color: '#fca5a5',
                 fontSize: 12, marginBottom: 12,
               }}>
@@ -425,17 +432,18 @@ export default function ComparePage() {
             <button
               onClick={runCompare}
               disabled={selected.size < 2 || loading}
+              className="tfx-press"
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 background: selected.size < 2 ? 'var(--surface-3)' : 'var(--primary)',
-                border: 'none', borderRadius: 'var(--radius-md)', padding: '11px 0',
-                color: selected.size < 2 ? 'var(--text-3)' : '#fff',
-                fontWeight: 600, fontSize: 14, cursor: selected.size < 2 ? 'not-allowed' : 'pointer',
-                transition: 'background 0.15s',
+                border: 'none', borderRadius: 2, padding: '12px 0',
+                color: selected.size < 2 ? 'var(--text-3)' : '#0a0e0d',
+                fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 12.5, letterSpacing: '0.08em',
+                cursor: selected.size < 2 ? 'not-allowed' : 'pointer',
               }}
             >
               <Play size={15} />
-              {loading ? 'Comparing...' : `Compare ${selected.size} Companies`}
+              {loading ? 'COMPARING…' : `COMPARE ${selected.size} COMPANIES`}
             </button>
 
             {selected.size < 2 && (
@@ -457,8 +465,8 @@ export default function ComparePage() {
           />
 
         {companyWarnings.length > 0 && (
-          <Card style={{ padding: '12px 16px', marginBottom: 16, border: '1px solid rgba(251,191,36,0.35)', background: 'rgba(251,191,36,0.08)' }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#fbbf24', marginBottom: 6 }}>Excluded companies</div>
+          <Card style={{ padding: '12px 16px', marginBottom: 16, border: '1px solid rgba(200,163,90,0.35)', background: 'rgba(200,163,90,0.08)' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#c8a35a', marginBottom: 6 }}>Excluded companies</div>
             <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5 }}>
               {companyWarnings.join(' · ')}
             </div>
@@ -472,6 +480,7 @@ export default function ComparePage() {
               return (
                 <Card
                   key={r.company_id}
+                  hoverable
                   style={{ padding: '1.25rem', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
                   onClick={() => navigate(`/companies/${r.company_id}`)}
                 >
