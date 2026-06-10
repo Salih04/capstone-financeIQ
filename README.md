@@ -43,12 +43,16 @@ The correct **T → T+1** modeling dataset (year-T features → year-(T+1) reali
 return) is built by a separate, validated pipeline:
 
 ```bash
-make full-research        # full pipeline: extract → benchmark → corrected yearly
-                          #   → free valuation → build → experiments
-# or individual stages:
+# Full pipeline in order:
+python scripts/fetch_yahoo_chart_prices.py --start-year 2020 --end-year 2025
 make shares               # expand capital-event shares → per-year (carry-forward)
 make valuation            # free valuation: Yahoo price × shares × financials → ratios
 make data                 # build + validate the T→T+1 modeling dataset
+make full-research-agent  # all steps + experiments + research-agent dataset + tests
+
+# Convenience aliases:
+make full-research        # extract → benchmark → ingest-corrected → valuation → data → experiments
+make fetch-prices         # re-run fetch_yahoo_chart_prices.py (uses JSON cache; network only for new)
 ```
 
 Outputs in `data/trusted_clean/` (`modeling_dataset_2020_2025.csv`,
@@ -57,11 +61,13 @@ Outputs in `data/trusted_clean/` (`modeling_dataset_2020_2025.csv`,
 **[DATA_PIPELINE.md](DATA_PIPELINE.md)** and **[DATA_REQUIREMENTS.md](DATA_REQUIREMENTS.md)**.
 
 Real per-year income/profitability is now ingested (corrected yearly files) and
-valuation is reconstructed for free from Yahoo year-end price × manual shares
-outstanding. Supply shares via the capital-event file
-(`data/trusted_raw/shares_outstanding_events.csv`) and 2024 fixes via
-`data/trusted_raw/financials/corrected_balance_sheet_2024.csv`. Targets are real;
-no value is fabricated or imputed.
+Valuation is reconstructed for free from Yahoo year-end **close** price (from
+`scripts/fetch_yahoo_chart_prices.py` → `yahoo_year_end_prices.csv`) × manual
+shares outstanding × validated financials. Supply shares via the capital-event
+file (`data/trusted_raw/shares_outstanding_events.csv`) and 2024 fixes via
+`data/trusted_raw/financials/corrected_balance_sheet_2024.csv`. Raw JSON responses
+are cached under `data/trusted_raw/prices/yahoo_chart_raw/` (idempotent; only
+missing ticker-years are re-fetched). Targets are real; no value is fabricated or imputed.
 
 ## Research Assistant (OpenRouter/local-LLM-assisted)
 

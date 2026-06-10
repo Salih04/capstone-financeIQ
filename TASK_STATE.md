@@ -1,6 +1,6 @@
 # TASK_STATE.md — FinanceIQ
 
-Last updated: 2026-06-10
+Last updated: 2026-06-10 (Yahoo new-format price integration)
 
 ## Status legend
 - `DONE` — shipped, tested
@@ -29,14 +29,14 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | T→T+1 modeling dataset | DONE | `modeling_dataset_2020_2025.csv`, VALID |
 | Validated features | DONE | **32** (balance-sheet, growth, income/profitability, valuation) |
 | BIST100 benchmark + excess/outperform targets | DONE | `benchmark_payload`, 2020–2025 |
-| Free valuation reconstruction (no Fintables Pro) | DONE | Yahoo price × manual shares → market_cap, P/E, P/B, EV, EV/EBITDA |
+| Free valuation reconstruction (no Fintables Pro) | DONE | Yahoo close price (new-format CSV) × manual shares → market_cap, P/E, P/B, EV, EV/EBITDA |
 | Capital-event shares workflow | DONE | `shares_outstanding_events.csv` → carry-forward |
 | 2024 balance-sheet manual correction | DONE | `corrected_balance_sheet_2024.csv` (40 tickers) |
 | Walk-forward experiments | DONE | `experiments/`, honest weak-signal verdict |
 | Explainable research agent (+ optional OpenRouter/local LLM) | DONE | `/research/*`, grounded intents, never advice |
 | Research Terminal frontend | DONE | dashboard, research-agent, data-quality, experiments, benchmark, companies |
 | Forecasting (legacy) restored | DONE | filters union, friendly errors, re-clickable actions |
-| Tests | DONE | root 93 + backend 12 passing |
+| Tests | DONE | root 93 + backend 12 passing (93 after price integration) |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
 ---
@@ -48,7 +48,8 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | Yearly XLSX → clean CSV | DONE | trusted reference / target bootstrap |
 | T→T+1 build (`make data`) | DONE | universe → features → returns → benchmark → manual merge → validate |
 | Corrected yearly income/profitability | DONE | 17 → 27 features (revenue, margins, ROE, ROA, …) |
-| Free valuation builder (`make valuation`) | DONE | 27 → 32 (market_cap, enterprise_value, pe_ratio, pb_ratio, ev_ebitda) |
+| Free valuation builder (`make valuation`) | DONE | 27 → 32 (market_cap, enterprise_value, pe_ratio, pb_ratio, ev_ebitda); uses close price from new-format CSV |
+| Yahoo price fetcher (`make fetch-prices`) | DONE | `fetch_yahoo_chart_prices.py`; JSON cache; retry only transient errors |
 | Capital-event shares (`make shares`) | DONE | events → per-year carry-forward; free-float rejected |
 | 2024 balance-sheet correction | DONE | money/ratio shape-validated; overrides only 2024 |
 | Sparse-aware feature acceptance | DONE | sparse-but-varying accepted; frozen/leakage rejected |

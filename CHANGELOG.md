@@ -46,9 +46,37 @@ All notable changes to FinanceIQ, most recent first.
 
 ---
 
-## [Unreleased / HEAD] — 2026-06-10
+## [3.1.1] — 2026-06-10 — Yahoo new-format price integration
 
-No unreleased changes beyond HEAD.
+### Added
+- `scripts/fetch_yahoo_chart_prices.py` — dedicated Yahoo Chart API fetcher.
+  Outputs richer format (`close`, `adjclose`, `price_date`, `yahoo_symbol`,
+  `status`, `error`). Raw JSON cache under `data/trusted_raw/prices/yahoo_chart_raw/`
+  (idempotent; only missing ticker-years hit the network). Retry policy: 429/5xx
+  are transient (exponential backoff); 400/401/403/404 fail immediately.
+- `make fetch-prices` — Makefile target for the above.
+- `scripts/__init__.py` — makes `scripts` a proper Python package (required for
+  test imports).
+
+### Changed
+- `build_free_valuation_history.py` — `collect_year_end_prices()` now detects
+  new-format CSV (by `status` column) and uses **close** (not adjclose) as the
+  canonical price. Falls back transparently to old-format cache or fresh fetch.
+  Candidate CSV and valuation report now include `price_source`, `price_date`,
+  `yahoo_symbol`. Report expanded with `yahoo_price_rows_loaded`,
+  `yahoo_success_rows`, `yahoo_error_rows`, per-metric success counts, and
+  missing ticker-year breakdowns.
+- `DATA_PIPELINE.md` — updated Commands section with full ordered pipeline and
+  price-fetch step documentation.
+- `README.md` — pipeline commands and valuation description updated.
+
+### Pipeline output (2026-06-10 run)
+- `yahoo_year_end_prices.csv`: 240 rows, 226 success, 14 expected errors
+  (ASTOR 2020–2022, CANTE 2020, DSTKF 2020–2024, MIATK 2020, PASEU 2020–2023)
+- `modeling_dataset_2020_2025.csv`: 240 rows, 32 features, VALID
+- Valuation non-null counts: market_cap=208, enterprise_value=208, pe_ratio=168,
+  pb_ratio=208, ev_ebitda=192
+- Tests: 93 passed
 
 ---
 
