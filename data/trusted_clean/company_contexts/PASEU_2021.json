@@ -1,0 +1,90 @@
+{
+  "ticker": "PASEU",
+  "year": 2021,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.4007,
+    "ml_rank": 31,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 2452511274.0,
+    "net_income": 1099516599.0,
+    "equity": 3509231734.0,
+    "ebitda": 90027954.0,
+    "roe": 37.4239,
+    "roa": 23.5174,
+    "gross_profit": 304094758.0,
+    "operating_income": 139948218.0,
+    "net_margin": 44.8323,
+    "gross_margin": 12.3993,
+    "ebitda_margin": 3.6708
+  },
+  "valuation": {
+    "pe_ratio": null,
+    "pb_ratio": null,
+    "ev_ebitda": null,
+    "market_cap": null,
+    "enterprise_value": null,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2021-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 17.5,
+      "net_income": 52.5,
+      "equity": 2.5,
+      "ebitda": 7.5,
+      "roe": 70.0,
+      "roa": 92.5,
+      "gross_profit": 15.0,
+      "operating_income": 10.0,
+      "net_margin": 92.5,
+      "gross_margin": 10.0,
+      "ebitda_margin": 2.5
+    },
+    "year_medians": {
+      "revenue": 17391953000.0,
+      "net_income": 1077289624.0,
+      "equity": 63457407000.0,
+      "ebitda": 2721713000.0,
+      "roe": 23.7568,
+      "roa": 7.431,
+      "gross_profit": 3657466000.0,
+      "operating_income": 2212915000.0,
+      "net_margin": 10.7059,
+      "gross_margin": 26.5256,
+      "ebitda_margin": 22.5316,
+      "pe_ratio": 3.8807,
+      "pb_ratio": 0.0953,
+      "ev_ebitda": 9.4537,
+      "market_cap": 5921365009.905,
+      "enterprise_value": 35015339824.0
+    }
+  },
+  "data_quality": {
+    "missing_fields": [
+      "pe_ratio",
+      "pb_ratio",
+      "ev_ebitda",
+      "market_cap",
+      "enterprise_value"
+    ],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

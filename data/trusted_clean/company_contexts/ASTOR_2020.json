@@ -1,0 +1,90 @@
+{
+  "ticker": "ASTOR",
+  "year": 2020,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.5212,
+    "ml_rank": 20,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 35290767390.0,
+    "net_income": 7668909328.0,
+    "equity": 33280133403.0,
+    "ebitda": 11102586376.0,
+    "roe": 25.336,
+    "roa": 16.9152,
+    "gross_profit": 13039821956.0,
+    "operating_income": 9777395430.0,
+    "net_margin": 21.7306,
+    "gross_margin": 36.9497,
+    "ebitda_margin": 31.4603
+  },
+  "valuation": {
+    "pe_ratio": null,
+    "pb_ratio": null,
+    "ev_ebitda": null,
+    "market_cap": null,
+    "enterprise_value": null,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2020-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 77.5,
+      "net_income": 95.0,
+      "equity": 27.5,
+      "ebitda": 85.0,
+      "roe": 72.5,
+      "roa": 90.0,
+      "gross_profit": 85.0,
+      "operating_income": 90.0,
+      "net_margin": 82.5,
+      "gross_margin": 82.5,
+      "ebitda_margin": 77.5
+    },
+    "year_medians": {
+      "revenue": 10508934500.0,
+      "net_income": 857963000.0,
+      "equity": 63457407000.0,
+      "ebitda": 1889612500.0,
+      "roe": 15.897,
+      "roa": 5.5618,
+      "gross_profit": 2065672500.0,
+      "operating_income": 1461450000.0,
+      "net_margin": 8.0192,
+      "gross_margin": 23.0896,
+      "ebitda_margin": 16.9362,
+      "pe_ratio": 6.3048,
+      "pb_ratio": 0.0725,
+      "ev_ebitda": 16.8359,
+      "market_cap": 6590953491.0,
+      "enterprise_value": 41337576818.9826
+    }
+  },
+  "data_quality": {
+    "missing_fields": [
+      "pe_ratio",
+      "pb_ratio",
+      "ev_ebitda",
+      "market_cap",
+      "enterprise_value"
+    ],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

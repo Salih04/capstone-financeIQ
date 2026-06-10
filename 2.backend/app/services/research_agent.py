@@ -41,6 +41,8 @@ def _resolve_repo_root() -> Path:
 REPO_ROOT = _resolve_repo_root()
 CLEAN = REPO_ROOT / "data" / "trusted_clean"
 MODELING_CSV = CLEAN / "modeling_dataset_2020_2025.csv"
+PUBLIC_MODELING_CSV = CLEAN / "modeling_dataset_public_2020_2025.csv"
+COMPANY_CONTEXTS_DIR = CLEAN / "company_contexts"
 QUALITY_JSON = CLEAN / "data_quality_report.json"
 MIGRATION_JSON = CLEAN / "yearly_snapshot_migration_report.json"
 LEADERBOARD = REPO_ROOT / "experiments" / "leaderboard.csv"
@@ -54,6 +56,36 @@ FROZEN_EVIDENCE = CLEAN / "frozen_column_evidence.json"
 QUARTERLY_INSPECTION = CLEAN / "quarterly_snapshot_inspection.json"
 CORRECTED_YEARLY_REPORT = CLEAN / "corrected_yearly_ingestion_report.json"
 FREE_VALUATION_REPORT = CLEAN / "free_valuation_history_report.json"
+
+
+def _public_modeling_csv() -> Path:
+    """Return the public-universe modeling dataset path, falling back to the standard one."""
+    return PUBLIC_MODELING_CSV if PUBLIC_MODELING_CSV.is_file() else MODELING_CSV
+
+
+def load_company_context_json(ticker: str, year: int | None = None) -> dict | None:
+    """Load pre-built structured context JSON for a ticker/year from company_contexts/.
+
+    Returns None if not found. Callers should fall back to build_company_context().
+    year=None → use the latest available year for the ticker.
+    """
+    if not COMPANY_CONTEXTS_DIR.is_dir():
+        return None
+    t = str(ticker).strip().upper()
+    if year is not None:
+        p = COMPANY_CONTEXTS_DIR / f"{t}_{year}.json"
+        try:
+            return json.loads(p.read_text()) if p.is_file() else None
+        except Exception:
+            return None
+    # Find latest year
+    candidates = sorted(COMPANY_CONTEXTS_DIR.glob(f"{t}_*.json"))
+    if not candidates:
+        return None
+    try:
+        return json.loads(candidates[-1].read_text())
+    except Exception:
+        return None
 
 NOT_ADVICE = ("This is a research-support score, NOT investment advice. The LLM is a "
               "decision-support layer, not the numerical predictor.")
@@ -109,7 +141,9 @@ def get_config() -> dict:
     }
 
 
-SYSTEM_PROMPT = """You are a cautious financial RESEARCH-SUPPORT assistant for a capstone project.
+SYSTEM_PROMPT = """You are a financial research assistant for an academic BIST (Borsa Istanbul) research project.
+
+You explain structured company data produced by a quantitative pipeline. You are a decision-support layer only.
 
 OUTPUT FORMAT (MANDATORY):
 - Return ONLY a single valid JSON object. No markdown, no code fences, no prose before or after.
@@ -121,26 +155,44 @@ OUTPUT FORMAT (MANDATORY):
    "negative_signals": [], "warnings": [], "limitations": []}
 - llm_research_score is a number in [0,1]. llm_confidence is exactly one of "low", "medium", "high".
 
-CONTENT RULES:
-- Use ONLY the structured context provided in the user message. Do not use outside knowledge.
-- Do NOT invent or estimate any financial fact, number, price, year, or return not present in the context.
-- If the context contains benchmark_available=true with benchmark_returns, the benchmark IS available.
-  NEVER say benchmark data is missing or unavailable when it is present in the context. Use the exact
-  years and values given; do not drop or add years.
-- Do NOT give investment advice. Never output buy, sell, hold, al, sat, or tut.
-- Do NOT output a price target or an exact expected return unless that exact value is in the context.
-- The structured ML pipeline is the primary predictor; your llm_research_score is only a bounded support
-  signal in [0,1], distinct from the ML score, confidence score and final research score. Set it to a
-  genuine value in (0,1] reflecting how well the supplied evidence supports the company/answer; use 0 ONLY
-  when the context truly gives you nothing to assess.
-- If the context includes "grounded_answer", treat it as the verified factual baseline: keep its facts
-  (tickers, years, numbers) and write a clearer, well-structured explanation around them. Never contradict it.
-- ALWAYS surface the relevant limitations actually present in the context: small sample size, frozen
-  valuation/profitability data, missing real historical financials, weak/unstable backtest metrics, and
-  a missing benchmark ONLY if benchmark_available is false.
-- "summary" = 2-4 sentence plain-English answer. "reasoning" = the supporting evidence from the project
-  data (cite the relevant metrics/years). Keep both grounded and free of hype.
-- This is research support, NOT investment advice.
+STRICT CONTENT RULES:
+- Use ONLY the structured JSON context provided in the user message. Do not use outside knowledge.
+- Do NOT invent, estimate, or fill in any financial number, price, ratio, year, or return that is null or absent in the context.
+  If a field is null or missing, say it is missing — do not guess or average.
+- Do NOT provide investment advice. Never output the words: buy, sell, hold, al, sat, tut, target price, expected return.
+- Do NOT guarantee any future price movement or return.
+- The structured ML pipeline is the primary numerical predictor. Your llm_research_score is ONLY a bounded
+  research-support signal in [0,1] reflecting how well the supplied evidence supports the company/answer.
+  Use 0 only when the context gives you nothing to assess.
+
+STRUCTURED CONTEXT INTERPRETATION:
+- "model.ml_score": quantitative rank-based score from the ML pipeline. Explain its relative rank if ml_rank is available.
+- "financials.*": real per-year income/balance-sheet data. If null, state it is missing.
+- "valuation.*": market_cap/P-E/P-B/EV/EV-EBITDA reconstructed from Yahoo year-end price × shares. If null, state it is missing.
+- "benchmarks.training_universe_percentiles": where this company ranks on each metric within its peer group for the year.
+  Use these percentiles to explain relative strength or weakness.
+- "benchmarks.year_medians": median values for the peer group. Use for comparison.
+- "data_quality.missing_fields": list these explicitly in your limitations.
+- "data_quality.warnings": always surface these.
+- "guardrails": always respected — research support only, not investment advice.
+
+ALWAYS SURFACE THESE LIMITATIONS:
+- Small sample size (~40 BIST stocks/year).
+- Walk-forward Spearman near zero — no reliable predictive edge has been found.
+- Valuation features may be from a frozen snapshot for some years.
+- Any null/missing fields from data_quality.missing_fields.
+- If benchmark_available=false, note benchmark data is unavailable.
+- If benchmark_available=true, use the exact years and values given; never say benchmark is missing.
+- If context includes "grounded_answer", treat it as the verified factual baseline — keep its facts and expand.
+
+RESPONSE GUIDANCE:
+- "summary": 2-4 plain-English sentences covering score drivers, key financial/valuation highlights, and data quality.
+- "reasoning": cite specific metrics and years from the context. Mention percentile rankings if available.
+- "positive_signals": list of factual strengths from the context data (no advice).
+- "negative_signals": list of factual weaknesses or missing data points.
+- "warnings": data quality issues, model limitations, missing fields.
+- "limitations": always include the small-sample and weak-backtest disclaimers.
+- This output is research support, NOT investment advice.
 Output JSON only."""
 
 
@@ -155,16 +207,17 @@ def _load_json(p: Path) -> dict:
 
 
 def load_research_state() -> dict:
+    pub_csv = _public_modeling_csv()
     state: dict[str, Any] = {
-        "modeling_available": MODELING_CSV.is_file(),
+        "modeling_available": pub_csv.is_file(),
         "quality": _load_json(QUALITY_JSON),
         "migration": _load_json(MIGRATION_JSON),
         "leaderboard": None,
         "modeling": None,
         "model_outputs": None,
     }
-    if MODELING_CSV.is_file():
-        state["modeling"] = pd.read_csv(MODELING_CSV)
+    if pub_csv.is_file():
+        state["modeling"] = pd.read_csv(pub_csv)
     if LEADERBOARD.is_file():
         try:
             state["leaderboard"] = pd.read_csv(LEADERBOARD)
@@ -790,11 +843,24 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
     ml = ml_score_for_company(ticker, state)
     ctx_for_score = {**ctx, **conf, **ml}
 
+    # Prefer the pre-built structured RAG context (richer: financials, valuation,
+    # benchmarks, data_quality). Fall back to the lighter build_company_context dict.
+    rag_ctx = load_company_context_json(ticker)
+    if rag_ctx is not None:
+        # Merge ml_score/rank into the RAG context model block
+        rag_ctx.setdefault("model", {})
+        if rag_ctx["model"].get("ml_score") is None:
+            rag_ctx["model"]["ml_score"] = ml.get("ml_score")
+            rag_ctx["model"]["ml_rank"] = ml.get("ml_rank")
+        llm_context = rag_ctx
+    else:
+        llm_context = ctx_for_score
+
     cfg = get_config()
     llm_out, fallback = None, True
     if cfg["provider"] != "none":
         msg = [{"role": "system", "content": SYSTEM_PROMPT},
-               {"role": "user", "content": json.dumps({"task": "company_insight", "context": ctx_for_score})}]
+               {"role": "user", "content": json.dumps({"task": "company_insight", "context": llm_context})}]
         res = call_local_llm(msg, cfg)
         if res.get("ok"):
             parsed = _parse_llm_json(res["content"])

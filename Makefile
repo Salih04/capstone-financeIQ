@@ -1,6 +1,6 @@
 .PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research \
 	inspect-quarterly research-agent-dataset research-agent-check full-research-agent ingest-corrected-yearly \
-	prices valuation shares \
+	prices valuation shares split-datasets build-company-contexts \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration
@@ -47,10 +47,12 @@ research-agent-autoresearch-iteration:
 research-agent-check:
 	PYTHONPATH=. python -m pytest tests/
 
-# Full pipeline + frozen evidence + dataset generation + tests.
+# Full pipeline + frozen evidence + universe split + contexts + dataset generation + tests.
 full-research-agent:
 	$(MAKE) full-research
 	$(MAKE) frozen-evidence
+	$(MAKE) split-datasets
+	$(MAKE) build-company-contexts
 	$(MAKE) research-agent-dataset
 	PYTHONPATH=. python -m pytest tests/
 
@@ -102,6 +104,16 @@ data-benchmark:
 # Run the walk-forward experiment loop.
 research:
 	PYTHONPATH=. python experiments/run_experiments.py
+
+# Split modeling_dataset_2020_2025.csv into training and public subsets.
+# Requires data/config/universe_*.csv to exist (created in data/config/).
+split-datasets:
+	PYTHONPATH=. python -m scripts.data_collection.split_universe_datasets
+
+# Build structured RAG context JSON files for all public-universe companies.
+# Run after: make data && make split-datasets && python experiments/run_experiments.py
+build-company-contexts:
+	PYTHONPATH=. python scripts/build_company_contexts.py
 
 # Full pipeline: extract -> benchmark -> corrected yearly -> valuation -> build -> experiments.
 full-research:

@@ -1,0 +1,92 @@
+{
+  "ticker": "KRDMD",
+  "year": 2025,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.374,
+    "ml_rank": 33,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 66718974139.0,
+    "net_income": -1679514697.0,
+    "equity": 84652617584.0,
+    "ebitda": 6833798117.0,
+    "roe": -2.2102,
+    "roa": -1.4334,
+    "gross_profit": 5185707438.0,
+    "operating_income": 1223249120.0,
+    "net_margin": -2.5173,
+    "gross_margin": 7.7725,
+    "ebitda_margin": 10.2427
+  },
+  "valuation": {
+    "pe_ratio": null,
+    "pb_ratio": 0.3402,
+    "ev_ebitda": 5.0579,
+    "market_cap": 28796400000.0,
+    "enterprise_value": 34564852927.0,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2025-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 42.5,
+      "net_income": 12.5,
+      "equity": 65.0,
+      "ebitda": 32.5,
+      "roe": 22.5,
+      "roa": 22.5,
+      "gross_profit": 27.5,
+      "operating_income": 27.5,
+      "net_margin": 17.5,
+      "gross_margin": 17.5,
+      "ebitda_margin": 42.5,
+      "pb_ratio": 2.7,
+      "ev_ebitda": 25.0,
+      "market_cap": 18.9,
+      "enterprise_value": 18.9
+    },
+    "year_medians": {
+      "revenue": 85613360000.0,
+      "net_income": 3453430000.0,
+      "equity": 63457407000.0,
+      "ebitda": 11141498854.5,
+      "roe": 8.8668,
+      "roa": 3.8981,
+      "gross_profit": 19595993000.0,
+      "operating_income": 7607343028.5,
+      "net_margin": 3.6143,
+      "gross_margin": 21.8406,
+      "ebitda_margin": 16.0995,
+      "pe_ratio": 12.006,
+      "pb_ratio": 1.1446,
+      "ev_ebitda": 7.4842,
+      "market_cap": 95849998500.0,
+      "enterprise_value": 124025580834.0
+    }
+  },
+  "data_quality": {
+    "missing_fields": [
+      "pe_ratio"
+    ],
+    "warnings": [
+      "inference_row: no T+1 target available (2025 is latest year)"
+    ],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

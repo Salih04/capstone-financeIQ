@@ -1,0 +1,90 @@
+{
+  "ticker": "TRALT",
+  "year": 2020,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.5093,
+    "ml_rank": 22,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 3249641000.0,
+    "net_income": 1810379000.0,
+    "equity": 42770233000.0,
+    "ebitda": 1932721000.0,
+    "roe": 23.9353,
+    "roa": 21.601,
+    "gross_profit": 2072344000.0,
+    "operating_income": 1707555000.0,
+    "net_margin": 55.7101,
+    "gross_margin": 63.7715,
+    "ebitda_margin": 59.4749
+  },
+  "valuation": {
+    "pe_ratio": null,
+    "pb_ratio": null,
+    "ev_ebitda": null,
+    "market_cap": null,
+    "enterprise_value": null,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2020-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 27.5,
+      "net_income": 67.5,
+      "equity": 35.0,
+      "ebitda": 52.5,
+      "roe": 65.0,
+      "roa": 95.0,
+      "gross_profit": 50.0,
+      "operating_income": 57.5,
+      "net_margin": 95.0,
+      "gross_margin": 100.0,
+      "ebitda_margin": 97.5
+    },
+    "year_medians": {
+      "revenue": 10508934500.0,
+      "net_income": 857963000.0,
+      "equity": 63457407000.0,
+      "ebitda": 1889612500.0,
+      "roe": 15.897,
+      "roa": 5.5618,
+      "gross_profit": 2065672500.0,
+      "operating_income": 1461450000.0,
+      "net_margin": 8.0192,
+      "gross_margin": 23.0896,
+      "ebitda_margin": 16.9362,
+      "pe_ratio": 6.3048,
+      "pb_ratio": 0.0725,
+      "ev_ebitda": 16.8359,
+      "market_cap": 6590953491.0,
+      "enterprise_value": 41337576818.9826
+    }
+  },
+  "data_quality": {
+    "missing_fields": [
+      "pe_ratio",
+      "pb_ratio",
+      "ev_ebitda",
+      "market_cap",
+      "enterprise_value"
+    ],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

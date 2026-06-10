@@ -45,19 +45,29 @@ PRED_FEATURES = [f for f in reg.features_for_next_year_prediction()]
 
 
 CLEAN_MODELING = ROOT / "data" / "trusted_clean" / "modeling_dataset_2020_2025.csv"
+TRAINING_MODELING = ROOT / "data" / "trusted_clean" / "modeling_dataset_training_2020_2025.csv"
+
+
+def _modeling_csv() -> Path:
+    """Return training dataset path if available, else fall back to standard path."""
+    return TRAINING_MODELING if TRAINING_MODELING.is_file() else CLEAN_MODELING
 
 
 def build_panel() -> pd.DataFrame:
     """One row per (ticker, feature_year) with the NEXT year's return as target.
 
-    Prefer the clean T->T+1 modeling dataset (frozen-snapshot columns already
-    excluded, real next-year targets). Fall back to the legacy reference panel.
+    Prefer the training dataset (may have a larger universe) when available,
+    then fall back to the standard modeling dataset, then the legacy panel.
+    Training dataset is used so experiments can benefit from a broader universe;
+    inference/frontend endpoints use the public-only dataset separately.
     """
-    if CLEAN_MODELING.is_file():
-        m = pd.read_csv(CLEAN_MODELING)
+    modeling_path = _modeling_csv()
+    if modeling_path.is_file():
+        m = pd.read_csv(modeling_path)
         _non_feat = {
             "ticker", "company_name", "year", "sector", "indices", "is_bist100",
             "same_year_return_pct", "target_year", "has_target", "is_inference_row",
+            "is_public_universe", "is_training_universe", "universe_source",
         }
         feat_cols = [c for c in m.columns
                      if c not in _non_feat and not c.startswith("next_year_")]

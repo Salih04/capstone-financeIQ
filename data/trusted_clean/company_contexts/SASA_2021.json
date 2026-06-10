@@ -1,0 +1,89 @@
+{
+  "ticker": "SASA",
+  "year": 2021,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.3852,
+    "ml_rank": 32,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 14644953000.0,
+    "net_income": 697435000.0,
+    "equity": 154302052000.0,
+    "ebitda": 2783427000.0,
+    "roe": 16.7547,
+    "roa": 3.1424,
+    "gross_profit": 3702517000.0,
+    "operating_income": 2540013000.0,
+    "net_margin": 4.7623,
+    "gross_margin": 25.2819,
+    "ebitda_margin": 19.006
+  },
+  "valuation": {
+    "pe_ratio": 2.2571,
+    "pb_ratio": 0.0102,
+    "ev_ebitda": 44.2754,
+    "market_cap": 1574147610.0,
+    "enterprise_value": 123237321610.0,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2021-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 47.5,
+      "net_income": 40.0,
+      "equity": 72.5,
+      "ebitda": 50.0,
+      "roe": 30.0,
+      "roa": 25.0,
+      "gross_profit": 50.0,
+      "operating_income": 52.5,
+      "net_margin": 35.0,
+      "gross_margin": 47.5,
+      "ebitda_margin": 37.5,
+      "pe_ratio": 28.6,
+      "pb_ratio": 5.9,
+      "ev_ebitda": 84.8,
+      "market_cap": 23.5,
+      "enterprise_value": 85.3
+    },
+    "year_medians": {
+      "revenue": 17391953000.0,
+      "net_income": 1077289624.0,
+      "equity": 63457407000.0,
+      "ebitda": 2721713000.0,
+      "roe": 23.7568,
+      "roa": 7.431,
+      "gross_profit": 3657466000.0,
+      "operating_income": 2212915000.0,
+      "net_margin": 10.7059,
+      "gross_margin": 26.5256,
+      "ebitda_margin": 22.5316,
+      "pe_ratio": 3.8807,
+      "pb_ratio": 0.0953,
+      "ev_ebitda": 9.4537,
+      "market_cap": 5921365009.905,
+      "enterprise_value": 35015339824.0
+    }
+  },
+  "data_quality": {
+    "missing_fields": [],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

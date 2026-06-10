@@ -1,0 +1,91 @@
+{
+  "ticker": "TAVHL",
+  "year": 2025,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.6099,
+    "ml_rank": 12,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 82151164000.0,
+    "net_income": 2815880000.0,
+    "equity": 77122493000.0,
+    "ebitda": 25678404000.0,
+    "roe": 3.5387,
+    "roa": 0.7099,
+    "gross_profit": 33126762000.0,
+    "operating_income": 16719282000.0,
+    "net_margin": 3.4277,
+    "gross_margin": 40.3242,
+    "ebitda_margin": 31.2575
+  },
+  "valuation": {
+    "pe_ratio": 38.4777,
+    "pb_ratio": 1.4049,
+    "ev_ebitda": 7.6418,
+    "market_cap": 108348632812.5,
+    "enterprise_value": 196229400812.5,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2025-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 47.5,
+      "net_income": 40.0,
+      "equity": 60.0,
+      "ebitda": 70.0,
+      "roe": 30.0,
+      "roa": 30.0,
+      "gross_profit": 67.5,
+      "operating_income": 75.0,
+      "net_margin": 47.5,
+      "gross_margin": 87.5,
+      "ebitda_margin": 85.0,
+      "pe_ratio": 80.8,
+      "pb_ratio": 56.8,
+      "ev_ebitda": 50.0,
+      "market_cap": 51.4,
+      "enterprise_value": 67.6
+    },
+    "year_medians": {
+      "revenue": 85613360000.0,
+      "net_income": 3453430000.0,
+      "equity": 63457407000.0,
+      "ebitda": 11141498854.5,
+      "roe": 8.8668,
+      "roa": 3.8981,
+      "gross_profit": 19595993000.0,
+      "operating_income": 7607343028.5,
+      "net_margin": 3.6143,
+      "gross_margin": 21.8406,
+      "ebitda_margin": 16.0995,
+      "pe_ratio": 12.006,
+      "pb_ratio": 1.1446,
+      "ev_ebitda": 7.4842,
+      "market_cap": 95849998500.0,
+      "enterprise_value": 124025580834.0
+    }
+  },
+  "data_quality": {
+    "missing_fields": [],
+    "warnings": [
+      "inference_row: no T+1 target available (2025 is latest year)"
+    ],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

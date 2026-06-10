@@ -1,0 +1,90 @@
+{
+  "ticker": "ULKER",
+  "year": 2021,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.5175,
+    "ml_rank": 21,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 12537080000.0,
+    "net_income": -464332000.0,
+    "equity": 43301842000.0,
+    "ebitda": 2659999000.0,
+    "roe": -15.5466,
+    "roa": -1.7693,
+    "gross_profit": 3612415000.0,
+    "operating_income": 2429990000.0,
+    "net_margin": -3.7037,
+    "gross_margin": 28.9045,
+    "ebitda_margin": 21.2171
+  },
+  "valuation": {
+    "pe_ratio": null,
+    "pb_ratio": 0.1274,
+    "ev_ebitda": 14.8636,
+    "market_cap": 5516878608.0,
+    "enterprise_value": 39537155608.0,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2021-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 45.0,
+      "net_income": 7.5,
+      "equity": 37.5,
+      "ebitda": 47.5,
+      "roe": 5.0,
+      "roa": 10.0,
+      "gross_profit": 47.5,
+      "operating_income": 50.0,
+      "net_margin": 7.5,
+      "gross_margin": 55.0,
+      "ebitda_margin": 47.5,
+      "pb_ratio": 61.8,
+      "ev_ebitda": 60.6,
+      "market_cap": 47.1,
+      "enterprise_value": 50.0
+    },
+    "year_medians": {
+      "revenue": 17391953000.0,
+      "net_income": 1077289624.0,
+      "equity": 63457407000.0,
+      "ebitda": 2721713000.0,
+      "roe": 23.7568,
+      "roa": 7.431,
+      "gross_profit": 3657466000.0,
+      "operating_income": 2212915000.0,
+      "net_margin": 10.7059,
+      "gross_margin": 26.5256,
+      "ebitda_margin": 22.5316,
+      "pe_ratio": 3.8807,
+      "pb_ratio": 0.0953,
+      "ev_ebitda": 9.4537,
+      "market_cap": 5921365009.905,
+      "enterprise_value": 35015339824.0
+    }
+  },
+  "data_quality": {
+    "missing_fields": [
+      "pe_ratio"
+    ],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

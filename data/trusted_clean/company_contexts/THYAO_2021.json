@@ -1,0 +1,90 @@
+{
+  "ticker": "THYAO",
+  "year": 2021,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.6533,
+    "ml_rank": 6,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 97378000.0,
+    "net_income": 8213000.0,
+    "equity": 966388000000.0,
+    "ebitda": 29020000.0,
+    "roe": 9.0611,
+    "roa": 2.322,
+    "gross_profit": 22145000.0,
+    "operating_income": 13547000.0,
+    "net_margin": 8.4341,
+    "gross_margin": 22.7413,
+    "ebitda_margin": 29.8014
+  },
+  "valuation": {
+    "pe_ratio": null,
+    "pb_ratio": 0.0279,
+    "ev_ebitda": null,
+    "market_cap": 26988966360.0,
+    "enterprise_value": 557382966360.0,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2021-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 2.5,
+      "net_income": 12.5,
+      "equity": 97.5,
+      "ebitda": 2.5,
+      "roe": 22.5,
+      "roa": 25.0,
+      "gross_profit": 0.0,
+      "operating_income": 2.5,
+      "net_margin": 37.5,
+      "gross_margin": 37.5,
+      "ebitda_margin": 77.5,
+      "pb_ratio": 26.5,
+      "market_cap": 76.5,
+      "enterprise_value": 97.1
+    },
+    "year_medians": {
+      "revenue": 17391953000.0,
+      "net_income": 1077289624.0,
+      "equity": 63457407000.0,
+      "ebitda": 2721713000.0,
+      "roe": 23.7568,
+      "roa": 7.431,
+      "gross_profit": 3657466000.0,
+      "operating_income": 2212915000.0,
+      "net_margin": 10.7059,
+      "gross_margin": 26.5256,
+      "ebitda_margin": 22.5316,
+      "pe_ratio": 3.8807,
+      "pb_ratio": 0.0953,
+      "ev_ebitda": 9.4537,
+      "market_cap": 5921365009.905,
+      "enterprise_value": 35015339824.0
+    }
+  },
+  "data_quality": {
+    "missing_fields": [
+      "pe_ratio",
+      "ev_ebitda"
+    ],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

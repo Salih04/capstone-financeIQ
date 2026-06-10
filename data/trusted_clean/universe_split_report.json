@@ -1,0 +1,18 @@
+{
+  "public_universe_count": 40,
+  "training_universe_count": 40,
+  "training_only_count": 0,
+  "training_dataset_rows": 240,
+  "training_dataset_tickers": 40,
+  "public_dataset_rows": 240,
+  "public_dataset_tickers": 40,
+  "missing_from_training_data": [],
+  "missing_from_public_data": [],
+  "non_public_in_public_dataset": [],
+  "validation_passed": true,
+  "outputs": {
+    "training": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/modest-franklin-37915b/data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+    "public": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/modest-franklin-37915b/data/trusted_clean/modeling_dataset_public_2020_2025.csv"
+  },
+  "note": "Training and public datasets are identical because no extra BIST100 financial data has been sourced yet. Add tickers to universe_training_bist100.csv with verified financials to expand."
+}

@@ -21,24 +21,28 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 }
 
+_NON_RETRYABLE = {400, 401, 403, 404}
+_RETRYABLE = {429, 500, 502, 503, 504}
+
+
 def fetch_with_backoff(url, params, headers, max_retries=5):
     for attempt in range(max_retries):
         try:
             response = requests.get(url, params=params, headers=headers, timeout=10)
             if response.status_code == 200:
                 return response.json()
-            elif response.status_code == 404:
-                return {"error": "Not Found (404)"}
-            elif response.status_code == 429:
-                logging.warning(f"Rate limited (429). Retrying... {attempt+1}/{max_retries}")
+            elif response.status_code in _NON_RETRYABLE:
+                return {"error": f"HTTP {response.status_code} (non-retryable)"}
+            elif response.status_code in _RETRYABLE:
+                logging.warning(f"HTTP {response.status_code}. Retrying... {attempt+1}/{max_retries}")
             else:
                 logging.warning(f"Error {response.status_code}. Retrying... {attempt+1}/{max_retries}")
         except requests.exceptions.RequestException as e:
             logging.warning(f"Request exception: {e}. Retrying... {attempt+1}/{max_retries}")
-        
+
         # Exponential backoff: 1s, 2s, 4s, 8s, 16s
         time.sleep(2 ** attempt)
-        
+
     return {"error": "Max retries reached"}
 
 def find_year_end_price(result, target_year):
@@ -74,19 +78,58 @@ def find_year_end_price(result, target_year):
         
     return None, None, None, currency
 
+def _load_tickers_from_universe_csv(csv_path: str) -> list[str]:
+    """Load tickers where is_training_universe=true from a universe config CSV.
+
+    Skips comment lines (starting with #). Falls back to DEFAULT_TICKERS on error.
+    """
+    from pathlib import Path
+    p = Path(csv_path)
+    if not p.is_file():
+        logging.warning(f"Universe CSV not found: {csv_path}. Using DEFAULT_TICKERS.")
+        return list(DEFAULT_TICKERS)
+    lines = [ln for ln in p.read_text().splitlines() if not ln.strip().startswith("#")]
+    try:
+        import io
+        df = pd.read_csv(io.StringIO("\n".join(lines)))
+        df["ticker"] = df["ticker"].astype(str).str.strip().str.upper()
+        col = "is_training_universe" if "is_training_universe" in df.columns else df.columns[0]
+        if col != "ticker":
+            df[col] = df[col].astype(str).str.lower().isin({"true", "1", "yes"})
+            tickers = df[df[col]]["ticker"].tolist()
+        else:
+            tickers = df["ticker"].tolist()
+        logging.info(f"Loaded {len(tickers)} tickers from {csv_path}")
+        return tickers
+    except Exception as e:
+        logging.warning(f"Failed to parse universe CSV {csv_path}: {e}. Using DEFAULT_TICKERS.")
+        return list(DEFAULT_TICKERS)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Fetch year-end daily close prices from Yahoo Finance Chart API.")
     parser.add_argument("--start-year", type=int, required=True, help="Start year (e.g., 2020)")
     parser.add_argument("--end-year", type=int, required=True, help="End year (e.g., 2025)")
-    parser.add_argument("--tickers", type=str, nargs='+', default=DEFAULT_TICKERS, help="List of BIST tickers")
+    parser.add_argument("--tickers", type=str, nargs='+', default=None,
+                        help="Explicit list of BIST tickers (overrides --universe-csv and default)")
+    parser.add_argument("--universe-csv", type=str, default=None,
+                        help="Path to universe config CSV (loads tickers with is_training_universe=true)")
     parser.add_argument("--force", action="store_true", help="Overwrite existing raw JSON files")
-    
+
     args = parser.parse_args()
-    
+
     start_year = args.start_year
     end_year = args.end_year
-    tickers = args.tickers
     force = args.force
+
+    if args.tickers:
+        tickers = args.tickers
+        logging.info(f"Using {len(tickers)} tickers from --tickers argument")
+    elif args.universe_csv:
+        tickers = _load_tickers_from_universe_csv(args.universe_csv)
+    else:
+        tickers = list(DEFAULT_TICKERS)
+        logging.info(f"Using {len(tickers)} default tickers")
     
     raw_dir = Path("data/trusted_raw/prices/yahoo_chart_raw")
     raw_dir.mkdir(parents=True, exist_ok=True)
