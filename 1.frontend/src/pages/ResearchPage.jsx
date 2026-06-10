@@ -18,6 +18,7 @@ import {
 import api from '../api/client'
 import { researchApi } from '../api/researchApi'
 import { Card, EmptyState, Chip } from '../components/ui'
+import TerminalFx from '../components/TerminalFx'
 
 const fmt = (v, d = 1) => (v === null || v === undefined || Number.isNaN(v) ? '—' : Number(v).toFixed(d))
 const pct = (v) => (v === null || v === undefined ? '—' : `${Number(v).toFixed(1)}%`)
@@ -113,12 +114,13 @@ export default function ResearchPage() {
   if (error) return <EmptyState icon={AlertTriangle} title="Research data unavailable" description={String(error)} />
 
   return (
-    <div style={styles.page}>
+    <div className="tfx tfx-enter" style={styles.page}>
+      <TerminalFx />
       <section style={styles.hero}>
         <div style={styles.heroGlow} />
         <div style={styles.heroContent}>
-          <div style={styles.kicker}>
-            <Sparkles size={15} />
+          <div className="tfx-kicker" style={styles.kicker}>
+            <Sparkles size={13} />
             Score Explorer
           </div>
 
@@ -199,7 +201,7 @@ export default function ResearchPage() {
           <div style={styles.chartBox}>
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 18, right: 26, bottom: 44, left: 18 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.12)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 211, 202, 0.12)" />
                 <XAxis
                   type="number"
                   dataKey="x"
@@ -220,7 +222,7 @@ export default function ResearchPage() {
                   label={{ value: 'Realized Return %', angle: -90, position: 'insideLeft', fill: 'var(--text-3)', dx: -6 }}
                 />
                 <ZAxis range={[76, 76]} />
-                <ReferenceLine y={0} stroke="rgba(226, 232, 240, 0.35)" />
+                <ReferenceLine y={0} stroke="rgba(200, 211, 202, 0.35)" />
                 <Tooltip
                   cursor={{ strokeDasharray: '3 3' }}
                   content={({ payload }) => {
@@ -239,7 +241,7 @@ export default function ResearchPage() {
                   {scatter.map((d) => (
                     <Cell
                       key={d.ticker}
-                      fill={d.ticker === selected ? 'var(--primary)' : 'rgba(148, 163, 184, 0.72)'}
+                      fill={d.ticker === selected ? 'var(--primary)' : 'rgba(200, 211, 202, 0.72)'}
                       opacity={d.ticker === selected ? 1 : 0.58}
                     />
                   ))}
@@ -411,7 +413,7 @@ function CompanyCard({ company, active, onClick }) {
   const outperformed = company.excess_vs_bist100 != null ? company.excess_vs_bist100 >= 0 : null
 
   return (
-    <button type="button" onClick={onClick} style={{ ...styles.companyCard, ...(active ? styles.companyCardActive : {}) }}>
+    <button type="button" onClick={onClick} className="tfx-card" style={{ ...styles.companyCard, ...(active ? styles.companyCardActive : {}) }}>
       <div style={styles.companyCardTop}>
         <div>
           <div style={styles.rankText}>#{company.score_rank ?? '—'}</div>
@@ -462,15 +464,15 @@ const styles = {
   hero: {
     position: 'relative',
     overflow: 'hidden',
-    border: '1px solid rgba(148, 163, 184, 0.18)',
+    border: '1px solid rgba(200, 211, 202, 0.18)',
     borderRadius: 28,
-    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(8, 47, 73, 0.42))',
+    background: 'linear-gradient(135deg, rgba(14, 20, 19, 0.96), rgba(12, 17, 15, 0.42))',
     boxShadow: '0 26px 80px rgba(0, 0, 0, 0.28)',
   },
   heroGlow: {
     position: 'absolute',
     inset: -120,
-    background: 'radial-gradient(circle at 20% 20%, rgba(251, 176, 64, 0.20), transparent 32%), radial-gradient(circle at 85% 10%, rgba(94, 234, 212, 0.14), transparent 30%)',
+    background: 'radial-gradient(circle at 20% 20%, rgba(200, 163, 90, 0.20), transparent 32%), radial-gradient(circle at 85% 10%, rgba(77, 165, 131, 0.14), transparent 30%)',
     pointerEvents: 'none',
   },
   heroContent: {
@@ -512,9 +514,9 @@ const styles = {
     lineHeight: 1.7,
   },
   yearSelect: {
-    background: 'rgba(15, 23, 42, 0.88)',
+    background: 'rgba(14, 20, 19, 0.88)',
     color: 'var(--text-1)',
-    border: '1px solid rgba(148, 163, 184, 0.28)',
+    border: '1px solid rgba(200, 211, 202, 0.28)',
     borderRadius: 14,
     padding: '11px 16px',
     fontSize: 14,
@@ -529,8 +531,8 @@ const styles = {
     minHeight: 112,
     padding: 18,
     borderRadius: 20,
-    background: 'rgba(15, 23, 42, 0.66)',
-    border: '1px solid rgba(148, 163, 184, 0.16)',
+    background: 'rgba(14, 20, 19, 0.66)',
+    border: '1px solid rgba(200, 211, 202, 0.16)',
     display: 'flex',
     gap: 14,
     alignItems: 'flex-start',
@@ -565,8 +567,8 @@ const styles = {
   explainCard: {
     padding: '16px 20px',
     borderRadius: 18,
-    border: '1px solid rgba(94, 234, 212, 0.18)',
-    background: 'linear-gradient(135deg, rgba(20, 184, 166, 0.10), rgba(15, 23, 42, 0.78))',
+    border: '1px solid rgba(77, 165, 131, 0.18)',
+    background: 'linear-gradient(135deg, rgba(77, 165, 131, 0.10), rgba(14, 20, 19, 0.78))',
     color: 'var(--text-2)',
     lineHeight: 1.7,
     fontSize: 14,
@@ -579,8 +581,8 @@ const styles = {
   insightCard: {
     padding: 20,
     borderRadius: 22,
-    background: 'rgba(15, 23, 42, 0.74)',
-    border: '1px solid rgba(148, 163, 184, 0.18)',
+    background: 'rgba(14, 20, 19, 0.74)',
+    border: '1px solid rgba(200, 211, 202, 0.18)',
     boxShadow: '0 18px 48px rgba(0, 0, 0, 0.16)',
   },
   insightTop: {
@@ -594,7 +596,7 @@ const styles = {
     display: 'grid',
     placeItems: 'center',
     borderRadius: 12,
-    background: 'rgba(251, 176, 64, 0.12)',
+    background: 'rgba(200, 163, 90, 0.12)',
     color: 'var(--primary)',
   },
   insightLabel: {
@@ -670,7 +672,7 @@ const styles = {
     width: 9,
     height: 9,
     borderRadius: 99,
-    background: 'rgba(148, 163, 184, 0.72)',
+    background: 'rgba(200, 211, 202, 0.72)',
     display: 'inline-block',
     marginLeft: 8,
   },
@@ -679,8 +681,8 @@ const styles = {
     padding: '2px 14px 18px',
   },
   tooltip: {
-    background: 'rgba(15, 23, 42, 0.96)',
-    border: '1px solid rgba(148, 163, 184, 0.24)',
+    background: 'rgba(14, 20, 19, 0.96)',
+    border: '1px solid rgba(200, 211, 202, 0.24)',
     borderRadius: 12,
     padding: '10px 12px',
     color: 'var(--text-1)',
@@ -728,13 +730,13 @@ const styles = {
   scoreTrack: {
     height: 12,
     borderRadius: 999,
-    background: 'rgba(2, 6, 23, 0.58)',
+    background: 'rgba(8, 11, 10, 0.58)',
     overflow: 'hidden',
   },
   scoreFill: {
     height: '100%',
     borderRadius: 999,
-    background: 'linear-gradient(90deg, var(--primary), rgba(94, 234, 212, 0.95))',
+    background: 'linear-gradient(90deg, var(--primary), rgba(77, 165, 131, 0.95))',
   },
   miniGrid: {
     display: 'grid',
@@ -743,8 +745,8 @@ const styles = {
   },
   mini: {
     padding: '12px 13px',
-    background: 'rgba(2, 6, 23, 0.32)',
-    border: '1px solid rgba(148, 163, 184, 0.14)',
+    background: 'rgba(8, 11, 10, 0.32)',
+    border: '1px solid rgba(200, 211, 202, 0.14)',
     borderRadius: 14,
   },
   miniLabel: {
@@ -787,14 +789,14 @@ const styles = {
   },
   breakdownTrack: {
     height: 9,
-    background: 'rgba(2, 6, 23, 0.55)',
+    background: 'rgba(8, 11, 10, 0.55)',
     borderRadius: 999,
     overflow: 'hidden',
   },
   breakdownFill: {
     height: '100%',
     borderRadius: 999,
-    background: 'linear-gradient(90deg, var(--primary), #facc15)',
+    background: 'linear-gradient(90deg, var(--primary), #c8a35a)',
   },
   breakdownValue: {
     color: 'var(--text-2)',
@@ -823,8 +825,8 @@ const styles = {
     alignItems: 'center',
     gap: 8,
     minWidth: 190,
-    background: 'rgba(2, 6, 23, 0.38)',
-    border: '1px solid rgba(148, 163, 184, 0.18)',
+    background: 'rgba(8, 11, 10, 0.38)',
+    border: '1px solid rgba(200, 211, 202, 0.18)',
     borderRadius: 13,
     padding: '9px 11px',
   },
@@ -837,9 +839,9 @@ const styles = {
     fontSize: 13,
   },
   sortSelect: {
-    background: 'rgba(2, 6, 23, 0.38)',
+    background: 'rgba(8, 11, 10, 0.38)',
     color: 'var(--text-1)',
-    border: '1px solid rgba(148, 163, 184, 0.18)',
+    border: '1px solid rgba(200, 211, 202, 0.18)',
     borderRadius: 13,
     padding: '10px 12px',
     fontSize: 13,
@@ -856,18 +858,18 @@ const styles = {
   },
   companyCard: {
     textAlign: 'left',
-    border: '1px solid rgba(148, 163, 184, 0.14)',
+    border: '1px solid rgba(200, 211, 202, 0.14)',
     borderRadius: 20,
-    background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(2, 6, 23, 0.34))',
+    background: 'linear-gradient(180deg, rgba(14, 20, 19, 0.78), rgba(8, 11, 10, 0.34))',
     padding: 17,
     color: 'var(--text-1)',
     cursor: 'pointer',
     transition: 'transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease',
   },
   companyCardActive: {
-    borderColor: 'rgba(251, 176, 64, 0.65)',
-    boxShadow: '0 18px 52px rgba(251, 176, 64, 0.16), inset 0 1px 0 rgba(255,255,255,0.08)',
-    background: 'linear-gradient(180deg, rgba(251, 176, 64, 0.12), rgba(15, 23, 42, 0.78))',
+    borderColor: 'rgba(200, 163, 90, 0.65)',
+    boxShadow: '0 18px 52px rgba(200, 163, 90, 0.16), inset 0 1px 0 rgba(255,255,255,0.08)',
+    background: 'linear-gradient(180deg, rgba(200, 163, 90, 0.12), rgba(14, 20, 19, 0.78))',
   },
   companyCardTop: {
     display: 'flex',
@@ -905,14 +907,14 @@ const styles = {
   companyScoreTrack: {
     height: 9,
     borderRadius: 999,
-    background: 'rgba(2, 6, 23, 0.62)',
+    background: 'rgba(8, 11, 10, 0.62)',
     overflow: 'hidden',
     marginBottom: 16,
   },
   companyScoreFill: {
     height: '100%',
     borderRadius: 999,
-    background: 'linear-gradient(90deg, var(--primary), rgba(94, 234, 212, 0.95))',
+    background: 'linear-gradient(90deg, var(--primary), rgba(77, 165, 131, 0.95))',
   },
   companyBottom: {
     display: 'grid',

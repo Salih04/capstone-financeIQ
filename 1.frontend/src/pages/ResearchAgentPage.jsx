@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Bot, Search, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react'
 import api from '../api/client'
 import { GhostButton } from '../components/ui'
+import TerminalFx from '../components/TerminalFx'
 import {
   MetricCard, EvidencePanel, ScoreBreakdown, SignalBadge, Bullets,
   WarningCallout, DecisionVerdict, humanizeWarning, asText, formatNumber, NOT_ADVICE,
@@ -86,10 +87,11 @@ export default function ResearchAgentPage() {
   const isFallback = !aiUsed
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
+    <div className="tfx tfx-enter" style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
+      <TerminalFx />
       <section style={agentHero}>
         <div>
-          <div style={heroKicker}><Sparkles size={15} /> AI Research Assistant</div>
+          <div className="tfx-kicker" style={heroKicker}><Sparkles size={13} /> AI RESEARCH ASSISTANT</div>
           <h1 style={heroTitle}>Ask questions grounded in validated project data.</h1>
           <p style={heroSub}>
             The assistant explains scores, BIST100 outcomes, weak-signal diagnostics, and company evidence.
@@ -115,7 +117,7 @@ export default function ResearchAgentPage() {
         display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <span style={{ width: 40, height: 40, borderRadius: 11, background: 'linear-gradient(135deg, var(--primary), var(--secondary))', color: '#fff',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 10px rgba(244,176,74,0.3)' }}><Sparkles size={20} /></span>
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 10px rgba(200,163,90,0.3)' }}><Sparkles size={20} /></span>
           <div>
             <div style={{ fontSize: 13.5, fontWeight: 800 }}>FinanceIQ Research Copilot</div>
             <div style={{ fontSize: 11.5, color: 'var(--text-3)' }}>Explains the validated data — the numbers stay the ML model’s</div>
@@ -149,7 +151,7 @@ export default function ResearchAgentPage() {
             <div style={{ display: 'flex', gap: 8 }}>
               <input value={ticker} onChange={e => setTicker(e.target.value)} placeholder="ticker (e.g. ASELS)"
                 onKeyDown={e => e.key === 'Enter' && loadScore()} style={inputS} />
-              <button onClick={loadScore} style={primaryBtn}>Score</button>
+              <button onClick={loadScore} className="tfx-press" style={primaryBtn}>Score</button>
             </div>
             {score?.loading && <div style={{ color: 'var(--text-3)', fontSize: 13 }}>Scoring...</div>}
             {score?.error && <div style={{ color: 'var(--danger-light)', fontSize: 13 }}>{asText(score.error)}</div>}
@@ -201,7 +203,7 @@ export default function ResearchAgentPage() {
 
           <div style={promptPills}>
             {EXAMPLES.map((ex, i) => (
-              <button key={i} onClick={() => setQuestion(ex)} style={chipBtn} title="Use this prompt">{ex}</button>
+              <button key={i} onClick={() => setQuestion(ex)} className="tfx-chip" style={chipBtn} title="Use this prompt">{ex}</button>
             ))}
           </div>
 
@@ -211,11 +213,11 @@ export default function ResearchAgentPage() {
               placeholder="Ask about outperformance, weak signal, company score evidence, or benchmark context..."
               style={{ ...inputS, width: '100%', resize: 'vertical', fontSize: 15, lineHeight: 1.55 }} />
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-              <button onClick={ask} disabled={askLoading || !question.trim()}
+              <button onClick={ask} disabled={askLoading || !question.trim()} className="tfx-press"
                 style={{ ...primaryBtn, padding: '12px 18px', opacity: (askLoading || !question.trim()) ? 0.6 : 1, cursor: askLoading ? 'wait' : 'pointer' }}>
                 <Search size={15} style={{ verticalAlign: 'middle', marginRight: 6 }} />{askLoading ? 'Asking...' : 'Ask FinanceIQ'}
               </button>
-              {answer && !askLoading && <button onClick={clearAnswer} style={ghostBtn}>Clear answer</button>}
+              {answer && !askLoading && <button onClick={clearAnswer} className="tfx-press is-emerald" style={ghostBtn}>Clear answer</button>}
               {askLoading && <span style={{ color: 'var(--text-3)', fontSize: 13 }}>Updating answer...</span>}
               {askErr && <span style={{ color: 'var(--danger-light)', fontSize: 13 }}>{asText(askErr)} - you can ask again.</span>}
             </div>
@@ -300,27 +302,27 @@ function AnswerBlock({ title, color, children }) {
 }
 
 const lbl = (c) => ({ fontSize: 11.5, fontWeight: 700, color: c, marginBottom: 6 })
-const agentHero = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 18, alignItems: 'stretch', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))', padding: 24 }
-const heroKicker = { display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--primary-hover)', background: 'var(--primary-subtle)', border: '1px solid rgba(244,176,74,0.25)', borderRadius: 999, padding: '5px 11px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.7 }
-const heroTitle = { margin: '14px 0 8px', color: 'var(--text-1)', fontSize: 'clamp(2rem, 5vw, 3.35rem)', lineHeight: 1, fontWeight: 900, maxWidth: 820 }
+const agentHero = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 18, alignItems: 'stretch', border: '1px solid var(--border-strong)', borderLeft: '3px solid var(--secondary)', borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(200,163,90,0.12), rgba(77,165,131,0.07) 44%, var(--surface-2))', padding: 24 }
+const heroKicker = { display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--text-3)', background: 'rgba(10,14,13,0.5)', border: '1px solid var(--border-strong)', borderRadius: 2, padding: '5px 11px', fontSize: 10.5 }
+const heroTitle = { margin: '14px 0 8px', color: 'var(--text-1)', fontSize: 'clamp(1.9rem, 4.4vw, 3rem)', lineHeight: 1.05, letterSpacing: '-0.015em', fontWeight: 650, maxWidth: 820 }
 const heroSub = { color: 'var(--text-2)', fontSize: 14.5, lineHeight: 1.65, margin: 0, maxWidth: 740 }
-const heroPanel = { background: 'rgba(8,15,26,0.54)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-md)', padding: 18, display: 'flex', flexDirection: 'column', gap: 10 }
+const heroPanel = { background: 'rgba(10,14,13,0.54)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-md)', padding: 18, display: 'flex', flexDirection: 'column', gap: 10 }
 const copilotGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: 18, alignItems: 'start' }
 const contextRail = { display: 'flex', flexDirection: 'column', gap: 14 }
 const railTitle = { color: 'var(--text-1)', fontSize: 15, fontWeight: 900, letterSpacing: '-0.02em' }
 const railMetrics = { display: 'grid', gridTemplateColumns: '1fr', gap: 10 }
-const chatPanel = { background: 'linear-gradient(180deg, rgba(17,30,48,0.88), rgba(7,17,31,0.76))', border: '1px solid var(--border-strong)', borderRadius: 24, padding: 22, boxShadow: 'var(--shadow-sm)', display: 'flex', flexDirection: 'column', gap: 16 }
+const chatPanel = { background: 'linear-gradient(180deg, rgba(14,20,19,0.88), rgba(10,14,13,0.76))', border: '1px solid var(--border-strong)', borderRadius: 4, padding: 22, boxShadow: 'inset 0 0 40px rgba(77,165,131,0.03)', display: 'flex', flexDirection: 'column', gap: 16 }
 const chatHeader = { display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }
 const promptPills = { display: 'flex', gap: 8, flexWrap: 'wrap' }
-const composer = { display: 'flex', flexDirection: 'column', gap: 10, background: 'rgba(3,7,18,0.34)', border: '1px solid var(--border)', borderRadius: 18, padding: 14 }
-const answerCard = { display: 'flex', flexDirection: 'column', gap: 16, background: 'linear-gradient(135deg, rgba(57,230,208,0.10), rgba(139,92,246,0.09), rgba(3,7,18,0.30))', border: '1px solid rgba(125,211,252,0.26)', borderRadius: 20, padding: 18, boxShadow: 'var(--shadow-sm)' }
+const composer = { display: 'flex', flexDirection: 'column', gap: 10, background: 'rgba(8,11,10,0.4)', border: '1px solid var(--border)', borderRadius: 4, padding: 14 }
+const answerCard = { display: 'flex', flexDirection: 'column', gap: 16, background: 'linear-gradient(135deg, rgba(77,165,131,0.09), rgba(168,103,75,0.07), rgba(8,11,10,0.3))', border: '1px solid var(--border-strong)', borderLeft: '3px solid var(--secondary)', borderRadius: 4, padding: 18, boxShadow: 'var(--shadow-sm)' }
 const answerHeader = { display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap', borderBottom: '1px solid var(--border)', paddingBottom: 12 }
 const aiEvidenceLine = { display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, flexWrap: 'wrap' }
 const chipBtn = { background: 'var(--surface-1)', color: 'var(--text-2)', border: '1px solid var(--border-strong)',
-  borderRadius: 999, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }
+  borderRadius: 2, padding: '7px 12px', fontFamily: 'var(--font-mono)', fontSize: 11.5, letterSpacing: '0.02em', cursor: 'pointer', whiteSpace: 'nowrap' }
 const ghostBtn = { background: 'transparent', color: 'var(--text-2)', border: '1px solid var(--border-strong)',
-  borderRadius: 'var(--radius-md)', padding: '9px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }
+  borderRadius: 2, padding: '9px 14px', fontFamily: 'var(--font-mono)', fontSize: 11.5, letterSpacing: '0.06em', cursor: 'pointer' }
 const inputS = { background: 'var(--surface-1)', color: 'var(--text-1)', border: '1px solid var(--border-strong)',
-  borderRadius: 'var(--radius-md)', padding: '9px 11px', fontSize: 13, flex: 1, boxSizing: 'border-box', outline: 'none' }
-const primaryBtn = { background: 'var(--primary)', color: '#0b111a', border: 0, borderRadius: 'var(--radius-md)',
-  padding: '9px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }
+  borderRadius: 2, padding: '9px 11px', fontSize: 13, flex: 1, boxSizing: 'border-box', outline: 'none' }
+const primaryBtn = { background: 'var(--primary)', color: '#0a0e0d', border: 0, borderRadius: 2,
+  padding: '9px 16px', fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', cursor: 'pointer', whiteSpace: 'nowrap' }

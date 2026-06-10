@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Database, Mail, ShieldCheck, Sparkles } from 'lucide-react'
 import { Chip } from '../components/ui'
+import TerminalFx from '../components/TerminalFx'
 import { researchApi } from '../api/researchApi'
 import {
   MetricCard, RenderList, WarningCallout, CollapsibleJson, EvidencePanel, SignalBadge, asText,
@@ -39,10 +40,11 @@ export default function DataQualityPage() {
   const featureCount = ctx.feature_count
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
+    <div className="tfx tfx-enter" style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1180 }}>
+      <TerminalFx />
       <section style={styles.hero}>
         <div>
-          <div style={styles.kicker}><Sparkles size={15} /> Integrity Dashboard</div>
+          <div className="tfx-kicker" style={styles.kicker}><Sparkles size={13} /> INTEGRITY DASHBOARD</div>
           <h1 style={styles.title}>Data quality is the core strength of FinanceIQ.</h1>
           <p style={styles.subtitle}>
             This audit separates accepted year-varying features from rejected frozen snapshots, documents
@@ -209,30 +211,29 @@ const styles = {
     gap: 18,
     alignItems: 'stretch',
     border: '1px solid var(--border-strong)',
+    borderLeft: '3px solid var(--secondary)',
     borderRadius: 'var(--radius-lg)',
-    background: 'linear-gradient(135deg, rgba(58,199,139,0.13), rgba(244,176,74,0.08) 44%, var(--surface-2))',
+    background: 'linear-gradient(135deg, rgba(77,165,131,0.12), rgba(200,163,90,0.07) 44%, var(--surface-2))',
     padding: 24,
   },
   kicker: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 7,
-    color: 'var(--primary-hover)',
-    background: 'var(--primary-subtle)',
-    border: '1px solid rgba(244,176,74,0.25)',
-    borderRadius: 999,
+    color: 'var(--text-3)',
+    background: 'rgba(10,14,13,0.5)',
+    border: '1px solid var(--border-strong)',
+    borderRadius: 2,
     padding: '5px 11px',
-    fontSize: 12,
-    fontWeight: 800,
-    textTransform: 'uppercase',
-    letterSpacing: 0.7,
+    fontSize: 10.5,
   },
   title: {
     margin: '14px 0 8px',
     color: 'var(--text-1)',
-    fontSize: 'clamp(2rem, 5vw, 3.35rem)',
-    lineHeight: 1,
-    fontWeight: 900,
+    fontSize: 'clamp(1.9rem, 4.4vw, 3rem)',
+    lineHeight: 1.05,
+    letterSpacing: '-0.015em',
+    fontWeight: 650,
     maxWidth: 820,
   },
   subtitle: {
@@ -249,8 +250,9 @@ const styles = {
     marginTop: 16,
   },
   auditCard: {
-    background: 'rgba(8,15,26,0.54)',
+    background: 'rgba(10,14,13,0.6)',
     border: '1px solid var(--border-strong)',
+    borderLeft: '3px solid var(--primary)',
     borderRadius: 'var(--radius-md)',
     padding: 18,
     display: 'flex',
@@ -259,8 +261,10 @@ const styles = {
   },
   auditTitle: {
     color: 'var(--text-1)',
-    fontSize: 18,
-    fontWeight: 900,
+    fontFamily: 'var(--font-mono)',
+    fontSize: 15,
+    fontWeight: 600,
+    letterSpacing: '0.04em',
   },
   auditText: {
     color: 'var(--text-2)',

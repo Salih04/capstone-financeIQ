@@ -2,19 +2,20 @@ import { useState, useEffect } from 'react'
 import { Activity, AlertTriangle, CheckCircle, Clock, ChevronDown, ChevronUp, Database, Sparkles } from 'lucide-react'
 import api from '../api/client'
 import { Card, Skeleton, EmptyState, SectionHeader } from '../components/ui'
+import TerminalFx from '../components/TerminalFx'
 
 const STATUS_STYLE = {
-  success: { bg: 'rgba(16,185,129,0.1)', color: 'var(--success)', border: 'rgba(16,185,129,0.25)' },
-  partial: { bg: 'rgba(245,158,11,0.1)', color: 'var(--warning)', border: 'rgba(245,158,11,0.25)' },
-  failed: { bg: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'rgba(239,68,68,0.25)' },
-  running: { bg: 'rgba(14,165,233,0.1)', color: 'var(--primary)', border: 'rgba(14,165,233,0.25)' },
+  success: { bg: 'rgba(77,165,131,0.1)', color: 'var(--success)', border: 'rgba(77,165,131,0.28)' },
+  partial: { bg: 'rgba(200,163,90,0.1)', color: 'var(--warning)', border: 'rgba(200,163,90,0.28)' },
+  failed: { bg: 'rgba(185,95,68,0.1)', color: 'var(--danger)', border: 'rgba(185,95,68,0.28)' },
+  running: { bg: 'rgba(200,163,90,0.1)', color: 'var(--primary)', border: 'rgba(200,163,90,0.28)' },
   queued: { bg: 'var(--surface-3)', color: 'var(--text-3)', border: 'var(--border)' },
 }
 
 const SEVERITY_STYLE = {
-  error: { bg: 'rgba(239,68,68,0.1)', color: 'var(--danger)', border: 'rgba(239,68,68,0.25)' },
-  warning: { bg: 'rgba(245,158,11,0.1)', color: 'var(--warning)', border: 'rgba(245,158,11,0.25)' },
-  info: { bg: 'rgba(99,102,241,0.1)', color: 'var(--info)', border: 'rgba(99,102,241,0.25)' },
+  error: { bg: 'rgba(185,95,68,0.1)', color: 'var(--danger)', border: 'rgba(185,95,68,0.28)' },
+  warning: { bg: 'rgba(200,163,90,0.1)', color: 'var(--warning)', border: 'rgba(200,163,90,0.28)' },
+  info: { bg: 'rgba(90,154,140,0.1)', color: 'var(--info)', border: 'rgba(90,154,140,0.28)' },
 }
 
 function StatusBadge({ status }) {
@@ -26,11 +27,11 @@ function StatusBadge({ status }) {
   )
 }
 
-const healthHero = { border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(58,199,139,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))', padding: 24, marginBottom: 24 }
-const heroKicker = { display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--primary-hover)', background: 'var(--primary-subtle)', border: '1px solid rgba(244,176,74,0.25)', borderRadius: 999, padding: '5px 11px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.7 }
-const heroTitle = { margin: '14px 0 8px', color: 'var(--text-1)', fontSize: 'clamp(2rem, 5vw, 3.25rem)', lineHeight: 1, fontWeight: 900, maxWidth: 820 }
+const healthHero = { border: '1px solid var(--border-strong)', borderLeft: '3px solid var(--secondary)', borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(77,165,131,0.12), rgba(200,163,90,0.07) 44%, var(--surface-2))', padding: 24, marginBottom: 24 }
+const heroKicker = { display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--text-3)', background: 'rgba(10,14,13,0.5)', border: '1px solid var(--border-strong)', borderRadius: 2, padding: '5px 11px', fontSize: 10.5 }
+const heroTitle = { margin: '14px 0 8px', color: 'var(--text-1)', fontSize: 'clamp(1.9rem, 4.4vw, 3rem)', lineHeight: 1.05, letterSpacing: '-0.015em', fontWeight: 650, maxWidth: 820 }
 const heroSub = { color: 'var(--text-2)', fontSize: 14.5, lineHeight: 1.65, margin: 0, maxWidth: 760 }
-const heroBadge = { display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-strong)', borderRadius: 999, padding: '6px 10px', color: 'var(--text-2)', fontSize: 12, fontWeight: 800 }
+const heroBadge = { display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, background: 'rgba(10,14,13,0.5)', border: '1px solid var(--border-strong)', borderRadius: 2, padding: '6px 10px', color: 'var(--text-2)', fontFamily: 'var(--font-mono)', fontSize: 10.5, letterSpacing: '0.08em' }
 function SeverityBadge({ severity }) {
   const st = SEVERITY_STYLE[severity] || SEVERITY_STYLE.info
   return (
@@ -84,9 +85,10 @@ export default function DataHealthPage() {
   const tdS = { padding: '10px 14px', fontSize: 13, color: 'var(--text-2)', borderTop: '1px solid var(--border)' }
 
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1.5rem' }}>
+    <div className="tfx tfx-enter" style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1.5rem' }}>
+      <TerminalFx />
       <section style={healthHero}>
-        <div style={heroKicker}><Sparkles size={15} /> Data Operations</div>
+        <div className="tfx-kicker" style={heroKicker}><Sparkles size={13} /> DATA OPERATIONS</div>
         <h1 style={heroTitle}>Pipeline health and ingestion history.</h1>
         <p style={heroSub}>Monitor data jobs, issue severity, and stale companies without mixing operational alerts with research conclusions.</p>
         <span style={heroBadge}><Database size={13} /> Audit workflow</span>
@@ -94,7 +96,7 @@ export default function DataHealthPage() {
 
       {/* API error banner */}
       {apiError && (
-        <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius-md)', padding: '12px 16px', marginBottom: 20, color: 'var(--danger)', fontSize: 13 }}>
+        <div style={{ background: 'rgba(185,95,68,0.1)', border: '1px solid rgba(185,95,68,0.4)', borderRadius: 'var(--radius-md)', padding: '12px 16px', marginBottom: 20, color: 'var(--danger)', fontSize: 13 }}>
           ⚠ Could not load data health information. Make sure the backend is running and you are logged in.
         </div>
       )}
@@ -228,10 +230,13 @@ export default function DataHealthPage() {
             <button
               key={f}
               onClick={() => setFilter(f)}
+              className="tfx-tab"
+              aria-pressed={filter === f}
               style={{
                 background: filter === f ? 'var(--primary-muted)' : 'var(--surface-2)',
                 border: `1px solid ${filter === f ? 'var(--primary)' : 'var(--border)'}`,
-                borderRadius: 'var(--radius-md)', padding: '4px 12px', fontSize: 12, fontWeight: 500,
+                borderRadius: 2, padding: '4px 12px', fontFamily: 'var(--font-mono)', fontSize: 11,
+                letterSpacing: '0.06em', textTransform: 'uppercase',
                 color: filter === f ? 'var(--primary)' : 'var(--text-3)', cursor: 'pointer',
               }}
             >

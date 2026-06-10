@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Search, ShieldCheck, Sparkles } from 'lucide-react'
 import { researchApi } from '../api/researchApi'
 import { MetricCard, MiniBar, SignalBadge, formatNumber, asText, NOT_ADVICE } from '../utils/safeRender'
+import TerminalFx from '../components/TerminalFx'
 
 // score band -> business status (score is a 0..1 fundamental rank, not advice)
 function statusOf(score) {
@@ -69,10 +70,11 @@ export default function CompaniesResearchPage() {
     : null
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 22, maxWidth: 1320, margin: '0 auto', padding: '4px 6px' }}>
+    <div className="tfx tfx-enter" style={{ display: 'flex', flexDirection: 'column', gap: 22, maxWidth: 1320, margin: '0 auto', padding: '4px 6px' }}>
+      <TerminalFx />
       <section style={styles.hero}>
         <div>
-          <div style={styles.kicker}><Sparkles size={15} /> Research Universe</div>
+          <div className="tfx-kicker" style={styles.kicker}><Sparkles size={13} /> RESEARCH UNIVERSE</div>
           <h1 style={styles.title}>Ranked company cards for the validated BIST universe.</h1>
           <p style={styles.subtitle}>
             Latest-year research scores for {asText(data?.count)} selected companies. Scores summarize
@@ -131,16 +133,14 @@ export default function CompaniesResearchPage() {
 }
 
 function CompanyCard({ c, st, onClick }) {
-  const [hover, setHover] = useState(false)
   const hasScore = c.ml_score != null
 
   return (
-    <div onClick={onClick} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+    <div className="tfx-card" role="button" tabIndex={0} onClick={onClick}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() } }}
       style={{ cursor: 'pointer', background: 'var(--surface-2)',
-        border: `1px solid ${hover ? 'var(--border-bright)' : 'var(--border-strong)'}`,
-        borderRadius: 'var(--radius-lg)', padding: 16, display: 'flex', flexDirection: 'column', gap: 11,
-        transition: 'border-color .15s, transform .12s, box-shadow .15s',
-        transform: hover ? 'translateY(-2px)' : 'none', boxShadow: hover ? 'var(--shadow-sm)' : 'none' }}>
+        border: '1px solid var(--border-strong)',
+        borderRadius: 'var(--radius-lg)', padding: 16, display: 'flex', flexDirection: 'column', gap: 11 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
           <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-1)' }}>{c.ticker}</span>
@@ -171,30 +171,29 @@ const styles = {
     gap: 18,
     alignItems: 'end',
     border: '1px solid var(--border-strong)',
+    borderLeft: '3px solid var(--secondary)',
     borderRadius: 'var(--radius-lg)',
-    background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(58,199,139,0.08) 44%, var(--surface-2))',
+    background: 'linear-gradient(135deg, rgba(200,163,90,0.12), rgba(77,165,131,0.07) 44%, var(--surface-2))',
     padding: 24,
   },
   kicker: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 7,
-    color: 'var(--primary-hover)',
-    background: 'var(--primary-subtle)',
-    border: '1px solid rgba(244,176,74,0.25)',
-    borderRadius: 999,
+    color: 'var(--text-3)',
+    border: '1px solid var(--border-strong)',
+    background: 'rgba(10,14,13,0.5)',
+    borderRadius: 2,
     padding: '5px 11px',
-    fontSize: 12,
-    fontWeight: 800,
-    textTransform: 'uppercase',
-    letterSpacing: 0.7,
+    fontSize: 10.5,
   },
   title: {
     margin: '14px 0 8px',
     color: 'var(--text-1)',
-    fontSize: 'clamp(2rem, 5vw, 3.35rem)',
-    lineHeight: 1,
-    fontWeight: 900,
+    fontSize: 'clamp(1.9rem, 4.4vw, 3rem)',
+    lineHeight: 1.05,
+    letterSpacing: '-0.015em',
+    fontWeight: 650,
     maxWidth: 820,
   },
   subtitle: {
@@ -211,17 +210,18 @@ const styles = {
     marginTop: 16,
   },
   searchPanel: {
-    background: 'rgba(8,15,26,0.54)',
+    background: 'rgba(10,14,13,0.6)',
     border: '1px solid var(--border-strong)',
     borderRadius: 'var(--radius-md)',
     padding: 16,
   },
   searchLabel: {
-    color: 'var(--text-3)',
-    fontSize: 11,
-    fontWeight: 900,
+    color: 'var(--text-4)',
+    fontFamily: 'var(--font-mono)',
+    fontSize: 9.5,
+    fontWeight: 600,
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: '0.24em',
     marginBottom: 8,
   },
   searchBox: {
