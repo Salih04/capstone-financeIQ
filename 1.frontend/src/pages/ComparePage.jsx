@@ -571,6 +571,11 @@ export default function ComparePage() {
           )}
         </div>
       )}
+
+      <footer className="tfx-caveat">
+        <span className="tfx-pulse" aria-hidden="true" />
+        Side-by-side diagnostic comparison · Research only · Not investment advice
+      </footer>
     </div>
   )
 }

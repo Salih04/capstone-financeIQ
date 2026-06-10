@@ -857,6 +857,11 @@ export default function CompanyPage() {
           )}
         </Card>
       )}
+
+      <footer className="tfx-caveat">
+        <span className="tfx-pulse" aria-hidden="true" />
+        Company diagnostic cockpit · Research only · Not investment advice
+      </footer>
     </div>
   )
 }

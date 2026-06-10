@@ -122,6 +122,11 @@ export default function CompanyResearchDetailPage() {
       </EvidencePanel>
 
       <CollapsibleJson label="View raw response (debug)" value={{ detail, score }} />
+
+      <footer className="tfx-caveat">
+        <span className="tfx-pulse" aria-hidden="true" />
+        Company research snapshot · Walk-forward IC ≈ 0 · Research only · Not investment advice
+      </footer>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import api from '../api/client'
 
 // ---------------------------------------------------------------------------
 // AI Research Assistant — a research query instrument, not a chat.
@@ -74,6 +75,7 @@ const INTENTS = [
     key: 'BENCHMARK_OUTPERFORMERS',
     label: 'BENCHMARK OUTPERFORMERS',
     desc: 'beat BIST100 in T+1 · historical evaluation',
+    question: 'Which companies outperformed BIST100 in T+1?',
     ms: 412,
     subtitle: 'Tickers whose realized T+1 return exceeded BIST100, 2020–2024. Historical fact, not a forecast.',
     select: (rs) => rs.filter((r) => r.hybrid_score >= 50),
@@ -82,6 +84,7 @@ const INTENTS = [
     key: 'TOP_RANKED',
     label: 'TOP RANKED',
     desc: 'highest composite research score',
+    question: 'Which stocks have the highest composite research score?',
     ms: 340,
     subtitle: 'Composite diagnostic ranking across the validated universe. Ranking signal, not predictive certainty.',
     select: (rs) => [...rs].sort((a, b) => a.rank - b.rank),
@@ -90,6 +93,7 @@ const INTENTS = [
     key: 'DATA_QUALITY',
     label: 'DATA QUALITY',
     desc: 'coverage & feature completeness',
+    question: 'Give a coverage and feature completeness overview of the universe.',
     ms: 287,
     subtitle: 'Universe ordered by validated feature coverage. Grainy entries carry thin data by design.',
     select: (rs) => [...rs].sort((a, b) => b.coverage - a.coverage),
@@ -98,14 +102,16 @@ const INTENTS = [
     key: 'VALUATION_SCREEN',
     label: 'VALUATION SCREEN',
     desc: 'P/E · P/B · EV/EBITDA ranked',
+    question: 'Rank the universe by validated valuation features (P/E, P/B, EV/EBITDA).',
     ms: 365,
     subtitle: 'Valuation-feature composite from validated year-end inputs only. Frozen snapshots are excluded.',
     select: (rs) => [...rs].sort((a, b) => b.ml_score - a.ml_score),
   },
   {
     key: 'DIAGNOSTICS',
-    label: 'DIAGNOSTICS',
+    label: 'MODEL DIAGNOSTICS',
     desc: 'model health · IC · contributions',
+    question: 'Why is the model signal weak?',
     ms: 198,
     subtitle: 'Model health view. Walk-forward IC ≈ 0 across 2020–2024 — the instrument reports its own weakness.',
     select: (rs) => [...rs].sort((a, b) => b.ml_score - a.ml_score),
@@ -142,12 +148,33 @@ function ScopeBar({ label, weight, value, color }) {
   )
 }
 
-function SignalReadout({ r }) {
+function AiStatus({ ai }) {
+  if (!ai) return null
+  return (
+    <div className={`ra-aistatus ${ai.state === 'ACTIVE' ? 'is-active' : 'is-fallback'}`}>
+      <div className="ra-aistatus-line">AI STATUS · {ai.state}</div>
+      {ai.state === 'ACTIVE' ? (
+        <>
+          <div className="ra-aistatus-sub">Model: {ai.model}</div>
+          <div className="ra-aistatus-sub">Hybrid: 0.65·ML + 0.20·CI + 0.15·LLM</div>
+        </>
+      ) : (
+        <>
+          <div className="ra-aistatus-sub">Running on validated project data.</div>
+          <div className="ra-aistatus-sub">LLM unavailable — deterministic mode.</div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function SignalReadout({ r, ai }) {
   if (!r) {
     return (
       <aside className="ra-readout" key="resting" aria-live="polite">
         <div className="ra-readout-kicker">SIGNAL READOUT · SYSTEM STATUS</div>
-        <div className="ra-readout-sub" style={{ marginTop: 0 }}>HYBRID WEIGHTS</div>
+        <AiStatus ai={ai} />
+        <div className="ra-readout-sub" style={{ marginTop: ai ? 14 : 0 }}>HYBRID WEIGHTS</div>
         <ScopeBar label="ML" weight={W.ml} value={W.ml} color="var(--ra-emerald)" />
         <ScopeBar label="CONFIDENCE" weight={W.confidence} value={W.confidence} color="var(--ra-gold)" />
         <ScopeBar label="LLM" weight={W.llm} value={W.llm} color="var(--ra-copper)" />
@@ -163,6 +190,7 @@ function SignalReadout({ r }) {
   return (
     <aside className="ra-readout" key={r.ticker} aria-live="polite">
       <div className="ra-readout-kicker">SIGNAL READOUT</div>
+      <AiStatus ai={ai} />
       <div className="ra-readout-head">
         <span className="ra-readout-ticker">{r.ticker}</span>
         <span className="ra-readout-rank">RANK #{r.rank}</span>
@@ -211,6 +239,13 @@ export default function AIResearchAssistantPage() {
   const [intentKey, setIntentKey] = useState(RESEARCH_MOCK.activeIntent)
   const [phase, setPhase] = useState(reduceMotion ? 'ready' : 'resolving')
   const [hovered, setHovered] = useState(null)
+  const [queryText, setQueryText] = useState(
+    INTENTS.find((i) => i.key === RESEARCH_MOCK.activeIntent)?.question || '',
+  )
+  const [custom, setCustom] = useState(false)
+  const [asking, setAsking] = useState(false)
+  const [answer, setAnswer] = useState(null)
+  const [askErr, setAskErr] = useState(null)
 
   const intent = INTENTS.find((i) => i.key === intentKey)
   const results = useMemo(() => intent.select(RESEARCH_MOCK.results), [intent])
@@ -223,11 +258,42 @@ export default function AIResearchAssistantPage() {
     return () => clearTimeout(id)
   }, [intentKey, reduceMotion])
 
-  const selectIntent = (key) => {
-    if (key === intentKey) return
-    setHovered(null)
-    setIntentKey(key)
+  // POST /research/ask — identical contract to the pre-redesign agent page.
+  const ask = async (text) => {
+    const q = String(text || '').trim()
+    if (!q || asking) return
+    setAsking(true)
+    setAskErr(null)
+    setAnswer(null)
+    if (!reduceMotion) setPhase('resolving')
+    try {
+      const r = await api.post('/research/ask', { question: q })
+      setAnswer(r.data)
+    } catch (e) {
+      const d = e?.response?.data?.detail
+      setAskErr(typeof d === 'string' ? d : 'Query failed — agent endpoint unreachable.')
+    } finally {
+      setAsking(false)
+      if (!reduceMotion) setTimeout(() => setPhase('ready'), 120)
+      else setPhase('ready')
+    }
   }
+
+  const selectIntent = (key) => {
+    const next = INTENTS.find((i) => i.key === key)
+    setHovered(null)
+    setCustom(false)
+    setIntentKey(key)
+    setQueryText(next?.question || '')
+    ask(next?.question)
+  }
+
+  // derived AI status for the readout
+  const ai = answer
+    ? (answer.llm_used
+      ? { state: 'ACTIVE', model: answer.model || answer.diagnostics?.configured_model || 'local model' }
+      : { state: 'FALLBACK' })
+    : (askErr ? { state: 'FALLBACK' } : null)
 
   return (
     <div className="ra">
@@ -254,7 +320,7 @@ export default function AIResearchAssistantPage() {
         <nav className="ra-tuner" aria-label="Query intent">
           <div className="ra-tuner-label">QUERY SCOPE</div>
           {INTENTS.map((i) => {
-            const on = i.key === intentKey
+            const on = i.key === intentKey && !custom
             return (
               <button
                 key={i.key}
@@ -271,6 +337,29 @@ export default function AIResearchAssistantPage() {
               </button>
             )
           })}
+
+          {/* custom query — instrument input, not a chat box */}
+          <div className={`ra-query ${custom ? 'is-custom' : ''}`}>
+            <label className="ra-query-label" htmlFor="ra-query-input">
+              {custom ? 'CUSTOM QUERY · ACTIVE' : 'CUSTOM QUERY'}
+            </label>
+            <input
+              id="ra-query-input"
+              className="ra-query-input"
+              value={queryText}
+              placeholder="Which stocks beat BIST100 in 2025?"
+              onChange={(e) => { setQueryText(e.target.value); setCustom(true) }}
+              onKeyDown={(e) => { if (e.key === 'Enter') ask(queryText) }}
+            />
+            <button
+              type="button"
+              className="ra-query-run"
+              disabled={asking || !queryText.trim()}
+              onClick={() => ask(queryText)}
+            >
+              {asking ? 'QUERYING…' : 'RUN QUERY →'}
+            </button>
+          </div>
         </nav>
 
         {/* ── Results field ───────────────────────────── */}
@@ -282,12 +371,50 @@ export default function AIResearchAssistantPage() {
             </div>
             <div className="ra-resolved">
               <span className={`ra-resolved-dot ${phase === 'resolving' ? 'is-busy' : ''}`} />
-              {phase === 'resolving' ? 'resolving…' : `resolved in ${intent.ms}ms`}
+              {phase === 'resolving' ? 'resolving…' : answer ? 'resolved via /research/ask' : `resolved in ${intent.ms}ms`}
             </div>
           </div>
 
           <div className={`ra-results ${phase}`}>
             <div className="ra-noise" aria-hidden="true" />
+
+            {/* agent response — instrument blocks, not chat bubbles */}
+            {phase === 'ready' && askErr && (
+              <div className="ra-answer is-error">
+                <div className="ra-answer-kicker">AGENT RESPONSE · ERROR</div>
+                <p className="ra-answer-text">{askErr}</p>
+              </div>
+            )}
+            {phase === 'ready' && answer && (
+              <div className="ra-answer">
+                <div className="ra-answer-kicker">
+                  AGENT RESPONSE · {answer.llm_used ? 'AI ASSISTED' : 'DETERMINISTIC'} · GROUNDED IN VALIDATED DATA
+                </div>
+                <div className="ra-answer-sub">SUMMARY</div>
+                <p className="ra-answer-text">{String(answer.answer ?? '')}</p>
+                {answer.llm_result?.reasoning && (
+                  <>
+                    <div className="ra-answer-sub">EVIDENCE</div>
+                    <p className="ra-answer-text">{String(answer.llm_result.reasoning)}</p>
+                  </>
+                )}
+                {Array.isArray(answer.warnings) && answer.warnings.length > 0 && (
+                  <>
+                    <div className="ra-answer-sub">LIMITATIONS</div>
+                    <ul className="ra-answer-warns">
+                      {answer.warnings.map((w, i) => <li key={i}>{String(w)}</li>)}
+                    </ul>
+                  </>
+                )}
+                <div className="ra-answer-meta">
+                  {answer.data_used?.source && (
+                    <span>SOURCE: {String(answer.data_used.source)}{answer.data_used.year ? ` · ${answer.data_used.year}` : ''}</span>
+                  )}
+                  {answer.intent && <span>INTENT: {String(answer.intent).replace(/_/g, ' ').toUpperCase()}</span>}
+                  <span className="is-gold">NOT INVESTMENT ADVICE</span>
+                </div>
+              </div>
+            )}
             {phase === 'ready' && results.map((r, i) => {
               const color = scoreColor(r.hybrid_score)
               const isActive = active?.ticker === r.ticker
@@ -314,7 +441,7 @@ export default function AIResearchAssistantPage() {
           </div>
         </main>
 
-        <SignalReadout r={phase === 'ready' ? active : null} />
+        <SignalReadout r={phase === 'ready' ? active : null} ai={ai} />
       </div>
 
       <footer className="ra-caveat">
@@ -394,6 +521,60 @@ const CSS = `
 .ra-intent.is-on .ra-intent-lamp { background: var(--ra-gold); box-shadow: 0 0 8px rgba(200,163,90,0.8); }
 .ra-intent-name { display: block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; color: var(--ra-paper); }
 .ra-intent-desc { display: block; font-size: 10.5px; color: var(--ra-faint); margin-top: 3px; letter-spacing: 0.02em; }
+
+/* ── custom query ── */
+.ra-query {
+  margin-top: 14px; border: 1px solid rgba(200,211,202,0.16); border-radius: 3px;
+  background: rgba(11,16,15,0.7); padding: 12px 13px;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.ra-query.is-custom { border-color: var(--ra-gold); box-shadow: inset 3px 0 0 var(--ra-gold); }
+.ra-query-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.26em; color: var(--ra-faint); }
+.ra-query.is-custom .ra-query-label { color: var(--ra-gold); }
+.ra-query-input {
+  width: 100%; background: rgba(8,11,10,0.8); border: 1px solid rgba(200,211,202,0.22);
+  border-radius: 2px; padding: 10px 11px; color: var(--ra-paper);
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.02em; outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.ra-query-input::placeholder { color: var(--ra-faint); }
+.ra-query-input:focus { border-color: var(--ra-emerald); box-shadow: 0 0 0 1px rgba(77,165,131,0.35); }
+.ra-query-run {
+  align-self: flex-end; font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.2em; background: var(--ra-gold); color: #0a0e0d; border: 0; border-radius: 2px;
+  padding: 8px 14px; cursor: pointer; transition: box-shadow 0.18s, transform 0.1s;
+}
+.ra-query-run:hover:not(:disabled) { box-shadow: 0 0 16px rgba(200,163,90,0.3); }
+.ra-query-run:active { transform: translateY(1px); }
+.ra-query-run:focus-visible { outline: 1px solid var(--ra-paper); outline-offset: 2px; }
+.ra-query-run:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── agent response ── */
+.ra-answer {
+  border: 1px solid rgba(77,165,131,0.4); border-left: 3px solid var(--ra-emerald);
+  border-radius: 2px; background: rgba(14,20,19,0.7); padding: 14px 16px; margin-bottom: 6px;
+  animation: raCrystal 0.5s ease both;
+}
+.ra-answer.is-error { border-color: rgba(168,103,75,0.5); border-left-color: var(--ra-copper); }
+.ra-answer-kicker { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.22em; color: var(--ra-emerald); margin-bottom: 10px; }
+.ra-answer.is-error .ra-answer-kicker { color: var(--ra-copper); }
+.ra-answer-sub { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.26em; color: var(--ra-faint); margin: 10px 0 5px; }
+.ra-answer-text { margin: 0; font-size: 13px; line-height: 1.65; color: var(--ra-paper); white-space: pre-wrap; }
+.ra-answer-warns { margin: 0; padding-left: 16px; font-size: 11.5px; line-height: 1.6; color: var(--ra-dim); }
+.ra-answer-meta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px;
+  border-top: 1px dashed rgba(200,211,202,0.16); padding-top: 9px;
+  font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.14em; color: var(--ra-faint); }
+.ra-answer-meta .is-gold { color: var(--ra-gold); }
+
+/* ── ai status ── */
+.ra-aistatus { border: 1px dashed rgba(200,211,202,0.22); border-radius: 2px; padding: 9px 11px; margin-bottom: 12px; }
+.ra-aistatus.is-active { border-color: rgba(77,165,131,0.5); }
+.ra-aistatus.is-fallback { border-color: rgba(200,163,90,0.5); }
+.ra-aistatus-line { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.2em; margin-bottom: 5px; }
+.ra-aistatus.is-active .ra-aistatus-line { color: var(--ra-emerald); }
+.ra-aistatus.is-fallback .ra-aistatus-line { color: var(--ra-gold); }
+.ra-aistatus-sub { font-family: var(--font-mono); font-size: 9.5px; color: var(--ra-dim); line-height: 1.6; }
 
 /* ── results field ── */
 .ra-field {

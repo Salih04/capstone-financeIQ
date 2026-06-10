@@ -287,7 +287,16 @@ export default function ForecastingPage() {
         {/* ── Signal Readout ── */}
         <aside className="ft-readout" key={focus ? `${focus.type}-${focus.data.name || focus.data.ticker}` : 'none'} aria-live="polite">
           <div className="ft-readout-kicker">SIGNAL READOUT</div>
-          {!focus && <p className="ft-readout-note">Train parameters to populate the instrument.</p>}
+          {!focus && (
+            <>
+              <div className="ft-readout-tag">INSTRUMENT STANDBY</div>
+              <div className="ft-readout-row"><span>TRAIN WINDOW</span><strong>{trainFrom}–{trainTo}</strong></div>
+              <div className="ft-readout-row"><span>TOP FEATURES</span><strong>{topN}</strong></div>
+              <div className="ft-readout-row"><span>UNIVERSE</span><strong>{mockMode ? FORECASTING_MOCK.options.ticker_count : (options?.ticker_count ?? '—')} TICKERS</strong></div>
+              <div className="ft-readout-row"><span>WALK-FORWARD IC</span><strong style={{ color: '#c8a35a' }}>≈ 0</strong></div>
+              <p className="ft-readout-note">Train parameters to energize the spectrum, then run the ranked field.</p>
+            </>
+          )}
           {focus?.type === 'feature' && (
             <>
               <div className="ft-readout-name">{focus.data.name}</div>

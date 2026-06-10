@@ -278,6 +278,11 @@ export default function DataHealthPage() {
           </tbody>
         </table>
       </Card>
+
+      <footer className="tfx-caveat">
+        <span className="tfx-pulse" aria-hidden="true" />
+        Pipeline operations monitor · Research only · Not investment advice
+      </footer>
     </div>
   )
 }

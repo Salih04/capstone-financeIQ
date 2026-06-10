@@ -571,6 +571,11 @@ export default function ScoreResultPage() {
           <ArrowLeft size={14} /> Back to Companies
         </GhostButton>
       </div>
+
+      <footer className="tfx-caveat">
+        <span className="tfx-pulse" aria-hidden="true" />
+        Diagnostic score readout · Research only · Not investment advice
+      </footer>
     </div>
   )
 }

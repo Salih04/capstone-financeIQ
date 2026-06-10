@@ -100,6 +100,19 @@ const CSS = `
 /* signal-pulse dot */
 .tfx-pulse { animation: tfxPulse 2.2s ease-in-out infinite; }
 
+/* bottom disclaimer strip — same grammar as the instrument pages */
+.tfx-caveat {
+  position: sticky; bottom: 14px; z-index: 4; margin-top: 28px;
+  display: flex; align-items: center; gap: 10px; width: fit-content; max-width: 100%; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em;
+  color: var(--text-1); background: rgba(10,14,13,0.92);
+  border: 1px solid rgba(200,163,90,0.5); border-radius: 2px; padding: 9px 16px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+}
+.tfx-caveat .tfx-pulse {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--primary); flex-shrink: 0;
+}
+
 /* inputs/selects/textareas inside a terminal page: emerald focus signal */
 .tfx input:focus, .tfx textarea:focus, .tfx select:focus {
   border-color: var(--secondary) !important;
