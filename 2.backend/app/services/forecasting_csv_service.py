@@ -1,8 +1,12 @@
 """Forecasting service backed by the validated CSV pipeline.
 
-Uses data/trusted_clean/modeling_dataset_public_2020_2025.csv (or fallback) so
-the forecasting page works immediately without requiring XLSX imports or DB
-population. This is a deterministic, honest baseline:
+Uses the validated CSV pipeline:
+  - training/model fitting: data/trusted_clean/modeling_dataset_training_2020_2025.csv
+  - public options/ranking/explanations: data/trusted_clean/modeling_dataset_public_2020_2025.csv
+
+This keeps the expanded yfinance training universe internal while exposing only
+the validated public 40-company universe in the UI. This is a deterministic,
+honest baseline:
 
   1. Training: identify top-quartile returners (historical winners) per year,
      measure per-feature discrimination power → normalised weights.
@@ -28,8 +32,9 @@ import pandas as pd
 # Paths
 # ---------------------------------------------------------------------------
 _REPO_ROOT = Path(__file__).resolve().parents[3]
+_TRAINING_CSV = _REPO_ROOT / "data" / "trusted_clean" / "modeling_dataset_training_2020_2025.csv"
 _PUBLIC_CSV = _REPO_ROOT / "data" / "trusted_clean" / "modeling_dataset_public_2020_2025.csv"
-_FALLBACK_CSV = _REPO_ROOT / "data" / "trusted_clean" / "modeling_dataset_2020_2025.csv"
+_BASE_CSV = _REPO_ROOT / "data" / "trusted_clean" / "modeling_dataset_2020_2025.csv"
 
 DISCLAIMER = "Experimental ranking signal — NOT investment advice. Do not use for buy/sell/hold decisions."
 
@@ -47,15 +52,31 @@ _NON_FEATURES = {
 _WINNER_PERCENTILE = 0.75   # top 25% by next-year return = winner
 
 
-def _load_df() -> pd.DataFrame:
-    p = _PUBLIC_CSV if _PUBLIC_CSV.is_file() else _FALLBACK_CSV
-    if not p.is_file():
+def _read_modeling_csv(path: Path, label: str) -> pd.DataFrame:
+    if not path.is_file():
         raise FileNotFoundError(
-            "Modeling dataset not found. Run `make data && make split-datasets`."
+            f"{label} dataset not found at {path}. Run `make full-research-agent`."
         )
-    df = pd.read_csv(p)
+    df = pd.read_csv(path)
     df["ticker"] = df["ticker"].astype(str).str.strip().str.upper()
     return df
+
+
+def _load_public_df() -> pd.DataFrame:
+    """Public-facing 40-company universe for dropdowns, rankings, and explain."""
+    p = _PUBLIC_CSV if _PUBLIC_CSV.is_file() else _BASE_CSV
+    return _read_modeling_csv(p, "public modeling")
+
+
+def _load_training_df() -> pd.DataFrame:
+    """Internal training universe, expanded with yfinance training-only rows."""
+    p = _TRAINING_CSV if _TRAINING_CSV.is_file() else _BASE_CSV
+    return _read_modeling_csv(p, "training modeling")
+
+
+def _load_df() -> pd.DataFrame:
+    """Backward-compatible alias: public-facing data by default."""
+    return _load_public_df()
 
 
 def _feature_cols(df: pd.DataFrame) -> list[str]:
@@ -94,7 +115,8 @@ def get_options() -> dict[str, Any]:
         "ticker_count": len(tickers),
         "tickers": tickers,
         "data_source": "modeling_dataset_public_2020_2025.csv",
-        "note": "CSV-backed pipeline. No XLSX import or DB population required.",
+        "training_data_source": "modeling_dataset_training_2020_2025.csv",
+        "note": "CSV-backed pipeline. Public options show 40 companies; training uses the expanded internal universe.",
     }
 
 
@@ -110,7 +132,7 @@ def train_parameters(
 
     Returns ranked list of features with weights in [0, 1].
     """
-    df = _load_df()
+    df = _load_training_df()
     feat_cols = _feature_cols(df)
 
     train_mask = (
