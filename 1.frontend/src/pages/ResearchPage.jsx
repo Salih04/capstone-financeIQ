@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import api from '../api/client'
+import { getCached, setCached } from '../utils/sessionCache'
 
 // ---------------------------------------------------------------------------
 // Score Explorer — THE DISSECTION TABLE.
@@ -55,6 +56,10 @@ const SCORE_EXPLORER_MOCK = {
 }
 
 const CAT_COLORS = ['#4da583', '#5a9a8c', '#7a8a80', '#c8a35a', '#a8674b', '#8c8a5e']
+const RESEARCH_PAGE_CACHE_KEY = 'page:research'
+const RESEARCH_YEARS_CACHE_KEY = 'page:research:years'
+const researchScoresCacheKey = (year) => `page:research:scores:${year}`
+const researchDetailCacheKey = (year, ticker) => `page:research:detail:${year}:${ticker}`
 const clampPct = (v) => Math.max(0, Math.min(100, Number(v) || 0))
 const fmt1 = (v) => (v == null || Number.isNaN(Number(v)) ? '—' : Number(v).toFixed(1))
 
@@ -85,46 +90,119 @@ function buildDissection(detail, mockMode) {
 }
 
 export default function ResearchPage() {
-  const [years, setYears] = useState([])
-  const [year, setYear] = useState(null)
-  const [companies, setCompanies] = useState([])
-  const [selected, setSelected] = useState(null)
-  const [detail, setDetail] = useState(null)
+  const cachedPage = useMemo(() => getCached(RESEARCH_PAGE_CACHE_KEY), [])
+  const cachedYears = useMemo(() => getCached(RESEARCH_YEARS_CACHE_KEY), [])
+  const initialYears = cachedPage?.years?.length ? cachedPage.years : (cachedYears || [])
+  const initialYear = cachedPage?.year ?? initialYears[initialYears.length - 1] ?? null
+  const cachedScores = useMemo(
+    () => (initialYear ? getCached(researchScoresCacheKey(initialYear)) : undefined),
+    [initialYear],
+  )
+  const initialCompanies = cachedPage?.companies?.length ? cachedPage.companies : (cachedScores || [])
+  const initialSelected = cachedPage?.selected ?? initialCompanies[0]?.ticker ?? null
+  const cachedDetail = useMemo(
+    () => (initialYear && initialSelected ? getCached(researchDetailCacheKey(initialYear, initialSelected)) : undefined),
+    [initialYear, initialSelected],
+  )
+  const [years, setYears] = useState(() => initialYears)
+  const [year, setYear] = useState(() => initialYear)
+  const [companies, setCompanies] = useState(() => initialCompanies)
+  const [selected, setSelected] = useState(() => initialSelected)
+  const [detail, setDetail] = useState(() => cachedPage?.detail ?? cachedDetail ?? null)
   const [query, setQuery] = useState('')
   const [openCat, setOpenCat] = useState(null)
   const [mockMode, setMockMode] = useState(false)
 
   useEffect(() => {
+    let mounted = true
+
     api.get('/research/years')
       .then(({ data }) => {
+        if (!mounted) return
         if (data?.years?.length) {
           setYears(data.years)
+          setCached(RESEARCH_YEARS_CACHE_KEY, data.years)
           setYear(data.years[data.years.length - 1])
-        } else setMockMode(true)
+        } else if (!getCached(RESEARCH_YEARS_CACHE_KEY)?.length) setMockMode(true)
       })
-      .catch(() => setMockMode(true))
+      .catch(() => {
+        if (mounted && !getCached(RESEARCH_YEARS_CACHE_KEY)?.length) setMockMode(true)
+      })
+
+    return () => {
+      mounted = false
+    }
   }, [])
 
   useEffect(() => {
     if (!year) return
+    let mounted = true
+    const cached = getCached(researchScoresCacheKey(year))
+
+    if (cached?.length) {
+      setCompanies(cached)
+      setSelected((s) => (cached.some((r) => r.ticker === s) ? s : cached[0].ticker))
+    }
+
     api.get('/research/scores', { params: { year } })
       .then(({ data }) => {
+        if (!mounted) return
         const rows = (data?.companies || [])
           .slice()
           .sort((a, b) => (b.fundamental_score || 0) - (a.fundamental_score || 0))
-        if (rows.length === 0) { setMockMode(true); return }
+        if (rows.length === 0) {
+          if (!getCached(researchScoresCacheKey(year))?.length) setMockMode(true)
+          return
+        }
         setCompanies(rows)
+        setCached(researchScoresCacheKey(year), rows)
         setSelected((s) => (rows.some((r) => r.ticker === s) ? s : rows[0].ticker))
       })
-      .catch(() => setMockMode(true))
+      .catch(() => {
+        if (mounted && !getCached(researchScoresCacheKey(year))?.length) setMockMode(true)
+      })
+
+    return () => {
+      mounted = false
+    }
   }, [year])
 
   useEffect(() => {
     if (!year || !selected || mockMode) return
+    let mounted = true
+    const cached = getCached(researchDetailCacheKey(year, selected))
+
+    if (cached) {
+      setDetail(cached)
+    } else {
+      setDetail(null)
+    }
+
     api.get('/research/company', { params: { ticker: selected, year } })
-      .then(({ data }) => setDetail(data))
-      .catch(() => setDetail(null))
+      .then(({ data }) => {
+        if (!mounted) return
+        setDetail(data)
+        if (data) setCached(researchDetailCacheKey(year, selected), data)
+      })
+      .catch(() => {
+        if (mounted && !cached) setDetail(null)
+      })
+
+    return () => {
+      mounted = false
+    }
   }, [year, selected, mockMode])
+
+  useEffect(() => {
+    if (mockMode || (!years.length && !companies.length && !detail)) return
+    setCached(RESEARCH_PAGE_CACHE_KEY, {
+      years,
+      year,
+      companies,
+      selected,
+      detail,
+    })
+  }, [years, year, companies, selected, detail, mockMode])
 
   const dissection = useMemo(() => buildDissection(detail, mockMode), [detail, mockMode])
   const list = mockMode

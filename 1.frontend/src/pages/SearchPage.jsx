@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/client'
+import { getCached, setCached } from '../utils/sessionCache'
 
 // ---------------------------------------------------------------------------
 // Companies — research map. Tickers positioned by research score (x) and
@@ -63,6 +64,7 @@ const SECTOR_COLORS = {
   Telecom: '#6e7f96',
 }
 const SECTORS = Object.keys(SECTOR_COLORS)
+const SEARCH_COMPANIES_CACHE_KEY = 'page:companies'
 
 // Map API sector_code values to visual sector categories used in SECTOR_COLORS
 const SECTOR_CODE_TO_VISUAL = {
@@ -243,17 +245,24 @@ export default function SearchPage() {
   const [sector, setSector] = useState(null)
   const [view, setView] = useState('map')
   const [hovered, setHovered] = useState(null)
-  const [rawData, setRawData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const cachedCompanies = useMemo(() => getCached(SEARCH_COMPANIES_CACHE_KEY), [])
+  const [rawData, setRawData] = useState(() => cachedCompanies ?? null)
+  const [loading, setLoading] = useState(() => !cachedCompanies)
 
   const fetchCompanies = useCallback(async () => {
-    setLoading(true)
+    const cached = getCached(SEARCH_COMPANIES_CACHE_KEY)
+    if (!cached) setLoading(true)
     try {
       const { data } = await api.get('/companies?limit=500')
       const arr = Array.isArray(data) ? data : []
-      setRawData(arr.length > 0 ? arr : null)
+      if (arr.length > 0) {
+        setRawData(arr)
+        setCached(SEARCH_COMPANIES_CACHE_KEY, arr)
+      } else if (!cached) {
+        setRawData(null)
+      }
     } catch {
-      setRawData(null)
+      if (!cached) setRawData(null)
     } finally {
       setLoading(false)
     }

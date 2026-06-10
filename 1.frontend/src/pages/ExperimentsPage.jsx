@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { researchApi } from '../api/researchApi'
+import { getCached, setCached } from '../utils/sessionCache'
 
 // ---------------------------------------------------------------------------
 // Experiments — THE SEISMOGRAPH.
@@ -23,6 +24,7 @@ const EXPERIMENTS_MOCK = {
   mean_ic_all_models: 0.033,
   mean_ic_baseline: 0.070,
 }
+const EXPERIMENTS_CACHE_KEY = 'page:experiments'
 
 const MODEL_LABELS = {
   baseline_equal_weight: 'Equal-weight',
@@ -149,15 +151,34 @@ function TraceBand({ trace, years, hovered, onHover }) {
 }
 
 export default function ExperimentsPage() {
-  const [exp, setExp] = useState(null)
+  const cachedPage = useMemo(() => getCached(EXPERIMENTS_CACHE_KEY), [])
+  const [exp, setExp] = useState(() => cachedPage?.exp ?? null)
   const [failed, setFailed] = useState(false)
   const [hovered, setHovered] = useState(null)
 
   useEffect(() => {
+    let mounted = true
+
     researchApi.experiments()
-      .then((r) => setExp(r.data))
-      .catch(() => setFailed(true))
-  }, [])
+      .then((r) => {
+        if (r.data) {
+          setCached(EXPERIMENTS_CACHE_KEY, { exp: r.data })
+          if (mounted) {
+            setExp(r.data)
+            setFailed(false)
+          }
+        } else if (!cachedPage?.exp && mounted) {
+          setFailed(true)
+        }
+      })
+      .catch(() => {
+        if (!cachedPage?.exp && mounted) setFailed(true)
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [cachedPage])
 
   const { traces, fromApi } = useMemo(() => buildTraces(failed ? null : exp), [exp, failed])
   const years = useMemo(

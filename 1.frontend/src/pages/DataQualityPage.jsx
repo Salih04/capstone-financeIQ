@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { researchApi } from '../api/researchApi'
+import { getCached, setCached } from '../utils/sessionCache'
 
 // ---------------------------------------------------------------------------
 // Data Quality — THE SPECIMEN ARCHIVE.
@@ -47,6 +48,7 @@ const GROUP_LABEL = {
 }
 
 const IC_BY_YEAR = { 2020: 0.08, 2021: -0.11, 2022: -0.14, 2023: 0.03, 2024: 0.12 }
+const DATA_QUALITY_CACHE_KEY = 'page:data-quality'
 
 const covSum = (c) => c.reduce((a, b) => a + b, 0)
 
@@ -174,20 +176,37 @@ function SpecimenTile({ s, active, onHover }) {
 }
 
 export default function DataQualityPage() {
-  const [dq, setDq] = useState(null)
-  const [summary, setSummary] = useState(null)
-  const [evi, setEvi] = useState(null)
-  const [acceptedLoading, setAcceptedLoading] = useState(true)
-  const [rejectedLoading, setRejectedLoading] = useState(true)
-  const [frozenEvidenceLoading, setFrozenEvidenceLoading] = useState(true)
+  const cachedPage = useMemo(() => getCached(DATA_QUALITY_CACHE_KEY), [])
+  const hasCachedSpecimens = Boolean(cachedPage?.dq || cachedPage?.summary)
+  const [dq, setDq] = useState(() => cachedPage?.dq ?? null)
+  const [summary, setSummary] = useState(() => cachedPage?.summary ?? null)
+  const [evi, setEvi] = useState(() => cachedPage?.evi ?? null)
+  const [acceptedLoading, setAcceptedLoading] = useState(() => !hasCachedSpecimens)
+  const [rejectedLoading, setRejectedLoading] = useState(() => !hasCachedSpecimens)
+  const [frozenEvidenceLoading, setFrozenEvidenceLoading] = useState(() => !cachedPage?.evi)
   const [hovered, setHovered] = useState(null)
 
   useEffect(() => {
     let mounted = true
+    let nextDq = cachedPage?.dq ?? null
+    let nextSummary = cachedPage?.summary ?? null
+    let nextEvi = cachedPage?.evi ?? null
+
+    const persist = () => {
+      setCached(DATA_QUALITY_CACHE_KEY, {
+        dq: nextDq,
+        summary: nextSummary,
+        evi: nextEvi,
+      })
+    }
 
     const dataQualityRequest = researchApi.dataQuality().then(
       (r) => {
-        if (mounted) setDq(r.data)
+        if (r.data) {
+          nextDq = r.data
+          persist()
+          if (mounted) setDq(r.data)
+        }
         return r.data
       },
       () => null,
@@ -195,7 +214,11 @@ export default function DataQualityPage() {
 
     const summaryRequest = researchApi.summary().then(
       (r) => {
-        if (mounted) setSummary(r.data)
+        if (r.data) {
+          nextSummary = r.data
+          persist()
+          if (mounted) setSummary(r.data)
+        }
         return r.data
       },
       () => null,
@@ -203,7 +226,11 @@ export default function DataQualityPage() {
 
     const frozenEvidenceRequest = researchApi.frozenEvidence().then(
       (r) => {
-        if (mounted) setEvi(r.data)
+        if (r.data) {
+          nextEvi = r.data
+          persist()
+          if (mounted) setEvi(r.data)
+        }
         return r.data
       },
       () => null,
@@ -222,7 +249,7 @@ export default function DataQualityPage() {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [cachedPage])
 
   const { accepted, rejected, fromApi } = useMemo(
     () => buildSpecimens(dq, summary, { allowFallback: !acceptedLoading && !rejectedLoading }),

@@ -2,6 +2,16 @@
 
 All notable changes to FinanceIQ, most recent first.
 
+## Unreleased
+
+### Fixed
+- Frontend page navigation now keeps already-loaded Research Terminal data in a
+  lightweight in-memory session cache, so returning to data-quality,
+  experiments, research, or companies pages no longer resets to full loading
+  states during the same app session.
+
+---
+
 ## [3.3.0] — 2026-06-10 — Expanded data/model/AI pipeline
 
 ### Added
