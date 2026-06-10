@@ -1,608 +1,690 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { BrainCircuit, Upload, Play, ListOrdered, Info, ShieldCheck, Sparkles } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { BrainCircuit, Play, ShieldCheck, ChevronRight, Zap, AlertCircle } from 'lucide-react'
 import api from '../api/client'
-import { Card, EmptyState } from '../components/ui'
 
-const PRESET_FILES = [
-  '2020stocks.xlsx',
-  '2021stocks.xlsx',
-  '2022stocks.xlsx',
-  '2023stocks.xlsx',
-  '2024stocks.xlsx',
-  '2025stocks.xlsx',
-]
-
-const inputS = {
-  width: '100%',
-  boxSizing: 'border-box',
-  background: 'var(--surface-1)',
-  border: '1px solid var(--border-strong)',
-  borderRadius: 'var(--radius-md)',
-  color: 'var(--text-1)',
-  padding: '9px 12px',
-  fontSize: 13,
-  outline: 'none',
+const CONFIDENCE_COLOR = {
+  high: 'var(--success)',
+  medium: 'var(--warning)',
+  low: 'var(--danger)',
 }
 
 export default function ForecastingPage() {
-  const navigate = useNavigate()
+  const [options, setOptions] = useState(null)
+  const [optionsErr, setOptionsErr] = useState('')
+
+  const [trainYearFrom, setTrainYearFrom] = useState(2020)
+  const [trainYearTo, setTrainYearTo] = useState(2024)
+  const [topN, setTopN] = useState(12)
+  const [training, setTraining] = useState(false)
+  const [trainResult, setTrainResult] = useState(null)
+  const [trainError, setTrainError] = useState('')
+
+  const [forecastYear, setForecastYear] = useState('')
   const [userType, setUserType] = useState('individual')
   const [riskLevel, setRiskLevel] = useState('medium')
-  const [investmentScope, setInvestmentScope] = useState('')
-  const [portfolioInput, setPortfolioInput] = useState('')
-  const [portfolioResult, setPortfolioResult] = useState(null)
-  const [uploaded, setUploaded] = useState([])
-  const [filters, setFilters] = useState({ years: [], sectors: [] })
-  const [year, setYear] = useState('')
-  const [sector, setSector] = useState('')
-  const [training, setTraining] = useState(false)
   const [running, setRunning] = useState(false)
-  const [cvLoading, setCvLoading] = useState(false)
-  const [modelResult, setModelResult] = useState(null)
-  const [stocksResult, setStocksResult] = useState(null)
-  const [selectedStock, setSelectedStock] = useState(null)
-  const [detail, setDetail] = useState(null)
-  const [msg, setMsg] = useState('')
-  const [modelType, setModelType] = useState('scoring')
-  const [evaluation, setEvaluation] = useState(null)
-  const [history, setHistory] = useState([])
-  const [catalog, setCatalog] = useState([])
-  const [fundamentalsFile, setFundamentalsFile] = useState(null)
+  const [forecastResult, setForecastResult] = useState(null)
+  const [forecastError, setForecastError] = useState('')
 
-  const loadFilters = async () => {
-    try {
-      const { data } = await api.get('/forecasting/filters')
-      setFilters(data)
-      if (!year && data.years?.length) setYear(String(data.years[data.years.length - 1]))
-      if (!sector && data.sectors?.length) setSector(data.sectors[0])
-    } catch {
-      setFilters({ years: [], sectors: [] })
-    }
-  }
+  const [selectedTicker, setSelectedTicker] = useState(null)
+  const [explaining, setExplaining] = useState(false)
+  const [explainResult, setExplainResult] = useState(null)
+  const [explainError, setExplainError] = useState('')
+
+  const [history, setHistory] = useState([])
 
   useEffect(() => {
-    loadFilters()
-    api.get('/predict/history').then(({ data }) => setHistory(data.items || [])).catch(() => setHistory([]))
-    api.get('/parameters/catalog').then(({ data }) => setCatalog(data.items || [])).catch(() => setCatalog([]))
+    api.get('/forecasting/options')
+      .then(({ data }) => {
+        setOptions(data)
+        if (data.all_years?.length) {
+          setForecastYear(String(data.all_years[data.all_years.length - 1]))
+        }
+        if (data.trainable_years?.length) {
+          setTrainYearFrom(data.trainable_years[0])
+          setTrainYearTo(data.trainable_years[data.trainable_years.length - 1])
+        }
+      })
+      .catch((e) => setOptionsErr(e.response?.data?.detail || 'Could not load dataset. Check backend connection.'))
   }, [])
 
-  const uploadPreset = async (fileName) => {
-    setMsg('')
-    try {
-      const { data } = await api.post('/upload-data', { file_name: fileName })
-      setUploaded((prev) => [data, ...prev])
-      await loadFilters()
-      setMsg(`${fileName} imported (${data.imported_rows} rows).`)
-    } catch (e) {
-      setMsg(e.response?.data?.detail || 'Import failed.')
-    }
-  }
-
-  const uploadFundamentals = async () => {
-    if (!fundamentalsFile) {
-      setMsg('Please select quarterly fundamentals CSV first.')
-      return
-    }
-    const form = new FormData()
-    form.append('file', fundamentalsFile)
-    try {
-      const { data } = await api.post('/fundamentals/upload-csv', form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-      // Refetch filters: uploaded fundamentals carry sector + year, so Year/Sector
-      // dropdowns should now populate and Train Parameters become usable.
-      await loadFilters()
-      setMsg(`Corrected financial history loaded (created=${data.created}, updated=${data.updated}, skipped=${data.skipped}). Year/Sector refreshed.`)
-    } catch (e) {
-      setMsg(e.response?.data?.detail || 'Fundamentals upload failed.')
-    }
-  }
-
   const trainModel = async () => {
-    if (!year || !sector) {
-      setMsg('Select year and sector first.')
-      return
-    }
     setTraining(true)
-    setMsg('')
+    setTrainError('')
+    setTrainResult(null)
+    setForecastResult(null)
+    setSelectedTicker(null)
+    setExplainResult(null)
     try {
-      const { data } = await api.post('/train-model', {
-        year: parseInt(year, 10),
-        sector,
-        top_n_parameters: 8,
+      const { data } = await api.post('/forecasting/train', {
+        train_year_from: trainYearFrom,
+        train_year_to: trainYearTo,
+        top_n: topN,
       })
-      setModelResult(data)
-      setMsg(`Model trained for ${sector} (${year}).`)
+      setTrainResult(data)
     } catch (e) {
-      setMsg(e.response?.data?.detail || 'Training failed.')
+      setTrainError(e.response?.data?.detail || 'Training failed.')
     } finally {
       setTraining(false)
     }
   }
 
   const runForecast = async () => {
-    if (!year || !sector) {
-      setMsg('Select year and sector first.')
-      return
-    }
+    if (!trainResult) return
+    const weights = {}
+    trainResult.top_parameters.forEach((p) => { weights[p.name] = p.weight })
     setRunning(true)
-    setMsg('')
+    setForecastError('')
+    setForecastResult(null)
+    setSelectedTicker(null)
+    setExplainResult(null)
     try {
-      const { data } = await api.post('/predict', {
-        year: parseInt(year, 10),
-        sector,
-        user_type: userType,
+      const { data } = await api.post('/forecasting/run', {
+        year: parseInt(forecastYear, 10),
+        trained_weights: weights,
         risk_level: riskLevel,
-        investment_scope: investmentScope ? parseFloat(investmentScope) : null,
-        model_type: modelType,
+        user_type: userType,
       })
-      setStocksResult(data)
-      setSelectedStock(null)
-      setDetail(null)
-      setMsg(`Forecast run completed. ${data.items.length} stocks ranked.`)
-      api.get('/predict/history').then(({ data: h }) => setHistory(h.items || [])).catch(() => {})
+      setForecastResult(data)
+      setHistory((h) => [
+        {
+          year: data.year,
+          risk_level: data.risk_level,
+          stock_count: data.stock_count,
+          ts: new Date().toLocaleTimeString(),
+        },
+        ...h.slice(0, 9),
+      ])
     } catch (e) {
-      setMsg(e.response?.data?.detail || 'Forecast failed.')
+      setForecastError(e.response?.data?.detail || 'Forecast failed.')
     } finally {
       setRunning(false)
     }
   }
 
-  const runEvaluation = async () => {
-    if (!sector) {
-      setMsg('Select sector for evaluation.')
-      return
-    }
-    if (cvLoading) return
-    setCvLoading(true)
+  const openStock = async (ticker) => {
+    setSelectedTicker(ticker)
+    setExplaining(true)
+    setExplainResult(null)
+    setExplainError('')
     try {
-      const { data } = await api.post('/predict/evaluate', {
-        sector,
-        model_type: modelType,
-        window_size: 2,
-      })
-      setEvaluation(data)
-      setMsg('Time-CV evaluation completed.')
+      const params = forecastYear ? { year: parseInt(forecastYear, 10) } : {}
+      const { data } = await api.get(`/forecasting/explain/${encodeURIComponent(ticker)}`, { params })
+      setExplainResult(data)
     } catch (e) {
-      setMsg(e.response?.data?.detail || 'Evaluation failed. You can try again.')
+      setExplainError(e.response?.data?.detail || 'Detail not available.')
     } finally {
-      setCvLoading(false)
+      setExplaining(false)
     }
   }
 
-  const analyzePortfolio = async () => {
-    if (!year || !sector) {
-      setMsg('Select year and sector first.')
-      return
-    }
-    const stock_codes = portfolioInput
-      .split(/[\s,;]+/)
-      .map((s) => s.trim().toUpperCase())
-      .filter(Boolean)
-    if (stock_codes.length === 0) {
-      setMsg('Enter at least one stock code for portfolio analysis.')
-      return
-    }
-    try {
-      const { data } = await api.post('/get-portfolio-analysis', {
-        year: parseInt(year, 10),
-        sector,
-        stock_codes,
-      })
-      setPortfolioResult(data)
-      setMsg('Portfolio analysis completed.')
-    } catch (e) {
-      setMsg(e.response?.data?.detail || 'Portfolio analysis failed.')
-    }
-  }
-
-  const openStock = async (stockCode) => {
-    if (!stocksResult?.run_id) return
-    setSelectedStock(stockCode)
-    try {
-      const { data } = await api.get('/get-stock-detail', {
-        params: { run_id: stocksResult.run_id, stock_code: stockCode },
-      })
-      setDetail(data)
-    } catch {
-      setDetail(null)
-    }
-  }
-
-  const canRun = Boolean(year && sector)
-
-  const topParams = useMemo(() => modelResult?.top_parameters || [], [modelResult])
+  const canTrain = Boolean(options && !optionsErr)
+  const canRun = Boolean(trainResult && forecastYear)
 
   return (
-    <div style={{ maxWidth: 1150, margin: '0 auto', padding: '2rem 1.5rem' }}>
-      <section style={forecastHero}>
-        <div style={heroKicker}><Sparkles size={15} /> Experimental Forecasting</div>
-        <h1 style={heroTitle}>Legacy forecasting tools, clearly marked as experimental.</h1>
-        <p style={heroSub}>
-          Import winner files, train parameter profiles, and run ranking experiments. This page supports exploration only and must not be read as production prediction or investment advice.
-        </p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
-          <span style={heroBadge}><BrainCircuit size={13} /> Experimental</span>
-          <span style={heroBadge}><ShieldCheck size={13} /> Diagnostic output</span>
-        </div>
-      </section>
+    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
 
-      {msg && (
-        <div style={{ marginBottom: 14, fontSize: 13, color: 'var(--text-2)', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '9px 12px' }}>
-          {msg}
-        </div>
-      )}
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 16, marginBottom: 16 }}>
-        <Card style={{ padding: '1rem' }}>
-           <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>Step 1: Import Winner Files</div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {PRESET_FILES.map((f) => (
-              <button
-                key={f}
-                onClick={() => uploadPreset(f)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  border: '1px solid var(--border-strong)',
-                  background: 'var(--surface-1)',
-                  borderRadius: 'var(--radius-md)',
-                  color: 'var(--text-1)',
-                  fontSize: 12,
-                  padding: '8px 10px',
-                  cursor: 'pointer',
-                }}
-              >
-                <Upload size={13} />
-                {f}
-              </button>
-            ))}
-          </div>
-          {uploaded.length > 0 && (
-            <div style={{ marginTop: 10, fontSize: 12, color: 'var(--text-3)' }}>
-              Last import: {uploaded[0].file_name} ({uploaded[0].imported_rows} rows)
+      {/* ── Header ─────────────────────────────────────────────── */}
+      <div style={{ ...panel, marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
+              <BrainCircuit size={15} style={{ color: 'var(--primary)' }} />
+              <span style={kicker}>Research Forecasting Lab</span>
             </div>
-          )}
-
-          <div style={{ marginTop: 14, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
-           <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 8 }}>Upload Quarterly Fundamentals (Exact Ratios, CSV)</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
-              <input
-                type="file"
-                accept=".csv"
-                onChange={(e) => setFundamentalsFile(e.target.files?.[0] || null)}
-                style={{ ...inputS, padding: '7px 10px' }}
-              />
-              <button
-                onClick={uploadFundamentals}
-                style={{
-                  border: '1px solid var(--border-strong)',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'var(--surface-1)',
-                  color: 'var(--text-1)',
-                  fontSize: 12,
-                  padding: '8px 12px',
-                  cursor: 'pointer',
-                }}
-              >
-                Upload CSV
-              </button>
-            </div>
+            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: 'var(--text-1)', lineHeight: 1.2 }}>
+              Parameter-Based Stock Ranking
+            </h1>
+            <p style={{ margin: '5px 0 0', fontSize: 12, color: 'var(--text-3)', lineHeight: 1.6, maxWidth: 700 }}>
+              Derive feature weights from historical top-quartile BIST returners, then rank all public-universe stocks
+              by those learned parameters.
+              {options && (
+                <span style={{ color: 'var(--text-4)' }}>
+                  {' '}· {options.ticker_count} stocks · {options.data_source}
+                </span>
+              )}
+            </p>
           </div>
-        </Card>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignSelf: 'flex-start' }}>
+            <span style={badgeStyle}><ShieldCheck size={10} /> Not investment advice</span>
+            <span style={badgeStyle}><Zap size={10} /> Experimental</span>
+          </div>
+        </div>
+        {optionsErr && (
+          <div style={errorBox}>
+            <AlertCircle size={12} /> {optionsErr}
+          </div>
+        )}
+      </div>
 
-        <Card style={{ padding: '1rem' }}>
-           <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>Step 2: User Setup and Scope</div>
+      {/* ── Steps row ─────────────────────────────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+
+        {/* Step 1: Train */}
+        <div style={panel}>
+          <div style={sectionLabel}>Step 1 · Train Parameters</div>
+          <p style={helpText}>
+            Identify which features best separate top-25% returners from the rest across training years.
+          </p>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
-            <select value={userType} onChange={(e) => setUserType(e.target.value)} style={inputS}>
-              <option value="individual">Individual</option>
-              <option value="advanced">Advanced</option>
-              <option value="corporate">Corporate</option>
-            </select>
-            <select value={riskLevel} onChange={(e) => setRiskLevel(e.target.value)} style={inputS}>
-              <option value="low">Low Risk</option>
-              <option value="medium">Medium Risk</option>
-              <option value="high">High Risk</option>
-            </select>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 8 }}>
-            <select value={year} onChange={(e) => setYear(e.target.value)} style={inputS}>
-              <option value="">Year</option>
-              {filters.years.map((y) => <option key={y} value={y}>{y}</option>)}
-            </select>
-            <select value={sector} onChange={(e) => setSector(e.target.value)} style={inputS}>
-              <option value="">Sector</option>
-              {filters.sectors.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </div>
-          {(filters.years.length === 0 || filters.sectors.length === 0) && (
-            <div style={{ marginTop: 8, fontSize: 11.5, color: 'var(--text-3)', lineHeight: 1.5 }}>
-              Year & Sector populate after importing a Winner file (Step 1) or uploading quarterly
-              fundamentals (Step 2). After upload they refresh automatically.
+            <div>
+              <label style={fieldLabel}>From year</label>
+              <select
+                value={trainYearFrom}
+                onChange={(e) => setTrainYearFrom(parseInt(e.target.value))}
+                style={selectS}
+                disabled={!options}
+              >
+                {(options?.trainable_years || []).map((y) => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
             </div>
-          )}
-          <select value={modelType} onChange={(e) => setModelType(e.target.value)} style={{ ...inputS, marginTop: 8 }}>
-            <option value="scoring">Scoring (Primary)</option>
-            <option value="dbscan">Cluster Profile</option>
-            <option value="gmm">Mixture Profile</option>
-            <option value="xgboost">Tree Ensemble</option>
-            <option value="prophet">Trend Projection</option>
-            <option value="arima">Momentum Projection</option>
-          </select>
-          <input
-            value={investmentScope}
-            onChange={(e) => setInvestmentScope(e.target.value)}
-            placeholder="Investment scope (optional amount)"
-            style={{ ...inputS, marginTop: 8 }}
-          />
-          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-            <button
-              onClick={trainModel}
-              disabled={training}
-              title={canRun ? 'Train solid-parameter model' : 'Select year and sector first'}
-              style={{
-                border: 'none',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--primary)',
-                color: '#fff',
-                fontSize: 12,
-                padding: '8px 12px',
-                cursor: training ? 'wait' : 'pointer',
-                opacity: training ? 0.7 : canRun ? 1 : 0.75,
-              }}
-            >
-              {training ? 'Training...' : 'Train Parameters'}
-            </button>
+            <div>
+              <label style={fieldLabel}>To year</label>
+              <select
+                value={trainYearTo}
+                onChange={(e) => setTrainYearTo(parseInt(e.target.value))}
+                style={selectS}
+                disabled={!options}
+              >
+                {(options?.trainable_years || []).map((y) => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 10 }}>
+            <label style={fieldLabel}>Top features ({topN})</label>
+            <input
+              type="range"
+              min={4}
+              max={20}
+              value={topN}
+              onChange={(e) => setTopN(parseInt(e.target.value))}
+              style={{ width: '100%', marginTop: 4, accentColor: 'var(--primary)' }}
+            />
+          </div>
+
+          <button
+            onClick={trainModel}
+            disabled={!canTrain || training}
+            style={{
+              ...primaryBtn,
+              opacity: !canTrain || training ? 0.5 : 1,
+              cursor: !canTrain || training ? 'not-allowed' : 'pointer',
+            }}
+          >
+            <BrainCircuit size={12} />
+            {training ? 'Deriving weights…' : 'Train Parameters'}
+          </button>
+
+          {trainError && <div style={errorBox}>{trainError}</div>}
+        </div>
+
+        {/* Step 2: Run Forecast */}
+        <div style={panel}>
+          <div style={sectionLabel}>Step 2 · Run Forecast</div>
+          <p style={helpText}>
+            Apply trained weights to rank all stocks in the selected year.
+            {!trainResult && <span style={{ color: 'var(--warning-light)' }}> Complete Step 1 first.</span>}
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 10 }}>
+            <div>
+              <label style={fieldLabel}>Year</label>
+              <select
+                value={forecastYear}
+                onChange={(e) => setForecastYear(e.target.value)}
+                style={selectS}
+                disabled={!options}
+              >
+                {(options?.all_years || []).map((y) => (
+                  <option key={y} value={y}>
+                    {y}{(options?.inference_years || []).includes(y) ? '*' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label style={fieldLabel}>User type</label>
+              <select value={userType} onChange={(e) => setUserType(e.target.value)} style={selectS}>
+                <option value="individual">Individual</option>
+                <option value="advanced">Advanced</option>
+                <option value="corporate">Corporate</option>
+              </select>
+            </div>
+            <div>
+              <label style={fieldLabel}>Risk</label>
+              <select value={riskLevel} onChange={(e) => setRiskLevel(e.target.value)} style={selectS}>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <button
               onClick={runForecast}
-              disabled={running}
-              title={canRun ? 'Run forecast' : 'Select year and sector first'}
+              disabled={!canRun || running}
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5,
-                border: '1px solid var(--border-strong)',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--surface-1)',
-                color: 'var(--text-1)',
-                fontSize: 12,
-                padding: '8px 12px',
-                cursor: running ? 'wait' : 'pointer',
-                opacity: running ? 0.7 : canRun ? 1 : 0.85,
+                ...secondaryBtn,
+                opacity: !canRun || running ? 0.5 : 1,
+                cursor: !canRun || running ? 'not-allowed' : 'pointer',
               }}
             >
-              <Play size={13} />
-              {running ? 'Running...' : 'Run Forecast'}
+              <Play size={12} />
+              {running ? 'Ranking…' : 'Run Forecast'}
             </button>
             <button
-              onClick={runEvaluation}
-              disabled={cvLoading}
-              style={{
-                border: '1px solid var(--border-strong)',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--surface-1)',
-                color: 'var(--text-1)',
-                fontSize: 12,
-                padding: '8px 12px',
-                cursor: cvLoading ? 'wait' : 'pointer',
-              }}
+              disabled
+              title="Time-CV requires multi-year next-year returns — not available for 2025 inference rows."
+              style={{ ...ghostBtn, opacity: 0.38, cursor: 'not-allowed' }}
             >
-              {cvLoading ? 'Running CV…' : 'Run Time CV'}
+              Run Time CV
             </button>
           </div>
-        </Card>
+
+          {options?.inference_years?.length > 0 && (
+            <div style={{ marginTop: 8, fontSize: 11, color: 'var(--text-4)' }}>
+              * Years marked with * are inference-only (no T+1 return target).
+            </div>
+          )}
+
+          {forecastError && <div style={errorBox}>{forecastError}</div>}
+        </div>
       </div>
 
-      {evaluation && (
-        <Card style={{ padding: '1rem', marginBottom: 16 }}>
-          <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
-            Rolling Window Evaluation
+      {/* ── Trained parameter weights ─────────────────────────── */}
+      {trainResult && (
+        <div style={{ ...panel, marginBottom: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
+            <span style={sectionLabel}>Learned Feature Weights</span>
+            <span style={{ fontSize: 10.5, color: 'var(--text-4)', fontFamily: 'var(--font-mono)' }}>
+              {trainResult.winner_rows} winners / {trainResult.total_training_rows} rows
+              · p{trainResult.winner_percentile * 100} threshold
+              · years {trainResult.train_year_from}–{trainResult.train_year_to}
+            </span>
           </div>
-          <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 6 }}>
-            Mean Rank Stability: {evaluation.mean_rank_stability != null ? evaluation.mean_rank_stability.toFixed(4) : 'n/a'}
-            {' | '}
-            Mean Overlap@10: {evaluation.mean_overlap_at_k != null ? evaluation.mean_overlap_at_k.toFixed(4) : 'n/a'}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: 5 }}>
+            {trainResult.top_parameters.map((p) => (
+              <div key={p.name} style={paramChip}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-2)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {p.name}
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+                  <div style={{ width: 40, height: 3, background: 'var(--border)', borderRadius: 2 }}>
+                    <div style={{ width: `${p.weight * 100}%`, height: '100%', background: 'var(--primary)', borderRadius: 2 }} />
+                  </div>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--primary)', minWidth: 34, textAlign: 'right' }}>
+                    {p.weight.toFixed(3)}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
-          {(evaluation.folds || []).map((f) => (
-            <div key={f.fold_index} style={{ borderTop: '1px solid var(--border)', padding: '8px 0', fontSize: 12, color: 'var(--text-2)' }}>
-              Fold {f.fold_index}: Train {f.train_year_start}-{f.train_year_end}, Test {f.test_year}, Stability {f.rank_stability != null ? f.rank_stability.toFixed(4) : 'n/a'}, Overlap@10 {f.overlap_at_k != null ? f.overlap_at_k.toFixed(4) : 'n/a'}
+        </div>
+      )}
+
+      {/* ── Forecast results: ranked table + explainability ──── */}
+      {(forecastResult || (forecastError && trainResult)) && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+
+          {/* Ranked Stocks */}
+          <div style={panel}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
+              <span style={sectionLabel}>Ranked Stocks</span>
+              {forecastResult && (
+                <span style={{ fontSize: 10.5, color: 'var(--text-4)', fontFamily: 'var(--font-mono)' }}>
+                  {forecastResult.stock_count} stocks · {forecastResult.year} · {forecastResult.risk_level}
+                </span>
+              )}
+            </div>
+
+            {!forecastResult ? (
+              <div style={{ fontSize: 12, color: 'var(--danger-light)' }}>{forecastError}</div>
+            ) : (
+              <div style={{ maxHeight: 440, overflowY: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11.5 }}>
+                  <thead>
+                    <tr style={{ position: 'sticky', top: 0, background: 'var(--surface-2)', zIndex: 1 }}>
+                      <th style={thStyle}>#</th>
+                      <th style={thStyle}>Ticker</th>
+                      <th style={{ ...thStyle, textAlign: 'right' }}>Score</th>
+                      <th style={{ ...thStyle, textAlign: 'right' }}>Conf</th>
+                      <th style={{ ...thStyle, width: 16 }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {forecastResult.items.map((item) => {
+                      const active = selectedTicker === item.ticker
+                      return (
+                        <tr
+                          key={item.ticker}
+                          onClick={() => openStock(item.ticker)}
+                          style={{
+                            cursor: 'pointer',
+                            background: active ? 'var(--primary-subtle)' : 'transparent',
+                            borderBottom: '1px solid var(--border)',
+                          }}
+                          onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = 'var(--surface-3)' }}
+                          onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent' }}
+                        >
+                          <td style={{ ...tdStyle, color: 'var(--text-4)', width: 32 }}>#{item.rank}</td>
+                          <td style={{ ...tdStyle, fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{item.ticker}</td>
+                          <td style={{ ...tdStyle, textAlign: 'right', color: 'var(--primary)', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                            {typeof item.score === 'number' ? item.score.toFixed(3) : '—'}
+                          </td>
+                          <td style={{ ...tdStyle, textAlign: 'right', fontFamily: 'var(--font-mono)', color: CONFIDENCE_COLOR[item.confidence_label] || 'var(--text-3)' }}>
+                            {Math.round((item.confidence ?? 0) * 100)}%
+                          </td>
+                          <td style={{ ...tdStyle, width: 16 }}>
+                            <ChevronRight size={11} style={{ color: active ? 'var(--primary)' : 'var(--text-4)', opacity: active ? 1 : 0.4 }} />
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Explainability panel */}
+          <div style={panel}>
+            <span style={sectionLabel}>Explainability</span>
+            {!selectedTicker ? (
+              <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-4)' }}>
+                Click any ranked stock to inspect feature contributions and data quality.
+              </div>
+            ) : explaining ? (
+              <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-3)' }}>
+                Loading {selectedTicker}…
+              </div>
+            ) : explainError ? (
+              <div style={{ marginTop: 14, fontSize: 12, color: 'var(--danger-light)' }}>{explainError}</div>
+            ) : explainResult ? (
+              <ExplainPanel
+                result={explainResult}
+                stockRow={forecastResult?.items?.find((s) => s.ticker === selectedTicker)}
+              />
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {/* ── Session run history ───────────────────────────────── */}
+      {history.length > 0 && (
+        <div style={{ ...panel, marginBottom: 12 }}>
+          <span style={sectionLabel}>Session History</span>
+          {history.map((h, i) => (
+            <div key={i} style={{ borderTop: '1px solid var(--border)', padding: '5px 0', fontSize: 11, color: 'var(--text-3)', display: 'flex', gap: 14 }}>
+              <span style={{ color: 'var(--text-4)', fontFamily: 'var(--font-mono)' }}>{h.ts}</span>
+              <span>Year {h.year}</span>
+              <span>{h.risk_level} risk</span>
+              <span>{h.stock_count} stocks ranked</span>
             </div>
           ))}
-        </Card>
+        </div>
       )}
 
-      {userType === 'corporate' && (
-        <Card style={{ padding: '1rem', marginBottom: 16 }}>
-          <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
-            Corporate Portfolio Mode
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
-            <input
-              value={portfolioInput}
-              onChange={(e) => setPortfolioInput(e.target.value)}
-              placeholder="Enter stock codes (comma separated), e.g. ASELS, TUPRS, THYAO"
-              style={inputS}
-            />
-            <button
-              onClick={analyzePortfolio}
-              style={{
-                border: '1px solid var(--border-strong)',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--surface-1)',
-                color: 'var(--text-1)',
-                fontSize: 12,
-                padding: '8px 12px',
-                cursor: 'pointer',
-              }}
-            >
-              Analyze Portfolio
-            </button>
-          </div>
-
-          {portfolioResult && (
-            <div style={{ marginTop: 10, fontSize: 12 }}>
-              <div style={{ fontWeight: 700, color: 'var(--text-2)', marginBottom: 6 }}>Suggestions</div>
-              {portfolioResult.optimization_actions?.map((a, idx) => (
-                <div key={idx} style={{ borderTop: '1px solid var(--border)', padding: '7px 0', color: 'var(--text-2)' }}>
-                  {a}
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-      )}
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 16 }}>
-        <Card style={{ padding: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <ListOrdered size={15} style={{ color: 'var(--primary)' }} />
-            <span style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6 }}>Ranked Stocks</span>
-          </div>
-          {!stocksResult?.items?.length ? (
-            <EmptyState title="No forecast yet" description="Run forecast to generate stock rankings." />
-          ) : (
-            <div style={{ maxHeight: 500, overflowY: 'auto' }}>
-              {stocksResult.items.map((item) => (
-                <button
-                  key={item.stock_code}
-                  onClick={() => openStock(item.stock_code)}
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    display: 'grid',
-                    gridTemplateColumns: '52px 1fr 80px 90px',
-                    gap: 8,
-                    alignItems: 'center',
-                    border: 'none',
-                    borderTop: '1px solid var(--border)',
-                    background: selectedStock === item.stock_code ? 'var(--surface-1)' : 'transparent',
-                    color: 'var(--text-1)',
-                    padding: '10px 6px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <span style={{ fontSize: 12, color: 'var(--text-3)' }}>#{item.rank}</span>
-                  <span style={{ fontWeight: 700 }}>{item.stock_code}</span>
-                  <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{item.score.toFixed(2)}</span>
-                  <span style={{ fontSize: 12, color: 'var(--text-3)' }}>C {Math.round(item.confidence * 100)}%</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {selectedStock && year && sector && (
-            <div style={{ marginTop: 10 }}>
-              <button
-                onClick={() => navigate(`/forecasting/detail?stock=${encodeURIComponent(selectedStock)}&sector=${encodeURIComponent(sector)}&year=${encodeURIComponent(year)}`)}
-                style={{
-                  border: '1px solid var(--border-strong)',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'var(--surface-1)',
-                  color: 'var(--text-1)',
-                  fontSize: 12,
-                  padding: '8px 12px',
-                  cursor: 'pointer',
-                }}
-              >
-                Open Detail Charts
-              </button>
-            </div>
-          )}
-        </Card>
-
-        <Card style={{ padding: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <Info size={15} style={{ color: 'var(--primary)' }} />
-            <span style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6 }}>Explainability</span>
-          </div>
-
-          {topParams.length > 0 && (
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-2)', marginBottom: 8 }}>Top Solid Parameters</div>
-              {topParams.slice(0, 6).map((p) => (
-                <div key={p.parameter_name} style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border)', padding: '7px 0', fontSize: 12 }}>
-                  <span style={{ color: 'var(--text-2)' }}>{p.parameter_name}</span>
-                  <span style={{ color: 'var(--primary)', fontWeight: 700 }}>{p.score.toFixed(4)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {detail ? (
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-2)', marginBottom: 8 }}>
-                Why {detail.stock_code}?
-              </div>
-              <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 8 }}>
-                Score {detail.score.toFixed(2)} | Rank #{detail.rank} | Confidence {Math.round(detail.confidence * 100)}%
-              </div>
-              {detail.top_contributors?.map((c) => (
-                <div key={c.parameter_name} style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border)', padding: '7px 0', fontSize: 12 }}>
-                  <span>{c.parameter_name}</span>
-                  <span style={{ fontWeight: 700 }}>{c.contribution.toFixed(4)}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <EmptyState title="Select a stock" description="Click any ranked stock to inspect top contributing parameters." />
-          )}
-        </Card>
+      {/* ── Disclaimer ───────────────────────────────────────── */}
+      <div style={{ padding: '9px 13px', background: 'var(--danger-subtle)', border: '1px solid rgba(233,112,86,0.18)', borderRadius: 'var(--radius-sm)', fontSize: 11, color: 'var(--text-3)', lineHeight: 1.65 }}>
+        <strong style={{ color: 'var(--danger-light)' }}>Research Use Only.</strong>{' '}
+        Scores are a deterministic ranking signal based on historical patterns.
+        Walk-forward Spearman correlation is near zero — no reliable predictive edge has been established.
+        This output must not be used for buy, sell, or hold decisions.
       </div>
-
-      <Card style={{ padding: '1rem', marginTop: 16 }}>
-        <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
-          Predict History
-        </div>
-        {history.length === 0 ? (
-          <EmptyState title="No history yet" description="Run predictions to populate history." />
-        ) : (
-          history.slice(0, 20).map((h) => (
-            <div key={h.run_id} style={{ borderTop: '1px solid var(--border)', padding: '8px 0', fontSize: 12, color: 'var(--text-2)' }}>
-              #{h.run_id} | {h.sector} | {h.year} | {new Date(h.created_at).toLocaleString('en-US')}
-            </div>
-          ))
-        )}
-      </Card>
-
-      <Card style={{ padding: '1rem', marginTop: 16 }}>
-        <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
-          Parameter Catalog (Requested)
-        </div>
-        {catalog.length === 0 ? (
-          <EmptyState title="No parameter catalog" description="Catalog endpoint has no data." />
-        ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: 12 }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Category</th>
-                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Ratio</th>
-                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Formula</th>
-                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Purpose</th>
-                </tr>
-              </thead>
-              <tbody>
-                {catalog.map((c, i) => (
-                  <tr key={`${c.ratio}-${i}`}>
-                    <td style={{ borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>{c.category}</td>
-                    <td style={{ borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>{c.ratio}</td>
-                    <td style={{ borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>{c.formula}</td>
-                    <td style={{ borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>{c.purpose}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
     </div>
   )
 }
 
-const forecastHero = { border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(244,176,74,0.13), rgba(85,194,195,0.08) 44%, var(--surface-2))', padding: 24, marginBottom: 18 }
-const heroKicker = { display: 'inline-flex', alignItems: 'center', gap: 7, color: 'var(--primary-hover)', background: 'var(--primary-subtle)', border: '1px solid rgba(244,176,74,0.25)', borderRadius: 999, padding: '5px 11px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.7 }
-const heroTitle = { margin: '14px 0 8px', color: 'var(--text-1)', fontSize: 'clamp(2rem, 5vw, 3.25rem)', lineHeight: 1, fontWeight: 900, maxWidth: 860 }
-const heroSub = { color: 'var(--text-2)', fontSize: 14.5, lineHeight: 1.65, margin: 0, maxWidth: 780 }
-const heroBadge = { display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-strong)', borderRadius: 999, padding: '6px 10px', color: 'var(--text-2)', fontSize: 12, fontWeight: 800 }
+function ExplainPanel({ result, stockRow }) {
+  return (
+    <div style={{ marginTop: 4 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 800, color: 'var(--text-1)' }}>
+          {result.ticker}
+        </span>
+        {stockRow && (
+          <div style={{ display: 'flex', gap: 10, fontSize: 11, fontFamily: 'var(--font-mono)' }}>
+            <span>Score <strong style={{ color: 'var(--primary)' }}>{stockRow.score.toFixed(3)}</strong></span>
+            <span>Rank <strong style={{ color: 'var(--text-2)' }}>#{stockRow.rank}</strong></span>
+            <span style={{ color: CONFIDENCE_COLOR[stockRow.confidence_label] }}>
+              {Math.round(stockRow.confidence * 100)}% conf
+            </span>
+          </div>
+        )}
+      </div>
+
+      {result.is_inference_row && (
+        <div style={{ fontSize: 10.5, color: 'var(--warning)', background: 'var(--warning-subtle)', borderRadius: 5, padding: '3px 7px', marginBottom: 8 }}>
+          2025 inference row — no T+1 return target
+        </div>
+      )}
+
+      {/* Score drivers from the forecast run */}
+      {stockRow?.top_parameters?.length > 0 && (
+        <>
+          <div style={miniLabel}>Score Drivers</div>
+          {stockRow.top_parameters.slice(0, 5).map((c) => (
+            <div key={c.name} style={explainRow}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-2)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {c.name}
+              </span>
+              <span style={{ fontSize: 10.5, color: 'var(--text-4)', marginLeft: 4 }}>
+                w={c.weight.toFixed(3)}
+              </span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--primary)', minWidth: 48, textAlign: 'right' }}>
+                +{c.contribution.toFixed(4)}
+              </span>
+            </div>
+          ))}
+        </>
+      )}
+
+      {/* Top features from explain endpoint */}
+      {result.top_features?.length > 0 && (
+        <>
+          <div style={{ ...miniLabel, marginTop: 10 }}>Top Features (within-year percentile)</div>
+          {result.top_features.slice(0, 6).map((f) => (
+            <div key={f.name} style={explainRow}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-2)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {f.name}
+              </span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--text-3)', minWidth: 64, textAlign: 'right' }}>
+                {typeof f.value === 'number' ? f.value.toFixed(2) : '—'}
+              </span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: f.signal === 'above_median' ? 'var(--secondary)' : 'var(--text-4)', minWidth: 38, textAlign: 'right' }}>
+                p{f.percentile_in_year.toFixed(0)}
+              </span>
+            </div>
+          ))}
+        </>
+      )}
+
+      {/* Data quality */}
+      <div style={{ marginTop: 10, padding: '5px 8px', background: 'var(--surface-3)', borderRadius: 5, fontSize: 10.5, color: 'var(--text-3)' }}>
+        Coverage {((result.data_quality?.coverage ?? 0) * 100).toFixed(0)}% · {result.feature_count} features
+        {result.missing_features?.length > 0 && (
+          <span style={{ color: 'var(--warning)', marginLeft: 4 }}>
+            · missing: {result.missing_features.slice(0, 4).join(', ')}{result.missing_features.length > 4 ? '…' : ''}
+          </span>
+        )}
+      </div>
+
+      {/* Warnings */}
+      {stockRow?.warnings?.length > 0 && (
+        <div style={{ marginTop: 6, fontSize: 10, color: 'var(--text-4)', lineHeight: 1.5 }}>
+          {stockRow.warnings.filter((w) => !w.includes('Experimental')).map((w, i) => (
+            <div key={i}>⚠ {w}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Style constants ───────────────────────────────────────────────────────────
+
+const panel = {
+  background: 'var(--surface-2)',
+  border: '1px solid var(--border-strong)',
+  borderRadius: 'var(--radius-md)',
+  padding: '13px 15px',
+}
+
+const kicker = {
+  fontSize: 11,
+  fontWeight: 700,
+  color: 'var(--primary)',
+  textTransform: 'uppercase',
+  letterSpacing: 0.8,
+}
+
+const sectionLabel = {
+  display: 'block',
+  fontSize: 10.5,
+  fontWeight: 700,
+  color: 'var(--text-4)',
+  textTransform: 'uppercase',
+  letterSpacing: 0.7,
+  marginBottom: 6,
+}
+
+const miniLabel = {
+  fontSize: 10,
+  fontWeight: 700,
+  color: 'var(--text-4)',
+  textTransform: 'uppercase',
+  letterSpacing: 0.6,
+  marginBottom: 5,
+}
+
+const badgeStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 5,
+  background: 'rgba(255,255,255,0.04)',
+  border: '1px solid var(--border-strong)',
+  borderRadius: 999,
+  padding: '3px 8px',
+  fontSize: 10.5,
+  color: 'var(--text-3)',
+  fontWeight: 700,
+}
+
+const helpText = {
+  fontSize: 11,
+  color: 'var(--text-3)',
+  lineHeight: 1.6,
+  margin: '0 0 9px',
+}
+
+const fieldLabel = {
+  fontSize: 10,
+  color: 'var(--text-4)',
+  display: 'block',
+  marginBottom: 3,
+  textTransform: 'uppercase',
+  letterSpacing: 0.5,
+}
+
+const selectS = {
+  width: '100%',
+  background: 'var(--surface-1)',
+  border: '1px solid var(--border-strong)',
+  borderRadius: 'var(--radius-sm)',
+  color: 'var(--text-1)',
+  padding: '6px 9px',
+  fontSize: 12,
+  outline: 'none',
+}
+
+const primaryBtn = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  border: 'none',
+  borderRadius: 'var(--radius-sm)',
+  background: 'var(--primary)',
+  color: '#07111F',
+  fontSize: 12,
+  fontWeight: 700,
+  padding: '7px 13px',
+}
+
+const secondaryBtn = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  border: '1px solid var(--secondary)',
+  borderRadius: 'var(--radius-sm)',
+  background: 'var(--secondary-subtle)',
+  color: 'var(--secondary)',
+  fontSize: 12,
+  fontWeight: 700,
+  padding: '7px 13px',
+}
+
+const ghostBtn = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 5,
+  border: '1px solid var(--border-strong)',
+  borderRadius: 'var(--radius-sm)',
+  background: 'transparent',
+  color: 'var(--text-3)',
+  fontSize: 11.5,
+  padding: '7px 11px',
+}
+
+const errorBox = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 5,
+  marginTop: 7,
+  fontSize: 11.5,
+  color: 'var(--danger-light)',
+  background: 'var(--danger-subtle)',
+  borderRadius: 5,
+  padding: '6px 9px',
+}
+
+const paramChip = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 7,
+  background: 'var(--surface-1)',
+  border: '1px solid var(--border)',
+  borderRadius: 5,
+  padding: '4px 8px',
+}
+
+const thStyle = {
+  padding: '5px 8px',
+  textAlign: 'left',
+  fontSize: 10,
+  fontWeight: 700,
+  color: 'var(--text-4)',
+  textTransform: 'uppercase',
+  letterSpacing: 0.5,
+  borderBottom: '1px solid var(--border-strong)',
+}
+
+const tdStyle = {
+  padding: '6px 8px',
+  fontSize: 11.5,
+  color: 'var(--text-2)',
+}
+
+const explainRow = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  borderTop: '1px solid var(--border)',
+  padding: '4px 0',
+}
