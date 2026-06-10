@@ -34,6 +34,11 @@ def data_quality(_: User = Depends(get_current_user)):
     return {"data_quality": RA.build_data_quality_context(), "disclaimer": RA.NOT_ADVICE}
 
 
+@router.get("/ai-status")
+def ai_status(smoke: bool = False, _: User = Depends(get_current_user)):
+    return RA.ai_status(smoke=smoke)
+
+
 @router.get("/experiments")
 def experiments(_: User = Depends(get_current_user)):
     return RA.experiments_payload()

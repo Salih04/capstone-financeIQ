@@ -4,8 +4,15 @@ import json
 import logging
 import time
 from pathlib import Path
-import requests
 import pandas as pd
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
+
+try:
+    import requests
+except ImportError:  # optional; stdlib fallback keeps cached/offline runs working
+    requests = None
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
@@ -28,16 +35,29 @@ _RETRYABLE = {429, 500, 502, 503, 504}
 def fetch_with_backoff(url, params, headers, max_retries=5):
     for attempt in range(max_retries):
         try:
-            response = requests.get(url, params=params, headers=headers, timeout=10)
-            if response.status_code == 200:
-                return response.json()
-            elif response.status_code in _NON_RETRYABLE:
-                return {"error": f"HTTP {response.status_code} (non-retryable)"}
-            elif response.status_code in _RETRYABLE:
-                logging.warning(f"HTTP {response.status_code}. Retrying... {attempt+1}/{max_retries}")
+            if requests is not None:
+                response = requests.get(url, params=params, headers=headers, timeout=10)
+                if response.status_code == 200:
+                    return response.json()
+                elif response.status_code in _NON_RETRYABLE:
+                    return {"error": f"HTTP {response.status_code} (non-retryable)"}
+                elif response.status_code in _RETRYABLE:
+                    logging.warning(f"HTTP {response.status_code}. Retrying... {attempt+1}/{max_retries}")
+                else:
+                    logging.warning(f"Error {response.status_code}. Retrying... {attempt+1}/{max_retries}")
             else:
-                logging.warning(f"Error {response.status_code}. Retrying... {attempt+1}/{max_retries}")
-        except requests.exceptions.RequestException as e:
+                req = Request(f"{url}?{urlencode(params)}", headers=headers, method="GET")
+                with urlopen(req, timeout=10) as response:
+                    if response.status == 200:
+                        return json.loads(response.read().decode())
+                    if response.status in _NON_RETRYABLE:
+                        return {"error": f"HTTP {response.status} (non-retryable)"}
+                    logging.warning(f"HTTP {response.status}. Retrying... {attempt+1}/{max_retries}")
+        except HTTPError as e:
+            if e.code in _NON_RETRYABLE:
+                return {"error": f"HTTP {e.code} (non-retryable)"}
+            logging.warning(f"HTTP {e.code}. Retrying... {attempt+1}/{max_retries}")
+        except (URLError, OSError) as e:
             logging.warning(f"Request exception: {e}. Retrying... {attempt+1}/{max_retries}")
 
         # Exponential backoff: 1s, 2s, 4s, 8s, 16s

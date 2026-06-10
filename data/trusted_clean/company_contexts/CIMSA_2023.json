@@ -6,7 +6,7 @@
     "is_training_universe": true
   },
   "model": {
-    "ml_score": 0.456,
+    "ml_score": 0.4727,
     "ml_rank": 28,
     "target_definition": "year-T features -> year-(T+1) realized return",
     "model_limitations": [
@@ -51,11 +51,11 @@
       "net_margin": 52.5,
       "gross_margin": 42.5,
       "ebitda_margin": 70.0,
-      "pe_ratio": 74.2,
-      "pb_ratio": 68.6,
-      "ev_ebitda": 71.0,
-      "market_cap": 37.1,
-      "enterprise_value": 28.6
+      "pe_ratio": 70.6,
+      "pb_ratio": 68.4,
+      "ev_ebitda": 70.6,
+      "market_cap": 39.5,
+      "enterprise_value": 34.2
     },
     "year_medians": {
       "revenue": 58138702500.0,
@@ -69,11 +69,11 @@
       "net_margin": 11.8651,
       "gross_margin": 21.5054,
       "ebitda_margin": 16.7162,
-      "pe_ratio": 6.2451,
-      "pb_ratio": 0.5527,
-      "ev_ebitda": 6.6036,
-      "market_cap": 46151421465.6,
-      "enterprise_value": 83656671408.0
+      "pe_ratio": 6.2481,
+      "pb_ratio": 0.5654,
+      "ev_ebitda": 5.9946,
+      "market_cap": 42863761762.8,
+      "enterprise_value": 64030388726.313
     }
   },
   "data_quality": {

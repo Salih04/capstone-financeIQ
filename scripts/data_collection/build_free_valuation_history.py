@@ -114,6 +114,15 @@ def collect_year_end_prices(tickers: list[str], use_cache: bool = True,
         try:
             cache = pd.read_csv(PRICES_CACHE)
             cache["ticker"] = cache["ticker"].astype(str).str.upper()
+            if "year_end_close" not in cache.columns:
+                if "adjclose" in cache.columns:
+                    cache["year_end_close"] = cache["adjclose"]
+                elif "close" in cache.columns:
+                    cache["year_end_close"] = cache["close"]
+            if "date" not in cache.columns and "price_date" in cache.columns:
+                cache["date"] = cache["price_date"]
+            if "source" not in cache.columns:
+                cache["source"] = "cache"
         except Exception:
             cache = None
     manual = None
@@ -162,6 +171,25 @@ def collect_year_end_prices(tickers: list[str], use_cache: bool = True,
         df = df.drop_duplicates(["ticker", "year"], keep="last")
         df = df[(pd.to_numeric(df["year_end_close"], errors="coerce") > 0)]
         PRICES_CACHE.parent.mkdir(parents=True, exist_ok=True)
+        if PRICES_CACHE.is_file():
+            try:
+                existing = pd.read_csv(PRICES_CACHE)
+                existing["ticker"] = existing["ticker"].astype(str).str.upper()
+                if "year_end_close" not in existing.columns:
+                    if "adjclose" in existing.columns:
+                        existing["year_end_close"] = existing["adjclose"]
+                    elif "close" in existing.columns:
+                        existing["year_end_close"] = existing["close"]
+                if "date" not in existing.columns and "price_date" in existing.columns:
+                    existing["date"] = existing["price_date"]
+                if "source" not in existing.columns:
+                    existing["source"] = "cache"
+                existing = existing[["ticker", "year", "year_end_close", "date", "source"]]
+                df = pd.concat([existing, df], ignore_index=True)
+                df = df.drop_duplicates(["ticker", "year"], keep="last")
+                df = df[(pd.to_numeric(df["year_end_close"], errors="coerce") > 0)]
+            except Exception:
+                pass
         df.sort_values(["ticker", "year"]).to_csv(PRICES_CACHE, index=False)
     log(f"[prices] tickers={len(tickers)} yahoo_ok={meta['yahoo_ok']} cache={meta['from_cache']} "
         f"manual={meta['from_manual']} failed={len(meta['failed'])} rows={len(df)}")

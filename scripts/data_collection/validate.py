@@ -9,6 +9,9 @@ import pandas as pd
 
 from scripts.data_collection import pipeline as P
 
+FEATURE_JSON = P.CLEAN_DIR / "feature_engineering_report.json"
+FEATURE_MD = P.CLEAN_DIR / "feature_engineering_report.md"
+
 # Feature registry roles (PHASE 7).
 ROLE_IDENTIFIER = "identifier"
 ROLE_METADATA = "metadata"
@@ -24,7 +27,8 @@ def feature_registry(df: pd.DataFrame) -> list[dict]:
     for col in df.columns:
         if col in ("ticker", "company_name", "year"):
             role, leak = ROLE_IDENTIFIER, "none"
-        elif col in ("sector", "indices", "is_bist100", "target_year", "has_target", "is_inference_row"):
+        elif col in ("sector", "indices", "is_bist100", "target_year", "has_target", "is_inference_row",
+                     "is_public_universe", "is_training_universe", "universe_source"):
             role, leak = ROLE_METADATA, "none"
         elif col == "same_year_return_pct":
             role, leak = ROLE_SAME_YEAR, "is_same_year_outcome"
@@ -192,6 +196,7 @@ def validate(df: pd.DataFrame, cfg: P.PipelineConfig) -> dict:
     }
     P.QUALITY_JSON.write_text(json.dumps(report, indent=2, default=str))
     _write_md(report)
+    _write_feature_report(report)
     status = "VALID" if report["valid_for_T_to_T1_modeling"] else f"ISSUES ({len(issues)})"
     cfg.say(f"[validate] {status}; features={len(feats)} target_rows={report['rows_with_target']} "
             f"benchmark={'yes' if report['benchmark_available'] else 'no'}")
@@ -247,3 +252,42 @@ def _write_md(r: dict) -> None:
     else:
         lines += ["## Issues", "", "None."]
     P.QUALITY_MD.write_text("\n".join(lines))
+
+
+def _write_feature_report(r: dict) -> None:
+    accepted = sorted(r.get("feature_columns") or [])
+    rejected = {
+        "target_columns": sorted(r.get("target_columns") or []),
+        "same_year_analysis_only": ["same_year_return_pct"],
+        "old_frozen_snapshot_columns": sorted(r.get("rejected_old_snapshot_columns") or []),
+        "explicit_leakage_columns": sorted((r.get("source_distinction") or {}).get("rejected_leakage_columns") or []),
+        "manual_rejected_features": sorted(((r.get("manual_financials") or {}).get("rejected_feature_columns") or {}).keys()),
+    }
+    price_features = [c for c in accepted if c.startswith("price_") or c.startswith("benchmark_same_year")]
+    payload = {
+        "accepted_feature_count": len(accepted),
+        "accepted_features": accepted,
+        "price_features": price_features,
+        "rejected_features": rejected,
+        "leakage_rule": "Features must be known by end of year T; next_year_* targets and post-target fields are excluded.",
+        "target_rule": "Training target is T+1 realized return only; rows without validated T+1 target are inference-only.",
+    }
+    FEATURE_JSON.write_text(json.dumps(payload, indent=2, default=str))
+    lines = [
+        "# Feature Engineering Report",
+        "",
+        f"- Accepted feature count: **{len(accepted)}**",
+        f"- Price/benchmark year-T features: `{price_features}`",
+        "- Leakage rule: year-T and earlier only; `next_year_*` never enters features.",
+        "- 2025 rule: inference-only unless validated T+1 outcome exists.",
+        "",
+        "## Accepted Features",
+        "",
+        ", ".join(accepted) or "none",
+        "",
+        "## Rejected / Excluded",
+        "",
+    ]
+    for k, vals in rejected.items():
+        lines.append(f"- {k}: `{vals}`")
+    FEATURE_MD.write_text("\n".join(lines))

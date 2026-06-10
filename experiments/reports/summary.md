@@ -12,36 +12,42 @@ all out-of-sample numbers as noisy and overfitting-prone.
 
 ## test_2023
 
-| split     | model                 | kind     |    mae |   rmse |   spearman |   precision_at_5 |   top_bucket_avg_return |   median_actual_return |   directional_acc |
-|:----------|:----------------------|:---------|-------:|-------:|-----------:|-----------------:|------------------------:|-----------------------:|------------------:|
-| test_2023 | ridge                 | ml       | 135.28 | 171.01 |      0.118 |              0.2 |                   82.19 |                  39.52 |             0.592 |
-| test_2023 | lasso                 | ml       | 143.17 | 190.88 |      0.112 |              0.2 |                   82.19 |                  39.52 |             0.633 |
-| test_2023 | linear_regression     | ml       | 145.88 | 196.03 |      0.061 |              0   |                   14.63 |                  39.52 |             0.551 |
-| test_2023 | baseline_equal_weight | baseline |  73.09 | 120.43 |      0.052 |              0   |                   21.63 |                  39.52 |             0.551 |
-| test_2023 | baseline_rank_score   | baseline |  73.09 | 120.43 |      0.052 |              0   |                   21.63 |                  39.52 |             0.551 |
-| test_2023 | elasticnet            | ml       | 133.5  | 162.97 |      0.031 |              0.2 |                   61.71 |                  39.52 |             0.469 |
-| test_2023 | random_forest         | ml       | 138.73 | 185.23 |     -0.098 |              0   |                   14.63 |                  39.52 |             0.551 |
+| split | model | kind | mae | rmse | spearman | precision_at_5 | top_bucket_avg_return | median_actual_return | directional_acc |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| test_2023 | baseline_equal_weight | baseline | 62.84 | 100.96 | 0.095 | 0.0 | 49.43 | 37.7 | 0.475 |
+| test_2023 | baseline_rank_score | baseline | 62.84 | 100.96 | 0.095 | 0.0 | 49.43 | 37.7 | 0.475 |
+| test_2023 | robust_rank_aggregation | baseline | 62.83 | 100.96 | 0.088 | 0.0 | 42.41 | 37.7 | 0.487 |
+| test_2023 | lasso | ml | 148.91 | 198.47 | 0.011 | 0.2 | 62.73 | 37.7 | 0.525 |
+| test_2023 | ridge | ml | 136.05 | 170.97 | -0.008 | 0.2 | 74.09 | 37.7 | 0.525 |
+| test_2023 | linear_regression | ml | 169.82 | 219.12 | -0.044 | 0.2 | 58.65 | 37.7 | 0.5 |
+| test_2023 | elasticnet | ml | 133.66 | 161.83 | -0.099 | 0.2 | 74.09 | 37.7 | 0.45 |
+| test_2023 | gradient_boosting | ml | 176.18 | 215.14 | -0.1 | 0.0 | -0.8 | 37.7 | 0.45 |
+| test_2023 | random_forest | ml | 183.64 | 215.88 | -0.151 | 0.0 | -3.32 | 37.7 | 0.425 |
 
 ## test_2024
 
-| split     | model                 | kind     |   mae |   rmse |   spearman |   precision_at_5 |   top_bucket_avg_return |   median_actual_return |   directional_acc |
-|:----------|:----------------------|:---------|------:|-------:|-----------:|-----------------:|------------------------:|-----------------------:|------------------:|
-| test_2024 | baseline_equal_weight | baseline | 46.16 |  56.12 |      0.175 |              0   |                   38.93 |                  35.56 |             0.551 |
-| test_2024 | baseline_rank_score   | baseline | 46.16 |  56.12 |      0.175 |              0   |                   38.93 |                  35.56 |             0.551 |
-| test_2024 | lasso                 | ml       | 90.75 | 114.34 |     -0.002 |              0.2 |                   21.19 |                  35.56 |             0.551 |
-| test_2024 | linear_regression     | ml       | 93.19 | 115.93 |     -0.006 |              0.2 |                   21.19 |                  35.56 |             0.551 |
-| test_2024 | ridge                 | ml       | 87.89 | 111.76 |     -0.028 |              0   |                    4.97 |                  35.56 |             0.51  |
-| test_2024 | elasticnet            | ml       | 87.02 | 108.21 |     -0.125 |              0.2 |                   25.31 |                  35.56 |             0.469 |
-| test_2024 | random_forest         | ml       | 87.52 | 122.44 |     -0.41  |              0   |                  -15.24 |                  35.56 |             0.347 |
+| split | model | kind | mae | rmse | spearman | precision_at_5 | top_bucket_avg_return | median_actual_return | directional_acc |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| test_2024 | ridge | ml | 72.54 | 92.4 | 0.218 | 0.0 | 27.33 | 35.05 | 0.6 |
+| test_2024 | baseline_equal_weight | baseline | 50.02 | 66.25 | 0.212 | 0.0 | 71.93 | 35.05 | 0.6 |
+| test_2024 | baseline_rank_score | baseline | 50.02 | 66.25 | 0.212 | 0.0 | 71.93 | 35.05 | 0.6 |
+| test_2024 | robust_rank_aggregation | baseline | 50.02 | 66.25 | 0.195 | 0.0 | 62.12 | 35.05 | 0.55 |
+| test_2024 | lasso | ml | 77.38 | 102.97 | 0.139 | 0.0 | 6.64 | 35.05 | 0.55 |
+| test_2024 | linear_regression | ml | 74.58 | 101.59 | 0.083 | 0.0 | -0.95 | 35.05 | 0.5 |
+| test_2024 | elasticnet | ml | 71.68 | 85.66 | 0.057 | 0.0 | -0.85 | 35.05 | 0.575 |
+| test_2024 | gradient_boosting | ml | 169.24 | 196.83 | -0.111 | 0.0 | 4.97 | 35.05 | 0.5 |
+| test_2024 | random_forest | ml | 186.86 | 213.46 | -0.171 | 0.0 | 7.67 | 35.05 | 0.45 |
 
 ## test_2025
 
-| split     | model                 | kind     |    mae |   rmse |   spearman |   precision_at_5 |   top_bucket_avg_return |   median_actual_return |   directional_acc |
-|:----------|:----------------------|:---------|-------:|-------:|-----------:|-----------------:|------------------------:|-----------------------:|------------------:|
-| test_2025 | linear_regression     | ml       | 102.58 | 120.45 |      0.133 |              0   |                   16.78 |                   0.35 |             0.429 |
-| test_2025 | baseline_equal_weight | baseline |  35.03 |  70.91 |      0.111 |              0.2 |                   41.97 |                   0.35 |             0.592 |
-| test_2025 | baseline_rank_score   | baseline |  35.03 |  70.91 |      0.111 |              0.2 |                   41.97 |                   0.35 |             0.592 |
-| test_2025 | lasso                 | ml       |  99.11 | 115.09 |     -0.036 |              0   |                   16.78 |                   0.35 |             0.347 |
-| test_2025 | ridge                 | ml       |  97.06 | 110.8  |     -0.081 |              0   |                    9.56 |                   0.35 |             0.388 |
-| test_2025 | random_forest         | ml       |  97.27 | 112.8  |     -0.089 |              0.2 |                   84.13 |                   0.35 |             0.429 |
-| test_2025 | elasticnet            | ml       |  95.38 | 106.61 |     -0.112 |              0.2 |                   43.83 |                   0.35 |             0.429 |
+| split | model | kind | mae | rmse | spearman | precision_at_5 | top_bucket_avg_return | median_actual_return | directional_acc |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| test_2025 | baseline_equal_weight | baseline | 31.2 | 59.96 | 0.142 | 0.2 | 55.45 | 5.6 | 0.5 |
+| test_2025 | baseline_rank_score | baseline | 31.2 | 59.96 | 0.142 | 0.2 | 55.45 | 5.6 | 0.5 |
+| test_2025 | lasso | ml | 74.52 | 88.45 | 0.119 | 0.0 | 4.35 | 5.6 | 0.55 |
+| test_2025 | linear_regression | ml | 66.41 | 86.15 | 0.108 | 0.0 | 34.15 | 5.6 | 0.55 |
+| test_2025 | robust_rank_aggregation | baseline | 31.2 | 59.97 | 0.1 | 0.0 | 7.07 | 5.6 | 0.475 |
+| test_2025 | ridge | ml | 80.17 | 92.7 | 0.068 | 0.0 | 4.35 | 5.6 | 0.575 |
+| test_2025 | elasticnet | ml | 79.05 | 89.23 | -0.018 | 0.0 | 3.19 | 5.6 | 0.575 |
+| test_2025 | gradient_boosting | ml | 204.01 | 229.78 | -0.099 | 0.2 | 27.98 | 5.6 | 0.525 |
+| test_2025 | random_forest | ml | 207.06 | 224.27 | -0.143 | 0.2 | 24.13 | 5.6 | 0.45 |

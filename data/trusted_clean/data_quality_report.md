@@ -1,6 +1,6 @@
 # Data quality report
 
-- Rows: **240**  |  Features: **27**  |  Rows with target: **200**  |  Inference-only: **40**
+- Rows: **403**  |  Features: **40**  |  Rows with target: **321**  |  Inference-only: **82**
 - Benchmark available: **True**
 - Valid for T→T+1 modeling: **True**
 
@@ -9,11 +9,11 @@
 | year | rows | tickers | target coverage |
 |---|---|---|---|
 | 2020 | 40 | 40 | 1.0 |
-| 2021 | 40 | 40 | 1.0 |
-| 2022 | 40 | 40 | 1.0 |
-| 2023 | 40 | 40 | 1.0 |
-| 2024 | 40 | 40 | 1.0 |
-| 2025 | 40 | 40 | 0.0 |
+| 2021 | 41 | 41 | 1.0 |
+| 2022 | 81 | 81 | 0.988 |
+| 2023 | 81 | 81 | 0.988 |
+| 2024 | 80 | 80 | 1.0 |
+| 2025 | 80 | 80 | 0.0 |
 
 ## BIST100 benchmark
 - Source: **yfinance**
@@ -23,15 +23,14 @@
 
 
 ## Manual financial history
-- Present: **True**
-- Files: ['bist100_yfinance_candidate_clean.csv', 'candidate_from_yearly_snapshots.csv', 'corrected_balance_sheet_2024.csv', 'corrected_yearly_financials_candidate.csv', 'free_valuation_history_candidate.csv']
-- Rows ingested: 276
-- Accepted as features: ['revenue', 'gross_profit', 'operating_income', 'net_income', 'ebitda', 'roe', 'roa', 'gross_margin', 'net_margin', 'ebitda_margin']
-- Overrides from snapshot: {'total_assets': 40, 'current_assets': 40, 'non_current_assets': 40, 'short_term_liabilities': 40, 'long_term_liabilities': 40, 'equity': 40, 'working_capital': 40, 'net_debt': 40, 'current_ratio': 40, 'leverage_ratio': 40, 'net_debt_to_ebitda': 34}
+- Present: **False**
+- Files: []
+- Rows ingested: 0
+- Accepted as features: []
+- Overrides from snapshot: {}
 - Rejected: {}
 - Misaligned columns: []
-- Source note: Multiple manual sources detected. Corrected yearly source was prioritized for income/profitability fields; legacy snapshot source only filled fields it uniquely provided. This overlap is expected, not an error.
-- Issues: ["unknown tickers not in universe: ['AKSA', 'AKSEN', 'DOHOL', 'EKGYO', 'KCHOL', 'ODAS', 'SAHOL', 'SMRTG', 'VESTL']"]
+- Issues: []
 
 
 ## Source distinction (corrected yearly vs old snapshot)
@@ -50,7 +49,7 @@ daily_change_pct, ebitda, ebitda_margin_pct, enterprise_value, ev_ebitda, ev_sal
 
 ## Provisional feature columns (year-T, genuinely varying)
 
-current_assets, current_ratio, ebitda, ebitda_growth_pct, ebitda_margin, equity, financial_debt_ratio, gross_margin, gross_profit, gross_profit_growth_pct, leverage_ratio, long_term_liabilities, net_debt, net_debt_to_ebitda, net_income, net_income_growth_pct, net_margin, non_current_assets, operating_income, operating_income_growth_pct, revenue, revenue_growth_pct, roa, roe, short_term_liabilities, total_assets, working_capital
+benchmark_same_year_return_pct, current_assets, current_ratio, ebitda, ebitda_growth_pct, ebitda_margin, enterprise_value, equity, ev_ebitda, financial_debt_ratio, gross_margin, gross_profit, gross_profit_growth_pct, leverage_ratio, long_term_liabilities, market_cap, net_debt, net_debt_to_ebitda, net_income, net_income_growth_pct, net_margin, non_current_assets, operating_income, operating_income_growth_pct, pb_ratio, pe_ratio, price_adjclose_t, price_data_available, price_drawdown_from_3y_high_pct, price_history_years_available, price_momentum_1y_pct, price_momentum_2y_pct, price_vs_bist100_1y_pct, revenue, revenue_growth_pct, roa, roe, short_term_liabilities, total_assets, working_capital
 
 ## Issues
 

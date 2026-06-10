@@ -2,7 +2,7 @@
 	inspect-quarterly research-agent-dataset research-agent-check full-research-agent ingest-corrected-yearly \
 	prices valuation shares split-datasets build-company-contexts collect-bist100-financials \
 	fetch-training-prices integrate-pilot-tickers check-pilot-financials \
-	collect-yfinance-bist100 clean-yfinance-bist100 update-training-universe-yfinance validate-universe \
+	collect-yfinance-bist100 clean-yfinance-bist100 update-training-universe-yfinance validate-universe data-audit \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration
@@ -55,6 +55,7 @@ full-research-agent:
 	$(MAKE) frozen-evidence
 	$(MAKE) split-datasets
 	$(MAKE) build-company-contexts
+	$(MAKE) data-audit
 	$(MAKE) research-agent-dataset
 	PYTHONPATH=. python -m pytest tests/
 
@@ -111,6 +112,9 @@ update-training-universe-yfinance:
 # Print universe counts and coverage for quick validation.
 validate-universe:
 	PYTHONPATH=. python scripts/data_collection/validate_universe.py
+
+data-audit:
+	PYTHONPATH=. python -m scripts.data_collection.audit_pipeline
 
 check-pilot-financials:
 	@test -f "data/trusted_raw/financials/bist100_yfinance_candidate_clean.csv" || \
@@ -180,15 +184,16 @@ split-datasets:
 build-company-contexts:
 	PYTHONPATH=. python scripts/build_company_contexts.py
 
-# Full pipeline: extract -> benchmark -> corrected yearly -> valuation -> build ->
-#   fetch training prices -> integrate pilot tickers -> experiments.
-# Pilot expansion is preserved: base dataset ends with 49 tickers (40 public + 9 training-only).
+# Full pipeline: extract -> benchmark -> corrected yearly -> fetch prices ->
+#   valuation -> build -> integrate pilot tickers -> experiments.
+# Pilot expansion is preserved: base dataset ends with 81 tickers (40 public + 41 training-only).
 full-research:
 	$(MAKE) extract-yearly-financials
 	$(MAKE) benchmark
 	$(MAKE) ingest-corrected-yearly
+	$(MAKE) fetch-training-prices
 	$(MAKE) valuation
 	$(MAKE) data
-	$(MAKE) fetch-training-prices
 	$(MAKE) integrate-pilot-tickers
+	$(MAKE) data-validate
 	PYTHONPATH=. python experiments/run_experiments.py

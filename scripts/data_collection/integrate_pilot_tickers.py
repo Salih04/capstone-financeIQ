@@ -44,6 +44,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from scripts.data_collection.price_features import PRICE_FEATURE_COLUMNS, build_price_features
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CLEAN_DIR = REPO_ROOT / "data" / "trusted_clean"
 RAW_DIR = REPO_ROOT / "data" / "trusted_raw"
@@ -54,6 +56,7 @@ PRICES_CSV = RAW_DIR / "prices" / "yahoo_year_end_prices.csv"
 MODELING_CSV = CLEAN_DIR / "modeling_dataset_2020_2025.csv"
 TRAINING_UNIVERSE_CSV = CONFIG_DIR / "universe_training_bist100.csv"
 REPORT_OUT = CLEAN_DIR / "pilot_integration_report.json"
+BENCHMARK_CSV = RAW_DIR / "bist100_benchmark_returns.csv"
 
 YFINANCE_SOURCE = "yfinance_unofficial"
 DISCLAIMER = (
@@ -90,6 +93,11 @@ def _compute_returns_from_prices(prices: pd.DataFrame, tickers: set[str]) -> pd.
     return(Y) = adjclose(Y) / adjclose(Y-1) - 1  (as percentage × 100)
     Requires adjclose for year Y-1 to compute return(Y).
     """
+    prices = prices.copy()
+    if "adjclose" not in prices.columns and "year_end_close" in prices.columns:
+        prices["adjclose"] = prices["year_end_close"]
+    if "status" not in prices.columns:
+        prices["status"] = "success"
     p = prices[prices["ticker"].isin(tickers) & (prices["status"] == "success")].copy()
     p = p[["ticker", "year", "adjclose"]].dropna(subset=["adjclose"])
     p["adjclose"] = pd.to_numeric(p["adjclose"], errors="coerce")
@@ -108,7 +116,16 @@ def _compute_returns_from_prices(prices: pd.DataFrame, tickers: set[str]) -> pd.
             else:
                 rows.append({"ticker": ticker, "year": year, "same_year_return_pct": np.nan})
 
-    return pd.DataFrame(rows)
+    return pd.DataFrame(rows, columns=["ticker", "year", "same_year_return_pct"])
+
+
+def _load_benchmark() -> pd.DataFrame | None:
+    if not BENCHMARK_CSV.is_file():
+        return None
+    b = pd.read_csv(BENCHMARK_CSV, comment="#")
+    if not {"year", "bist100_return_pct"}.issubset(b.columns):
+        return None
+    return b[["year", "bist100_return_pct"]]
 
 
 def _build_pilot_rows(
@@ -157,6 +174,13 @@ def _build_pilot_rows(
     df["next_year_bist100_return_pct"] = np.nan
     df["next_year_excess_return_vs_bist100"] = np.nan
     df["next_year_outperform_bist100"] = np.nan
+
+    price_feats = build_price_features(benchmark=_load_benchmark())
+    if not price_feats.empty:
+        df = df.merge(price_feats, on=["ticker", "year"], how="left")
+    else:
+        for c in PRICE_FEATURE_COLUMNS:
+            df[c] = np.nan
 
     # Meta
     df["has_target"] = df["next_year_return_pct"].notna()

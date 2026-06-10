@@ -2,8 +2,8 @@
 
 Reconstruct missing valuation columns from FREE sources (no Fintables). Research/educational only — NOT investment advice.
 
-- Tickers: **40**  Years: 2020–2025
-- Year-end price rows: **226/240** (Yahoo ok for 0 tickers)
+- Tickers: **81**  Years: 2020–2025
+- Year-end price rows: **465/486** (Yahoo ok for 0 tickers)
 - Shares outstanding: **manual**
 
 ## Target valuation columns
@@ -12,9 +12,9 @@ Reconstruct missing valuation columns from FREE sources (no Fintables). Research
 |---|---|---|---|
 | market_cap | year_end_close × shares_outstanding | accepted | 226 |
 | pe | market_cap / net_income | accepted | 185 |
-| pb | market_cap / equity | accepted | 187 |
-| enterprise_value | market_cap + net_debt | accepted | 187 |
-| ev_ebitda | enterprise_value / ebitda | accepted | 174 |
+| pb | market_cap / equity | accepted | 226 |
+| enterprise_value | market_cap + net_debt | accepted | 226 |
+| ev_ebitda | enterprise_value / ebitda | accepted | 210 |
 
 ## Columns entering the model candidate
 
@@ -22,11 +22,9 @@ market_cap, enterprise_value, pe, pb, ev_ebitda
 
 ## Rejection summary
 
-- **market_cap**: missing_price=14
-- **enterprise_value**: suspect_2024_net_debt=39
+- **market_cap**: missing_shares=246, missing_price=21
 - **pe**: non_positive_net_income=36, absurd_value=5
-- **pb**: suspect_2024_equity=39
-- **ev_ebitda**: missing_enterprise_value=39, non_positive_ebitda=7, absurd_value=6
+- **ev_ebitda**: non_positive_ebitda=9, absurd_value=7
 
 ## Limitation
 

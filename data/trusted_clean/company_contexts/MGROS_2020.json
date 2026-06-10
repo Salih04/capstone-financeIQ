@@ -6,7 +6,7 @@
     "is_training_universe": true
   },
   "model": {
-    "ml_score": 0.5047,
+    "ml_score": 0.5074,
     "ml_rank": 23,
     "target_definition": "year-T features -> year-(T+1) realized return",
     "model_limitations": [
@@ -33,8 +33,8 @@
     "pe_ratio": null,
     "pb_ratio": 0.0919,
     "ev_ebitda": 5.9407,
-    "market_cap": 7259563743.327,
-    "enterprise_value": 11150830743.327,
+    "market_cap": 7259564467.5439,
+    "enterprise_value": 11150831467.5439,
     "price_source": "yahoo_chart_api",
     "price_date": "2020-12-31 (approximate year-end)"
   },
@@ -51,10 +51,10 @@
       "net_margin": 22.5,
       "gross_margin": 60.0,
       "ebitda_margin": 7.5,
-      "pb_ratio": 59.4,
-      "ev_ebitda": 26.7,
-      "market_cap": 53.1,
-      "enterprise_value": 25.0
+      "pb_ratio": 60.0,
+      "ev_ebitda": 33.3,
+      "market_cap": 57.1,
+      "enterprise_value": 31.4
     },
     "year_medians": {
       "revenue": 10508934500.0,
@@ -68,11 +68,11 @@
       "net_margin": 8.0192,
       "gross_margin": 23.0896,
       "ebitda_margin": 16.9362,
-      "pe_ratio": 6.3048,
-      "pb_ratio": 0.0725,
-      "ev_ebitda": 16.8359,
-      "market_cap": 6590953491.0,
-      "enterprise_value": 41337576818.9826
+      "pe_ratio": 6.4123,
+      "pb_ratio": 0.0721,
+      "ev_ebitda": 13.5812,
+      "market_cap": 5999716800.0,
+      "enterprise_value": 28368323915.0
     }
   },
   "data_quality": {

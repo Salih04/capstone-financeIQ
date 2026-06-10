@@ -34,7 +34,7 @@ sys.path.insert(0, str(ROOT / "2.backend"))
 
 from app.services.research import data, feature_registry as reg, scoring  # noqa: E402
 
-from sklearn.ensemble import RandomForestRegressor  # noqa: E402
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor  # noqa: E402
 from sklearn.linear_model import ElasticNet, Lasso, LinearRegression, Ridge  # noqa: E402
 
 RESULTS = ROOT / "experiments" / "results"
@@ -46,6 +46,7 @@ PRED_FEATURES = [f for f in reg.features_for_next_year_prediction()]
 
 CLEAN_MODELING = ROOT / "data" / "trusted_clean" / "modeling_dataset_2020_2025.csv"
 TRAINING_MODELING = ROOT / "data" / "trusted_clean" / "modeling_dataset_training_2020_2025.csv"
+PUBLIC_MODELING = ROOT / "data" / "trusted_clean" / "modeling_dataset_public_2020_2025.csv"
 
 
 def _modeling_csv() -> Path:
@@ -106,15 +107,17 @@ TARGETS = ["next_year_return_pct", "next_year_excess_return_vs_bist100",
 
 def _feature_cols(m: pd.DataFrame) -> list[str]:
     non = {"ticker", "company_name", "year", "sector", "indices", "is_bist100",
-           "same_year_return_pct", "target_year", "has_target", "is_inference_row"}
+           "same_year_return_pct", "target_year", "has_target", "is_inference_row",
+           "is_public_universe", "is_training_universe", "universe_source"}
     return [c for c in m.columns if c not in non and not c.startswith("next_year_")]
 
 
 def build_panel_for_target(target_col: str):
     """(panel, feat_cols) with the given next_year_* column as target. None if absent."""
-    if not CLEAN_MODELING.is_file():
+    modeling_path = _modeling_csv()
+    if not modeling_path.is_file():
         return None, []
-    m = pd.read_csv(CLEAN_MODELING)
+    m = pd.read_csv(modeling_path)
     if target_col not in m.columns or m[target_col].notna().sum() == 0:
         return None, []
     feat_cols = _feature_cols(m)
@@ -157,9 +160,10 @@ def write_model_outputs(path: Path) -> None:
     No trained model beats the equal-weight baseline on this data, so the score
     is a transparent rank-based fallback (mean of validated feature percentiles).
     """
-    if not CLEAN_MODELING.is_file():
+    modeling_path = PUBLIC_MODELING if PUBLIC_MODELING.is_file() else CLEAN_MODELING
+    if not modeling_path.is_file():
         return
-    m = pd.read_csv(CLEAN_MODELING)
+    m = pd.read_csv(modeling_path)
     feat_cols = _feature_cols(m)
     year = int(m["year"].max())
     sub = m[m["year"] == year].copy()
@@ -213,6 +217,10 @@ def _score_rank(Xtr, ytr, Xte):
     return np.nanmean(Xte, axis=1)
 
 
+def _score_robust_rank_aggregation(Xtr, ytr, Xte):
+    return np.nanmedian(Xte, axis=1)
+
+
 def _fit_sklearn(model, Xtr, ytr, Xte):
     Xtr2 = np.nan_to_num(Xtr, nan=0.5)  # rank-imputed center for ML only
     Xte2 = np.nan_to_num(Xte, nan=0.5)
@@ -223,12 +231,15 @@ def _fit_sklearn(model, Xtr, ytr, Xte):
 MODELS = {
     "baseline_equal_weight": ("baseline", _score_equal_weight),
     "baseline_rank_score": ("baseline", _score_rank),
+    "robust_rank_aggregation": ("baseline", _score_robust_rank_aggregation),
     "linear_regression": ("ml", lambda a, b, c: _fit_sklearn(LinearRegression(), a, b, c)),
     "ridge": ("ml", lambda a, b, c: _fit_sklearn(Ridge(alpha=1.0), a, b, c)),
     "lasso": ("ml", lambda a, b, c: _fit_sklearn(Lasso(alpha=0.1, max_iter=5000), a, b, c)),
     "elasticnet": ("ml", lambda a, b, c: _fit_sklearn(ElasticNet(alpha=0.1, max_iter=5000), a, b, c)),
     "random_forest": ("ml", lambda a, b, c: _fit_sklearn(
         RandomForestRegressor(n_estimators=200, max_depth=4, random_state=42), a, b, c)),
+    "gradient_boosting": ("ml", lambda a, b, c: _fit_sklearn(
+        GradientBoostingRegressor(random_state=42, max_depth=2, n_estimators=120), a, b, c)),
 }
 
 SPLITS = [
@@ -238,11 +249,86 @@ SPLITS = [
 ]
 
 
+def _write_feature_reports(panel: pd.DataFrame, feat_cols: list[str]) -> None:
+    coverage_rows = []
+    for c in feat_cols:
+        s = panel[c]
+        coverage_rows.append({
+            "feature": c,
+            "nonnull_rows": int(s.notna().sum()),
+            "nonnull_rate": round(float(s.notna().mean()), 4),
+            "years_with_data": int(panel.loc[s.notna(), "feature_year"].nunique()),
+            "tickers_with_data": int(panel.loc[s.notna(), "ticker"].nunique()),
+        })
+    pd.DataFrame(coverage_rows).sort_values(
+        ["nonnull_rate", "feature"], ascending=[False, True]
+    ).to_csv(RESULTS / "feature_coverage.csv", index=False)
+
+    stability_rows = []
+    for split in SPLITS:
+        tr = panel[(panel["feature_year"] + 1).isin(split["train_target_years"])]
+        y = tr["target_return"]
+        for c in feat_cols:
+            x = tr[c]
+            ok = x.notna() & y.notna()
+            corr = pd.Series(x[ok]).corr(pd.Series(y[ok]), method="spearman") if int(ok.sum()) >= 5 else np.nan
+            stability_rows.append({
+                "split": split["name"],
+                "feature": c,
+                "train_rows": int(ok.sum()),
+                "abs_spearman_to_target": None if pd.isna(corr) else round(abs(float(corr)), 4),
+                "spearman_to_target": None if pd.isna(corr) else round(float(corr), 4),
+            })
+    st = pd.DataFrame(stability_rows)
+    st.to_csv(RESULTS / "feature_stability_by_split.csv", index=False)
+    if len(st):
+        agg = (st.dropna(subset=["abs_spearman_to_target"])
+                 .groupby("feature", as_index=False)
+                 .agg(mean_abs_spearman=("abs_spearman_to_target", "mean"),
+                      std_abs_spearman=("abs_spearman_to_target", "std"),
+                      splits_observed=("abs_spearman_to_target", "count")))
+        agg["mean_abs_spearman"] = agg["mean_abs_spearman"].round(4)
+        agg["std_abs_spearman"] = agg["std_abs_spearman"].fillna(0).round(4)
+        agg.sort_values(["mean_abs_spearman", "splits_observed"], ascending=[False, False]).to_csv(
+            RESULTS / "feature_stability_summary.csv", index=False
+        )
+
+    tmp = panel[["target_return", *feat_cols]].copy()
+    tmp["coverage_fraction"] = tmp[feat_cols].notna().mean(axis=1)
+    tmp["coverage_bucket"] = pd.cut(
+        tmp["coverage_fraction"],
+        bins=[-0.01, 0.5, 0.8, 1.0],
+        labels=["low", "medium", "high"],
+    )
+    cov = (tmp.dropna(subset=["target_return"])
+             .groupby("coverage_bucket", observed=False)["target_return"]
+             .agg(["count", "mean", "median"])
+             .reset_index())
+    cov.rename(columns={"mean": "mean_next_year_return_pct",
+                        "median": "median_next_year_return_pct"}, inplace=True)
+    cov.to_csv(RESULTS / "coverage_impact.csv", index=False)
+
+
+def _markdown_table(df: pd.DataFrame) -> str:
+    if df.empty:
+        return "_No rows._"
+    d = df.copy()
+    d = d.where(pd.notna(d), "")
+    cols = [str(c) for c in d.columns]
+    lines = ["| " + " | ".join(cols) + " |",
+             "| " + " | ".join("---" for _ in cols) + " |"]
+    for _, row in d.iterrows():
+        vals = [str(row[c]).replace("|", "\\|") for c in d.columns]
+        lines.append("| " + " | ".join(vals) + " |")
+    return "\n".join(lines)
+
+
 def run() -> None:
     RESULTS.mkdir(parents=True, exist_ok=True)
     REPORTS.mkdir(parents=True, exist_ok=True)
     panel = build_panel()
     feat_cols = [c for c in panel.columns if c not in ("ticker", "feature_year", "target_return")]
+    _write_feature_reports(panel, feat_cols)
 
     # honest feature/sample reporting
     manual_feats = []
@@ -251,7 +337,7 @@ def run() -> None:
         import json as _json
         manual_feats = (_json.loads(qr.read_text()).get("manual_financials", {}) or {}).get(
             "accepted_feature_columns", []) or []
-    used_source = "clean modeling dataset" if CLEAN_MODELING.is_file() else "legacy reference panel"
+    used_source = str(_modeling_csv().relative_to(ROOT)) if _modeling_csv().is_file() else "legacy reference panel"
     train_years = sorted({y for s in SPLITS for y in s["train_target_years"]})
     test_years = sorted({s["test_feature_year"] + 1 for s in SPLITS})
     print(f"[experiments] source: {used_source}")
@@ -319,6 +405,7 @@ def run() -> None:
     sm = ["# Experiment summary (benchmark-aware, walk-forward)\n",
           "Small data (~40 stocks/year), leakage-controlled. Treat all numbers as noisy.",
           "Features are largely a static snapshot; baselines usually match/beat ML.\n",
+          "Additional reports: `feature_coverage.csv`, `feature_stability_summary.csv`, `coverage_impact.csv`.\n",
           f"Targets evaluated: {sorted(bt['target'].unique()) if len(bt) else ['next_year_return_pct']}\n"]
     if len(bt):
         for tgt in sorted(bt["target"].unique()):
@@ -346,7 +433,7 @@ def run() -> None:
         if "spearman" in sub:
             sub = sub.sort_values("spearman", ascending=False, na_position="last")
         lines.append(f"## {split['name']}\n")
-        lines.append(sub.to_markdown(index=False))
+        lines.append(_markdown_table(sub))
         lines.append("")
     (REPORTS / "summary.md").write_text("\n".join(lines))
     print("Wrote leaderboard + results + reports.")

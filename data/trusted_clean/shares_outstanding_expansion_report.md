@@ -2,10 +2,10 @@
 
 Capital-EVENT workflow: enter only capital CHANGES; they are carried forward to each year. Research/educational only — NOT investment advice.
 
-- Events source: `events`  | event rows used: **61**
-- Ticker-year rows filled: **213** / 240
-- Tickers with stable carry-forward: 18
-- Tickers with multiple capital events: 19
+- Events source: `events`  | event rows used: **76**
+- Ticker-year rows filled: **240** / 486
+- Tickers with stable carry-forward: 17
+- Tickers with multiple capital events: 23
 - Free-float-only rows rejected (not total shares): **0**
 - Ready for valuation: **True**
 

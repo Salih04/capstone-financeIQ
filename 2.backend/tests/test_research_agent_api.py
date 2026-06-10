@@ -36,6 +36,16 @@ class ResearchAgentApiTests(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertIn("data_quality", r.json())
 
+    def test_ai_status_not_configured_is_structured(self):
+        r = self.client.get("/research/ai-status", headers=self.h)
+        self.assertEqual(r.status_code, 200)
+        body = r.json()
+        self.assertFalse(body["available"])
+        self.assertFalse(body["configured"])
+        self.assertEqual(body["provider"], "none")
+        self.assertIn("AI not configured", body["reason"])
+        self.assertTrue(body["fallback_available"])
+
     def test_model_diagnostics(self):
         r = self.client.get("/research/model-diagnostics", headers=self.h)
         self.assertEqual(r.status_code, 200)

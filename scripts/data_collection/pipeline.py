@@ -25,6 +25,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from scripts.data_collection.price_features import PRICE_FEATURE_COLUMNS, build_price_features
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RAW_DIR = REPO_ROOT / "data" / "trusted_raw"
 CLEAN_DIR = REPO_ROOT / "data" / "trusted_clean"
@@ -72,7 +74,10 @@ TARGET_COLS = (
     "next_year_bist100_return_pct", "next_year_excess_return_vs_bist100",
     "next_year_outperform_bist100",
 )
-META_COLS = ("has_target", "target_year", "is_inference_row", "same_year_return_pct")
+META_COLS = (
+    "has_target", "target_year", "is_inference_row", "same_year_return_pct",
+    "is_public_universe", "is_training_universe", "universe_source",
+)
 
 
 FINANCIALS_DIR = RAW_DIR / "financials"
@@ -370,6 +375,16 @@ def build_modeling_dataset(cfg: PipelineConfig) -> pd.DataFrame:
         for c in ("next_year_bist100_return_pct", "next_year_excess_return_vs_bist100",
                   "next_year_outperform_bist100"):
             df[c] = np.nan
+
+    price_feats = build_price_features(benchmark=bench)
+    if not price_feats.empty:
+        df = df.merge(price_feats, on=["ticker", "year"], how="left")
+        matched = int(df["price_data_available"].fillna(0).sum()) if "price_data_available" in df.columns else 0
+        cfg.say(f"[price_features] merged {matched}/{len(df)} ticker-year rows from Yahoo year-end prices")
+    else:
+        for c in PRICE_FEATURE_COLUMNS:
+            df[c] = np.nan
+        cfg.say("[price_features] no cached Yahoo year-end prices found; price features left null")
 
     # Merge real manual financial history (if any) and accept varying columns.
     base_features = set(feature_columns(df))

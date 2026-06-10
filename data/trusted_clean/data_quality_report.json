@@ -1,35 +1,39 @@
 {
-  "rows": 240,
+  "rows": 403,
   "rows_by_year": {
     "2020": 40,
-    "2021": 40,
-    "2022": 40,
-    "2023": 40,
-    "2024": 40,
-    "2025": 40
+    "2021": 41,
+    "2022": 81,
+    "2023": 81,
+    "2024": 80,
+    "2025": 80
   },
   "tickers_by_year": {
     "2020": 40,
-    "2021": 40,
-    "2022": 40,
-    "2023": 40,
-    "2024": 40,
-    "2025": 40
+    "2021": 41,
+    "2022": 81,
+    "2023": 81,
+    "2024": 80,
+    "2025": 80
   },
-  "n_features": 27,
+  "n_features": 40,
   "feature_columns": [
+    "benchmark_same_year_return_pct",
     "current_assets",
     "current_ratio",
     "ebitda",
     "ebitda_growth_pct",
     "ebitda_margin",
+    "enterprise_value",
     "equity",
+    "ev_ebitda",
     "financial_debt_ratio",
     "gross_margin",
     "gross_profit",
     "gross_profit_growth_pct",
     "leverage_ratio",
     "long_term_liabilities",
+    "market_cap",
     "net_debt",
     "net_debt_to_ebitda",
     "net_income",
@@ -38,6 +42,15 @@
     "non_current_assets",
     "operating_income",
     "operating_income_growth_pct",
+    "pb_ratio",
+    "pe_ratio",
+    "price_adjclose_t",
+    "price_data_available",
+    "price_drawdown_from_3y_high_pct",
+    "price_history_years_available",
+    "price_momentum_1y_pct",
+    "price_momentum_2y_pct",
+    "price_vs_bist100_1y_pct",
     "revenue",
     "revenue_growth_pct",
     "roa",
@@ -229,13 +242,19 @@
       "attempted": true,
       "shares_status": "manual",
       "target_column_status": {
-        "market_cap": "missing",
-        "enterprise_value": "missing",
-        "pe": "missing",
-        "pb": "missing",
-        "ev_ebitda": "missing"
+        "market_cap": "accepted",
+        "enterprise_value": "accepted",
+        "pe": "accepted",
+        "pb": "accepted",
+        "ev_ebitda": "accepted"
       },
-      "columns_entering_candidate": []
+      "columns_entering_candidate": [
+        "market_cap",
+        "enterprise_value",
+        "pe",
+        "pb",
+        "ev_ebitda"
+      ]
     },
     "old_snapshot_rejected_but_corrected_accepted": [
       "ebitda",
@@ -254,58 +273,74 @@
     "company_name": 0.0,
     "year": 0.0,
     "sector": 1.0,
-    "indices": 0.0,
+    "indices": 0.404,
     "is_bist100": 0.0,
-    "current_assets": 0.0,
-    "current_ratio": 0.0,
-    "ebitda": 0.0,
-    "ebitda_growth_pct": 0.0,
-    "ebitda_margin": 0.0,
+    "benchmark_same_year_return_pct": 0.04,
+    "current_assets": 0.109,
+    "current_ratio": 0.404,
+    "ebitda": 0.112,
+    "ebitda_growth_pct": 0.404,
+    "ebitda_margin": 0.112,
+    "enterprise_value": 0.439,
     "equity": 0.0,
-    "financial_debt_ratio": 0.0,
-    "gross_margin": 0.0,
-    "gross_profit": 0.0,
-    "gross_profit_growth_pct": 0.0,
-    "leverage_ratio": 0.0,
-    "long_term_liabilities": 0.0,
-    "net_debt": 0.0,
-    "net_debt_to_ebitda": 0.0,
+    "ev_ebitda": 0.479,
+    "financial_debt_ratio": 0.404,
+    "gross_margin": 0.109,
+    "gross_profit": 0.109,
+    "gross_profit_growth_pct": 0.404,
+    "leverage_ratio": 0.404,
+    "long_term_liabilities": 0.109,
+    "market_cap": 0.439,
+    "net_debt": 0.164,
+    "net_debt_to_ebitda": 0.404,
     "net_income": 0.0,
-    "net_income_growth_pct": 0.0,
+    "net_income_growth_pct": 0.404,
     "net_margin": 0.0,
-    "non_current_assets": 0.0,
-    "operating_income": 0.0,
-    "operating_income_growth_pct": 0.0,
+    "non_current_assets": 0.109,
+    "operating_income": 0.109,
+    "operating_income_growth_pct": 0.404,
+    "pb_ratio": 0.439,
+    "pe_ratio": 0.541,
+    "price_adjclose_t": 0.04,
+    "price_data_available": 0.04,
+    "price_drawdown_from_3y_high_pct": 0.04,
+    "price_history_years_available": 0.04,
+    "price_momentum_1y_pct": 0.144,
+    "price_momentum_2y_pct": 0.251,
+    "price_vs_bist100_1y_pct": 0.144,
     "revenue": 0.0,
-    "revenue_growth_pct": 0.0,
+    "revenue_growth_pct": 0.404,
     "roa": 0.0,
     "roe": 0.0,
-    "short_term_liabilities": 0.0,
+    "short_term_liabilities": 0.109,
     "total_assets": 0.0,
-    "working_capital": 0.0,
-    "next_year_return_pct": 0.167,
-    "next_year_rank_by_return": 0.167,
-    "next_year_return_percentile": 0.167,
-    "next_year_top_10pct_returner": 0.167,
-    "next_year_top_20pct_returner": 0.167,
-    "next_year_bist100_return_pct": 0.167,
-    "next_year_excess_return_vs_bist100": 0.167,
-    "next_year_outperform_bist100": 0.167,
-    "same_year_return_pct": 0.0,
+    "working_capital": 0.109,
+    "next_year_return_pct": 0.203,
+    "next_year_rank_by_return": 0.203,
+    "next_year_return_percentile": 0.203,
+    "next_year_top_10pct_returner": 0.203,
+    "next_year_top_20pct_returner": 0.203,
+    "next_year_bist100_return_pct": 0.504,
+    "next_year_excess_return_vs_bist100": 0.504,
+    "next_year_outperform_bist100": 0.504,
+    "same_year_return_pct": 0.01,
     "target_year": 0.0,
     "has_target": 0.0,
-    "is_inference_row": 0.0
+    "is_inference_row": 0.0,
+    "is_public_universe": 0.0,
+    "is_training_universe": 0.0,
+    "universe_source": 0.0
   },
   "target_coverage_by_year": {
     "2020": 1.0,
     "2021": 1.0,
-    "2022": 1.0,
-    "2023": 1.0,
+    "2022": 0.988,
+    "2023": 0.988,
     "2024": 1.0,
     "2025": 0.0
   },
-  "rows_with_target": 200,
-  "inference_only_rows": 40,
+  "rows_with_target": 321,
+  "inference_only_rows": 82,
   "benchmark_available": true,
   "benchmark": {
     "source": "yfinance",
@@ -364,6 +399,11 @@
       "leakage_risk": "none"
     },
     {
+      "column": "benchmark_same_year_return_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
       "column": "current_assets",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
@@ -389,7 +429,17 @@
       "leakage_risk": "provisional_reference_fundamental"
     },
     {
+      "column": "enterprise_value",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
       "column": "equity",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "ev_ebitda",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -420,6 +470,11 @@
     },
     {
       "column": "long_term_liabilities",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "market_cap",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -460,6 +515,51 @@
     },
     {
       "column": "operating_income_growth_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "pb_ratio",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "pe_ratio",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "price_adjclose_t",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "price_data_available",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "price_drawdown_from_3y_high_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "price_history_years_available",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "price_momentum_1y_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "price_momentum_2y_pct",
+      "role": "feature_allowed",
+      "leakage_risk": "provisional_reference_fundamental"
+    },
+    {
+      "column": "price_vs_bist100_1y_pct",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -557,95 +657,25 @@
       "column": "is_inference_row",
       "role": "metadata",
       "leakage_risk": "none"
+    },
+    {
+      "column": "is_public_universe",
+      "role": "metadata",
+      "leakage_risk": "none"
+    },
+    {
+      "column": "is_training_universe",
+      "role": "metadata",
+      "leakage_risk": "none"
+    },
+    {
+      "column": "universe_source",
+      "role": "metadata",
+      "leakage_risk": "none"
     }
   ],
   "manual_financials": {
-    "files": [
-      "bist100_yfinance_candidate_clean.csv",
-      "candidate_from_yearly_snapshots.csv",
-      "corrected_balance_sheet_2024.csv",
-      "corrected_yearly_financials_candidate.csv",
-      "free_valuation_history_candidate.csv"
-    ],
-    "rows_ingested": 276,
-    "coverage_by_year": {
-      "2020": 40,
-      "2021": 40,
-      "2022": 49,
-      "2023": 49,
-      "2024": 49,
-      "2025": 49
-    },
-    "columns_ingested": [
-      "revenue",
-      "gross_profit",
-      "operating_income",
-      "net_income",
-      "ebitda",
-      "total_assets",
-      "current_assets",
-      "non_current_assets",
-      "short_term_liabilities",
-      "long_term_liabilities",
-      "total_equity",
-      "working_capital",
-      "net_debt",
-      "roe",
-      "roa",
-      "gross_margin",
-      "net_margin",
-      "ebitda_margin",
-      "current_ratio",
-      "leverage_ratio",
-      "net_debt_to_ebitda"
-    ],
-    "unknown_columns_ignored": [
-      "source",
-      "retrieved_at",
-      "roic",
-      "year_end_close",
-      "shares_outstanding",
-      "source_price",
-      "source_shares",
-      "source_financials",
-      "validation_status",
-      "validation_notes"
-    ],
-    "misaligned_columns_rejected": [],
-    "all_null_columns_rejected": [
-      "financial_debt_ratio"
-    ],
-    "source_note": "Multiple manual sources detected. Corrected yearly source was prioritized for income/profitability fields; legacy snapshot source only filled fields it uniquely provided. This overlap is expected, not an error.",
-    "issues": [
-      "unknown tickers not in universe: ['AKSA', 'AKSEN', 'DOHOL', 'EKGYO', 'KCHOL', 'ODAS', 'SAHOL', 'SMRTG', 'VESTL']"
-    ],
-    "present": true,
-    "overrides_from_snapshot": {
-      "total_assets": 40,
-      "current_assets": 40,
-      "non_current_assets": 40,
-      "short_term_liabilities": 40,
-      "long_term_liabilities": 40,
-      "equity": 40,
-      "working_capital": 40,
-      "net_debt": 40,
-      "current_ratio": 40,
-      "leverage_ratio": 40,
-      "net_debt_to_ebitda": 34
-    },
-    "accepted_feature_columns": [
-      "revenue",
-      "gross_profit",
-      "operating_income",
-      "net_income",
-      "ebitda",
-      "roe",
-      "roa",
-      "gross_margin",
-      "net_margin",
-      "ebitda_margin"
-    ],
-    "rejected_feature_columns": {}
+    "present": false
   },
   "issues": [],
   "valid_for_T_to_T1_modeling": true

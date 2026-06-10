@@ -5,6 +5,60 @@ AEFES,2022,592105263.0,user provided merged capital research,stable issued capit
 AEFES,2023,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1.0,carried_forward
 AEFES,2024,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1.0,carried_forward
 AEFES,2025,5921052630.0,user provided merged capital research,2025 900 percent bonus issue,medium,issued_capital,1.0,carried_forward
+AGESA,2020,,,,,,,missing_prior_event
+AGESA,2021,,,,,,,missing_prior_event
+AGESA,2022,,,,,,,missing_prior_event
+AGESA,2023,,,,,,,missing_prior_event
+AGESA,2024,,,,,,,missing_prior_event
+AGESA,2025,,,,,,,missing_prior_event
+AGHOL,2020,,,,,,,missing_prior_event
+AGHOL,2021,,,,,,,missing_prior_event
+AGHOL,2022,,,,,,,missing_prior_event
+AGHOL,2023,,,,,,,missing_prior_event
+AGHOL,2024,,,,,,,missing_prior_event
+AGHOL,2025,,,,,,,missing_prior_event
+AKBNK,2020,,,,,,,missing_prior_event
+AKBNK,2021,,,,,,,missing_prior_event
+AKBNK,2022,,,,,,,missing_prior_event
+AKBNK,2023,,,,,,,missing_prior_event
+AKBNK,2024,,,,,,,missing_prior_event
+AKBNK,2025,,,,,,,missing_prior_event
+AKENR,2020,,,,,,,missing_prior_event
+AKENR,2021,,,,,,,missing_prior_event
+AKENR,2022,,,,,,,missing_prior_event
+AKENR,2023,,,,,,,missing_prior_event
+AKENR,2024,,,,,,,missing_prior_event
+AKENR,2025,,,,,,,missing_prior_event
+AKSA,2020,,,,,,,missing_prior_event
+AKSA,2021,,,,,,,missing_prior_event
+AKSA,2022,,,,,,,missing_prior_event
+AKSA,2023,,,,,,,missing_prior_event
+AKSA,2024,,,,,,,missing_prior_event
+AKSA,2025,,,,,,,missing_prior_event
+AKSEN,2020,,,,,,,missing_prior_event
+AKSEN,2021,,,,,,,missing_prior_event
+AKSEN,2022,,,,,,,missing_prior_event
+AKSEN,2023,,,,,,,missing_prior_event
+AKSEN,2024,,,,,,,missing_prior_event
+AKSEN,2025,,,,,,,missing_prior_event
+ALARK,2020,,,,,,,missing_prior_event
+ALARK,2021,,,,,,,missing_prior_event
+ALARK,2022,,,,,,,missing_prior_event
+ALARK,2023,,,,,,,missing_prior_event
+ALARK,2024,,,,,,,missing_prior_event
+ALARK,2025,,,,,,,missing_prior_event
+ALBRK,2020,,,,,,,missing_prior_event
+ALBRK,2021,,,,,,,missing_prior_event
+ALBRK,2022,,,,,,,missing_prior_event
+ALBRK,2023,,,,,,,missing_prior_event
+ALBRK,2024,,,,,,,missing_prior_event
+ALBRK,2025,,,,,,,missing_prior_event
+ANHYT,2020,,,,,,,missing_prior_event
+ANHYT,2021,,,,,,,missing_prior_event
+ANHYT,2022,,,,,,,missing_prior_event
+ANHYT,2023,,,,,,,missing_prior_event
+ANHYT,2024,,,,,,,missing_prior_event
+ANHYT,2025,,,,,,,missing_prior_event
 ARCLK,2020,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1.0,carried_forward
 ARCLK,2021,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1.0,carried_forward
 ARCLK,2022,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1.0,carried_forward
@@ -17,12 +71,18 @@ ASELS,2022,2280000000.0,user provided merged capital research,2020 year-end capi
 ASELS,2023,4560000000.0,user provided merged capital research,2023 100 percent bonus issue; included because earlier research had specific SPK/KAP timing,low,issued_capital,1.0,carried_forward
 ASELS,2024,4560000000.0,user provided merged capital research,2023 100 percent bonus issue; included because earlier research had specific SPK/KAP timing,low,issued_capital,1.0,carried_forward
 ASELS,2025,4560000000.0,user provided merged capital research,2023 100 percent bonus issue; included because earlier research had specific SPK/KAP timing,low,issued_capital,1.0,carried_forward
-ASTOR,2020,,,,,,,missing_prior_event
-ASTOR,2021,,,,,,,missing_prior_event
+ASTOR,2020,200000000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1.0,carried_forward
+ASTOR,2021,850000000.0,user provided merged capital research,2021 pre-IPO internal capital increase,medium,issued_capital,1.0,carried_forward
 ASTOR,2022,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1.0,carried_forward
 ASTOR,2023,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1.0,carried_forward
 ASTOR,2024,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1.0,carried_forward
 ASTOR,2025,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1.0,carried_forward
+BERA,2020,,,,,,,missing_prior_event
+BERA,2021,,,,,,,missing_prior_event
+BERA,2022,,,,,,,missing_prior_event
+BERA,2023,,,,,,,missing_prior_event
+BERA,2024,,,,,,,missing_prior_event
+BERA,2025,,,,,,,missing_prior_event
 BIMAS,2020,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1.0,carried_forward
 BIMAS,2021,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1.0,carried_forward
 BIMAS,2022,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1.0,carried_forward
@@ -41,7 +101,7 @@ BTCIM,2022,180000000.0,user provided merged capital research,issued capital befo
 BTCIM,2023,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
 BTCIM,2024,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
 BTCIM,2025,5580000000.0,user provided merged capital research,2025 3000 percent bonus issue,medium,issued_capital,1.0,carried_forward
-CANTE,2020,,,,,,,missing_prior_event
+CANTE,2020,252410000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1.0,carried_forward
 CANTE,2021,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1.0,carried_forward
 CANTE,2022,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1.0,carried_forward
 CANTE,2023,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1.0,carried_forward
@@ -53,24 +113,60 @@ CCOLA,2022,254370782.0,user provided merged capital research,issued capital befo
 CCOLA,2023,254370782.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
 CCOLA,2024,2798078602.0,user provided merged capital research,2024 1000 percent bonus issue,medium,issued_capital,1.0,carried_forward
 CCOLA,2025,2798078602.0,user provided merged capital research,2024 1000 percent bonus issue,medium,issued_capital,1.0,carried_forward
+CEMTS,2020,,,,,,,missing_prior_event
+CEMTS,2021,,,,,,,missing_prior_event
+CEMTS,2022,,,,,,,missing_prior_event
+CEMTS,2023,,,,,,,missing_prior_event
+CEMTS,2024,,,,,,,missing_prior_event
+CEMTS,2025,,,,,,,missing_prior_event
 CIMSA,2020,135084442.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
 CIMSA,2021,135084442.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
 CIMSA,2022,135084442.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
 CIMSA,2023,945591094.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1.0,carried_forward
 CIMSA,2024,945591094.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1.0,carried_forward
 CIMSA,2025,945591094.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1.0,carried_forward
+DEVA,2020,,,,,,,missing_prior_event
+DEVA,2021,,,,,,,missing_prior_event
+DEVA,2022,,,,,,,missing_prior_event
+DEVA,2023,,,,,,,missing_prior_event
+DEVA,2024,,,,,,,missing_prior_event
+DEVA,2025,,,,,,,missing_prior_event
 DOAS,2020,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 DOAS,2021,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 DOAS,2022,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 DOAS,2023,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 DOAS,2024,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 DOAS,2025,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
-DSTKF,2020,,,,,,,missing_prior_event
-DSTKF,2021,,,,,,,missing_prior_event
-DSTKF,2022,,,,,,,missing_prior_event
-DSTKF,2023,,,,,,,missing_prior_event
-DSTKF,2024,,,,,,,missing_prior_event
-DSTKF,2025,333333333.0,user provided merged capital research,2025 IPO capital after new share issue; no earlier rows because company was private,medium,issued_capital,1.0,carried_forward
+DOHOL,2020,,,,,,,missing_prior_event
+DOHOL,2021,,,,,,,missing_prior_event
+DOHOL,2022,,,,,,,missing_prior_event
+DOHOL,2023,,,,,,,missing_prior_event
+DOHOL,2024,,,,,,,missing_prior_event
+DOHOL,2025,,,,,,,missing_prior_event
+DSTKF,2020,50000000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1.0,carried_forward
+DSTKF,2021,50000000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1.0,carried_forward
+DSTKF,2022,190000000.0,user provided merged capital research,2022 pre-IPO capital increase,low,issued_capital,1.0,carried_forward
+DSTKF,2023,250000000.0,user provided merged capital research,2023 pre-IPO internal capital increase,medium,issued_capital,1.0,carried_forward
+DSTKF,2024,250000000.0,user provided merged capital research,2023 pre-IPO internal capital increase,medium,issued_capital,1.0,carried_forward
+DSTKF,2025,333333333.0,user provided merged capital research,2025 IPO capital after new share issue,medium,issued_capital,1.0,carried_forward
+EGEEN,2020,,,,,,,missing_prior_event
+EGEEN,2021,,,,,,,missing_prior_event
+EGEEN,2022,,,,,,,missing_prior_event
+EGEEN,2023,,,,,,,missing_prior_event
+EGEEN,2024,,,,,,,missing_prior_event
+EGEEN,2025,,,,,,,missing_prior_event
+EKGYO,2020,,,,,,,missing_prior_event
+EKGYO,2021,,,,,,,missing_prior_event
+EKGYO,2022,,,,,,,missing_prior_event
+EKGYO,2023,,,,,,,missing_prior_event
+EKGYO,2024,,,,,,,missing_prior_event
+EKGYO,2025,,,,,,,missing_prior_event
+ENJSA,2020,,,,,,,missing_prior_event
+ENJSA,2021,,,,,,,missing_prior_event
+ENJSA,2022,,,,,,,missing_prior_event
+ENJSA,2023,,,,,,,missing_prior_event
+ENJSA,2024,,,,,,,missing_prior_event
+ENJSA,2025,,,,,,,missing_prior_event
 ENKAI,2020,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1.0,carried_forward
 ENKAI,2021,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1.0,carried_forward
 ENKAI,2022,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1.0,carried_forward
@@ -89,18 +185,48 @@ FROTO,2022,350910000.0,user provided merged capital research,issued capital befo
 FROTO,2023,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
 FROTO,2024,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1.0,carried_forward
 FROTO,2025,3509100000.0,user provided merged capital research,2025 900 percent bonus issue,medium,issued_capital,1.0,carried_forward
+GARAN,2020,,,,,,,missing_prior_event
+GARAN,2021,,,,,,,missing_prior_event
+GARAN,2022,,,,,,,missing_prior_event
+GARAN,2023,,,,,,,missing_prior_event
+GARAN,2024,,,,,,,missing_prior_event
+GARAN,2025,,,,,,,missing_prior_event
 GUBRF,2020,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
 GUBRF,2021,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
 GUBRF,2022,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
 GUBRF,2023,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
 GUBRF,2024,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
 GUBRF,2025,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1.0,carried_forward
+HALKB,2020,,,,,,,missing_prior_event
+HALKB,2021,,,,,,,missing_prior_event
+HALKB,2022,,,,,,,missing_prior_event
+HALKB,2023,,,,,,,missing_prior_event
+HALKB,2024,,,,,,,missing_prior_event
+HALKB,2025,,,,,,,missing_prior_event
 HEKTS,2020,860000000.0,user provided merged capital research,issued capital before 2022 capital increases,medium,issued_capital,1.0,carried_forward
 HEKTS,2021,860000000.0,user provided merged capital research,issued capital before 2022 capital increases,medium,issued_capital,1.0,carried_forward
 HEKTS,2022,2530000000.0,user provided merged capital research,2022 paid plus bonus capital increase,medium,issued_capital,1.0,carried_forward
 HEKTS,2023,2530000000.0,user provided merged capital research,2022 paid plus bonus capital increase,medium,issued_capital,1.0,carried_forward
 HEKTS,2024,8430000000.0,user provided merged capital research,2024 paid capital increase,medium,issued_capital,1.0,carried_forward
 HEKTS,2025,8430000000.0,user provided merged capital research,2024 paid capital increase,medium,issued_capital,1.0,carried_forward
+ISCTR,2020,,,,,,,missing_prior_event
+ISCTR,2021,,,,,,,missing_prior_event
+ISCTR,2022,,,,,,,missing_prior_event
+ISCTR,2023,,,,,,,missing_prior_event
+ISCTR,2024,,,,,,,missing_prior_event
+ISCTR,2025,,,,,,,missing_prior_event
+ISGYO,2020,,,,,,,missing_prior_event
+ISGYO,2021,,,,,,,missing_prior_event
+ISGYO,2022,,,,,,,missing_prior_event
+ISGYO,2023,,,,,,,missing_prior_event
+ISGYO,2024,,,,,,,missing_prior_event
+ISGYO,2025,,,,,,,missing_prior_event
+KCHOL,2020,,,,,,,missing_prior_event
+KCHOL,2021,,,,,,,missing_prior_event
+KCHOL,2022,,,,,,,missing_prior_event
+KCHOL,2023,,,,,,,missing_prior_event
+KCHOL,2024,,,,,,,missing_prior_event
+KCHOL,2025,,,,,,,missing_prior_event
 KONTR,2020,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1.0,carried_forward
 KONTR,2021,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1.0,carried_forward
 KONTR,2022,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1.0,carried_forward
@@ -113,30 +239,72 @@ KRDMD,2022,1140000000.0,user provided merged capital research,likely stable issu
 KRDMD,2023,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1.0,carried_forward
 KRDMD,2024,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1.0,carried_forward
 KRDMD,2025,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1.0,carried_forward
+KRVGD,2020,,,,,,,missing_prior_event
+KRVGD,2021,,,,,,,missing_prior_event
+KRVGD,2022,,,,,,,missing_prior_event
+KRVGD,2023,,,,,,,missing_prior_event
+KRVGD,2024,,,,,,,missing_prior_event
+KRVGD,2025,,,,,,,missing_prior_event
 KUYAS,2020,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1.0,carried_forward
 KUYAS,2021,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1.0,carried_forward
 KUYAS,2022,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1.0,carried_forward
 KUYAS,2023,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1.0,carried_forward
 KUYAS,2024,400000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1.0,carried_forward
 KUYAS,2025,400000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1.0,carried_forward
-MAVI,2020,,,,,,,missing_prior_event
-MAVI,2021,,,,,,,missing_prior_event
-MAVI,2022,,,,,,,missing_prior_event
-MAVI,2023,,,,,,,missing_prior_event
-MAVI,2024,,,,,,,missing_prior_event
-MAVI,2025,,,,,,,missing_prior_event
+LOGO,2020,,,,,,,missing_prior_event
+LOGO,2021,,,,,,,missing_prior_event
+LOGO,2022,,,,,,,missing_prior_event
+LOGO,2023,,,,,,,missing_prior_event
+LOGO,2024,,,,,,,missing_prior_event
+LOGO,2025,,,,,,,missing_prior_event
+MAVI,2020,49657000.0,user provided merged capital research,2020-2021 capital before later bonus issues,medium,issued_capital,1.0,carried_forward
+MAVI,2021,49657000.0,user provided merged capital research,2020-2021 capital before later bonus issues,medium,issued_capital,1.0,carried_forward
+MAVI,2022,99314000.0,user provided merged capital research,2022 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
+MAVI,2023,198628000.0,user provided merged capital research,2023 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
+MAVI,2024,397256000.0,user provided merged capital research,2024 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
+MAVI,2025,794512000.0,user provided merged capital research,2025 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
 MGROS,2020,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 MGROS,2021,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 MGROS,2022,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 MGROS,2023,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 MGROS,2024,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 MGROS,2025,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
-MIATK,2020,,,,,,,missing_prior_event
+MIATK,2020,30000000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1.0,carried_forward
 MIATK,2021,38000000.0,user provided merged capital research,IPO period capital; no 2020 row because listed later,medium,issued_capital,1.0,carried_forward
 MIATK,2022,38000000.0,user provided merged capital research,IPO period capital; no 2020 row because listed later,medium,issued_capital,1.0,carried_forward
 MIATK,2023,494000000.0,user provided merged capital research,2023 1200 percent bonus issue,medium,issued_capital,1.0,carried_forward
 MIATK,2024,494000000.0,user provided merged capital research,2023 1200 percent bonus issue,medium,issued_capital,1.0,carried_forward
 MIATK,2025,494000000.0,user provided merged capital research,2023 1200 percent bonus issue,medium,issued_capital,1.0,carried_forward
+MPARK,2020,,,,,,,missing_prior_event
+MPARK,2021,,,,,,,missing_prior_event
+MPARK,2022,,,,,,,missing_prior_event
+MPARK,2023,,,,,,,missing_prior_event
+MPARK,2024,,,,,,,missing_prior_event
+MPARK,2025,,,,,,,missing_prior_event
+NETAS,2020,,,,,,,missing_prior_event
+NETAS,2021,,,,,,,missing_prior_event
+NETAS,2022,,,,,,,missing_prior_event
+NETAS,2023,,,,,,,missing_prior_event
+NETAS,2024,,,,,,,missing_prior_event
+NETAS,2025,,,,,,,missing_prior_event
+NTGAZ,2020,,,,,,,missing_prior_event
+NTGAZ,2021,,,,,,,missing_prior_event
+NTGAZ,2022,,,,,,,missing_prior_event
+NTGAZ,2023,,,,,,,missing_prior_event
+NTGAZ,2024,,,,,,,missing_prior_event
+NTGAZ,2025,,,,,,,missing_prior_event
+ODAS,2020,,,,,,,missing_prior_event
+ODAS,2021,,,,,,,missing_prior_event
+ODAS,2022,,,,,,,missing_prior_event
+ODAS,2023,,,,,,,missing_prior_event
+ODAS,2024,,,,,,,missing_prior_event
+ODAS,2025,,,,,,,missing_prior_event
+OTKAR,2020,,,,,,,missing_prior_event
+OTKAR,2021,,,,,,,missing_prior_event
+OTKAR,2022,,,,,,,missing_prior_event
+OTKAR,2023,,,,,,,missing_prior_event
+OTKAR,2024,,,,,,,missing_prior_event
+OTKAR,2025,,,,,,,missing_prior_event
 OYAKC,2020,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
 OYAKC,2021,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
 OYAKC,2022,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
@@ -161,24 +329,72 @@ PGSUS,2022,102299707.0,user provided merged capital research,issued capital befo
 PGSUS,2023,102299707.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1.0,carried_forward
 PGSUS,2024,500000000.0,user provided merged capital research,2024 388.75995 percent bonus issue,medium,issued_capital,1.0,carried_forward
 PGSUS,2025,500000000.0,user provided merged capital research,2024 388.75995 percent bonus issue,medium,issued_capital,1.0,carried_forward
+PRKME,2020,,,,,,,missing_prior_event
+PRKME,2021,,,,,,,missing_prior_event
+PRKME,2022,,,,,,,missing_prior_event
+PRKME,2023,,,,,,,missing_prior_event
+PRKME,2024,,,,,,,missing_prior_event
+PRKME,2025,,,,,,,missing_prior_event
+RGYAS,2020,,,,,,,missing_prior_event
+RGYAS,2021,,,,,,,missing_prior_event
+RGYAS,2022,,,,,,,missing_prior_event
+RGYAS,2023,,,,,,,missing_prior_event
+RGYAS,2024,,,,,,,missing_prior_event
+RGYAS,2025,,,,,,,missing_prior_event
+SAHOL,2020,,,,,,,missing_prior_event
+SAHOL,2021,,,,,,,missing_prior_event
+SAHOL,2022,,,,,,,missing_prior_event
+SAHOL,2023,,,,,,,missing_prior_event
+SAHOL,2024,,,,,,,missing_prior_event
+SAHOL,2025,,,,,,,missing_prior_event
 SASA,2020,830000000.0,user provided merged capital research,issued capital in 2020 annual report,medium,issued_capital,1.0,carried_forward
 SASA,2021,1110000000.0,user provided merged capital research,capital shown in 2021 report,medium,issued_capital,1.0,carried_forward
 SASA,2022,2240000000.0,user provided merged capital research,2022 100 percent bonus issue,medium,issued_capital,1.0,carried_forward
 SASA,2023,5295959799.1,user provided merged capital research,2023 130 percent bonus issue proposal/result; verify final registered amount,medium,issued_capital,1.0,carried_forward
 SASA,2024,5295959799.1,user provided merged capital research,2023 130 percent bonus issue proposal/result; verify final registered amount,medium,issued_capital,1.0,carried_forward
 SASA,2025,5295959799.1,user provided merged capital research,2023 130 percent bonus issue proposal/result; verify final registered amount,medium,issued_capital,1.0,carried_forward
+SELEC,2020,,,,,,,missing_prior_event
+SELEC,2021,,,,,,,missing_prior_event
+SELEC,2022,,,,,,,missing_prior_event
+SELEC,2023,,,,,,,missing_prior_event
+SELEC,2024,,,,,,,missing_prior_event
+SELEC,2025,,,,,,,missing_prior_event
 SISE,2020,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
 SISE,2021,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
 SISE,2022,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
 SISE,2023,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
 SISE,2024,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
 SISE,2025,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1.0,carried_forward
+SKBNK,2020,,,,,,,missing_prior_event
+SKBNK,2021,,,,,,,missing_prior_event
+SKBNK,2022,,,,,,,missing_prior_event
+SKBNK,2023,,,,,,,missing_prior_event
+SKBNK,2024,,,,,,,missing_prior_event
+SKBNK,2025,,,,,,,missing_prior_event
+SMRTG,2020,,,,,,,missing_prior_event
+SMRTG,2021,,,,,,,missing_prior_event
+SMRTG,2022,,,,,,,missing_prior_event
+SMRTG,2023,,,,,,,missing_prior_event
+SMRTG,2024,,,,,,,missing_prior_event
+SMRTG,2025,,,,,,,missing_prior_event
+SOKM,2020,,,,,,,missing_prior_event
+SOKM,2021,,,,,,,missing_prior_event
+SOKM,2022,,,,,,,missing_prior_event
+SOKM,2023,,,,,,,missing_prior_event
+SOKM,2024,,,,,,,missing_prior_event
+SOKM,2025,,,,,,,missing_prior_event
 TAVHL,2020,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 TAVHL,2021,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 TAVHL,2022,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 TAVHL,2023,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 TAVHL,2024,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 TAVHL,2025,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TBORG,2020,,,,,,,missing_prior_event
+TBORG,2021,,,,,,,missing_prior_event
+TBORG,2022,,,,,,,missing_prior_event
+TBORG,2023,,,,,,,missing_prior_event
+TBORG,2024,,,,,,,missing_prior_event
+TBORG,2025,,,,,,,missing_prior_event
 TCELL,2020,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 TCELL,2021,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 TCELL,2022,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
@@ -197,18 +413,18 @@ TOASO,2022,500000000.0,user provided merged capital research,stable issued capit
 TOASO,2023,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 TOASO,2024,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 TOASO,2025,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
-TRALT,2020,,,,,,,missing_prior_event
-TRALT,2021,,,,,,,missing_prior_event
-TRALT,2022,,,,,,,missing_prior_event
-TRALT,2023,,,,,,,missing_prior_event
-TRALT,2024,,,,,,,missing_prior_event
-TRALT,2025,,,,,,,missing_prior_event
-TRMET,2020,,,,,,,missing_prior_event
-TRMET,2021,,,,,,,missing_prior_event
-TRMET,2022,,,,,,,missing_prior_event
-TRMET,2023,,,,,,,missing_prior_event
-TRMET,2024,,,,,,,missing_prior_event
-TRMET,2025,,,,,,,missing_prior_event
+TRALT,2020,152500000.0,user provided merged capital research,former KOZAL; stable before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
+TRALT,2021,152500000.0,user provided merged capital research,former KOZAL; stable before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
+TRALT,2022,152500000.0,user provided merged capital research,former KOZAL; stable before 2023 bonus issue,medium,issued_capital,1.0,carried_forward
+TRALT,2023,3202500000.0,user provided merged capital research,2023 2000 percent bonus issue,medium,issued_capital,1.0,carried_forward
+TRALT,2024,3202500000.0,user provided merged capital research,2023 2000 percent bonus issue,medium,issued_capital,1.0,carried_forward
+TRALT,2025,3202500000.0,user provided merged capital research,2023 2000 percent bonus issue,medium,issued_capital,1.0,carried_forward
+TRMET,2020,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TRMET,2021,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TRMET,2022,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TRMET,2023,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TRMET,2024,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+TRMET,2025,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 TSKB,2020,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1.0,carried_forward
 TSKB,2021,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1.0,carried_forward
 TSKB,2022,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1.0,carried_forward
@@ -239,3 +455,33 @@ ULKER,2022,342000000.0,user provided merged capital research,stable issued capit
 ULKER,2023,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 ULKER,2024,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
 ULKER,2025,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1.0,carried_forward
+ULUSE,2020,,,,,,,missing_prior_event
+ULUSE,2021,,,,,,,missing_prior_event
+ULUSE,2022,,,,,,,missing_prior_event
+ULUSE,2023,,,,,,,missing_prior_event
+ULUSE,2024,,,,,,,missing_prior_event
+ULUSE,2025,,,,,,,missing_prior_event
+VAKBN,2020,,,,,,,missing_prior_event
+VAKBN,2021,,,,,,,missing_prior_event
+VAKBN,2022,,,,,,,missing_prior_event
+VAKBN,2023,,,,,,,missing_prior_event
+VAKBN,2024,,,,,,,missing_prior_event
+VAKBN,2025,,,,,,,missing_prior_event
+VESTL,2020,,,,,,,missing_prior_event
+VESTL,2021,,,,,,,missing_prior_event
+VESTL,2022,,,,,,,missing_prior_event
+VESTL,2023,,,,,,,missing_prior_event
+VESTL,2024,,,,,,,missing_prior_event
+VESTL,2025,,,,,,,missing_prior_event
+YKBNK,2020,,,,,,,missing_prior_event
+YKBNK,2021,,,,,,,missing_prior_event
+YKBNK,2022,,,,,,,missing_prior_event
+YKBNK,2023,,,,,,,missing_prior_event
+YKBNK,2024,,,,,,,missing_prior_event
+YKBNK,2025,,,,,,,missing_prior_event
+ZOREN,2020,,,,,,,missing_prior_event
+ZOREN,2021,,,,,,,missing_prior_event
+ZOREN,2022,,,,,,,missing_prior_event
+ZOREN,2023,,,,,,,missing_prior_event
+ZOREN,2024,,,,,,,missing_prior_event
+ZOREN,2025,,,,,,,missing_prior_event

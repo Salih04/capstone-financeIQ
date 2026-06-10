@@ -1,0 +1,4 @@
+coverage_bucket,count,mean_next_year_return_pct,median_next_year_return_pct
+low,33,57.300075757575755,48.679
+medium,102,35.09305625305135,21.45165
+high,186,90.43906811471939,44.62113350030947

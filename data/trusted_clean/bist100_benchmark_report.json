@@ -1,5 +1,5 @@
 {
-  "source": "yahoo_chart_api",
+  "source": "yfinance",
   "years_covered": [
     2020,
     2021,
@@ -14,14 +14,13 @@
     "2022": 185.94,
     "2023": 31.96,
     "2024": 28.94,
-    "2025": 13.05
+    "2025": 12.64
   },
   "missing_years": [],
   "excess_targets_enabled": true,
   "issues": [],
   "log": [
-    "yfinance unavailable/failed: No module named 'yfinance'",
-    "source=yahoo_chart_api"
+    "source=yfinance"
   ],
   "output": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/bist100_benchmark_returns.csv"
 }

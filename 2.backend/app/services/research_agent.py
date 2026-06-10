@@ -141,6 +141,62 @@ def get_config() -> dict:
     }
 
 
+def ai_status(smoke: bool = False) -> dict:
+    """Safe AI configuration diagnostic; never exposes secrets."""
+    cfg = get_config()
+    provider = cfg["provider"]
+    missing: list[str] = []
+    configured = provider != "none" and bool(cfg.get("base_url"))
+    if provider in {"openrouter", "openai"} and not cfg.get("api_key"):
+        configured = False
+        missing.append("OPENROUTER_API_KEY or OPENAI_API_KEY")
+    if provider == "none":
+        configured = False
+
+    reason = None
+    if provider == "none":
+        reason = "AI not configured: set RESEARCH_LLM_PROVIDER to openrouter, openai, lmstudio, or ollama."
+    elif missing:
+        reason = f"AI not configured: missing {', '.join(missing)}."
+    elif not cfg.get("base_url"):
+        reason = "AI not configured: missing RESEARCH_LLM_BASE_URL."
+
+    result = {
+        "available": bool(configured),
+        "configured": bool(configured),
+        "provider": provider,
+        "model": cfg["model"] if configured else None,
+        "base_url": cfg["base_url"] if configured else None,
+        "missing_env": missing,
+        "reason": reason,
+        "fallback_available": True,
+        "fallback_mode": "validated deterministic research agent",
+        "env": {
+            "provider": "RESEARCH_LLM_PROVIDER",
+            "model": "RESEARCH_LLM_MODEL",
+            "base_url": "RESEARCH_LLM_BASE_URL",
+            "openrouter_key": "OPENROUTER_API_KEY",
+            "openai_key": "OPENAI_API_KEY",
+        },
+        "guide": "docs/research_agent_guide.md",
+    }
+    if smoke and configured:
+        probe = call_local_llm(
+            [{"role": "system", "content": "Return JSON only."},
+             {"role": "user", "content": "{\"ping\":\"FinanceIQ AI status\"}"}],
+            cfg,
+        )
+        result["smoke_test"] = {
+            "ok": bool(probe.get("ok")),
+            "provider": probe.get("provider"),
+            "error": probe.get("error"),
+        }
+        result["available"] = bool(probe.get("ok"))
+    elif smoke:
+        result["smoke_test"] = {"ok": False, "error": reason}
+    return result
+
+
 SYSTEM_PROMPT = """You are a financial research assistant for an academic BIST (Borsa Istanbul) research project.
 
 You explain structured company data produced by a quantitative pipeline. You are a decision-support layer only.
@@ -358,20 +414,32 @@ def build_model_diagnostics_context(state: dict | None = None) -> dict:
             })
         spears = lb["spearman"].dropna()
         out["mean_spearman"] = round(float(spears.mean()), 3) if len(spears) else None
-        out["weak_backtest"] = bool(out.get("mean_spearman") is None or abs(out["mean_spearman"]) < 0.1)
         out["ml_beats_baseline_consistently"] = all(s["ml_beats_baseline"] for s in out["splits"]) if out["splits"] else False
+        out["weak_backtest"] = bool(
+            out.get("mean_spearman") is None
+            or abs(out["mean_spearman"]) < 0.15
+            or out["mean_spearman"] <= 0
+            or not out["ml_beats_baseline_consistently"]
+        )
     else:
         out["weak_backtest"] = True
         out["ml_beats_baseline_consistently"] = False
     after = (state["quality"] or {}).get("n_features", FEATURE_COUNT_BEFORE_CORRECTED)
     out["feature_count_before_corrected_yearly"] = FEATURE_COUNT_BEFORE_CORRECTED
     out["feature_count_after_corrected_yearly"] = after
+    free_val = free_valuation_payload()
+    val_cols = free_val.get("columns_entering_candidate") or []
+    valuation_note = (
+        f"Free-data valuation fields now enter as provisional features ({', '.join(val_cols)}), but they depend "
+        "on Yahoo prices plus manual shares and still need official cross-checking."
+        if val_cols else
+        "The missing block is historical valuation: P/E, P/B, EV/EBITDA, market cap and enterprise value."
+    )
     out["interpretation_business"] = (
         f"The dataset improved from {FEATURE_COUNT_BEFORE_CORRECTED} to {after} validated features after adding "
         "corrected yearly income and profitability data. Despite this structural improvement, the out-of-sample "
         "signal remains weak/unstable — the pipeline is better but the current data still does not demonstrate a "
-        "reliable predictive edge. The missing block is historical valuation: P/E, P/B, EV/EBITDA, market cap and "
-        "enterprise value, which are still repeated snapshots.")
+        f"reliable predictive edge. {valuation_note}")
     return out
 
 
@@ -857,7 +925,7 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
         llm_context = ctx_for_score
 
     cfg = get_config()
-    llm_out, fallback = None, True
+    llm_out, fallback, llm_error = None, True, None
     if cfg["provider"] != "none":
         msg = [{"role": "system", "content": SYSTEM_PROMPT},
                {"role": "user", "content": json.dumps({"task": "company_insight", "context": llm_context})}]
@@ -866,6 +934,10 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
             parsed = _parse_llm_json(res["content"])
             if parsed:
                 llm_out, fallback = parsed, False
+            else:
+                llm_error = "LLM output could not be parsed into valid JSON; deterministic fallback used"
+        else:
+            llm_error = res.get("error")
     if llm_out is None:
         det = deterministic_company_summary(ctx)
         llm_out = {**det, **deterministic_research_score(ctx_for_score)}
@@ -898,7 +970,9 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
         "required_next_data": ds["required_next_data"],
         "not_investment_advice": True,
     }
-    llm_err = None if not fallback else "no LLM provider or unparseable output; deterministic fallback used"
+    llm_err = None if not fallback else (
+        llm_error or "no LLM provider configured; deterministic fallback used"
+    )
     llm_used = not fallback
     return {
         "ticker": ctx["ticker"], "context": ctx, "ml": ml, "confidence": conf,

@@ -6,8 +6,8 @@
     "is_training_universe": true
   },
   "model": {
-    "ml_score": 0.6317,
-    "ml_rank": 8,
+    "ml_score": 0.5922,
+    "ml_rank": 14,
     "target_definition": "year-T features -> year-(T+1) realized return",
     "model_limitations": [
       "small_sample (~40 stocks/year)",
@@ -33,8 +33,8 @@
     "pe_ratio": 3.872,
     "pb_ratio": 0.2359,
     "ev_ebitda": 3.7388,
-    "market_cap": 69715453500.0,
-    "enterprise_value": 101186728500.0,
+    "market_cap": 69715446500.0,
+    "enterprise_value": 101186721500.0,
     "price_source": "yahoo_chart_api",
     "price_date": "2022-12-31 (approximate year-end)"
   },
@@ -51,11 +51,11 @@
       "net_margin": 52.5,
       "gross_margin": 32.5,
       "ebitda_margin": 47.5,
-      "pe_ratio": 40.0,
-      "pb_ratio": 38.2,
-      "ev_ebitda": 27.3,
-      "market_cap": 70.6,
-      "enterprise_value": 70.6
+      "pe_ratio": 42.4,
+      "pb_ratio": 40.5,
+      "ev_ebitda": 33.3,
+      "market_cap": 73.0,
+      "enterprise_value": 73.0
     },
     "year_medians": {
       "revenue": 33170927500.0,
@@ -69,11 +69,11 @@
       "net_margin": 13.5232,
       "gross_margin": 25.6181,
       "ebitda_margin": 21.4339,
-      "pe_ratio": 5.3438,
-      "pb_ratio": 0.2724,
-      "ev_ebitda": 7.3031,
-      "market_cap": 22588001297.6966,
-      "enterprise_value": 67377380528.8991
+      "pe_ratio": 4.7699,
+      "pb_ratio": 0.2509,
+      "ev_ebitda": 6.4768,
+      "market_cap": 20304014460.0,
+      "enterprise_value": 51751865320.0
     }
   },
   "data_quality": {

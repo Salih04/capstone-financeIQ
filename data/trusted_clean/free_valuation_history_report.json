@@ -1,5 +1,5 @@
 {
-  "tickers_covered": 40,
+  "tickers_covered": 81,
   "years_covered": [
     2020,
     2021,
@@ -9,23 +9,69 @@
     2025
   ],
   "price_coverage": {
-    "rows_with_price": 226,
-    "total_rows": 240,
+    "rows_with_price": 465,
+    "total_rows": 486,
     "yahoo_meta": {
       "attempted": 0,
       "yahoo_ok": 0,
-      "from_cache": 40,
+      "from_cache": 81,
       "from_manual": 0,
       "failed": []
     }
   },
   "shares_status": "manual",
+  "corrected_balance_sheet_2024": {
+    "present": true,
+    "tickers_corrected": 40,
+    "tickers": [
+      "AEFES",
+      "ARCLK",
+      "ASELS",
+      "ASTOR",
+      "BIMAS",
+      "BRSAN",
+      "BTCIM",
+      "CANTE",
+      "CCOLA",
+      "CIMSA",
+      "DOAS",
+      "DSTKF",
+      "ENKAI",
+      "EREGL",
+      "FROTO",
+      "GUBRF",
+      "HEKTS",
+      "KONTR",
+      "KRDMD",
+      "KUYAS",
+      "MAVI",
+      "MGROS",
+      "MIATK",
+      "OYAKC",
+      "PASEU",
+      "PETKM",
+      "PGSUS",
+      "SASA",
+      "SISE",
+      "TAVHL",
+      "TCELL",
+      "THYAO",
+      "TOASO",
+      "TRALT",
+      "TRMET",
+      "TSKB",
+      "TTKOM",
+      "TUPRS",
+      "TURSG",
+      "ULKER"
+    ]
+  },
   "shares_template_path": null,
   "financial_dependency_coverage": {
-    "net_income": 240,
-    "equity": 240,
-    "ebitda": 240,
-    "net_debt": 240
+    "net_income": 403,
+    "equity": 403,
+    "ebitda": 358,
+    "net_debt": 337
   },
   "target_column_status": {
     "market_cap": "accepted",
@@ -36,10 +82,10 @@
   },
   "usable_values_by_column": {
     "market_cap": 226,
-    "enterprise_value": 187,
+    "enterprise_value": 226,
     "pe": 185,
-    "pb": 187,
-    "ev_ebitda": 174
+    "pb": 226,
+    "ev_ebitda": 210
   },
   "columns_entering_candidate": [
     "market_cap",
@@ -50,31 +96,27 @@
   ],
   "rejection_summary": {
     "market_cap": {
-      "missing_price": 14
+      "missing_shares": 246,
+      "missing_price": 21
     },
-    "enterprise_value": {
-      "suspect_2024_net_debt": 39
-    },
+    "enterprise_value": {},
     "pe": {
       "non_positive_net_income": 36,
       "absurd_value": 5
     },
-    "pb": {
-      "suspect_2024_equity": 39
-    },
+    "pb": {},
     "ev_ebitda": {
-      "missing_enterprise_value": 39,
-      "non_positive_ebitda": 7,
-      "absurd_value": 6
+      "non_positive_ebitda": 9,
+      "absurd_value": 7
     }
   },
   "coverage_by_year": {
-    "2020": 40,
-    "2021": 40,
-    "2022": 40,
-    "2023": 40,
-    "2024": 40,
-    "2025": 40
+    "2020": 81,
+    "2021": 81,
+    "2022": 81,
+    "2023": 81,
+    "2024": 81,
+    "2025": 81
   },
   "feature_count_before": 27,
   "feature_count_after_if_accepted": 32,
