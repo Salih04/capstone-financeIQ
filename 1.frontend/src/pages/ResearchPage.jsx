@@ -1,932 +1,424 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  ScatterChart, Scatter, XAxis, YAxis, ZAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, ReferenceLine, Cell,
-} from 'recharts'
-import {
-  FlaskConical,
-  Search,
-  AlertTriangle,
-  Trophy,
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  BarChart3,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react'
 import api from '../api/client'
-import { researchApi } from '../api/researchApi'
-import { Card, EmptyState, Chip } from '../components/ui'
-import TerminalFx from '../components/TerminalFx'
 
-const fmt = (v, d = 1) => (v === null || v === undefined || Number.isNaN(v) ? '—' : Number(v).toFixed(d))
-const pct = (v) => (v === null || v === undefined ? '—' : `${Number(v).toFixed(1)}%`)
+// ---------------------------------------------------------------------------
+// Score Explorer — THE DISSECTION TABLE.
+// The composite score is opened up and laid flat: weighted category segments
+// that unfold into constituent features. Real API data (/research/years,
+// /research/scores, /research/company); mock is fallback only.
+// ---------------------------------------------------------------------------
 
-const scoreTone = (score) => {
-  if (score >= 70) return { label: 'Strong', color: 'var(--success)' }
-  if (score >= 55) return { label: 'Moderate', color: 'var(--primary)' }
-  if (score >= 40) return { label: 'Watchlist', color: 'var(--warning)' }
-  return { label: 'Low confidence', color: 'var(--danger)' }
+const SCORE_EXPLORER_MOCK = {
+  selected_ticker: 'ASELS',
+  composite_score: 78.4,
+  categories: [
+    {
+      name: 'Profitability', weight: 0.28, score: 82.1,
+      features: [
+        { name: 'ROE', value: 0.187, percentile: 88, coverage: 1.0 },
+        { name: 'ROA', value: 0.094, percentile: 79, coverage: 1.0 },
+        { name: 'Net margin', value: 0.124, percentile: 81, coverage: 1.0 },
+        { name: 'EBITDA margin', value: 0.198, percentile: 85, coverage: 0.83 },
+      ],
+    },
+    {
+      name: 'Balance Sheet', weight: 0.22, score: 74.3,
+      features: [
+        { name: 'Current ratio', value: 1.84, percentile: 72, coverage: 1.0 },
+        { name: 'Net debt/EBITDA', value: 0.43, percentile: 78, coverage: 0.83 },
+        { name: 'Equity growth', value: 0.231, percentile: 74, coverage: 1.0 },
+      ],
+    },
+    {
+      name: 'Growth', weight: 0.20, score: 79.8,
+      features: [
+        { name: 'Revenue growth', value: 0.342, percentile: 83, coverage: 1.0 },
+        { name: 'Asset growth', value: 0.218, percentile: 71, coverage: 1.0 },
+      ],
+    },
+    {
+      name: 'Valuation', weight: 0.18, score: 71.2,
+      features: [
+        { name: 'P/B ratio', value: 2.14, percentile: 68, coverage: 0.67 },
+        { name: 'EV/EBITDA', value: 7.8, percentile: 74, coverage: 0.67 },
+        { name: 'P/E ratio', value: 11.4, percentile: 69, coverage: 0.50 },
+      ],
+    },
+    {
+      name: 'Cash Flow', weight: 0.12, score: 77.4,
+      features: [
+        { name: 'FCF margin', value: 0.089, percentile: 76, coverage: 0.83 },
+        { name: 'OCF/assets', value: 0.112, percentile: 79, coverage: 1.0 },
+      ],
+    },
+  ],
 }
 
-const returnTone = (value) => {
-  if (value === null || value === undefined) return 'var(--text-3)'
-  return Number(value) >= 0 ? 'var(--success)' : 'var(--danger)'
+const CAT_COLORS = ['#4da583', '#5a9a8c', '#7a8a80', '#c8a35a', '#a8674b', '#8c8a5e']
+const clampPct = (v) => Math.max(0, Math.min(100, Number(v) || 0))
+const fmt1 = (v) => (v == null || Number.isNaN(Number(v)) ? '—' : Number(v).toFixed(1))
+
+// Normalize real detail OR mock into one dissection structure.
+function buildDissection(detail, mockMode) {
+  if (mockMode) {
+    return {
+      ticker: SCORE_EXPLORER_MOCK.selected_ticker,
+      composite: SCORE_EXPLORER_MOCK.composite_score,
+      categories: SCORE_EXPLORER_MOCK.categories,
+      weightsExplicit: true,
+    }
+  }
+  if (!detail) return null
+  const breakdown = Array.isArray(detail.score_breakdown) ? detail.score_breakdown : []
+  const n = Math.max(breakdown.length, 1)
+  return {
+    ticker: detail.ticker,
+    composite: Number(detail.fundamental_score) || 0,
+    categories: breakdown.map((c) => ({
+      name: c.category,
+      weight: 1 / n,
+      score: Number(c.category_score) || 0,
+      features: null, // feature-level detail not exposed by this endpoint
+    })),
+    weightsExplicit: false,
+  }
 }
 
 export default function ResearchPage() {
   const [years, setYears] = useState([])
   const [year, setYear] = useState(null)
-  const [overview, setOverview] = useState(null)
-  const [dashboard, setDashboard] = useState(null)
+  const [companies, setCompanies] = useState([])
   const [selected, setSelected] = useState(null)
   const [detail, setDetail] = useState(null)
-  const [sortKey, setSortKey] = useState('fundamental_score')
   const [query, setQuery] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [terminal, setTerminal] = useState(null)
+  const [openCat, setOpenCat] = useState(null)
+  const [mockMode, setMockMode] = useState(false)
 
   useEffect(() => {
     api.get('/research/years')
       .then(({ data }) => {
-        setYears(data.years)
-        setYear(data.years[data.years.length - 1])
+        if (data?.years?.length) {
+          setYears(data.years)
+          setYear(data.years[data.years.length - 1])
+        } else setMockMode(true)
       })
-      .catch((e) => setError(e?.response?.data?.detail || 'Failed to load years'))
-
-    api.get('/research/dashboard')
-      .then(({ data }) => setDashboard(data))
-      .catch(() => {})
-
-    Promise.all([researchApi.summary(), researchApi.benchmark(), researchApi.diagnostics()])
-      .then(([s, b, d]) => setTerminal({
-        ctx: s.data?.context || {},
-        bench: b.data || {},
-        diag: d.data?.diagnostics || {},
-      }))
-      .catch(() => {})
+      .catch(() => setMockMode(true))
   }, [])
 
   useEffect(() => {
     if (!year) return
-    setLoading(true)
     api.get('/research/scores', { params: { year } })
       .then(({ data }) => {
-        setOverview(data)
-        const first = [...data.companies].sort((a, b) => (b.fundamental_score || 0) - (a.fundamental_score || 0))[0]
-        setSelected(first?.ticker || null)
+        const rows = (data?.companies || [])
+          .slice()
+          .sort((a, b) => (b.fundamental_score || 0) - (a.fundamental_score || 0))
+        if (rows.length === 0) { setMockMode(true); return }
+        setCompanies(rows)
+        setSelected((s) => (rows.some((r) => r.ticker === s) ? s : rows[0].ticker))
       })
-      .catch((e) => setError(e?.response?.data?.detail || 'Failed to load scores'))
-      .finally(() => setLoading(false))
+      .catch(() => setMockMode(true))
   }, [year])
 
   useEffect(() => {
-    if (!year || !selected) return
+    if (!year || !selected || mockMode) return
     api.get('/research/company', { params: { ticker: selected, year } })
       .then(({ data }) => setDetail(data))
       .catch(() => setDetail(null))
-  }, [year, selected])
+  }, [year, selected, mockMode])
 
-  const rows = useMemo(() => {
-    if (!overview) return []
-    let r = [...overview.companies]
-    if (query) r = r.filter((c) => c.ticker.toLowerCase().includes(query.toLowerCase()))
-    r.sort((a, b) => (b[sortKey] ?? -1e18) - (a[sortKey] ?? -1e18))
-    return r
-  }, [overview, sortKey, query])
+  const dissection = useMemo(() => buildDissection(detail, mockMode), [detail, mockMode])
+  const list = mockMode
+    ? [{ ticker: SCORE_EXPLORER_MOCK.selected_ticker, fundamental_score: SCORE_EXPLORER_MOCK.composite_score }]
+    : companies.filter((c) => !query || c.ticker.toUpperCase().includes(query.trim().toUpperCase()))
 
-  const scatter = useMemo(
-    () => (overview?.companies || [])
-      .filter((c) => c.fundamental_score != null && c.realized_return != null)
-      .map((c) => ({ ...c, x: c.fundamental_score, y: c.realized_return })),
-    [overview],
-  )
-
-  const topCompany = rows[0]
-  const v = dashboard?.validation
-  const benchOk = terminal?.bench?.available ?? dashboard?.benchmark?.available
-  const featureCount = terminal?.ctx?.feature_count
-  const correctedLoaded = terminal?.ctx?.corrected_yearly_financials?.available
-  const weak = terminal?.diag?.weak_backtest
-
-  if (error) return <EmptyState icon={AlertTriangle} title="Research data unavailable" description={String(error)} />
+  const openCategory = dissection?.categories?.find((c) => c.name === openCat) || null
 
   return (
-    <div className="tfx tfx-enter" style={styles.page}>
-      <TerminalFx />
-      <section style={styles.hero}>
-        <div style={styles.heroGlow} />
-        <div style={styles.heroContent}>
-          <div className="tfx-kicker" style={styles.kicker}>
-            <Sparkles size={13} />
-            Score Explorer
-          </div>
+    <div className="dx">
+      <style>{CSS}</style>
+      <div className="dx-scan" aria-hidden="true" />
 
-          <div style={styles.heroMain}>
-            <div>
-              <h1 style={styles.title}>Research Score vs Realized Performance</h1>
-              <p style={styles.subtitle}>
-                Diagnostic view of how the fundamental score aligned with realized same-year returns.
-                The project’s actual modeling task remains T → T+1 research, not investment advice.
-              </p>
-            </div>
-
-            <select
-              value={year || ''}
-              onChange={(e) => setYear(Number(e.target.value))}
-              style={styles.yearSelect}
-            >
+      <header className="dx-head">
+        <div>
+          <div className="dx-kicker">FINANCEIQ · SCORE DISSECTION TABLE</div>
+          <h1>The score, <em>opened up</em>.</h1>
+          <p>
+            A composite research score is not a number — it is a weighted structure. This table lays it
+            flat: categories, constituent features, coverage. Diagnostic ranking signal only;
+            walk-forward IC ≈ 0, so no predictive claim travels with it.
+          </p>
+        </div>
+        {!mockMode && years.length > 0 && (
+          <label className="dx-yearbox">
+            EVALUATION YEAR
+            <select value={year || ''} onChange={(e) => setYear(Number(e.target.value))}>
               {years.map((y) => <option key={y} value={y}>{y}</option>)}
             </select>
-          </div>
-
-          <div style={styles.heroStats}>
-            <HeroStat icon={ShieldCheck} label="Validated features" value={featureCount ?? '—'} sub="17 → 32" tone="good" />
-            <HeroStat icon={BarChart3} label="BIST100 benchmark" value={benchOk ? 'Available' : 'Missing'} sub="excess return enabled" tone={benchOk ? 'good' : 'warn'} />
-            <HeroStat icon={Activity} label="Corrected financials" value={correctedLoaded ? 'Loaded' : 'Pending'} sub="income & profitability" tone={correctedLoaded ? 'good' : 'warn'} />
-            <HeroStat icon={weak ? TrendingDown : TrendingUp} label="Backtest signal" value={weak ? 'Weak' : 'Stable'} sub="honest diagnostic" tone={weak ? 'bad' : 'good'} />
-          </div>
-        </div>
-      </section>
-
-      <section style={styles.explainCard}>
-        <b style={{ color: 'var(--text-1)' }}>What this page means:</b>{' '}
-        Every company receives a research score for every year. The chart checks whether that score aligned
-        with the realized return in the same year. Some years align positively, some years are noisy or inverse.
-        That is a diagnostic finding, not a broken system and not a future prediction.
-      </section>
-
-      <section style={styles.qualityGrid}>
-        <InsightCard
-          label="Mean rank correlation"
-          value={v ? fmt(v.mean_spearman, 3) : '—'}
-          sub="all years · score vs same-year return"
-          icon={Activity}
-        />
-        <InsightCard
-          label="Positive alignment years"
-          value={v ? (v.years_score_worked.join(', ') || 'none') : '—'}
-          sub="score moved with realized returns"
-          icon={TrendingUp}
-        />
-        <InsightCard
-          label="Noisy / inverse years"
-          value={v ? (v.years_score_failed.join(', ') || 'none') : '—'}
-          sub="relationship was weak, not system failure"
-          icon={TrendingDown}
-        />
-        <InsightCard
-          label="Companies in selected year"
-          value={overview?.count ?? '—'}
-          sub={`BIST100: ${overview?.bist100_return != null ? pct(overview.bist100_return) : (benchOk ? 'available' : 'missing')}`}
-          icon={BarChart3}
-        />
-      </section>
-
-      <section style={styles.mainGrid}>
-        <Card style={styles.chartCard}>
-          <div style={styles.cardHeader}>
-            <div>
-              <h2 style={styles.cardTitle}>Score vs Realized Return — {year || ''}</h2>
-              <p style={styles.cardSub}>Each dot is one company. Click a dot to inspect the company.</p>
-            </div>
-            <div style={styles.legend}>
-              <span style={styles.legendDotSelected} /> Selected
-              <span style={styles.legendDot} /> Company
-            </div>
-          </div>
-
-          <div style={styles.chartBox}>
-            <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ top: 18, right: 26, bottom: 44, left: 18 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 211, 202, 0.12)" />
-                <XAxis
-                  type="number"
-                  dataKey="x"
-                  name="Fundamental Score"
-                  domain={[0, 100]}
-                  label={{ value: 'Fundamental Score', position: 'bottom', fill: 'var(--text-3)', dy: 20 }}
-                  stroke="var(--text-3)"
-                  fontSize={11}
-                  tickLine={false}
-                />
-                <YAxis
-                  type="number"
-                  dataKey="y"
-                  name="Realized Return %"
-                  stroke="var(--text-3)"
-                  fontSize={11}
-                  tickLine={false}
-                  label={{ value: 'Realized Return %', angle: -90, position: 'insideLeft', fill: 'var(--text-3)', dx: -6 }}
-                />
-                <ZAxis range={[76, 76]} />
-                <ReferenceLine y={0} stroke="rgba(200, 211, 202, 0.35)" />
-                <Tooltip
-                  cursor={{ strokeDasharray: '3 3' }}
-                  content={({ payload }) => {
-                    if (!payload?.length) return null
-                    const d = payload[0].payload
-                    return (
-                      <div style={styles.tooltip}>
-                        <b>{d.ticker}</b>
-                        <div>Score {fmt(d.x)} · Return {pct(d.y)}</div>
-                        <div>score #{d.score_rank} · return #{d.return_rank}</div>
-                      </div>
-                    )
-                  }}
-                />
-                <Scatter data={scatter} onClick={(d) => setSelected(d.ticker)}>
-                  {scatter.map((d) => (
-                    <Cell
-                      key={d.ticker}
-                      fill={d.ticker === selected ? 'var(--primary)' : 'rgba(200, 211, 202, 0.72)'}
-                      opacity={d.ticker === selected ? 1 : 0.58}
-                    />
-                  ))}
-                </Scatter>
-              </ScatterChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-        <Card style={styles.detailCard}>
-          {detail ? <CompanyDetail d={detail} /> : <EmptyState icon={Search} title="Select a company" description="Click a dot or a company card." />}
-        </Card>
-      </section>
-
-      <Card style={styles.companySection}>
-        <div style={styles.companyHeader}>
-          <div>
-            <h2 style={styles.cardTitle}>Company universe — {year || ''}</h2>
-            <p style={styles.cardSub}>
-              Ranked by selected metric. This replaces the old spreadsheet-style table with a presentation-ready research list.
-            </p>
-          </div>
-
-          <div style={styles.companyControls}>
-            <div style={styles.searchBox}>
-              <Search size={15} color="var(--text-3)" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Filter ticker"
-                style={styles.searchInput}
-              />
-            </div>
-
-            <select value={sortKey} onChange={(e) => setSortKey(e.target.value)} style={styles.sortSelect}>
-              <option value="fundamental_score">Sort by score</option>
-              <option value="market_score">Sort by market score</option>
-              <option value="realized_return">Sort by return</option>
-              <option value="score_rank">Sort by score rank</option>
-              <option value="return_rank">Sort by return rank</option>
-            </select>
-          </div>
-        </div>
-
-        {loading ? (
-          <div style={styles.loading}>Loading companies…</div>
-        ) : (
-          <div style={styles.companyGrid}>
-            {rows.map((c) => (
-              <CompanyCard
-                key={c.ticker}
-                company={c}
-                active={c.ticker === selected}
-                onClick={() => setSelected(c.ticker)}
-              />
-            ))}
-          </div>
+          </label>
         )}
-      </Card>
-    </div>
-  )
-}
+        {mockMode && <div className="dx-mocknote">demo data — research API returned no usable rows</div>}
+      </header>
 
-function HeroStat({ icon: Icon, label, value, sub, tone }) {
-  const color = tone === 'good' ? 'var(--success)' : tone === 'bad' ? 'var(--danger)' : 'var(--warning)'
-  return (
-    <div style={styles.heroStat}>
-      <div style={{ ...styles.heroIcon, color }}>
-        <Icon size={18} />
-      </div>
-      <div>
-        <div style={styles.heroStatLabel}>{label}</div>
-        <div style={{ ...styles.heroStatValue, color }}>{value}</div>
-        <div style={styles.heroStatSub}>{sub}</div>
-      </div>
-    </div>
-  )
-}
-
-function InsightCard({ icon: Icon, label, value, sub }) {
-  return (
-    <div style={styles.insightCard}>
-      <div style={styles.insightTop}>
-        <div style={styles.insightIcon}><Icon size={18} /></div>
-        <div style={styles.insightLabel}>{label}</div>
-      </div>
-      <div style={styles.insightValue}>{value}</div>
-      <div style={styles.insightSub}>{sub}</div>
-    </div>
-  )
-}
-
-function CompanyDetail({ d }) {
-  const profit = d.profit_status || {}
-  const tone = scoreTone(Number(d.fundamental_score || 0))
-
-  return (
-    <div style={styles.detailWrap}>
-      <div style={styles.detailTop}>
-        <div>
-          <div style={styles.detailTicker}>{d.ticker}</div>
-          <div style={styles.detailYear}>{d.year}</div>
-        </div>
-        <div style={{ ...styles.statusPill, borderColor: tone.color, color: tone.color }}>
-          {tone.label}
-        </div>
-      </div>
-
-      <div>
-        <div style={styles.detailScoreRow}>
-          <span>Fundamental score</span>
-          <b>{fmt(d.fundamental_score)}</b>
-        </div>
-        <div style={styles.scoreTrack}>
-          <div style={{ ...styles.scoreFill, width: `${Math.max(0, Math.min(100, d.fundamental_score || 0))}%` }} />
-        </div>
-      </div>
-
-      <div style={styles.miniGrid}>
-        <Mini label="Realized return" value={d.realized_return != null ? `${d.realized_return.toFixed(1)}%` : '—'} strong color={returnTone(d.realized_return)} />
-        <Mini label="Return rank" value={`${d.return_rank ?? '—'} / ${d.total_companies}`} />
-        <Mini label="Score rank" value={`${d.score_rank ?? '—'} / ${d.total_companies}`} />
-        <Mini label="Market score" value={fmt(d.market_score)} />
-        <Mini label="vs BIST100" value={d.excess_vs_bist100 != null ? `${d.excess_vs_bist100.toFixed(1)}%` : 'n/a'} />
-        <Mini label="Gap to best" value={d.gap_to_best != null ? `${d.gap_to_best.toFixed(1)}%` : '—'} />
-      </div>
-
-      <div style={styles.chipWrap}>
-        {Object.entries(profit).map(([k, val]) => (
-          <Chip key={k} color={val === true ? 'success' : val === false ? 'danger' : 'default'}>
-            {k.replace(/_positive/, '').replace(/_/g, ' ')}: {val === null ? 'n/a' : val ? '✓' : '✗'}
-          </Chip>
-        ))}
-      </div>
-
-      <div style={styles.bestLine}>
-        <Trophy size={15} />
-        Best {d.year}: <b>{d.best_performer?.ticker}</b> ({fmt(d.best_performer?.return)}%)
-      </div>
-
-      <div>
-        <div style={styles.breakdownTitle}>Score breakdown by category</div>
-        {(d.score_breakdown || []).map((c) => (
-          <div key={c.category} style={styles.breakdownRow}>
-            <span style={styles.breakdownLabel}>{c.category}</span>
-            <div style={styles.breakdownTrack}>
-              <div style={{ ...styles.breakdownFill, width: `${Math.max(0, Math.min(100, c.category_score ?? 0))}%` }} />
-            </div>
-            <span style={styles.breakdownValue}>{c.category_score != null ? c.category_score.toFixed(0) : '—'}</span>
+      <div className="dx-main">
+        {/* ── ticker rail ── */}
+        <nav className="dx-rail" aria-label="Ticker selector">
+          <div className="dx-rail-label">UNIVERSE · {list.length}</div>
+          <input
+            className="dx-rail-search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="FILTER…"
+            aria-label="Filter ticker"
+            disabled={mockMode}
+          />
+          <div className="dx-rail-list">
+            {list.map((c) => {
+              const on = c.ticker === (dissection?.ticker || selected)
+              return (
+                <button
+                  key={c.ticker}
+                  type="button"
+                  className={`dx-rail-item ${on ? 'is-on' : ''}`}
+                  aria-pressed={on}
+                  onClick={() => { setSelected(c.ticker); setOpenCat(null) }}
+                >
+                  <span>{c.ticker}</span>
+                  <strong>{fmt1(c.fundamental_score)}</strong>
+                </button>
+              )
+            })}
           </div>
-        ))}
+        </nav>
+
+        {/* ── dissection ── */}
+        <main className="dx-table">
+          {dissection ? (
+            <>
+              <div className="dx-specimen-head">
+                <span className="dx-specimen-ticker">{dissection.ticker}</span>
+                <span className="dx-specimen-score">{fmt1(dissection.composite)}<em>/100 COMPOSITE</em></span>
+              </div>
+
+              <div className="dx-bar" role="group" aria-label="Composite score segments">
+                {dissection.categories.map((cat, i) => {
+                  const on = openCat === cat.name
+                  return (
+                    <button
+                      key={cat.name}
+                      type="button"
+                      className={`dx-seg ${on ? 'is-open' : ''}`}
+                      style={{ flexGrow: Math.max(cat.weight, 0.05) * 100, '--seg-c': CAT_COLORS[i % CAT_COLORS.length] }}
+                      aria-expanded={on}
+                      onClick={() => setOpenCat(on ? null : cat.name)}
+                    >
+                      <span className="dx-seg-fill" style={{ height: `${clampPct(cat.score)}%` }} />
+                      <span className="dx-seg-name">{cat.name.toUpperCase()}</span>
+                      <span className="dx-seg-meta">
+                        {dissection.weightsExplicit ? `w ${cat.weight.toFixed(2)}` : 'equal display w'} · {fmt1(cat.score)}
+                      </span>
+                    </button>
+                  )
+                })}
+                {dissection.categories.length === 0 && (
+                  <div className="dx-empty">No category breakdown available for this ticker/year.</div>
+                )}
+              </div>
+              <div className="dx-bar-axis"><span>0</span><span>segment fill = category score</span><span>100</span></div>
+
+              {/* unfolded segment */}
+              {openCategory && (
+                <div className="dx-unfold" key={openCategory.name}>
+                  <div className="dx-unfold-head">
+                    <span>{openCategory.name.toUpperCase()} · UNFOLDED</span>
+                    <span>category score {fmt1(openCategory.score)}</span>
+                  </div>
+                  {openCategory.features ? openCategory.features.map((f) => (
+                    <div key={f.name} className={`dx-feature ${f.coverage < 0.7 ? 'is-grainy' : ''}`}>
+                      <span className="dx-feature-name">{f.name}</span>
+                      <span className="dx-feature-val">{Number(f.value).toFixed(3)}</span>
+                      <span className="dx-feature-track">
+                        <span className="dx-feature-fill" style={{ width: `${clampPct(f.percentile)}%` }} />
+                      </span>
+                      <span className="dx-feature-pct">p{f.percentile}</span>
+                      <span className="dx-feature-cov">{Math.round(f.coverage * 100)}% cov</span>
+                    </div>
+                  )) : (
+                    <p className="dx-unfold-note">
+                      Feature-level constituents are not exposed by this endpoint — the category score
+                      above is the finest validated granularity for live data.
+                    </p>
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="dx-empty">Loading dissection…</div>
+          )}
+        </main>
+
+        {/* ── Signal Readout ── */}
+        <aside className="dx-readout" key={dissection?.ticker || 'none'} aria-live="polite">
+          <div className="dx-readout-kicker">SIGNAL READOUT</div>
+          {dissection && (
+            <>
+              <div className="dx-readout-ticker">{dissection.ticker}</div>
+              <div className="dx-readout-score">{fmt1(dissection.composite)}<em>COMPOSITE RESEARCH SCORE</em></div>
+              {mockMode ? (
+                <>
+                  {SCORE_EXPLORER_MOCK.categories.map((c, i) => (
+                    <div key={c.name} className="dx-readout-row">
+                      <i style={{ background: CAT_COLORS[i % CAT_COLORS.length] }} />
+                      <span>{c.name}</span>
+                      <strong>{fmt1(c.score)} · w {c.weight.toFixed(2)}</strong>
+                    </div>
+                  ))}
+                  <p className="dx-readout-note">
+                    Low-coverage features render grainy: P/E at 50% coverage is the weakest specimen here.
+                  </p>
+                </>
+              ) : detail ? (
+                <>
+                  <div className="dx-readout-row"><span>REALIZED RETURN ({detail.year})</span><strong>{detail.realized_return != null ? `${Number(detail.realized_return).toFixed(1)}%` : '—'}</strong></div>
+                  <div className="dx-readout-row"><span>SCORE RANK</span><strong>#{detail.score_rank ?? '—'} / {detail.total_companies ?? '—'}</strong></div>
+                  <div className="dx-readout-row"><span>RETURN RANK</span><strong>#{detail.return_rank ?? '—'} / {detail.total_companies ?? '—'}</strong></div>
+                  <div className="dx-readout-row"><span>VS BIST100</span><strong>{detail.excess_vs_bist100 != null ? `${Number(detail.excess_vs_bist100).toFixed(1)}%` : 'n/a'}</strong></div>
+                  <p className="dx-readout-note">
+                    Same-year alignment between score and return is a diagnostic, not a forecast.
+                  </p>
+                </>
+              ) : (
+                <p className="dx-readout-note">Loading company detail…</p>
+              )}
+            </>
+          )}
+        </aside>
       </div>
+
+      <footer className="dx-caveat">
+        <span className="dx-caveat-pulse" aria-hidden="true" />
+        Walk-forward IC ≈ 0 · Score is a ranking structure, not a prediction · Research only · Not investment advice
+      </footer>
     </div>
   )
 }
 
-function Mini({ label, value, strong, color }) {
-  return (
-    <div style={styles.mini}>
-      <div style={styles.miniLabel}>{label}</div>
-      <div style={{ ...styles.miniValue, fontSize: strong ? 17 : 15, color: color || 'var(--text-1)' }}>{value}</div>
-    </div>
-  )
+const CSS = `
+.dx {
+  --dx-ink: #0a0e0d;
+  --dx-paper: #e8ece6;
+  --dx-dim: #9fae9f;
+  --dx-faint: #6b7a70;
+  --dx-emerald: #4da583;
+  --dx-gold: #c8a35a;
+  --dx-copper: #a8674b;
+  position: relative;
+  margin: -30px calc(-1 * clamp(18px, 2.4vw, 38px)) -56px;
+  min-height: calc(100vh - var(--topbar-h, 0px));
+  padding: 34px clamp(22px, 3vw, 52px) 86px;
+  background:
+    radial-gradient(1100px 540px at 78% -8%, rgba(77,165,131,0.06), transparent 60%),
+    linear-gradient(165deg, #0b100f 0%, var(--dx-ink) 55%, #080b0a 100%);
+  color: var(--dx-paper);
+  overflow: hidden;
+  animation: dxIn 0.7s ease both;
 }
+.dx * { box-sizing: border-box; }
+.dx-scan { position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 4px); }
+.dx > *:not(.dx-scan) { position: relative; z-index: 2; }
 
-function CompanyCard({ company, active, onClick }) {
-  const score = Number(company.fundamental_score || 0)
-  const tone = scoreTone(score)
-  const outperformed = company.excess_vs_bist100 != null ? company.excess_vs_bist100 >= 0 : null
+.dx-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap; margin-bottom: 24px; }
+.dx-kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.34em; color: var(--dx-faint); margin-bottom: 13px; }
+.dx-head h1 { margin: 0 0 10px; font-size: clamp(26px, 3vw, 40px); line-height: 1.05; font-weight: 650; letter-spacing: -0.015em; }
+.dx-head h1 em { font-style: italic; color: var(--dx-emerald); }
+.dx-head p { margin: 0; max-width: 62ch; color: var(--dx-dim); font-size: 14px; line-height: 1.55; }
+.dx-yearbox { display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.24em; color: var(--dx-faint); }
+.dx-yearbox select { background: rgba(10,14,13,0.8); border: 1px solid rgba(200,211,202,0.22); border-radius: 2px;
+  color: var(--dx-paper); font-family: var(--font-mono); font-size: 13px; padding: 8px 10px; outline: none; }
+.dx-yearbox select:focus { border-color: var(--dx-emerald); }
+.dx-mocknote { font-family: var(--font-mono); font-size: 10px; color: var(--dx-copper);
+  border: 1px dashed rgba(168,103,75,0.45); border-radius: 2px; padding: 8px 12px; }
 
-  return (
-    <button type="button" onClick={onClick} className="tfx-card" style={{ ...styles.companyCard, ...(active ? styles.companyCardActive : {}) }}>
-      <div style={styles.companyCardTop}>
-        <div>
-          <div style={styles.rankText}>#{company.score_rank ?? '—'}</div>
-          <div style={styles.companyTicker}>{company.ticker}</div>
-        </div>
-        <div style={{ ...styles.statusPillSmall, color: tone.color, borderColor: tone.color }}>
-          {tone.label}
-        </div>
-      </div>
+.dx-main { display: grid; grid-template-columns: 190px 1fr 300px; gap: 22px; align-items: start; }
+@media (max-width: 1100px) { .dx-main { grid-template-columns: 1fr; } }
 
-      <div style={styles.companyMetricRow}>
-        <span>Research score</span>
-        <b>{fmt(company.fundamental_score)}</b>
-      </div>
-      <div style={styles.companyScoreTrack}>
-        <div style={{ ...styles.companyScoreFill, width: `${Math.max(0, Math.min(100, score))}%` }} />
-      </div>
+/* rail */
+.dx-rail { border: 1px solid rgba(200,211,202,0.16); border-radius: 3px; background: rgba(11,16,15,0.6); padding: 12px; }
+.dx-rail-label { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.26em; color: var(--dx-faint); margin-bottom: 9px; }
+.dx-rail-search { width: 100%; background: rgba(10,14,13,0.8); border: 1px solid rgba(200,211,202,0.2); border-radius: 2px;
+  color: var(--dx-paper); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; padding: 7px 9px; outline: none; margin-bottom: 9px; }
+.dx-rail-search:focus { border-color: var(--dx-emerald); }
+.dx-rail-list { max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
+.dx-rail-item { display: flex; justify-content: space-between; gap: 8px; padding: 7px 9px;
+  border: 1px solid transparent; border-radius: 2px; background: transparent; cursor: pointer;
+  font-family: var(--font-mono); font-size: 11px; color: var(--dx-dim); transition: background 0.15s, border-color 0.15s; }
+.dx-rail-item:hover, .dx-rail-item:focus-visible { background: rgba(22,29,27,0.8); outline: none; }
+.dx-rail-item.is-on { border-color: var(--dx-emerald); color: var(--dx-paper); box-shadow: inset 2px 0 0 var(--dx-emerald); }
+.dx-rail-item strong { color: var(--dx-gold); }
 
-      <div style={styles.companyBottom}>
-        <div>
-          <span style={styles.companyBottomLabel}>Return</span>
-          <b style={{ color: returnTone(company.realized_return) }}>{pct(company.realized_return)}</b>
-        </div>
-        <div>
-          <span style={styles.companyBottomLabel}>Market</span>
-          <b>{fmt(company.market_score)}</b>
-        </div>
-        <div>
-          <span style={styles.companyBottomLabel}>Benchmark</span>
-          <b style={{ color: outperformed === true ? 'var(--success)' : outperformed === false ? 'var(--danger)' : 'var(--text-3)' }}>
-            {outperformed === null ? 'n/a' : outperformed ? 'Beat' : 'Below'}
-          </b>
-        </div>
-      </div>
-    </button>
-  )
+/* dissection */
+.dx-table { border: 1px solid rgba(200,211,202,0.16); border-radius: 3px; background: rgba(11,16,15,0.6); padding: 18px 20px; min-height: 380px; }
+.dx-specimen-head { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+.dx-specimen-ticker { font-family: var(--font-mono); font-size: 24px; font-weight: 700; letter-spacing: 0.05em; }
+.dx-specimen-score { font-family: var(--font-mono); font-size: 24px; color: var(--dx-emerald); }
+.dx-specimen-score em { font-style: normal; font-size: 9px; letter-spacing: 0.2em; color: var(--dx-faint); margin-left: 8px; }
+
+.dx-bar { display: flex; gap: 3px; height: 110px; }
+.dx-seg { position: relative; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden;
+  border: 1px solid rgba(200,211,202,0.18); border-radius: 2px; background: rgba(8,11,10,0.6);
+  cursor: pointer; padding: 7px 9px; min-width: 70px; color: inherit; font: inherit; text-align: left;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.1s; }
+.dx-seg:hover { border-color: var(--seg-c); box-shadow: 0 0 14px rgba(200,163,90,0.1); }
+.dx-seg:active { transform: translateY(1px); }
+.dx-seg:focus-visible { outline: 1px solid var(--seg-c); outline-offset: 2px; }
+.dx-seg.is-open { border-color: var(--seg-c); box-shadow: inset 0 -3px 0 var(--seg-c); }
+.dx-seg-fill { position: absolute; left: 0; right: 0; bottom: 0; background: var(--seg-c); opacity: 0.22; transition: height 0.5s ease; }
+.dx-seg-name { position: relative; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; color: var(--dx-paper); }
+.dx-seg-meta { position: relative; font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.04em; color: var(--dx-dim); margin-top: 3px; }
+.dx-bar-axis { display: flex; justify-content: space-between; margin-top: 6px;
+  font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; color: var(--dx-faint); }
+
+.dx-unfold { margin-top: 18px; border-top: 1px dashed rgba(200,211,202,0.2); padding-top: 14px; animation: dxIn 0.35s ease; }
+.dx-unfold-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.2em; color: var(--dx-faint); margin-bottom: 12px; }
+.dx-feature { display: grid; grid-template-columns: 130px 64px 1fr 38px 64px; gap: 10px; align-items: center;
+  font-family: var(--font-mono); padding: 6px 0; border-bottom: 1px solid rgba(200,211,202,0.07); }
+.dx-feature.is-grainy { opacity: 0.65; }
+.dx-feature.is-grainy .dx-feature-track { border: 1px dashed rgba(200,211,202,0.3); }
+.dx-feature-name { font-size: 11px; color: var(--dx-paper); }
+.dx-feature-val { font-size: 10.5px; color: var(--dx-dim); text-align: right; }
+.dx-feature-track { position: relative; height: 6px; background: rgba(200,211,202,0.08); border-radius: 1px; overflow: hidden; }
+.dx-feature-fill { display: block; height: 100%; background: var(--dx-emerald); transition: width 0.5s ease; }
+.dx-feature-pct { font-size: 10px; color: var(--dx-gold); text-align: right; }
+.dx-feature-cov { font-size: 9px; color: var(--dx-faint); text-align: right; letter-spacing: 0.04em; }
+.dx-unfold-note { margin: 0; font-size: 12px; line-height: 1.55; color: var(--dx-dim); }
+.dx-empty { font-family: var(--font-mono); font-size: 12px; color: var(--dx-faint); padding: 20px 0; }
+
+/* readout */
+.dx-readout { border: 1px solid rgba(200,211,202,0.18); border-left: 3px solid var(--dx-emerald);
+  background: linear-gradient(180deg, rgba(14,20,19,0.92), rgba(10,14,13,0.85)); padding: 18px 20px; border-radius: 3px; animation: dxIn 0.35s ease; }
+.dx-readout-kicker { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.32em; color: var(--dx-faint); margin-bottom: 12px; }
+.dx-readout-ticker { font-family: var(--font-mono); font-size: 24px; font-weight: 700; letter-spacing: 0.05em; }
+.dx-readout-score { font-family: var(--font-mono); font-size: 34px; color: var(--dx-emerald); margin: 10px 0 16px;
+  display: flex; flex-direction: column; gap: 3px; line-height: 1; }
+.dx-readout-score em { font-style: normal; font-size: 9px; letter-spacing: 0.2em; color: var(--dx-faint); }
+.dx-readout-row { display: flex; align-items: center; gap: 9px; font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.08em; color: var(--dx-dim); border-top: 1px dashed rgba(200,211,202,0.14); padding: 8px 0; }
+.dx-readout-row i { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dx-readout-row strong { margin-left: auto; color: var(--dx-paper); font-size: 11.5px; }
+.dx-readout-note { margin: 12px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--dx-dim); }
+
+.dx-caveat { position: sticky; bottom: 14px; z-index: 4; margin-top: 28px;
+  display: flex; align-items: center; gap: 10px; width: fit-content; max-width: 100%; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em;
+  color: var(--dx-paper); background: rgba(10,14,13,0.92);
+  border: 1px solid rgba(200,163,90,0.5); border-radius: 2px; padding: 9px 16px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
+.dx-caveat-pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--dx-gold); animation: dxPulse 2.2s ease-in-out infinite; flex-shrink: 0; }
+
+@keyframes dxIn { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: blur(0); } }
+@keyframes dxPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) {
+  .dx, .dx *, .dx *::before, .dx *::after { animation: none !important; transition: none !important; }
 }
-
-const styles = {
-  page: {
-    maxWidth: 1480,
-    margin: '0 auto',
-    padding: 'clamp(16px, 2vw, 28px) clamp(12px, 2.4vw, 34px) 64px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 22,
-  },
-  hero: {
-    position: 'relative',
-    overflow: 'hidden',
-    border: '1px solid rgba(200, 211, 202, 0.18)',
-    borderRadius: 28,
-    background: 'linear-gradient(135deg, rgba(14, 20, 19, 0.96), rgba(12, 17, 15, 0.42))',
-    boxShadow: '0 26px 80px rgba(0, 0, 0, 0.28)',
-  },
-  heroGlow: {
-    position: 'absolute',
-    inset: -120,
-    background: 'radial-gradient(circle at 20% 20%, rgba(200, 163, 90, 0.20), transparent 32%), radial-gradient(circle at 85% 10%, rgba(77, 165, 131, 0.14), transparent 30%)',
-    pointerEvents: 'none',
-  },
-  heroContent: {
-    position: 'relative',
-    padding: 30,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 24,
-  },
-  kicker: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 8,
-    width: 'fit-content',
-    color: 'var(--primary)',
-    fontWeight: 800,
-    letterSpacing: '.12em',
-    textTransform: 'uppercase',
-    fontSize: 12,
-  },
-  heroMain: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: 28,
-    alignItems: 'flex-start',
-  },
-  title: {
-    margin: 0,
-    fontSize: 'clamp(30px, 3.2vw, 48px)',
-    lineHeight: 1.04,
-    letterSpacing: '-0.04em',
-    color: 'var(--text-1)',
-  },
-  subtitle: {
-    margin: '14px 0 0',
-    maxWidth: 900,
-    color: 'var(--text-2)',
-    fontSize: 15,
-    lineHeight: 1.7,
-  },
-  yearSelect: {
-    background: 'rgba(14, 20, 19, 0.88)',
-    color: 'var(--text-1)',
-    border: '1px solid rgba(200, 211, 202, 0.28)',
-    borderRadius: 14,
-    padding: '11px 16px',
-    fontSize: 14,
-    outline: 'none',
-  },
-  heroStats: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-    gap: 14,
-  },
-  heroStat: {
-    minHeight: 112,
-    padding: 18,
-    borderRadius: 20,
-    background: 'rgba(14, 20, 19, 0.66)',
-    border: '1px solid rgba(200, 211, 202, 0.16)',
-    display: 'flex',
-    gap: 14,
-    alignItems: 'flex-start',
-  },
-  heroIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 14,
-    background: 'rgba(255,255,255,0.06)',
-    display: 'grid',
-    placeItems: 'center',
-    flexShrink: 0,
-  },
-  heroStatLabel: {
-    color: 'var(--text-3)',
-    fontSize: 11,
-    textTransform: 'uppercase',
-    letterSpacing: '.08em',
-    fontWeight: 800,
-  },
-  heroStatValue: {
-    marginTop: 6,
-    fontSize: 24,
-    fontWeight: 900,
-    letterSpacing: '-0.03em',
-  },
-  heroStatSub: {
-    marginTop: 3,
-    color: 'var(--text-3)',
-    fontSize: 12,
-  },
-  explainCard: {
-    padding: '16px 20px',
-    borderRadius: 18,
-    border: '1px solid rgba(77, 165, 131, 0.18)',
-    background: 'linear-gradient(135deg, rgba(77, 165, 131, 0.10), rgba(14, 20, 19, 0.78))',
-    color: 'var(--text-2)',
-    lineHeight: 1.7,
-    fontSize: 14,
-  },
-  qualityGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: 16,
-  },
-  insightCard: {
-    padding: 20,
-    borderRadius: 22,
-    background: 'rgba(14, 20, 19, 0.74)',
-    border: '1px solid rgba(200, 211, 202, 0.18)',
-    boxShadow: '0 18px 48px rgba(0, 0, 0, 0.16)',
-  },
-  insightTop: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-  },
-  insightIcon: {
-    width: 34,
-    height: 34,
-    display: 'grid',
-    placeItems: 'center',
-    borderRadius: 12,
-    background: 'rgba(200, 163, 90, 0.12)',
-    color: 'var(--primary)',
-  },
-  insightLabel: {
-    color: 'var(--text-3)',
-    fontSize: 11,
-    textTransform: 'uppercase',
-    letterSpacing: '.08em',
-    fontWeight: 800,
-  },
-  insightValue: {
-    marginTop: 16,
-    fontSize: 28,
-    lineHeight: 1.05,
-    color: 'var(--text-1)',
-    fontWeight: 900,
-    letterSpacing: '-0.04em',
-  },
-  insightSub: {
-    marginTop: 8,
-    color: 'var(--text-3)',
-    fontSize: 12.5,
-    lineHeight: 1.45,
-  },
-  mainGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))',
-    gap: 22,
-    alignItems: 'stretch',
-  },
-  chartCard: {
-    padding: 0,
-    overflow: 'hidden',
-  },
-  detailCard: {
-    padding: 0,
-    overflow: 'hidden',
-  },
-  cardHeader: {
-    padding: '24px 26px 6px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: 18,
-    alignItems: 'flex-start',
-  },
-  cardTitle: {
-    margin: 0,
-    color: 'var(--text-1)',
-    fontSize: 23,
-    letterSpacing: '-0.035em',
-  },
-  cardSub: {
-    margin: '7px 0 0',
-    color: 'var(--text-3)',
-    fontSize: 13.5,
-    lineHeight: 1.5,
-  },
-  legend: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    color: 'var(--text-3)',
-    fontSize: 12,
-    whiteSpace: 'nowrap',
-  },
-  legendDotSelected: {
-    width: 9,
-    height: 9,
-    borderRadius: 99,
-    background: 'var(--primary)',
-    display: 'inline-block',
-  },
-  legendDot: {
-    width: 9,
-    height: 9,
-    borderRadius: 99,
-    background: 'rgba(200, 211, 202, 0.72)',
-    display: 'inline-block',
-    marginLeft: 8,
-  },
-  chartBox: {
-    height: 540,
-    padding: '2px 14px 18px',
-  },
-  tooltip: {
-    background: 'rgba(14, 20, 19, 0.96)',
-    border: '1px solid rgba(200, 211, 202, 0.24)',
-    borderRadius: 12,
-    padding: '10px 12px',
-    color: 'var(--text-1)',
-    fontSize: 12,
-    boxShadow: '0 18px 45px rgba(0,0,0,.28)',
-  },
-  detailWrap: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 20,
-    padding: 26,
-  },
-  detailTop: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: 18,
-    alignItems: 'flex-start',
-  },
-  detailTicker: {
-    fontSize: 28,
-    fontWeight: 900,
-    color: 'var(--text-1)',
-    letterSpacing: '-0.04em',
-  },
-  detailYear: {
-    marginTop: 2,
-    color: 'var(--text-3)',
-    fontSize: 13,
-  },
-  statusPill: {
-    border: '1px solid',
-    borderRadius: 999,
-    padding: '8px 12px',
-    fontSize: 12,
-    fontWeight: 800,
-    background: 'rgba(255,255,255,0.04)',
-  },
-  detailScoreRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    color: 'var(--text-2)',
-    fontSize: 14,
-    marginBottom: 8,
-  },
-  scoreTrack: {
-    height: 12,
-    borderRadius: 999,
-    background: 'rgba(8, 11, 10, 0.58)',
-    overflow: 'hidden',
-  },
-  scoreFill: {
-    height: '100%',
-    borderRadius: 999,
-    background: 'linear-gradient(90deg, var(--primary), rgba(77, 165, 131, 0.95))',
-  },
-  miniGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-    gap: 10,
-  },
-  mini: {
-    padding: '12px 13px',
-    background: 'rgba(8, 11, 10, 0.32)',
-    border: '1px solid rgba(200, 211, 202, 0.14)',
-    borderRadius: 14,
-  },
-  miniLabel: {
-    color: 'var(--text-3)',
-    fontSize: 11,
-    textTransform: 'uppercase',
-    letterSpacing: '.06em',
-    marginBottom: 6,
-  },
-  miniValue: {
-    fontWeight: 850,
-  },
-  chipWrap: {
-    display: 'flex',
-    gap: 8,
-    flexWrap: 'wrap',
-  },
-  bestLine: {
-    display: 'flex',
-    gap: 8,
-    alignItems: 'center',
-    color: 'var(--text-2)',
-    fontSize: 13,
-  },
-  breakdownTitle: {
-    fontSize: 13,
-    color: 'var(--text-3)',
-    marginBottom: 10,
-  },
-  breakdownRow: {
-    display: 'grid',
-    gridTemplateColumns: '108px 1fr 34px',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 9,
-  },
-  breakdownLabel: {
-    color: 'var(--text-2)',
-    fontSize: 12.5,
-  },
-  breakdownTrack: {
-    height: 9,
-    background: 'rgba(8, 11, 10, 0.55)',
-    borderRadius: 999,
-    overflow: 'hidden',
-  },
-  breakdownFill: {
-    height: '100%',
-    borderRadius: 999,
-    background: 'linear-gradient(90deg, var(--primary), #c8a35a)',
-  },
-  breakdownValue: {
-    color: 'var(--text-2)',
-    fontSize: 12,
-    textAlign: 'right',
-  },
-  companySection: {
-    padding: 26,
-  },
-  companyHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: 22,
-    alignItems: 'flex-start',
-    marginBottom: 22,
-  },
-  companyControls: {
-    display: 'flex',
-    gap: 10,
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end',
-  },
-  searchBox: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    minWidth: 190,
-    background: 'rgba(8, 11, 10, 0.38)',
-    border: '1px solid rgba(200, 211, 202, 0.18)',
-    borderRadius: 13,
-    padding: '9px 11px',
-  },
-  searchInput: {
-    border: 0,
-    outline: 'none',
-    background: 'transparent',
-    color: 'var(--text-1)',
-    width: '100%',
-    fontSize: 13,
-  },
-  sortSelect: {
-    background: 'rgba(8, 11, 10, 0.38)',
-    color: 'var(--text-1)',
-    border: '1px solid rgba(200, 211, 202, 0.18)',
-    borderRadius: 13,
-    padding: '10px 12px',
-    fontSize: 13,
-    outline: 'none',
-  },
-  loading: {
-    padding: 30,
-    color: 'var(--text-3)',
-  },
-  companyGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-    gap: 14,
-  },
-  companyCard: {
-    textAlign: 'left',
-    border: '1px solid rgba(200, 211, 202, 0.14)',
-    borderRadius: 20,
-    background: 'linear-gradient(180deg, rgba(14, 20, 19, 0.78), rgba(8, 11, 10, 0.34))',
-    padding: 17,
-    color: 'var(--text-1)',
-    cursor: 'pointer',
-    transition: 'transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease',
-  },
-  companyCardActive: {
-    borderColor: 'rgba(200, 163, 90, 0.65)',
-    boxShadow: '0 18px 52px rgba(200, 163, 90, 0.16), inset 0 1px 0 rgba(255,255,255,0.08)',
-    background: 'linear-gradient(180deg, rgba(200, 163, 90, 0.12), rgba(14, 20, 19, 0.78))',
-  },
-  companyCardTop: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: 10,
-    alignItems: 'flex-start',
-    marginBottom: 15,
-  },
-  rankText: {
-    color: 'var(--text-3)',
-    fontSize: 12,
-    marginBottom: 4,
-  },
-  companyTicker: {
-    fontSize: 22,
-    fontWeight: 900,
-    letterSpacing: '-0.04em',
-  },
-  statusPillSmall: {
-    border: '1px solid',
-    borderRadius: 999,
-    padding: '6px 9px',
-    fontSize: 11,
-    fontWeight: 800,
-    background: 'rgba(255,255,255,0.04)',
-    whiteSpace: 'nowrap',
-  },
-  companyMetricRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    color: 'var(--text-2)',
-    fontSize: 13,
-    marginBottom: 8,
-  },
-  companyScoreTrack: {
-    height: 9,
-    borderRadius: 999,
-    background: 'rgba(8, 11, 10, 0.62)',
-    overflow: 'hidden',
-    marginBottom: 16,
-  },
-  companyScoreFill: {
-    height: '100%',
-    borderRadius: 999,
-    background: 'linear-gradient(90deg, var(--primary), rgba(77, 165, 131, 0.95))',
-  },
-  companyBottom: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: 8,
-  },
-  companyBottomLabel: {
-    display: 'block',
-    color: 'var(--text-3)',
-    fontSize: 10.5,
-    textTransform: 'uppercase',
-    letterSpacing: '.06em',
-    marginBottom: 4,
-  },
-}
+`
