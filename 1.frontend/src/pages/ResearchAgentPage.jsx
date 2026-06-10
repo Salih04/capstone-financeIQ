@@ -21,6 +21,9 @@ const errText = (e) => {
 export default function ResearchAgentPage() {
   const [summary, setSummary] = useState(null)
   const [diag, setDiag] = useState(null)
+  const [projectContext, setProjectContext] = useState(null)
+  const [projectConfidence, setProjectConfidence] = useState(null)
+  const [projectDiagnostics, setProjectDiagnostics] = useState(null)
   const [loadErr, setLoadErr] = useState(null)
   const [ticker, setTicker] = useState('ASELS')
   const [score, setScore] = useState(null)
@@ -47,8 +50,15 @@ export default function ResearchAgentPage() {
 
   const loadAll = useCallback(() => {
     setLoadErr(null)
-    api.get('/research/summary').then(r => setSummary(r.data)).catch(e => setLoadErr(errText(e)))
-    api.get('/research/model-diagnostics').then(r => setDiag(r.data)).catch(e => setLoadErr(errText(e)))
+    api.get('/research/summary').then(r => {
+      setSummary(r.data)
+      if (r.data?.context) setProjectContext(r.data.context)
+      if (r.data?.confidence) setProjectConfidence(r.data.confidence)
+    }).catch(e => setLoadErr(errText(e)))
+    api.get('/research/model-diagnostics').then(r => {
+      setDiag(r.data)
+      if (r.data?.diagnostics) setProjectDiagnostics(r.data.diagnostics)
+    }).catch(e => setLoadErr(errText(e)))
   }, [])
   useEffect(() => { loadAll() }, [loadAll])
 
@@ -74,9 +84,11 @@ export default function ResearchAgentPage() {
   }
   const clearAnswer = () => { setAnswer(null); setAskErr(null) }
 
-  const sctx = summary?.context || {}
-  const conf = summary?.confidence || {}
-  const dgx = diag?.diagnostics || {}
+  const sctx = projectContext || summary?.context || {}
+  const conf = projectConfidence || summary?.confidence || {}
+  const dgx = projectDiagnostics || diag?.diagnostics || {}
+  const benchmarkKnown = sctx.benchmark_available !== undefined && sctx.benchmark_available !== null
+  const weakSignalKnown = dgx.weak_backtest !== undefined && dgx.weak_backtest !== null
   const ready = score && !score.loading && !score.error
   const sc = ready ? (score.score || {}) : {}
   const llm = (score && score.llm) || {}
@@ -143,8 +155,8 @@ export default function ResearchAgentPage() {
           <div style={railMetrics}>
             <MetricCard label="Dataset rows" value={asText(sctx.rows)} sub={`${asText(sctx.rows_with_target)} with target`} />
             <MetricCard label="Validated features" value={asText(sctx.feature_count)} />
-            <MetricCard label="Benchmark" value={sctx.benchmark_available ? 'Available' : 'Missing'} tone={sctx.benchmark_available ? 'good' : 'warn'} sub={asText(sctx.benchmark_source)} />
-            <MetricCard label="Model signal" value={dgx.weak_backtest ? 'Weak' : 'OK'} tone={dgx.weak_backtest ? 'bad' : 'good'} sub={`Spearman ${asText(dgx.mean_spearman)}`} />
+            <MetricCard label="Benchmark" value={benchmarkKnown ? (sctx.benchmark_available ? 'Available' : 'Missing') : '—'} tone={benchmarkKnown ? (sctx.benchmark_available ? 'good' : 'warn') : undefined} sub={asText(sctx.benchmark_source)} />
+            <MetricCard label="Model signal" value={weakSignalKnown ? (dgx.weak_backtest ? 'Weak' : 'OK') : '—'} tone={weakSignalKnown ? (dgx.weak_backtest ? 'bad' : 'good') : undefined} sub={`Spearman ${asText(dgx.mean_spearman)}`} />
           </div>
 
           <EvidencePanel title="Company scorecard" sub="Fundamental ranking + data confidence + AI evidence" tone="accent">
