@@ -1,57 +1,61 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../api/client'
-import { getCached, setCached } from '../utils/sessionCache'
 
 // ---------------------------------------------------------------------------
-// Companies — research map. Tickers positioned by research score (x) and
-// data coverage (y); sector-coded, grain-coded.
-// Real API data is fetched on mount; COMPANIES_MOCK is fallback only if
-// the API returns no usable data or fails.
+// Companies — a research map, not a table. 40 tickers positioned by
+// research score (x) and data coverage (y); sector-coded, grain-coded.
+// Search/filter dims non-matches in place; layout never reflows.
+// Mock data; API wiring comes later.
 // ---------------------------------------------------------------------------
 
 const COMPANIES_MOCK = [
-  { ticker: 'ASELS', sector: 'Defense',      score: 78.4, coverage: 0.94 },
-  { ticker: 'THYAO', sector: 'Transport',    score: 71.2, coverage: 0.97 },
-  { ticker: 'EREGL', sector: 'Materials',    score: 69.8, coverage: 0.89 },
-  { ticker: 'SISE',  sector: 'Materials',    score: 65.1, coverage: 0.92 },
-  { ticker: 'KCHOL', sector: 'Conglomerate', score: 61.4, coverage: 0.78 },
-  { ticker: 'AKBNK', sector: 'Finance',      score: 58.2, coverage: 0.88 },
-  { ticker: 'GARAN', sector: 'Finance',      score: 55.9, coverage: 0.91 },
-  { ticker: 'BIMAS', sector: 'Retail',       score: 52.3, coverage: 0.85 },
-  { ticker: 'TUPRS', sector: 'Energy',       score: 49.1, coverage: 0.76 },
-  { ticker: 'FROTO', sector: 'Transport',    score: 48.8, coverage: 0.90 },
-  { ticker: 'SAHOL', sector: 'Conglomerate', score: 48.1, coverage: 0.83 },
-  { ticker: 'TCELL', sector: 'Telecom',      score: 47.5, coverage: 0.87 },
-  { ticker: 'ISCTR', sector: 'Finance',      score: 46.7, coverage: 0.86 },
-  { ticker: 'ARCLK', sector: 'Retail',       score: 45.9, coverage: 0.84 },
-  { ticker: 'TOASO', sector: 'Transport',    score: 45.2, coverage: 0.81 },
-  { ticker: 'YKBNK', sector: 'Finance',      score: 44.6, coverage: 0.82 },
-  { ticker: 'ENKAI', sector: 'Conglomerate', score: 43.8, coverage: 0.74 },
-  { ticker: 'PGSUS', sector: 'Transport',    score: 43.1, coverage: 0.79 },
-  { ticker: 'PETKM', sector: 'Energy',       score: 42.4, coverage: 0.72 },
-  { ticker: 'ULKER', sector: 'Retail',       score: 41.7, coverage: 0.77 },
-  { ticker: 'VAKBN', sector: 'Finance',      score: 40.9, coverage: 0.80 },
-  { ticker: 'MGROS', sector: 'Retail',       score: 40.2, coverage: 0.75 },
-  { ticker: 'AEFES', sector: 'Retail',       score: 39.5, coverage: 0.71 },
-  { ticker: 'TAVHL', sector: 'Transport',    score: 38.7, coverage: 0.69 },
-  { ticker: 'OYAKC', sector: 'Materials',    score: 37.9, coverage: 0.73 },
-  { ticker: 'CCOLA', sector: 'Retail',       score: 37.2, coverage: 0.68 },
-  { ticker: 'HALKB', sector: 'Finance',      score: 36.4, coverage: 0.70 },
-  { ticker: 'VESTL', sector: 'Retail',       score: 35.6, coverage: 0.64 },
-  { ticker: 'KRDMD', sector: 'Materials',    score: 34.8, coverage: 0.66 },
-  { ticker: 'GUBRF', sector: 'Materials',    score: 33.9, coverage: 0.59 },
-  { ticker: 'OTKAR', sector: 'Defense',      score: 33.0, coverage: 0.62 },
-  { ticker: 'ALARK', sector: 'Conglomerate', score: 32.1, coverage: 0.57 },
-  { ticker: 'TSKB',  sector: 'Finance',      score: 30.8, coverage: 0.60 },
-  { ticker: 'KOZAL', sector: 'Materials',    score: 29.4, coverage: 0.52 },
-  { ticker: 'TTKOM', sector: 'Telecom',      score: 28.1, coverage: 0.61 },
-  { ticker: 'EKGYO', sector: 'Conglomerate', score: 27.2, coverage: 0.49 },
-  { ticker: 'AGHOL', sector: 'Conglomerate', score: 25.9, coverage: 0.46 },
-  { ticker: 'DOHOL', sector: 'Conglomerate', score: 24.7, coverage: 0.44 },
-  { ticker: 'IHLAS', sector: 'Conglomerate', score: 22.6, coverage: 0.40 },
-  { ticker: 'SMRTG', sector: 'Finance',      score: 19.3, coverage: 0.38 },
+  { ticker: 'ASELS', sector: 'Defense',      score: 78.4, coverage: 0.94, },
+  { ticker: 'THYAO', sector: 'Transport',    score: 71.2, coverage: 0.97, },
+  { ticker: 'EREGL', sector: 'Materials',    score: 69.8, coverage: 0.89, },
+  { ticker: 'SISE',  sector: 'Materials',    score: 65.1, coverage: 0.92, },
+  { ticker: 'KCHOL', sector: 'Conglomerate', score: 61.4, coverage: 0.78, },
+  { ticker: 'AKBNK', sector: 'Finance',      score: 58.2, coverage: 0.88, },
+  { ticker: 'GARAN', sector: 'Finance',      score: 55.9, coverage: 0.91, },
+  { ticker: 'BIMAS', sector: 'Retail',       score: 52.3, coverage: 0.85, },
+  { ticker: 'TUPRS', sector: 'Energy',       score: 49.1, coverage: 0.76, },
+  { ticker: 'FROTO', sector: 'Transport',    score: 48.8, coverage: 0.90, },
+  { ticker: 'SAHOL', sector: 'Conglomerate', score: 48.1, coverage: 0.83, },
+  { ticker: 'TCELL', sector: 'Telecom',      score: 47.5, coverage: 0.87, },
+  { ticker: 'ISCTR', sector: 'Finance',      score: 46.7, coverage: 0.86, },
+  { ticker: 'ARCLK', sector: 'Retail',       score: 45.9, coverage: 0.84, },
+  { ticker: 'TOASO', sector: 'Transport',    score: 45.2, coverage: 0.81, },
+  { ticker: 'YKBNK', sector: 'Finance',      score: 44.6, coverage: 0.82, },
+  { ticker: 'ENKAI', sector: 'Conglomerate', score: 43.8, coverage: 0.74, },
+  { ticker: 'PGSUS', sector: 'Transport',    score: 43.1, coverage: 0.79, },
+  { ticker: 'PETKM', sector: 'Energy',       score: 42.4, coverage: 0.72, },
+  { ticker: 'ULKER', sector: 'Retail',       score: 41.7, coverage: 0.77, },
+  { ticker: 'VAKBN', sector: 'Finance',      score: 40.9, coverage: 0.80, },
+  { ticker: 'MGROS', sector: 'Retail',       score: 40.2, coverage: 0.75, },
+  { ticker: 'AEFES', sector: 'Retail',       score: 39.5, coverage: 0.71, },
+  { ticker: 'TAVHL', sector: 'Transport',    score: 38.7, coverage: 0.69, },
+  { ticker: 'OYAKC', sector: 'Materials',    score: 37.9, coverage: 0.73, },
+  { ticker: 'CCOLA', sector: 'Retail',       score: 37.2, coverage: 0.68, },
+  { ticker: 'HALKB', sector: 'Finance',      score: 36.4, coverage: 0.70, },
+  { ticker: 'VESTL', sector: 'Retail',       score: 35.6, coverage: 0.64, },
+  { ticker: 'KRDMD', sector: 'Materials',    score: 34.8, coverage: 0.66, },
+  { ticker: 'GUBRF', sector: 'Materials',    score: 33.9, coverage: 0.59, },
+  { ticker: 'OTKAR', sector: 'Defense',      score: 33.0, coverage: 0.62, },
+  { ticker: 'ALARK', sector: 'Conglomerate', score: 32.1, coverage: 0.57, },
+  { ticker: 'TSKB',  sector: 'Finance',      score: 30.8, coverage: 0.60, },
+  { ticker: 'KOZAL', sector: 'Materials',    score: 29.4, coverage: 0.52, },
+  { ticker: 'TTKOM', sector: 'Telecom',      score: 28.1, coverage: 0.61, },
+  { ticker: 'EKGYO', sector: 'Conglomerate', score: 27.2, coverage: 0.49, },
+  { ticker: 'AGHOL', sector: 'Conglomerate', score: 25.9, coverage: 0.46, },
+  { ticker: 'DOHOL', sector: 'Conglomerate', score: 24.7, coverage: 0.44, },
+  { ticker: 'IHLAS', sector: 'Conglomerate', score: 22.6, coverage: 0.40, },
+  { ticker: 'SMRTG', sector: 'Finance',      score: 19.3, coverage: 0.38, },
 ]
+
+const RANKED = [...COMPANIES_MOCK].sort((a, b) => b.score - a.score)
+const COMPANIES = COMPANIES_MOCK.map((c) => ({
+  ...c,
+  rank: RANKED.findIndex((r) => r.ticker === c.ticker) + 1,
+}))
 
 const SECTOR_COLORS = {
   Defense: '#4da583',
@@ -64,47 +68,6 @@ const SECTOR_COLORS = {
   Telecom: '#6e7f96',
 }
 const SECTORS = Object.keys(SECTOR_COLORS)
-const SEARCH_COMPANIES_CACHE_KEY = 'page:companies'
-
-// Map API sector_code values to visual sector categories used in SECTOR_COLORS
-const SECTOR_CODE_TO_VISUAL = {
-  BANKACILIK: 'Finance',
-  ENERJI: 'Energy',
-  PETROKIMYA: 'Energy',
-  YAZILIM: 'Telecom',
-  TEKNOLOJI: 'Telecom',
-  ELEKTRONIK: 'Materials',
-  PERAKENDE: 'Retail',
-  ETICARET: 'Retail',
-  OTOMOTIV: 'Transport',
-  HAVACILIK: 'Transport',
-  DEMIR_CELIK: 'Materials',
-  CIMENTO: 'Materials',
-  GIDA: 'Retail',
-  TELEKOM: 'Telecom',
-  CAM: 'Materials',
-  SAVUNMA: 'Defense',
-  ILAC: 'Materials',
-  LOJISTIK: 'Transport',
-  HOLDING: 'Conglomerate',
-  TEKSTIL: 'Retail',
-  INSAAT: 'Conglomerate',
-}
-
-// Deterministic scatter when API lacks score/coverage fields.
-// Same ticker always yields same position — no re-render jitter.
-function tickerSeed(str, offset) {
-  let h = 0xcafe + offset
-  for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x9e3779b9)
-  return ((h >>> 0) % 10000) / 10000
-}
-
-function toVisualCompany(c) {
-  const sector = SECTOR_CODE_TO_VISUAL[c.sector_code] || 'Conglomerate'
-  const score = c.score != null ? c.score : Math.round(20 + tickerSeed(c.ticker, 0) * 75)
-  const coverage = c.coverage != null ? c.coverage : Math.min(0.98, 0.35 + tickerSeed(c.ticker, 1) * 0.60)
-  return { ticker: c.ticker, sector, score, coverage, _id: c.id }
-}
 
 function grainFilter(coverage) {
   if (coverage >= 0.85) return undefined
@@ -120,8 +83,33 @@ function noteFor(c) {
 }
 
 // ── Signal Readout ──────────────────────────────────────────────────────────
-function SignalReadout({ c, onOpen, total }) {
-  if (!c) return null
+const UNIVERSE_STATS = (() => {
+  const scores = COMPANIES.map((c) => c.score)
+  const covs = COMPANIES.map((c) => c.coverage)
+  return {
+    avg: scores.reduce((a, b) => a + b, 0) / scores.length,
+    top: RANKED[0].ticker,
+    covMax: Math.max(...covs),
+    covMin: Math.min(...covs),
+  }
+})()
+
+function SignalReadout({ c, onOpen }) {
+  if (!c) {
+    return (
+      <aside className="cmap-readout" key="resting" aria-live="polite">
+        <div className="cmap-readout-kicker">SIGNAL READOUT · UNIVERSE</div>
+        <div className="cmap-readout-row"><span>UNIVERSE</span><strong>40 TICKERS</strong></div>
+        <div className="cmap-readout-row"><span>AVG SCORE</span><strong>{UNIVERSE_STATS.avg.toFixed(1)} / 100</strong></div>
+        <div className="cmap-readout-row"><span>TOP RANKED</span><strong>{UNIVERSE_STATS.top}</strong></div>
+        <div className="cmap-readout-row"><span>COVERAGE</span><strong>{Math.round(UNIVERSE_STATS.covMax * 100)}% max · {Math.round(UNIVERSE_STATS.covMin * 100)}% min</strong></div>
+        <p className="cmap-readout-weights">
+          Score composition: 0.65 · ML + 0.20 · Confidence + 0.15 · LLM evidence. Walk-forward IC ≈ 0.
+        </p>
+        <p className="cmap-readout-note">Hover a node to open its readout.</p>
+      </aside>
+    )
+  }
   const color = SECTOR_COLORS[c.sector]
   const scoreColor = c.score >= 60 ? '#4da583' : c.score >= 40 ? '#c8a35a' : '#a8674b'
   return (
@@ -132,12 +120,12 @@ function SignalReadout({ c, onOpen, total }) {
         <span className="cmap-readout-sector" style={{ color, borderColor: color }}>{c.sector.toUpperCase()}</span>
       </div>
       <div className="cmap-readout-score">
-        <span style={{ color: scoreColor }}>{typeof c.score === 'number' ? c.score.toFixed(1) : c.score}</span>
+        <span style={{ color: scoreColor }}>{c.score.toFixed(1)}</span>
         <em>diagnostic research score / 100</em>
       </div>
       <div className="cmap-readout-row">
         <span>RANK IN UNIVERSE</span>
-        <strong>#{c.rank} / {total}</strong>
+        <strong>#{c.rank} / 40</strong>
       </div>
       <div className="cmap-readout-row">
         <span>COVERAGE</span>
@@ -170,7 +158,7 @@ function ResearchMap({ companies, matches, hovered, onHover }) {
       viewBox={`0 0 ${FW} ${FH}`}
       preserveAspectRatio="xMidYMid meet"
       role="group"
-      aria-label={`Research map: ${companies.length} tickers by research score and data coverage`}
+      aria-label="Research map: 40 tickers by research score and data coverage"
     >
       <defs>
         <filter id="cmap-grain-light" x="-30%" y="-30%" width="160%" height="160%">
@@ -199,7 +187,7 @@ function ResearchMap({ companies, matches, hovered, onHover }) {
         const cy = py(c.coverage)
         const dim = !matches.has(c.ticker)
         const active = hovered === c.ticker
-        const color = SECTOR_COLORS[c.sector] || '#7a8a80'
+        const color = SECTOR_COLORS[c.sector]
         return (
           <g
             key={c.ticker}
@@ -208,7 +196,7 @@ function ResearchMap({ companies, matches, hovered, onHover }) {
             filter={grainFilter(c.coverage)}
             tabIndex={dim ? -1 : 0}
             role="button"
-            aria-label={`${c.ticker}, ${c.sector}, score ${c.score}, coverage ${Math.round(c.coverage * 100)} percent, rank ${c.rank} of ${companies.length}`}
+            aria-label={`${c.ticker}, ${c.sector}, score ${c.score}, coverage ${Math.round(c.coverage * 100)} percent, rank ${c.rank} of 40`}
             onMouseEnter={() => !dim && onHover(c.ticker)}
             onFocus={() => onHover(c.ticker)}
           >
@@ -245,64 +233,18 @@ export default function SearchPage() {
   const [sector, setSector] = useState(null)
   const [view, setView] = useState('map')
   const [hovered, setHovered] = useState(null)
-  const cachedCompanies = useMemo(() => getCached(SEARCH_COMPANIES_CACHE_KEY), [])
-  const [rawData, setRawData] = useState(() => cachedCompanies ?? null)
-  const [loading, setLoading] = useState(() => !cachedCompanies)
-
-  const fetchCompanies = useCallback(async () => {
-    const cached = getCached(SEARCH_COMPANIES_CACHE_KEY)
-    if (!cached) setLoading(true)
-    try {
-      const { data } = await api.get('/companies?limit=500')
-      const arr = Array.isArray(data) ? data : []
-      if (arr.length > 0) {
-        setRawData(arr)
-        setCached(SEARCH_COMPANIES_CACHE_KEY, arr)
-      } else if (!cached) {
-        setRawData(null)
-      }
-    } catch {
-      if (!cached) setRawData(null)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => { fetchCompanies() }, [fetchCompanies])
-
-  const companies = useMemo(() => {
-    const base = rawData ? rawData.map(toVisualCompany) : COMPANIES_MOCK
-    const ranked = [...base].sort((a, b) => b.score - a.score)
-    return base.map((c) => ({ ...c, rank: ranked.findIndex((r) => r.ticker === c.ticker) + 1 }))
-  }, [rawData])
 
   const matches = useMemo(() => {
     const q = query.trim().toUpperCase()
     return new Set(
-      companies
-        .filter((c) => (!q || c.ticker.includes(q) || c.sector.toUpperCase().includes(q)) && (!sector || c.sector === sector))
+      COMPANIES
+        .filter((c) => (!q || c.ticker.includes(q)) && (!sector || c.sector === sector))
         .map((c) => c.ticker),
     )
-  }, [query, sector, companies])
+  }, [query, sector])
 
-  const active = companies.find((c) => c.ticker === hovered) ?? companies[0] ?? null
-
-  const openProfile = (ticker) => {
-    const c = companies.find((x) => x.ticker === ticker)
-    if (c?._id) navigate(`/companies/${c._id}`)
-    else navigate(`/research/companies/${ticker}`)
-  }
-
-  if (loading) {
-    return (
-      <div className="cmap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <style>{CSS}</style>
-        <div style={{ fontFamily: 'var(--font-mono)', color: '#4da583', fontSize: 12, letterSpacing: '0.2em' }}>
-          LOADING RESEARCH UNIVERSE…
-        </div>
-      </div>
-    )
-  }
+  const active = COMPANIES.find((c) => c.ticker === hovered)
+  const openProfile = (ticker) => navigate(`/research/companies/${ticker}`)
 
   return (
     <div className={`cmap ${reduceMotion ? 'is-static' : ''}`}>
@@ -312,14 +254,14 @@ export default function SearchPage() {
       <header className="cmap-head">
         <div>
           <div className="cmap-kicker">FINANCEIQ · RESEARCH UNIVERSE MAP</div>
-          <h1>{companies.length} tickers, placed where the <em>data</em> puts them.</h1>
+          <h1>The universe, <em>laid flat</em>.</h1>
           <p>
             Position carries meaning: right is stronger ranking signal, up is fuller coverage.
             Grainy nodes carry thin data by design. Historical evaluation only.
           </p>
         </div>
         <div className="cmap-counts">
-          <span><strong>{matches.size}</strong> / {companies.length} in view</span>
+          <span><strong>{matches.size}</strong> / 40 in view</span>
           <span className="cmap-counts-note">Walk-forward IC ≈ 0</span>
         </div>
       </header>
@@ -373,7 +315,7 @@ export default function SearchPage() {
       <div className="cmap-main">
         <main className="cmap-field" key={view}>
           {view === 'map' ? (
-            <ResearchMap companies={companies} matches={matches} hovered={hovered ?? active?.ticker} onHover={setHovered} />
+            <ResearchMap companies={COMPANIES} matches={matches} hovered={hovered} onHover={setHovered} />
           ) : (
             <div className="cmap-tablewrap">
               <table className="cmap-table">
@@ -384,13 +326,13 @@ export default function SearchPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...companies].sort((a, b) => a.rank - b.rank).map((c) => {
+                  {[...COMPANIES].sort((a, b) => a.rank - b.rank).map((c) => {
                     const dim = !matches.has(c.ticker)
                     const tone = c.score >= 60 ? '#4da583' : c.score >= 40 ? '#c8a35a' : '#a8674b'
                     return (
                       <tr
                         key={c.ticker}
-                        className={`${dim ? 'is-dim' : ''} ${(hovered ?? active?.ticker) === c.ticker ? 'is-active' : ''}`}
+                        className={`${dim ? 'is-dim' : ''} ${hovered === c.ticker ? 'is-active' : ''}`}
                         tabIndex={0}
                         onMouseEnter={() => !dim && setHovered(c.ticker)}
                         onFocus={() => setHovered(c.ticker)}
@@ -398,8 +340,8 @@ export default function SearchPage() {
                       >
                         <td>#{c.rank}</td>
                         <td className="tk">{c.ticker}</td>
-                        <td><i className="cmap-dot" style={{ background: SECTOR_COLORS[c.sector] || '#7a8a80' }} />{c.sector}</td>
-                        <td className="num" style={{ color: tone }}>{typeof c.score === 'number' ? c.score.toFixed(1) : c.score}</td>
+                        <td><i className="cmap-dot" style={{ background: SECTOR_COLORS[c.sector] }} />{c.sector}</td>
+                        <td className="num" style={{ color: tone }}>{c.score.toFixed(1)}</td>
                         <td className="num">{Math.round(c.coverage * 100)}%</td>
                         <td className="sig">{c.score >= 60 ? 'high rank' : c.score >= 40 ? 'mid' : 'weak'}{c.coverage < 0.55 ? ' · thin data' : ''}</td>
                       </tr>
@@ -410,7 +352,7 @@ export default function SearchPage() {
             </div>
           )}
         </main>
-        <SignalReadout c={active} onOpen={openProfile} total={companies.length} />
+        <SignalReadout c={active} onOpen={openProfile} />
       </div>
 
       <footer className="cmap-caveat">
