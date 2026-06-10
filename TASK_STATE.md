@@ -1,6 +1,6 @@
 # TASK_STATE.md — FinanceIQ
 
-Last updated: 2026-06-10
+Last updated: 2026-06-10 (rev 2)
 
 ## Status legend
 - `DONE` — shipped, tested
@@ -36,6 +36,10 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | Explainable research agent (+ optional OpenRouter/local LLM) | DONE | `/research/*`, grounded intents, never advice |
 | Research Terminal frontend | DONE | dashboard, research-agent, data-quality, experiments, benchmark, companies |
 | Forecasting (legacy) restored | DONE | filters union, friendly errors, re-clickable actions |
+| Forecasting CSV pipeline | DONE | CSV-backed; no DB required; train→rank→explain functional |
+| Universe split (public/training) | DONE | `make split-datasets`; `universe_public_40.csv` + `universe_training_bist100.csv` |
+| RAG context layer | DONE | `make build-company-contexts` → per-ticker/year JSON; injected into LLM prompt |
+| BIST100 expansion investigation | DONE | Yahoo=price only confirmed; yfinance collector stub + manual template delivered |
 | Tests | DONE | root 93 + backend 12 passing |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
@@ -75,6 +79,8 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | `SECRET_KEY` / CORS in compose | tighten before any external backend deployment |
 
 ## Next steps (optional, beyond capstone scope)
-- Expand the universe (more BIST tickers, more years) to give the model a chance.
+- Expand training universe: run `make collect-bist100-financials`, verify vs KAP,
+  add tickers to `universe_training_bist100.csv`, add return targets to reference CSV,
+  re-run `make data && make split-datasets`. Training tickers > 40 required before claiming success.
 - Quarterly fundamentals with genuine per-period variation (current quarterly exports are frozen).
 - Optional: point the research agent at a fine-tuned local model (see `research_agent_training/mlx_training_plan.md`).

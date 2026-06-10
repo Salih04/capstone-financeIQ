@@ -46,9 +46,50 @@ All notable changes to FinanceIQ, most recent first.
 
 ---
 
-## [Unreleased / HEAD] — 2026-06-10
+## [3.2.0] — 2026-06-10
 
-No unreleased changes beyond HEAD.
+### Added
+- **CSV-backed Forecasting pipeline** — completely replaces the broken DB-dependent
+  legacy path. Root cause: `WinnerCohortRow` / `QuarterlyFundamental` tables empty in
+  production → dropdowns empty → all buttons broken.
+  - `app/services/forecasting_csv_service.py`: `get_options`, `train_parameters`,
+    `run_forecast`, `explain_ticker` — reads `modeling_dataset_public_2020_2025.csv`
+    directly. Deterministic, honest, no DB required.
+  - `GET /forecasting/options`, `POST /forecasting/train`, `POST /forecasting/run`,
+    `GET /forecasting/explain/{ticker}` — new CSV-backed endpoints alongside legacy.
+  - `ForecastingPage.jsx` rewritten: options load on mount from CSV, Step 1 derives
+    feature weights, Step 2 ranks stocks, click reveals explainability panel.
+    Dark research terminal style. No buy/sell signals. Clearly experimental.
+- **Universe split + public/training separation** — `make split-datasets` produces
+  `modeling_dataset_public_2020_2025.csv` (frontend, inference) and
+  `modeling_dataset_training_2020_2025.csv` (experiments, walk-forward only).
+  Config: `data/config/universe_public_40.csv` + `data/config/universe_training_bist100.csv`.
+- **RAG context layer** — `make build-company-contexts` generates structured JSON per
+  ticker/year (`data/trusted_clean/company_contexts/`). Research agent injects pre-built
+  context into LLM prompt instead of computing live.
+- **BIST100 expansion investigation** — confirmed Yahoo Chart is price/return-only (no IS/BS).
+  No KAP/Fintables/Finnet adapter existed. Delivered:
+  - `scripts/data_collection/collect_bist100_financials_yfinance.py`: yfinance collector
+    stub, clearly marked unofficial, rate-limited, banks flagged, never fabricates.
+  - `data/trusted_raw/financials/bist100_expansion_template.csv`: manual import spec
+    for KAP/Fintables/TradingView export.
+  - `data/trusted_clean/bist100_expansion_report.md`: full investigation report.
+  - `make collect-bist100-financials` Makefile target.
+  - Training tickers remain = 40; expansion not claimed.
+
+### Fixed
+- Forecasting page: all buttons now functional without XLSX import or DB population.
+- `run_forecast` score crash on null value: guarded with `typeof item.score === 'number'`.
+- `openStock()` field name corrected: `ticker` not `stock_code`.
+- `experiments/run_experiments.py`: uses training dataset when available; added
+  `is_public_universe`, `is_training_universe`, `universe_source` to non-feature set.
+- `research_agent.py`: uses public CSV for inference; loads pre-built RAG JSON
+  preferentially over live computation.
+
+### Notes
+- Training tickers = 40 (unchanged). New tickers need both financials AND return
+  targets before `make data && make split-datasets` shows > 40.
+- Walk-forward Spearman still ≈ 0 — no reliable predictive edge. Honest result.
 
 ---
 
