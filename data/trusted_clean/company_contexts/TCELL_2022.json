@@ -1,0 +1,89 @@
+{
+  "ticker": "TCELL",
+  "year": 2022,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.6845,
+    "ml_rank": 5,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 52169979000.0,
+    "net_income": 11053193000.0,
+    "equity": 259333069000.0,
+    "ebitda": 28960971000.0,
+    "roe": 35.7812,
+    "roa": 10.9151,
+    "gross_profit": 17089845000.0,
+    "operating_income": 19671614000.0,
+    "net_margin": 21.1869,
+    "gross_margin": 32.758,
+    "ebitda_margin": 55.5127
+  },
+  "valuation": {
+    "pe_ratio": 6.8966,
+    "pb_ratio": 0.2939,
+    "ev_ebitda": 3.1462,
+    "market_cap": 76228928600.0,
+    "enterprise_value": 91117231600.0,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2022-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 60.0,
+      "net_income": 82.5,
+      "equity": 85.0,
+      "ebitda": 92.5,
+      "roe": 55.0,
+      "roa": 52.5,
+      "gross_profit": 65.0,
+      "operating_income": 92.5,
+      "net_margin": 67.5,
+      "gross_margin": 62.5,
+      "ebitda_margin": 95.0,
+      "pe_ratio": 56.7,
+      "pb_ratio": 50.0,
+      "ev_ebitda": 21.2,
+      "market_cap": 79.4,
+      "enterprise_value": 58.8
+    },
+    "year_medians": {
+      "revenue": 33170927500.0,
+      "net_income": 2719986500.0,
+      "equity": 63457407000.0,
+      "ebitda": 5783548500.0,
+      "roe": 33.0956,
+      "roa": 10.776,
+      "gross_profit": 7285091000.0,
+      "operating_income": 3761568500.0,
+      "net_margin": 13.5232,
+      "gross_margin": 25.6181,
+      "ebitda_margin": 21.4339,
+      "pe_ratio": 5.3438,
+      "pb_ratio": 0.2724,
+      "ev_ebitda": 7.3031,
+      "market_cap": 22588001297.6966,
+      "enterprise_value": 67377380528.8991
+    }
+  },
+  "data_quality": {
+    "missing_fields": [],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

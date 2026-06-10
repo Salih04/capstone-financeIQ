@@ -1,0 +1,89 @@
+{
+  "ticker": "KUYAS",
+  "year": 2022,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.2589,
+    "ml_rank": 39,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 243220003.0,
+    "net_income": 231185473.0,
+    "equity": 1433769960.0,
+    "ebitda": 112411336.0,
+    "roe": 43.5372,
+    "roa": 32.3325,
+    "gross_profit": 157229706.0,
+    "operating_income": 109631726.0,
+    "net_margin": 95.052,
+    "gross_margin": 64.6451,
+    "ebitda_margin": 46.218
+  },
+  "valuation": {
+    "pe_ratio": 2.857,
+    "pb_ratio": 0.4607,
+    "ev_ebitda": 11.7746,
+    "market_cap": 660500000.0,
+    "enterprise_value": 1323598337.0,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2022-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 0.0,
+      "net_income": 10.0,
+      "equity": 0.0,
+      "ebitda": 5.0,
+      "roe": 65.0,
+      "roa": 90.0,
+      "gross_profit": 2.5,
+      "operating_income": 2.5,
+      "net_margin": 100.0,
+      "gross_margin": 100.0,
+      "ebitda_margin": 92.5,
+      "pe_ratio": 33.3,
+      "pb_ratio": 73.5,
+      "ev_ebitda": 72.7,
+      "market_cap": 5.9,
+      "enterprise_value": 14.7
+    },
+    "year_medians": {
+      "revenue": 33170927500.0,
+      "net_income": 2719986500.0,
+      "equity": 63457407000.0,
+      "ebitda": 5783548500.0,
+      "roe": 33.0956,
+      "roa": 10.776,
+      "gross_profit": 7285091000.0,
+      "operating_income": 3761568500.0,
+      "net_margin": 13.5232,
+      "gross_margin": 25.6181,
+      "ebitda_margin": 21.4339,
+      "pe_ratio": 5.3438,
+      "pb_ratio": 0.2724,
+      "ev_ebitda": 7.3031,
+      "market_cap": 22588001297.6966,
+      "enterprise_value": 67377380528.8991
+    }
+  },
+  "data_quality": {
+    "missing_fields": [],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "ticker": "EREGL",
+  "year": 2022,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.6317,
+    "ml_rank": 8,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 127782881000.0,
+    "net_income": 18005034000.0,
+    "equity": 295496351000.0,
+    "ebitda": 27063819000.0,
+    "roe": 15.5692,
+    "roa": 10.2948,
+    "gross_profit": 25538796000.0,
+    "operating_income": 23569988000.0,
+    "net_margin": 14.0903,
+    "gross_margin": 19.9861,
+    "ebitda_margin": 21.1795
+  },
+  "valuation": {
+    "pe_ratio": 3.872,
+    "pb_ratio": 0.2359,
+    "ev_ebitda": 3.7388,
+    "market_cap": 69715453500.0,
+    "enterprise_value": 101186728500.0,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2022-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 80.0,
+      "net_income": 90.0,
+      "equity": 90.0,
+      "ebitda": 90.0,
+      "roe": 25.0,
+      "roa": 45.0,
+      "gross_profit": 77.5,
+      "operating_income": 95.0,
+      "net_margin": 52.5,
+      "gross_margin": 32.5,
+      "ebitda_margin": 47.5,
+      "pe_ratio": 40.0,
+      "pb_ratio": 38.2,
+      "ev_ebitda": 27.3,
+      "market_cap": 70.6,
+      "enterprise_value": 70.6
+    },
+    "year_medians": {
+      "revenue": 33170927500.0,
+      "net_income": 2719986500.0,
+      "equity": 63457407000.0,
+      "ebitda": 5783548500.0,
+      "roe": 33.0956,
+      "roa": 10.776,
+      "gross_profit": 7285091000.0,
+      "operating_income": 3761568500.0,
+      "net_margin": 13.5232,
+      "gross_margin": 25.6181,
+      "ebitda_margin": 21.4339,
+      "pe_ratio": 5.3438,
+      "pb_ratio": 0.2724,
+      "ev_ebitda": 7.3031,
+      "market_cap": 22588001297.6966,
+      "enterprise_value": 67377380528.8991
+    }
+  },
+  "data_quality": {
+    "missing_fields": [],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

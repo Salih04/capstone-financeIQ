@@ -1,0 +1,89 @@
+{
+  "ticker": "HEKTS",
+  "year": 2020,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.2688,
+    "ml_rank": 38,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 1013719129.0,
+    "net_income": 188330967.0,
+    "equity": 13955964667.0,
+    "ebitda": 262177234.0,
+    "roe": 27.019,
+    "roa": 9.2607,
+    "gross_profit": 351313603.0,
+    "operating_income": 239067029.0,
+    "net_margin": 18.5782,
+    "gross_margin": 34.6559,
+    "ebitda_margin": 25.8629
+  },
+  "valuation": {
+    "pe_ratio": 4.7252,
+    "pb_ratio": 0.0638,
+    "ev_ebitda": 34.4072,
+    "market_cap": 889907360.0,
+    "enterprise_value": 9020783412.0,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2020-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 7.5,
+      "net_income": 37.5,
+      "equity": 15.0,
+      "ebitda": 15.0,
+      "roe": 80.0,
+      "roa": 80.0,
+      "gross_profit": 20.0,
+      "operating_income": 27.5,
+      "net_margin": 77.5,
+      "gross_margin": 75.0,
+      "ebitda_margin": 75.0,
+      "pe_ratio": 33.3,
+      "pb_ratio": 40.6,
+      "ev_ebitda": 73.3,
+      "market_cap": 18.8,
+      "enterprise_value": 21.9
+    },
+    "year_medians": {
+      "revenue": 10508934500.0,
+      "net_income": 857963000.0,
+      "equity": 63457407000.0,
+      "ebitda": 1889612500.0,
+      "roe": 15.897,
+      "roa": 5.5618,
+      "gross_profit": 2065672500.0,
+      "operating_income": 1461450000.0,
+      "net_margin": 8.0192,
+      "gross_margin": 23.0896,
+      "ebitda_margin": 16.9362,
+      "pe_ratio": 6.3048,
+      "pb_ratio": 0.0725,
+      "ev_ebitda": 16.8359,
+      "market_cap": 6590953491.0,
+      "enterprise_value": 41337576818.9826
+    }
+  },
+  "data_quality": {
+    "missing_fields": [],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

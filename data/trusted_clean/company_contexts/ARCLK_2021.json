@@ -1,0 +1,89 @@
+{
+  "ticker": "ARCLK",
+  "year": 2021,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.5698,
+    "ml_rank": 17,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 68184437000.0,
+    "net_income": 3064674000.0,
+    "equity": 73314458000.0,
+    "ebitda": 8865826000.0,
+    "roe": 15.8107,
+    "roa": 3.6022,
+    "gross_profit": 20478345000.0,
+    "operating_income": 7020144000.0,
+    "net_margin": 4.4947,
+    "gross_margin": 29.8008,
+    "ebitda_margin": 13.0027
+  },
+  "valuation": {
+    "pe_ratio": 10.0874,
+    "pb_ratio": 0.4217,
+    "ev_ebitda": 22.637,
+    "market_cap": 30914578217.5859,
+    "enterprise_value": 200695687217.5859,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2021-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 82.5,
+      "net_income": 70.0,
+      "equity": 55.0,
+      "ebitda": 77.5,
+      "roe": 25.0,
+      "roa": 35.0,
+      "gross_profit": 90.0,
+      "operating_income": 77.5,
+      "net_margin": 32.5,
+      "gross_margin": 60.0,
+      "ebitda_margin": 20.0,
+      "pe_ratio": 75.0,
+      "pb_ratio": 91.2,
+      "ev_ebitda": 72.7,
+      "market_cap": 85.3,
+      "enterprise_value": 94.1
+    },
+    "year_medians": {
+      "revenue": 17391953000.0,
+      "net_income": 1077289624.0,
+      "equity": 63457407000.0,
+      "ebitda": 2721713000.0,
+      "roe": 23.7568,
+      "roa": 7.431,
+      "gross_profit": 3657466000.0,
+      "operating_income": 2212915000.0,
+      "net_margin": 10.7059,
+      "gross_margin": 26.5256,
+      "ebitda_margin": 22.5316,
+      "pe_ratio": 3.8807,
+      "pb_ratio": 0.0953,
+      "ev_ebitda": 9.4537,
+      "market_cap": 5921365009.905,
+      "enterprise_value": 35015339824.0
+    }
+  },
+  "data_quality": {
+    "missing_fields": [],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

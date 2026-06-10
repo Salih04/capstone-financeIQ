@@ -1,0 +1,89 @@
+{
+  "ticker": "SISE",
+  "year": 2024,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.6512,
+    "ml_rank": 7,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 185589224000.0,
+    "net_income": 5022436000.0,
+    "equity": 272400000000.0,
+    "ebitda": 13080545000.0,
+    "roe": 2.6993,
+    "roa": 1.9194,
+    "gross_profit": 42024878000.0,
+    "operating_income": -2010307000.0,
+    "net_margin": 2.7062,
+    "gross_margin": 22.644,
+    "ebitda_margin": 7.0481
+  },
+  "valuation": {
+    "pe_ratio": 24.5214,
+    "pb_ratio": 0.4521,
+    "ev_ebitda": 16.7648,
+    "market_cap": 123157345132.896,
+    "enterprise_value": 219292345132.896,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2024-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 77.5,
+      "net_income": 47.5,
+      "equity": 90.0,
+      "ebitda": 52.5,
+      "roe": 25.0,
+      "roa": 27.5,
+      "gross_profit": 77.5,
+      "operating_income": 7.5,
+      "net_margin": 35.0,
+      "gross_margin": 52.5,
+      "ebitda_margin": 20.0,
+      "pe_ratio": 79.3,
+      "pb_ratio": 13.9,
+      "ev_ebitda": 75.8,
+      "market_cap": 72.2,
+      "enterprise_value": 83.3
+    },
+    "year_medians": {
+      "revenue": 72049884569.5,
+      "net_income": 5023658042.0,
+      "equity": 60862600000.0,
+      "ebitda": 8946573000.0,
+      "roe": 11.0739,
+      "roa": 4.3269,
+      "gross_profit": 16371383500.0,
+      "operating_income": 5071042500.0,
+      "net_margin": 6.1007,
+      "gross_margin": 22.0206,
+      "ebitda_margin": 15.9818,
+      "pe_ratio": 13.0346,
+      "pb_ratio": 0.9969,
+      "ev_ebitda": 8.5837,
+      "market_cap": 75303744481.34,
+      "enterprise_value": 100757227215.3456
+    }
+  },
+  "data_quality": {
+    "missing_fields": [],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "ticker": "TOASO",
+  "year": 2024,
+  "universe": {
+    "is_public_universe": true,
+    "is_training_universe": true
+  },
+  "model": {
+    "ml_score": 0.5816,
+    "ml_rank": 15,
+    "target_definition": "year-T features -> year-(T+1) realized return",
+    "model_limitations": [
+      "small_sample (~40 stocks/year)",
+      "walk-forward Spearman near zero (no reliable predictive edge)",
+      "valuation features may be from frozen snapshot for some years",
+      "no guaranteed future return prediction"
+    ]
+  },
+  "financials": {
+    "revenue": 120266571000.0,
+    "net_income": 5221439000.0,
+    "equity": 61652000000.0,
+    "ebitda": 10321968000.0,
+    "roe": 11.0855,
+    "roa": 5.6926,
+    "gross_profit": 13371873000.0,
+    "operating_income": 4122373000.0,
+    "net_margin": 4.3416,
+    "gross_margin": 11.1185,
+    "ebitda_margin": 8.5826
+  },
+  "valuation": {
+    "pe_ratio": 17.1416,
+    "pb_ratio": 1.4518,
+    "ev_ebitda": 9.6988,
+    "market_cap": 89503937000.0,
+    "enterprise_value": 100110937000.0,
+    "price_source": "yahoo_chart_api",
+    "price_date": "2024-12-31 (approximate year-end)"
+  },
+  "benchmarks": {
+    "training_universe_percentiles": {
+      "revenue": 62.5,
+      "net_income": 52.5,
+      "equity": 50.0,
+      "ebitda": 50.0,
+      "roe": 52.5,
+      "roa": 55.0,
+      "gross_profit": 47.5,
+      "operating_income": 45.0,
+      "net_margin": 45.0,
+      "gross_margin": 17.5,
+      "ebitda_margin": 27.5,
+      "pe_ratio": 65.5,
+      "pb_ratio": 61.1,
+      "ev_ebitda": 57.6,
+      "market_cap": 50.0,
+      "enterprise_value": 44.4
+    },
+    "year_medians": {
+      "revenue": 72049884569.5,
+      "net_income": 5023658042.0,
+      "equity": 60862600000.0,
+      "ebitda": 8946573000.0,
+      "roe": 11.0739,
+      "roa": 4.3269,
+      "gross_profit": 16371383500.0,
+      "operating_income": 5071042500.0,
+      "net_margin": 6.1007,
+      "gross_margin": 22.0206,
+      "ebitda_margin": 15.9818,
+      "pe_ratio": 13.0346,
+      "pb_ratio": 0.9969,
+      "ev_ebitda": 8.5837,
+      "market_cap": 75303744481.34,
+      "enterprise_value": 100757227215.3456
+    }
+  },
+  "data_quality": {
+    "missing_fields": [],
+    "warnings": [],
+    "has_data_row": true
+  },
+  "guardrails": {
+    "not_investment_advice": true,
+    "no_buy_sell_recommendation": true,
+    "research_support_only": true
+  }
+}

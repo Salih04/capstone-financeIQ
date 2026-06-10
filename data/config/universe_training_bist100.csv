@@ -1,0 +1,56 @@
+# BIST100 training universe config.
+# Current state: only the public_40 tickers have validated financial statements
+# in this project. No additional BIST100 financials have been sourced.
+#
+# TODO: To expand the training universe beyond the public 40:
+#   1. Source real historical financial statements for additional BIST100 tickers
+#      (e.g. from KAP, Refinitiv, Bloomberg, or Fintables Pro).
+#   2. Run them through the corrected-yearly ingestion pipeline:
+#         python -m scripts.data_collection.ingest_corrected_yearly_financials
+#   3. Add those tickers below with is_public_universe=false, is_training_universe=true.
+#   4. Re-run: make shares && make valuation && make data && python experiments/run_experiments.py
+#
+# Do NOT add tickers here without verified financial statements.
+# is_public_universe=false tickers will NEVER appear in frontend endpoints.
+#
+ticker,is_public_universe,is_training_universe,notes
+AEFES,true,true,public_40
+ARCLK,true,true,public_40
+ASELS,true,true,public_40
+ASTOR,true,true,public_40
+BIMAS,true,true,public_40
+BRSAN,true,true,public_40
+BTCIM,true,true,public_40
+CANTE,true,true,public_40
+CCOLA,true,true,public_40
+CIMSA,true,true,public_40
+DOAS,true,true,public_40
+DSTKF,true,true,public_40
+ENKAI,true,true,public_40
+EREGL,true,true,public_40
+FROTO,true,true,public_40
+GUBRF,true,true,public_40
+HEKTS,true,true,public_40
+KONTR,true,true,public_40
+KRDMD,true,true,public_40
+KUYAS,true,true,public_40
+MAVI,true,true,public_40
+MGROS,true,true,public_40
+MIATK,true,true,public_40
+OYAKC,true,true,public_40
+PASEU,true,true,public_40
+PETKM,true,true,public_40
+PGSUS,true,true,public_40
+SASA,true,true,public_40
+SISE,true,true,public_40
+TAVHL,true,true,public_40
+TCELL,true,true,public_40
+THYAO,true,true,public_40
+TOASO,true,true,public_40
+TRALT,true,true,public_40
+TRMET,true,true,public_40
+TSKB,true,true,public_40
+TTKOM,true,true,public_40
+TUPRS,true,true,public_40
+TURSG,true,true,public_40
+ULKER,true,true,public_40
