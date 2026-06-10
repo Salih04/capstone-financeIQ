@@ -50,14 +50,41 @@ const IC_BY_YEAR = { 2020: 0.08, 2021: -0.11, 2022: -0.14, 2023: 0.03, 2024: 0.1
 
 const covSum = (c) => c.reduce((a, b) => a + b, 0)
 
-function buildSpecimens(dq, summary) {
+const usableEntries = (groups) =>
+  Object.entries(groups || {}).filter(([, arr]) => Array.isArray(arr) && arr.length > 0)
+
+const uniqueStrings = (items) => [...new Set((items || []).filter((n) => typeof n === 'string' && n.trim()))]
+
+function acceptedFromFlatData(d) {
+  const names = uniqueStrings([
+    ...(d.accepted_columns || []),
+    ...(d.accepted_features || []),
+    ...(d.accepted_feature_columns || []),
+    ...(d.modeling_columns || []),
+    ...(d.modeling_features || []),
+    ...(d.final_feature_columns || []),
+    ...(d.valid_feature_columns || []),
+  ])
+
+  return names.map((name) => ({
+    name,
+    category: 'Model Feature',
+    coverage: [1, 1, 1, 1, 1, 0],
+    source: 'data_quality',
+    accepted: true,
+  }))
+}
+
+function buildSpecimens(dq, summary, { allowFallback = true } = {}) {
   const d = dq?.data_quality || {}
   const ctx = summary?.context || {}
-  const groups = ctx.feature_groups || {}
+  const summaryGroups = ctx.feature_groups || {}
+  const dqGroups = d.feature_groups || d.accepted_feature_groups || {}
+  const groupEntries = usableEntries(summaryGroups).length ? usableEntries(summaryGroups) : usableEntries(dqGroups)
   const sd = d.source_distinction || {}
   const cy = d.corrected_yearly || {}
 
-  const accepted = Object.entries(groups).flatMap(([g, arr]) =>
+  const acceptedFromGroups = groupEntries.flatMap(([g, arr]) =>
     (arr || []).map((name) => ({
       name,
       category: GROUP_LABEL[g] || g,
@@ -66,6 +93,7 @@ function buildSpecimens(dq, summary) {
       accepted: true,
     })),
   )
+  const accepted = acceptedFromGroups.length ? acceptedFromGroups : acceptedFromFlatData(d)
 
   const frozenNames = [
     ...(d.frozen_columns || ctx.rejected_frozen_columns || []),
@@ -84,7 +112,7 @@ function buildSpecimens(dq, summary) {
     ...LEAKAGE_GUARDED.map((l) => ({ ...l, reason: 'LEAKAGE', accepted: false })),
   ]
 
-  if (accepted.length === 0 && frozenNames.length === 0) {
+  if (allowFallback && accepted.length === 0 && frozenNames.length === 0) {
     return {
       accepted: DATA_QUALITY_MOCK.accepted.map((s) => ({ ...s, accepted: true })),
       rejected: DATA_QUALITY_MOCK.rejected.map((s) => ({ ...s, accepted: false })),
@@ -149,20 +177,68 @@ export default function DataQualityPage() {
   const [dq, setDq] = useState(null)
   const [summary, setSummary] = useState(null)
   const [evi, setEvi] = useState(null)
+  const [acceptedLoading, setAcceptedLoading] = useState(true)
+  const [rejectedLoading, setRejectedLoading] = useState(true)
+  const [frozenEvidenceLoading, setFrozenEvidenceLoading] = useState(true)
   const [hovered, setHovered] = useState(null)
 
   useEffect(() => {
-    researchApi.dataQuality().then((r) => setDq(r.data)).catch(() => {})
-    researchApi.summary().then((r) => setSummary(r.data)).catch(() => {})
-    researchApi.frozenEvidence().then((r) => setEvi(r.data)).catch(() => {})
+    let mounted = true
+
+    const dataQualityRequest = researchApi.dataQuality().then(
+      (r) => {
+        if (mounted) setDq(r.data)
+        return r.data
+      },
+      () => null,
+    )
+
+    const summaryRequest = researchApi.summary().then(
+      (r) => {
+        if (mounted) setSummary(r.data)
+        return r.data
+      },
+      () => null,
+    )
+
+    const frozenEvidenceRequest = researchApi.frozenEvidence().then(
+      (r) => {
+        if (mounted) setEvi(r.data)
+        return r.data
+      },
+      () => null,
+    )
+
+    Promise.allSettled([dataQualityRequest, summaryRequest]).then(() => {
+      if (!mounted) return
+      setAcceptedLoading(false)
+      setRejectedLoading(false)
+    })
+
+    frozenEvidenceRequest.finally(() => {
+      if (mounted) setFrozenEvidenceLoading(false)
+    })
+
+    return () => {
+      mounted = false
+    }
   }, [])
 
-  const { accepted, rejected, fromApi } = useMemo(() => buildSpecimens(dq, summary), [dq, summary])
+  const { accepted, rejected, fromApi } = useMemo(
+    () => buildSpecimens(dq, summary, { allowFallback: !acceptedLoading && !rejectedLoading }),
+    [dq, summary, acceptedLoading, rejectedLoading],
+  )
   const active = hovered || accepted[0] || rejected[0] || null
   const copy = active ? readoutCopy(active) : null
   const evidence = active && evi?.available ? evi.columns?.[active.name] : null
   const frozenCount = rejected.filter((r) => r.reason === 'FROZEN').length
   const leakCount = rejected.filter((r) => r.reason === 'LEAKAGE').length
+  const acceptedStillLoading = acceptedLoading && accepted.length === 0
+  const rejectedStillLoading = rejectedLoading && rejected.length === 0
+  const frozenStillLoading = rejectedLoading && frozenCount === 0
+  const acceptedCountLabel = acceptedStillLoading ? 'LOADING' : accepted.length
+  const rejectedCountLabel = rejectedStillLoading ? 'LOADING' : rejected.length
+  const frozenCountLabel = frozenStillLoading ? 'LOADING' : frozenCount
 
   return (
     <div className="spx">
@@ -180,10 +256,10 @@ export default function DataQualityPage() {
           </p>
         </div>
         <div className="spx-counts">
-          <div><strong className="is-emerald">{accepted.length}</strong><span>ACCEPTED</span></div>
-          <div><strong className="is-copper">{rejected.length}</strong><span>REJECTED</span></div>
+          <div><strong className="is-emerald">{acceptedCountLabel}</strong><span>ACCEPTED</span></div>
+          <div><strong className="is-copper">{rejectedCountLabel}</strong><span>REJECTED</span></div>
           <div><strong className="is-gold">{leakCount}</strong><span>LEAKAGE-GUARDED</span></div>
-          <div><strong className="is-copper">{frozenCount}</strong><span>FROZEN-EXCLUDED</span></div>
+          <div><strong className="is-copper">{frozenCountLabel}</strong><span>FROZEN-EXCLUDED</span></div>
           {!fromApi && <div className="spx-mocknote">demo data — quality API returned no columns</div>}
         </div>
       </header>
@@ -193,6 +269,7 @@ export default function DataQualityPage() {
           <section>
             <div className="spx-col-label is-emerald">ACCEPTED · MOUNTED SPECIMENS</div>
             <div className="spx-tiles">
+              {acceptedStillLoading && <div className="spx-loading">LOADING ACCEPTED SPECIMENS</div>}
               {accepted.map((s) => (
                 <SpecimenTile key={s.name} s={s} active={active?.name === s.name && active?.accepted} onHover={setHovered} />
               ))}
@@ -201,6 +278,7 @@ export default function DataQualityPage() {
           <section>
             <div className="spx-col-label is-copper">REJECTED · STAMPED & ARCHIVED</div>
             <div className="spx-tiles">
+              {rejectedStillLoading && <div className="spx-loading">LOADING REJECTED SPECIMENS</div>}
               {rejected.map((s) => (
                 <SpecimenTile key={s.name} s={s} active={active?.name === s.name && !active?.accepted} onHover={setHovered} />
               ))}
@@ -232,6 +310,12 @@ export default function DataQualityPage() {
                 <>
                   <div className="spx-readout-sub">VARIANCE EVIDENCE</div>
                   <div className="spx-readout-mono">{JSON.stringify(evidence).slice(0, 120)}</div>
+                </>
+              )}
+              {!evidence && frozenEvidenceLoading && active.reason === 'FROZEN' && (
+                <>
+                  <div className="spx-readout-sub">VARIANCE EVIDENCE</div>
+                  <div className="spx-readout-mono">LOADING</div>
                 </>
               )}
               <div className="spx-readout-sub">WHY</div>
@@ -357,6 +441,8 @@ const CSS = `
 .spx-stamp.is-leakage { color: var(--sp-copper); border-color: var(--sp-copper); }
 .spx-stamp.is-frozen { color: #8fb6c4; border-color: rgba(143,182,196,0.6); }
 .spx-stamp.is-allnull { color: var(--sp-faint); border-color: var(--sp-faint); }
+.spx-loading { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; color: var(--sp-faint);
+  border: 1px solid rgba(200,211,202,0.14); background: rgba(14,20,19,0.45); padding: 10px 12px; border-radius: 2px; }
 
 .spx-readout { border: 1px solid rgba(200,211,202,0.18); border-left: 3px solid var(--sp-emerald);
   background: linear-gradient(180deg, rgba(14,20,19,0.92), rgba(10,14,13,0.85)); padding: 18px 20px; border-radius: 3px; animation: spxIn 0.35s ease; }
