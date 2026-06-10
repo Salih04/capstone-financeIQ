@@ -63,7 +63,7 @@ get_options()
   └─ returns trainable_years, all_years, inference_years, feature_columns, ticker_count
 
 train_parameters(train_year_from, train_year_to, top_n)
-  └─ loads public CSV → filters to training years
+  └─ loads internal training CSV → filters to training years
   └─ computes top-quartile winners (WINNER_PERCENTILE = 0.75)
   └─ per feature: effect_size = (winner_mean − overall_mean) / std × coverage_fraction
   └─ returns top_parameters [{name, weight, rank}], winner_rows, total_training_rows
@@ -96,6 +96,8 @@ run_time_cv_evaluation(db, ...)           → ForecastEvaluationRun + folds
 - **`research_agent.py`** — hybrid score (0.65·ML + 0.20·confidence + 0.15·LLM), grounded intents,
   OpenRouter (`openai/gpt-oss-120b:free`) + legacy LM Studio/Ollama, deterministic fallback.
   Reads public CSV for inference; loads pre-built RAG context JSON preferentially.
+  `/research/ai-status` reports provider/model configuration without exposing secrets and
+  returns structured "AI not configured" diagnostics when no provider/key is available.
 
 ### Parameter catalog (17 ratios, 5 categories)
 

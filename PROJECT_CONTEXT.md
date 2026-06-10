@@ -3,14 +3,16 @@
 ## What it is
 
 FinanceIQ is a capstone project: an honest, leakage-safe **T→T+1 equity-research
-system** for 40 BIST (Borsa Istanbul) companies, 2020–2025. It builds a validated
-modeling dataset (year-T features → year-(T+1) realized return), a BIST100 benchmark,
+system** for 40 public BIST (Borsa Istanbul) companies, 2020–2025, plus an
+expanded 81-ticker internal training universe. It builds a validated modeling
+dataset (year-T features → year-(T+1) realized return), a BIST100 benchmark,
 a free-data valuation reconstruction, walk-forward experiments, an explainable hybrid
 research agent (OpenRouter by default, local providers optional), a CSV-backed
 forecasting pipeline at `/forecasting`, and a "Research Terminal" frontend.
 
-**Status: complete.** Honest finding: no reliable predictive edge on ~40 stocks/year
-— a rigorous pipeline + transparent negative result, not alpha. See `TASK_STATE.md`.
+**Status: complete.** Honest finding: no reliable predictive edge after the
+expanded training run — a rigorous pipeline + transparent negative result, not alpha.
+See `TASK_STATE.md`.
 
 ## Goals
 
@@ -30,13 +32,15 @@ Investors (individual, corporate) and admins. Role stored on `User.role` (invest
 | Source | Content |
 |---|---|
 | `3.Datasets/2020stocks.xlsx` … `2025stocks.xlsx` | Yearly BIST winner cohorts — price returns, sector, stock code (returns/universe trusted; income-statement columns are frozen snapshots, excluded) |
-| `data/trusted_clean/modeling_dataset_public_2020_2025.csv` | Primary inference dataset — 40 tickers × 6 years, 32 validated features, no DB required |
-| `data/trusted_clean/modeling_dataset_training_2020_2025.csv` | Training-only split (experiments + walk-forward CV) |
+| `data/trusted_clean/modeling_dataset_public_2020_2025.csv` | Primary inference dataset — 40 tickers × 6 years, 40 validated features, no DB required |
+| `data/trusted_clean/modeling_dataset_training_2020_2025.csv` | Training-only split — 403 rows / 81 tickers / 321 target rows (experiments + walk-forward CV) |
 | `data/trusted_raw/financials/` | Corrected yearly XLSX exports + yfinance candidate CSV + manual KAP template |
 | `data/trusted_raw/prices/yahoo_year_end_prices.csv` | Yahoo Chart year-end prices (OHLCV only — no financial statements) |
 | `data/trusted_clean/bist100_benchmark_returns.csv` | BIST100 annual returns → excess-return / outperform targets |
 | `data/config/universe_public_40.csv` | 40-ticker public inference universe |
-| `data/config/universe_training_bist100.csv` | Training universe config (currently identical to public_40) |
+| `data/config/universe_training_bist100.csv` | Expanded training universe config (81 tickers; public_40 plus training-only yfinance-compatible names) |
+| `data/trusted_clean/pipeline_audit_report.*` | CSV inventory, source class, row/ticker/year coverage, missingness, duplicate-key checks |
+| `data/trusted_clean/feature_engineering_report.*` | Accepted/rejected feature report with leakage-safe year-T feature list |
 | `data/trusted_clean/company_contexts/` | Pre-built RAG JSON per ticker/year — injected into LLM research prompt |
 | Quarterly fundamentals CSV | 28-column fundamentals per stock/period (uploaded via UI; legacy DB path) |
 

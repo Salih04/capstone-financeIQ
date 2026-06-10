@@ -1,15 +1,15 @@
 # Data pipeline — T → T+1 modeling dataset
 
-> **Current state (2026-06): 32 validated features, 49-ticker training universe.**
+> **Current state (2026-06): 40 validated features, 81-ticker training universe.**
 > Full run is `make full-research-agent` (extract → benchmark → corrected yearly →
-> valuation → build_all → fetch training prices → integrate pilot tickers →
-> experiments → split → contexts → research-agent-dataset → tests).
+> fetch training prices → valuation → build_all → integrate training-only tickers →
+> validate → experiments → split → contexts → audit → research-agent-dataset → tests).
 > `make full-research` covers steps 1–8 (through experiments).
 > Added since original write-up: corrected per-year income/profitability (17→27),
 > free valuation reconstruction (Yahoo year-end price × manual shares →
-> market_cap/P-E/P-B/EV/EV-EBITDA, 27→32), capital-event shares (`make shares`),
-> 2024 balance-sheet manual correction, and yfinance pilot expansion (9 training-only
-> tickers: AKSA AKSEN DOHOL EKGYO KCHOL ODAS SAHOL SMRTG VESTL).
+> market_cap/P-E/P-B/EV/EV-EBITDA), leakage-safe year-T price/benchmark features,
+> capital-event shares (`make shares`), 2024 balance-sheet manual correction, and
+> yfinance expansion (41 training-only tickers; public UI remains 40).
 > Acceptance is sparse-aware; frozen-snapshot and price/return leakage stay rejected.
 
 Goal: study whether **year-T** financial metrics relate to **year-(T+1)**
@@ -36,6 +36,7 @@ make research                    # walk-forward experiments
 make split-datasets              # split into public_40 + training subsets
 make build-company-contexts      # generate RAG JSON per ticker/year (run after split-datasets)
 make validate-universe           # print public/training counts and coverage
+make data-audit                  # write pipeline_audit_report.{json,md}
 
 # yfinance BIST100 training expansion (run BEFORE make full-research-agent to expand universe)
 make collect-yfinance-bist100          # fetch yfinance financials for all bist100_candidates.csv (--missing-only)
@@ -49,15 +50,17 @@ make update-training-universe-yfinance # add verified tickers to universe_traini
 1. `extract-yearly-financials` — XLSX → candidate
 2. `benchmark` — BIST100 returns
 3. `ingest-corrected-yearly` — real per-year income/profitability
-4. `valuation` / `shares` — free valuation reconstruction
-5. `data` / `build_all` — 40-ticker base modeling dataset
-6. `fetch-training-prices` — Yahoo prices for training universe (public + all training-only tickers)
+4. `fetch-training-prices` — Yahoo prices for training universe (public + all training-only tickers)
+5. `valuation` / `shares` — free valuation reconstruction
+6. `data` / `build_all` — 40-ticker base modeling dataset
 7. `integrate-pilot-tickers` — append all training-only tickers from clean financials CSV
-8. experiments — walk-forward CV (uses base/training dataset)
-9. `split-datasets` — training=N tickers (all with data), public=40 tickers
-10. `build-company-contexts` — RAG JSON per ticker/year
-11. `research-agent-dataset` — instruction JSONL
-12. tests
+8. `data-validate` — validate final 403-row expanded modeling dataset
+9. experiments — walk-forward CV (uses training dataset)
+10. `split-datasets` — training=81 tickers, public=40 tickers
+11. `build-company-contexts` — RAG JSON per ticker/year
+12. `data-audit` — CSV inventory/count/missingness/source report
+13. `research-agent-dataset` — instruction JSONL
+14. tests
 
 ### BIST100 training expansion (one-time, run before step 1 above)
 
@@ -69,9 +72,9 @@ make full-research-agent                # 4. full pipeline (preserves expansion)
 make validate-universe                  # 5. verify counts
 ```
 
-Expected outcome after expansion: training tickers may increase toward ~80-100 (depending on yfinance coverage). Public universe stays exactly 40.
+Current verified outcome: training dataset has 403 rows / 81 tickers / 321 target rows; public dataset stays 240 rows / 40 tickers / 200 target rows.
 
-**Candidate list:** `data/config/bist100_candidates.csv` — 44 curated candidates (9 existing pilots + 35 new, including banks). Banks flagged with `is_bank=true`; their revenue = net interest income and EBITDA is undefined.
+**Candidate list:** `data/config/bist100_candidates.csv` — 44 curated candidates, including banks. Banks flagged with `is_bank=true`; their revenue = net interest income and EBITDA is undefined.
 
 **KAP cross-check recommended** before trusting any yfinance value in research decisions.
 
@@ -114,7 +117,9 @@ reference (data/trusted/stocks_2020_2025.csv, UNRELIABLE — bootstrap only)
    ├─ load_benchmark        → data/trusted_clean/bist100_benchmark_returns.csv
    │        MANUAL only (template shipped). Never fabricated.
    ├─ build_modeling_dataset→ data/trusted_clean/modeling_dataset_2020_2025.csv
-   ├─ validate              → data_quality_report.json / .md, data_dictionary.md
+   ├─ price_features        → leakage-safe year-T price/momentum/benchmark-relative features
+   ├─ validate              → data_quality_report.json / .md, data_dictionary.md,
+   │                          feature_engineering_report.*, pipeline_audit_report.*
    ├─ split_universe        → modeling_dataset_public_2020_2025.csv (40 tickers, inference)
    │                          modeling_dataset_training_2020_2025.csv (experiments only)
    └─ build_company_contexts→ data/trusted_clean/company_contexts/{ticker}_{year}.json

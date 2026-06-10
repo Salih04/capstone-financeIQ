@@ -3,10 +3,11 @@
 How FinanceIQ scores BIST stocks and validates those scores against realized
 performance. Written to be honest about what the scores can and cannot do.
 
-> **Honest result (2026-06):** with 32 validated features (incl. real income/
-> profitability and free-reconstructed valuation) the walk-forward signal is still
-> **weak/unstable** — mean Spearman ≈ 0 and ML does not consistently beat a simple
-> baseline on ~40 stocks/year. Scores are research support, **not** investment advice.
+> **Honest result (2026-06):** with 40 validated features and an expanded
+> 81-ticker internal training universe, the walk-forward signal is still
+> **weak/unstable** — overall Spearman remains close to zero and ML does not
+> establish a reliable edge over simple baselines. Scores are research support,
+> **not** investment advice.
 > Hybrid research score = 0.65·ML + 0.20·confidence + 0.15·AI-evidence, components always shown.
 > The AI-evidence term contributes ONLY when the local model returns a meaningful score
 > in (0,1]; a null/zero value means "AI evidence unavailable" and its weight is
@@ -14,37 +15,38 @@ performance. Written to be honest about what the scores can and cannot do.
 
 ## Data
 
-Single trusted source: the 2020–2025 yearly dataset
-(`data/trusted/stocks_2020_2025.csv`), 40 BIST companies × 6 years. No external
-APIs, no synthetic data. Realized yearly return (`annual_return_pct`) is treated
-strictly as **ground truth / target**, never as a feature.
+Primary trusted modeling outputs:
 
-### ⚠️ Important data reality: the dataset is INCONSISTENT
+- `data/trusted_clean/modeling_dataset_training_2020_2025.csv`: internal training
+  split, 403 rows / 81 tickers / 321 target rows.
+- `data/trusted_clean/modeling_dataset_public_2020_2025.csv`: public UI split,
+  240 rows / 40 tickers / 200 target rows.
+
+Realized yearly return is treated strictly as **ground truth / target**, never as
+a feature for the same row. The 2025 rows are inference-only unless explicit,
+validated T+1 outcome data is added later.
+
+### Important data reality: source fields are mixed-quality
 
 Verified by `scripts/validate_trusted_data.py` (`column_variability`):
 
-- **Frozen across years** (a single 2025 snapshot repeated in every file):
-  income statement (revenue, net income, EBITDA, operating income), profitability
-  (ROE, ROA, ROIC, margins), valuation multiples (P/E, P/B, EV/EBITDA, PEG),
-  price, market cap, and **all** momentum/return windows (1W…5Y).
-- **Genuinely per-year**: balance sheet (total/current/non-current assets,
-  liabilities, equity, working capital, net debt), leverage & liquidity ratios
-  (current ratio, leverage ratio, financial-debt ratio, net-debt/EBITDA), the
-  growth % columns, and the realized annual return (`annual_return_pct`).
+- **Accepted per-year fundamentals:** corrected income statement, profitability,
+  balance-sheet, leverage, liquidity, growth, cash-flow-derived fields, and
+  free-reconstructed valuation fields where inputs pass shape/coverage checks.
+- **Accepted year-T market features:** Yahoo year-end price, year-T return,
+  volatility, drawdown, benchmark-relative return, dividend/split indicators,
+  sector metadata, and data-coverage indicators.
+- **Rejected or guarded fields:** frozen snapshot columns, current-only multiples,
+  same-row realized returns, future-derived targets, and any post-target fields.
 
 Consequences, stated honestly:
 
-- The **Fundamental Score only partly varies** across years — its Profitability,
-  Value and Size categories are frozen; only Balance-Sheet and Growth move.
-- Year-over-year analysis of profitability/valuation is **not meaningful** on this
-  data; those fields do not actually change between files.
-- Robust multi-year fundamental forecasting is **not supported** until the
-  income-statement/valuation fields are real per-year history.
-
-The product still answers the core question — "our score rates this company
-strong; did the stock actually perform in year X, and where did it rank?" —
-because realized returns are real and per-year. It does **not** claim time-series
-fundamental forecasting on this data.
+- The dataset is more realistic than the original frozen snapshot, but still
+  small and sparse.
+- The expanded 81-ticker universe is used internally for training and evaluation;
+  the public UI universe remains the selected 40 BIST companies.
+- The product does **not** claim robust predictive alpha. It tests whether
+  leakage-safe year-T information has measurable T+1 rank signal.
 
 ## Two separate scores
 
@@ -57,10 +59,10 @@ missing values are excluded and tracked (never filled with fake zeros). Category
 scores are averaged into a 0–100 score. Rank normalization is robust to the
 dataset's extreme outliers (growth % in the trillions) without deleting data.
 
-### Market-Aware Score
-Built only from momentum/return windows (3M, 6M, YTD, 1Y, 3Y, 5Y). Reported
-separately and **never mixed** into the Fundamental Score, because momentum
-overlaps the realized-return window and would leak the target.
+### Market/Price Features
+Year-T price-derived features can be used in the T→T+1 experiment only when the
+measurement window ends inside year T. Same-row realized return and future price
+movement are target-only and never feature inputs.
 
 ## Literature motivation (references, not data)
 
@@ -89,39 +91,36 @@ Two clearly separated questions:
    This is descriptive, **not** a forecast.
 2. **Predictive (next year):** the `experiments/` walk-forward harness is built
    with strict leakage controls (no same-year target, no future data in
-   training) and is ready for genuinely time-varying fundamentals. **On the
-   current data it is degenerate**: because fundamentals are a static snapshot,
-   the "year-Y features" are identical every year, so the harness effectively
-   tests one fixed fundamental ranking against each year's returns. Treat its
-   numbers as illustrative of the pipeline, not as real out-of-sample
-   forecasting skill.
+   training). It compares simple baselines and ML models on year-T features
+   against year-(T+1) outcomes.
 
 ## Honest findings (current data)
 
-- Same-year: the single fundamental cross-section has mean Spearman ≈ **−0.08**
-  against realized return across 2020–2025 — **negative/weak** in 2020–2023
-  (notably the 2021–2022 hyperinflation rally, where low-quality names led),
-  positive only in 2024–2025. The static Fundamental ranking does **not** reliably
-  match the best-performing stocks in most years.
-- Experiment harness: the **equal-weight baseline beats every ML model** on rank
-  correlation — but see the degeneracy caveat above; with static features this
-  mostly reflects ML overfitting noise on 40 samples. No heavy model is deployed.
+- Walk-forward signal remains weak/unstable. The expanded pipeline improved the
+  test bed, but not enough to justify claiming reliable signal.
+- Before expansion, overall Spearman was about **0.007**. After adding the
+  expanded training universe and leakage-safe price/benchmark features, overall
+  Spearman is about **0.042**. This is still close to zero.
+- The best ML run can look better in isolated folds, but stability is limited.
+  The correct conclusion is uncertainty, not a predictive edge.
 
 ## Leakage controls
 
 Enforced in `app/services/research/feature_registry.py`:
 - Realized return is target-only.
-- Momentum is barred from same-year explanatory scoring (overlaps target).
+- Same-row realized return is barred from features.
 - Next-year prediction uses only prior-year features.
 - Selected year never silently falls back to the latest year.
+- 2025 is inference-only unless explicit validated T+1 outcomes are added.
 
 ## Limitations
 
-- Tiny dataset (40 × 6). All out-of-sample numbers are noisy; overfitting is easy.
+- Small dataset, even after expansion. All out-of-sample numbers are noisy;
+  overfitting is easy.
 - No survivorship/look-ahead audit of how the 40-company universe was selected.
-- BIST100 benchmark is **not** included; excess-return is hidden until the user
-  provides real values in `data/trusted/bist100_benchmark_returns.csv`.
-- Supervised ML is **not** presented as a trained predictor — baselines win.
+- BIST100 benchmark/excess-return fields exist where source coverage is valid;
+  they are not available for every expanded training row.
+- Supervised ML is **not** presented as a reliable trained predictor.
 
 ## Disclaimer
 

@@ -6,19 +6,25 @@
 > inputs: **shares outstanding** via the capital-event file
 > (`data/trusted_raw/shares_outstanding_events.csv`, run `make shares`) and **2024
 > balance-sheet** fixes via `data/trusted_raw/financials/corrected_balance_sheet_2024.csv`.
-> With these supplied the dataset reaches **32 validated features**.
+> With these supplied plus the Yahoo price/benchmark feature layer, the dataset
+> reaches **40 validated features**.
 
-The automated pipeline produces a valid T→T+1 **structure** and **real next-year
-return targets**, but the year-T **fundamentals are provisional** (only the
-genuinely-varying balance-sheet / leverage / growth columns from the reference
-data). For real predictive modelling you must supply true historical statements.
+The automated pipeline produces a valid T→T+1 **structure**, real next-year
+return targets where available, corrected yearly fundamentals, free-reconstructed
+valuation fields, and leakage-safe price/benchmark features. More complete
+historical statements can still improve coverage.
 
 ## What is already real
 
-- **Targets:** next-year realized return per ticker-year (from the dated
-  per-year return in the reference data). 200 rows have a target; the 2025 rows
-  are inference-only.
-- **Universe / metadata:** 40 BIST100 tickers, `is_bist100` derived from indices.
+- **Targets:** next-year realized return per ticker-year. The public dataset has
+  200 target rows; the expanded internal training dataset has 321 target rows.
+  The 2025 rows are inference-only.
+- **Universe / metadata:** public UI universe is fixed at 40 selected BIST
+  companies; expanded internal training universe is 81 yfinance-compatible
+  tickers.
+- **Prices/benchmark:** Yahoo year-end prices, yearly price features, dividend/
+  split fields when available, sector metadata, and BIST100 benchmark fields
+  where validated source coverage exists.
 
 ## What you must provide for real prediction
 
@@ -70,7 +76,8 @@ configure your own.
 ## After providing data
 
 ```bash
-make data        # re-runs build + validation; report shows new coverage
+make full-research-agent   # full data/model/AI pipeline + validation + tests
+make data-audit            # refresh source inventory and coverage report
 ```
 
 The validator (`data_quality_report.json`) will show which columns became real

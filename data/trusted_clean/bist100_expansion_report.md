@@ -1,7 +1,10 @@
 # BIST100 Financial Data Expansion — Investigation Report
 
 **Date:** 2026-06-10  
-**Status:** Infrastructure ready. Data not yet collected. Training tickers = 40 (unchanged).
+**Status:** Superseded by the 2026-06-10 pipeline expansion. Infrastructure is
+ready and a verified yfinance-compatible internal training split now exists:
+81 training tickers / 403 modeling rows / 321 target rows. Public UI remains the
+selected 40-company universe.
 
 ---
 
@@ -10,8 +13,8 @@
 | Dimension | Value |
 |---|---|
 | Public universe tickers | 40 |
-| Training universe tickers | 40 (identical — no extra BIST100 financials yet) |
-| Modeling dataset rows | 240 (40 tickers × 6 years, 2020–2025) |
+| Training universe tickers | 81 internal training tickers |
+| Modeling dataset rows | 403 training rows; 240 public rows |
 | Years with return targets | 2020–2024 (next-year return known) |
 | Inference-only year | 2025 (no T+1 return) |
 
@@ -225,4 +228,5 @@ fields are ever fetched or written by this script.
 
 ---
 
-*Experimental research. Not investment advice. Training tickers = 40 until expansion is verified.*
+*Experimental research. Not investment advice. Expansion is verified for internal
+training only; public UI remains the selected 40-company universe.*

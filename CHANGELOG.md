@@ -2,6 +2,42 @@
 
 All notable changes to FinanceIQ, most recent first.
 
+## [3.3.0] — 2026-06-10 — Expanded data/model/AI pipeline
+
+### Added
+- **Expanded internal training universe** — public UI remains the selected 40 BIST
+  companies, while walk-forward experiments and forecasting training can use the
+  validated 81-ticker internal training split.
+- **Yahoo price feature layer** (`make fetch-training-prices`) — yearly price,
+  return, volatility, drawdown, benchmark-relative, dividend/split, and sector
+  metadata fields are collected into raw CSVs and converted into leakage-safe
+  year-T features.
+- **Pipeline audit and feature reports** — `make data-audit` writes
+  `pipeline_audit_report.*`; feature engineering writes
+  `feature_engineering_report.*` with accepted/rejected feature rationale.
+- **Full research-agent pipeline** — `make full-research-agent` now runs price
+  collection, valuation, dataset build, pilot integration, validation, splitting,
+  contexts, audit, experiments, and tests in order.
+- **AI availability diagnostics** — `/research/ai-status` reports configured
+  provider/model status and returns structured "AI not configured" responses when
+  keys are absent.
+
+### Changed
+- Modeling-ready training data is now 403 rows / 81 tickers / 321 target rows;
+  public inference data stays 240 rows / 40 tickers / 200 target rows.
+- Validated model feature count is now 40 after leakage-safe price and benchmark
+  features are added.
+- Walk-forward experiments compare baseline ranking, linear/ridge/lasso/elastic
+  net, random forest, gradient boosting, and robust rank aggregation where
+  dependencies are available.
+
+### Notes
+- Honest finding remains conservative: overall Spearman improved only from about
+  0.007 to about 0.042 and remains weak/unstable. ML still does not establish a
+  reliable predictive edge.
+
+---
+
 ## [3.1.0] — 2026-06 — Research Terminal + honest T→T+1 research system
 
 ### Added
@@ -13,7 +49,8 @@ All notable changes to FinanceIQ, most recent first.
 - **BIST100 benchmark** (Yahoo, free) → excess-return / outperform-BIST100 targets.
 - **Free valuation builder** (`make valuation`) — reconstructs market_cap, enterprise_value,
   pe_ratio, pb_ratio, ev_ebitda from free Yahoo year-end price × manual shares × validated
-  financials. No Fintables Pro. **27 → 32 features** once shares are supplied.
+  financials. No Fintables Pro. **27 → 32 features** once shares are supplied
+  (later expanded to 40 in 3.3.0).
 - **Capital-event shares workflow** (`make shares`) — record only capital CHANGES in
   `shares_outstanding_events.csv`; carried forward per year. Free-float rejected for market cap.
 - **2024 balance-sheet correction** (`corrected_balance_sheet_2024.csv`) — money/ratio
@@ -41,8 +78,9 @@ All notable changes to FinanceIQ, most recent first.
   URL or login POSTs will hit the static site and return `405 Method Not Allowed`.
 
 ### Notes
-- Honest finding: model signal remains weak/unstable (~40 stocks/year). The deliverable is a
-  rigorous, transparent pipeline + honest negative result, not alpha.
+- Honest finding at this stage: model signal remained weak/unstable on the public
+  40-stock universe. The deliverable is a rigorous, transparent pipeline + honest
+  negative result, not alpha.
 
 ---
 
@@ -68,14 +106,15 @@ All notable changes to FinanceIQ, most recent first.
   ticker/year (`data/trusted_clean/company_contexts/`). Research agent injects pre-built
   context into LLM prompt instead of computing live.
 - **BIST100 expansion investigation** — confirmed Yahoo Chart is price/return-only (no IS/BS).
-  No KAP/Fintables/Finnet adapter existed. Delivered:
+  No KAP/Fintables/Finnet adapter existed at this stage. Delivered:
   - `scripts/data_collection/collect_bist100_financials_yfinance.py`: yfinance collector
     stub, clearly marked unofficial, rate-limited, banks flagged, never fabricates.
   - `data/trusted_raw/financials/bist100_expansion_template.csv`: manual import spec
     for KAP/Fintables/TradingView export.
   - `data/trusted_clean/bist100_expansion_report.md`: full investigation report.
   - `make collect-bist100-financials` Makefile target.
-  - Training tickers remain = 40; expansion not claimed.
+  - Training tickers remained = 40 in this release; superseded by the verified
+    81-ticker internal training split in 3.3.0.
 
 ### Fixed
 - Forecasting page: all buttons now functional without XLSX import or DB population.
@@ -87,8 +126,7 @@ All notable changes to FinanceIQ, most recent first.
   preferentially over live computation.
 
 ### Notes
-- Training tickers = 40 (unchanged). New tickers need both financials AND return
-  targets before `make data && make split-datasets` shows > 40.
+- Training tickers were 40 in this release. Expansion is now verified in 3.3.0.
 - Walk-forward Spearman still ≈ 0 — no reliable predictive edge. Honest result.
 
 ---

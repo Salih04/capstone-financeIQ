@@ -1,19 +1,21 @@
 # FinanceIQ
 
-An honest, leakage-safe **T→T+1 equity-research system** for 40 BIST companies
-(2020–2025): a validated modeling dataset, a BIST100 benchmark, a free-data
+An honest, leakage-safe **T→T+1 equity-research system** for 40 public BIST companies
+(2020–2025), with an expanded 81-ticker internal training universe: a validated modeling dataset, a BIST100 benchmark, a free-data
 valuation reconstruction, an explainable hybrid research agent, and a "Research
 Terminal" frontend. No paid APIs, no synthetic/fabricated data, no scrapers.
 
 > **Capstone status: complete.** The pipeline is rigorous and transparent. The
-> honest finding is that the model shows **no reliable predictive edge** on ~40
-> stocks/year (walk-forward Spearman ≈ 0). That is a defensible negative result,
+> honest finding is that the model still shows **no reliable predictive edge** after
+> expanding internal training to 81 tickers (walk-forward Spearman remains weak/unstable).
+> That is a defensible negative result,
 > not a bug see `TASK_STATE.md`.
 
-**Validated features: 32** balance-sheet + growth (reference), real per-year
+**Validated features: 40** balance-sheet + growth (reference), real per-year
 income/profitability (corrected yearly: revenue, margins, ROE, ROA, …), and
 free-derived valuation (market_cap, enterprise_value, pe_ratio, pb_ratio,
-ev_ebitda). Old frozen-snapshot valuation and price/return leakage are rejected.
+ev_ebitda), plus leakage-safe year-T price/benchmark features. Old frozen-snapshot
+valuation and price/return leakage are rejected.
 
 ## Architecture
 
@@ -44,15 +46,21 @@ return) is built by a separate, validated pipeline:
 
 ```bash
 make full-research        # full pipeline: extract → benchmark → corrected yearly
-                          #   → free valuation → build → experiments
+                          #   → fetch prices → free valuation → build
+                          #   → integrate training-only tickers → validate → experiments
+make full-research-agent  # full pipeline + frozen evidence + split + contexts + audit + tests
 # or individual stages:
+make fetch-training-prices # Yahoo year-end prices for public + training-only universe
 make shares               # expand capital-event shares → per-year (carry-forward)
 make valuation            # free valuation: Yahoo price × shares × financials → ratios
 make data                 # build + validate the T→T+1 modeling dataset
+make data-audit           # write CSV inventory/count/missingness report
 ```
 
 Outputs in `data/trusted_clean/` (`modeling_dataset_2020_2025.csv`,
-`data_quality_report.json/.md`, `free_valuation_history_report.*`,
+`modeling_dataset_public_2020_2025.csv`, `modeling_dataset_training_2020_2025.csv`,
+`data_quality_report.json/.md`, `pipeline_audit_report.*`,
+`feature_engineering_report.*`, `free_valuation_history_report.*`,
 `corrected_yearly_ingestion_report.*`, `data_dictionary.md`). See
 **[DATA_PIPELINE.md](DATA_PIPELINE.md)** and **[DATA_REQUIREMENTS.md](DATA_REQUIREMENTS.md)**.
 
@@ -78,7 +86,8 @@ Components are always returned separately; `ml_score` may be null (partial score
 
 Endpoints (`/research/summary`, `/research/company/{ticker}`,
 `/research/company/{ticker}/score`, `/research/model-diagnostics`,
-`/research/data-quality`, `POST /research/ask`). Frontend page: `/research-agent`.
+`/research/data-quality`, `/research/ai-status`, `POST /research/ask`).
+Frontend page: `/research-agent`.
 
 ### Run with / without an LLM
 ```bash
@@ -101,7 +110,8 @@ export RESEARCH_LLM_PROVIDER=ollama
 export RESEARCH_LLM_BASE_URL=http://localhost:11434/api/chat
 export RESEARCH_LLM_MODEL=qwen2.5:3b-instruct
 ```
-Any LLM error falls back to the deterministic path it cannot break the pipeline.
+Any LLM error falls back to the deterministic path; it cannot break the pipeline.
+Check configuration with `GET /research/ai-status` or `/research/ai-status?smoke=true`.
 
 ### Training preparation (no training here)
 ```bash
@@ -258,9 +268,10 @@ Everything non-trusted is in [`unnecessary/`](unnecessary/README.md):
 
 ## Known limitations (accepted)
 
-- **No reliable predictive edge.** With ~40 stocks/year the walk-forward signal is
-  weak/unstable and ML does not beat a simple baseline. This is the honest result;
-  treat scores as research support, not investment advice.
+- **No reliable predictive edge.** Even after expanding the internal training
+  universe to 81 tickers, the walk-forward signal is weak/unstable and ML does not
+  consistently beat simple baselines. This is the honest result; treat scores as
+  research support, not investment advice.
 - **Shares outstanding is manual.** No free historical source exists, so market_cap
   (and the valuation ratios derived from it) require the capital-event file. Until
   supplied for a ticker, those values stay null never fabricated.
