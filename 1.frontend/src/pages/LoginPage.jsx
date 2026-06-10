@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { LineChart, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react'
+
+// Login screen in the dashboard's "signal from noise" visual language:
+// deep ink, emerald/gold/copper accents, mono kickers, crystallize entrance.
 
 export default function LoginPage() {
   const { login, register } = useAuth()
@@ -11,7 +13,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [focusField, setFocusField] = useState(null)
+  const [booted, setBooted] = useState(false)
+
+  useEffect(() => {
+    const id = setTimeout(() => setBooted(true), 80)
+    return () => clearTimeout(id)
+  }, [])
 
   const getErrorMessage = (err) => {
     const detail = err?.response?.data?.detail
@@ -52,141 +59,220 @@ export default function LoginPage() {
     }
   }
 
-  const inputStyle = (field) => ({
-    width: '100%', boxSizing: 'border-box',
-    background: 'var(--surface-1)', border: `1px solid ${focusField === field ? 'var(--primary)' : 'var(--border-strong)'}`,
-    borderRadius: 'var(--radius-md)', padding: '10px 14px',
-    color: 'var(--text-1)', fontSize: 14, outline: 'none',
-    transition: 'border-color 0.15s',
-  })
-
   return (
-    <div style={{
-      minHeight: '100vh', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', alignItems: 'center',
-      gap: 28, padding: 28,
-      background: 'var(--bg-deep)',
-      backgroundImage: 'linear-gradient(135deg, rgba(244,176,74,0.10), transparent 38%), linear-gradient(315deg, rgba(85,194,195,0.08), transparent 42%)',
-    }}>
-      <section style={{ maxWidth: 760 }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--primary-hover)', background: 'var(--primary-subtle)', border: '1px solid rgba(244,176,74,0.25)', borderRadius: 999, padding: '6px 12px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.8 }}>
-          <Sparkles size={15} />
-          FinanceIQ Research Terminal
-        </div>
-        <h1 style={{ margin: '18px 0 10px', color: 'var(--text-1)', fontSize: 'clamp(2.4rem, 6vw, 4.5rem)', lineHeight: 1, fontWeight: 900 }}>
-          BIST research support with validated data discipline.
+    <div className={`fiq-login ${booted ? 'is-booted' : ''}`}>
+      <style>{CSS}</style>
+      <div className="fiq-login-scan" aria-hidden="true" />
+
+      <section className="fiq-login-hero">
+        <div className="fiq-login-kicker">FINANCEIQ · BIST EQUITY RESEARCH INSTRUMENT</div>
+        <h1>
+          A weak signal, reported <em>honestly</em>.
         </h1>
-        <p style={{ color: 'var(--text-2)', fontSize: 15.5, lineHeight: 1.7, maxWidth: 650, margin: 0 }}>
-          Sign in to access company profiles, research scores, experiments, benchmark diagnostics, and the grounded AI assistant. Research support only; not investment advice.
+        <p>
+          T→T+1 historical evaluation over 40 selected BIST stocks, 2020–2025. Leakage-safe features,
+          BIST100 benchmarking, and a grounded assistant that explains findings without turning them
+          into investment advice.
         </p>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 20 }}>
-          <span style={heroBadge}><ShieldCheck size={13} /> Leakage-safe methodology</span>
-          <span style={heroBadge}><LineChart size={13} /> BIST100 benchmark</span>
+        <div className="fiq-login-badges">
+          <span className="fiq-login-badge">LEAKAGE-SAFE METHODOLOGY</span>
+          <span className="fiq-login-badge">BIST100 BENCHMARK</span>
+          <span className="fiq-login-badge is-gold">WALK-FORWARD IC ≈ 0</span>
         </div>
       </section>
 
-      <div style={{
-        background: 'rgba(15, 23, 42, 0.78)', border: '1px solid var(--border-strong)',
-        borderRadius: 'var(--radius-xl)', padding: '2.5rem 2.25rem', width: 400,
-        maxWidth: '100%', boxSizing: 'border-box', boxShadow: 'var(--shadow-lg)',
-      }}>
-        {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
-          <div style={{
-            width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'var(--primary)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          }}>
-            <TrendingUp size={20} color="#fff" />
-          </div>
-          <div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-1)' }}>FinanceIQ</div>
-            <div style={{ fontSize: 11, color: 'var(--text-3)', letterSpacing: 0.5 }}>Validated Research Terminal</div>
-          </div>
-        </div>
-
-        <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-1)', margin: 0, marginBottom: 4 }}>
-          {mode === 'login' ? 'Welcome Back' : 'Create Account'}
-        </h2>
-        <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0, marginBottom: 24 }}>
-          {mode === 'login' ? 'Sign in to continue' : 'Create access for the research terminal'}
-        </p>
-
-        <form onSubmit={handle}>
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontSize: 12, color: 'var(--text-2)', marginBottom: 6, fontWeight: 500 }}>
-              Email
-            </label>
-            <input
-              style={inputStyle('email')}
-              type="email" required
-              value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              onFocus={() => setFocusField('email')}
-              onBlur={() => setFocusField(null)}
-            />
-          </div>
-          <div style={{ marginBottom: 20 }}>
-            <label style={{ display: 'block', fontSize: 12, color: 'var(--text-2)', marginBottom: 6, fontWeight: 500 }}>
-              Password
-            </label>
-            <input
-              style={inputStyle('password')}
-              type="password" required
-              value={password} onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••"
-              onFocus={() => setFocusField('password')}
-              onBlur={() => setFocusField(null)}
-            />
-          </div>
-
-          {error && (
-            <div style={{
-              background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)',
-              borderRadius: 'var(--radius-md)', padding: '10px 14px',
-              color: '#fca5a5', fontSize: 13, marginBottom: 16,
-            }}>
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit" disabled={loading}
-            style={{
-              width: '100%', background: loading ? 'var(--primary-muted)' : 'var(--primary)',
-              border: 'none', borderRadius: 'var(--radius-md)',
-              padding: '11px 0', color: '#fff', fontWeight: 600, fontSize: 14,
-              cursor: loading ? 'not-allowed' : 'pointer', transition: 'background 0.15s',
-            }}
-            onMouseEnter={e => { if (!loading) e.target.style.background = 'var(--primary-hover)' }}
-            onMouseLeave={e => { if (!loading) e.target.style.background = 'var(--primary)' }}
-          >
-            {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Sign Up'}
-          </button>
-        </form>
-
-        <div style={{ textAlign: 'center', marginTop: 18, fontSize: 13, color: 'var(--text-3)' }}>
-          {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-          <span
-            onClick={() => { setMode(m => m === 'login' ? 'register' : 'login'); setError('') }}
-            style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: 500 }}
-          >
-            {mode === 'login' ? 'Sign Up' : 'Sign In'}
+      <div className="fiq-login-card">
+        <div className="fiq-login-brand">
+          <span className="fiq-login-mark">IQ</span>
+          <span>
+            <span className="fiq-login-name">FinanceIQ</span>
+            <span className="fiq-login-sub">RESEARCH INSTRUMENT</span>
           </span>
         </div>
 
+        <h2>{mode === 'login' ? 'Sign in' : 'Create account'}</h2>
+        <p className="fiq-login-lead">
+          {mode === 'login' ? 'Access the research terminal.' : 'Create access for the research terminal.'}
+        </p>
+
+        <form onSubmit={handle}>
+          <label className="fiq-login-label" htmlFor="fiq-email">EMAIL</label>
+          <input
+            id="fiq-email"
+            className="fiq-login-input"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+          />
+
+          <label className="fiq-login-label" htmlFor="fiq-password">PASSWORD</label>
+          <input
+            id="fiq-password"
+            className="fiq-login-input"
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+          />
+
+          {error && <div className="fiq-login-error">{error}</div>}
+
+          <button className="fiq-login-submit" type="submit" disabled={loading}>
+            {loading ? 'TUNING…' : mode === 'login' ? 'SIGN IN' : 'SIGN UP'}
+          </button>
+        </form>
+
+        <div className="fiq-login-switch">
+          {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+          <button
+            type="button"
+            onClick={() => { setMode((m) => (m === 'login' ? 'register' : 'login')); setError('') }}
+          >
+            {mode === 'login' ? 'Sign up' : 'Sign in'}
+          </button>
+        </div>
+
+        <div className="fiq-login-caveat">
+          <span className="fiq-login-pulse" aria-hidden="true" />
+          Research only · Not investment advice
+        </div>
       </div>
     </div>
   )
 }
 
-const heroBadge = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 6,
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid var(--border-strong)',
-  borderRadius: 999,
-  padding: '7px 11px',
-  color: 'var(--text-2)',
-  fontSize: 12,
-  fontWeight: 800,
+const CSS = `
+.fiq-login {
+  --li-ink: #0a0e0d;
+  --li-paper: #e8ece6;
+  --li-dim: #9fae9f;
+  --li-faint: #6b7a70;
+  --li-emerald: #4da583;
+  --li-gold: #c8a35a;
+  --li-copper: #a8674b;
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  align-items: center;
+  gap: clamp(28px, 5vw, 72px);
+  padding: clamp(24px, 5vw, 64px);
+  background:
+    radial-gradient(1100px 540px at 78% -8%, rgba(77,165,131,0.08), transparent 60%),
+    radial-gradient(800px 500px at 8% 108%, rgba(168,103,75,0.07), transparent 60%),
+    linear-gradient(165deg, #0b100f 0%, var(--li-ink) 55%, #080b0a 100%);
+  color: var(--li-paper);
+  overflow: hidden;
 }
+.fiq-login-scan {
+  position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 4px);
+}
+
+.fiq-login-hero, .fiq-login-card {
+  position: relative;
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity 1s ease, filter 1s ease;
+}
+.fiq-login.is-booted .fiq-login-hero,
+.fiq-login.is-booted .fiq-login-card { opacity: 1; filter: blur(0); }
+.fiq-login.is-booted .fiq-login-card { transition-delay: 0.18s; }
+
+.fiq-login-hero { max-width: 700px; }
+.fiq-login-kicker {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.34em;
+  color: var(--li-faint); margin-bottom: 18px;
+}
+.fiq-login-hero h1 {
+  margin: 0 0 14px; font-size: clamp(30px, 4.2vw, 54px); line-height: 1.04;
+  font-weight: 650; letter-spacing: -0.015em; color: var(--li-paper);
+}
+.fiq-login-hero h1 em { font-style: italic; color: var(--li-emerald); }
+.fiq-login-hero p { margin: 0; max-width: 58ch; color: var(--li-dim); font-size: 15px; line-height: 1.6; }
+.fiq-login-badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+.fiq-login-badge {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em;
+  color: var(--li-dim); border: 1px solid rgba(200,211,202,0.2);
+  border-radius: 2px; padding: 7px 12px; background: rgba(14,20,19,0.6);
+}
+.fiq-login-badge.is-gold { color: var(--li-gold); border-color: rgba(200,163,90,0.45); }
+
+.fiq-login-card {
+  width: 400px; max-width: 100%; justify-self: start;
+  border: 1px solid rgba(200,211,202,0.18); border-left: 3px solid var(--li-emerald);
+  border-radius: 3px; padding: 34px 32px 26px;
+  background: linear-gradient(180deg, rgba(14,20,19,0.92), rgba(10,14,13,0.88));
+  box-shadow: 0 28px 90px rgba(0,0,0,0.5);
+}
+.fiq-login-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+.fiq-login-mark {
+  width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-weight: 600; font-size: 15px; color: #0a0e0d;
+  background: linear-gradient(135deg, var(--li-gold), var(--li-emerald)); border-radius: 2px;
+}
+.fiq-login-name { display: block; font-size: 16px; font-weight: 700; color: var(--li-paper); }
+.fiq-login-sub {
+  display: block; font-family: var(--font-mono); font-size: 8.5px;
+  letter-spacing: 0.28em; color: var(--li-gold); margin-top: 1px;
+}
+.fiq-login-card h2 { margin: 0 0 4px; font-size: 19px; font-weight: 650; color: var(--li-paper); }
+.fiq-login-lead { margin: 0 0 24px; font-size: 13px; color: var(--li-faint); }
+
+.fiq-login-label {
+  display: block; font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.26em; color: var(--li-dim); margin-bottom: 7px;
+}
+.fiq-login-input {
+  width: 100%; box-sizing: border-box; margin-bottom: 16px;
+  background: rgba(10,14,13,0.8); border: 1px solid rgba(200,211,202,0.22);
+  border-radius: 2px; padding: 11px 14px;
+  color: var(--li-paper); font-size: 14px; font-family: var(--font-mono);
+  outline: none; transition: border-color 0.18s, box-shadow 0.18s;
+}
+.fiq-login-input::placeholder { color: var(--li-faint); }
+.fiq-login-input:focus {
+  border-color: var(--li-emerald);
+  box-shadow: 0 0 0 1px rgba(77,165,131,0.35), 0 0 18px rgba(77,165,131,0.12);
+}
+.fiq-login-error {
+  background: rgba(168,103,75,0.1); border: 1px solid rgba(168,103,75,0.45);
+  border-radius: 2px; padding: 10px 14px; color: #d8a18b; font-size: 13px; margin-bottom: 16px;
+}
+.fiq-login-submit {
+  width: 100%; padding: 12px 0; margin-top: 4px;
+  background: var(--li-gold); border: none; border-radius: 2px;
+  color: #0a0e0d; font-family: var(--font-mono); font-size: 12px;
+  font-weight: 700; letter-spacing: 0.26em; cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.fiq-login-submit:hover:not(:disabled) { background: #dcbb74; box-shadow: 0 0 22px rgba(200,163,90,0.3); }
+.fiq-login-submit:focus-visible { outline: 1px solid var(--li-paper); outline-offset: 2px; }
+.fiq-login-submit:disabled { background: rgba(200,163,90,0.4); cursor: not-allowed; }
+
+.fiq-login-switch { text-align: center; margin-top: 18px; font-size: 13px; color: var(--li-faint); }
+.fiq-login-switch button {
+  background: none; border: none; padding: 0; font: inherit;
+  color: var(--li-emerald); cursor: pointer; font-weight: 600;
+}
+.fiq-login-switch button:hover { text-decoration: underline; }
+
+.fiq-login-caveat {
+  display: flex; align-items: center; gap: 9px; justify-content: center;
+  margin-top: 22px; padding-top: 16px; border-top: 1px dashed rgba(200,211,202,0.18);
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.12em; color: var(--li-dim);
+}
+.fiq-login-pulse {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--li-gold);
+  animation: fiqLoginPulse 2.2s ease-in-out infinite;
+}
+@keyframes fiqLoginPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .fiq-login-hero, .fiq-login-card { opacity: 1 !important; filter: none !important; transition: none !important; }
+  .fiq-login-pulse { animation: none; }
+}
+`

@@ -43,7 +43,7 @@ const s = {
     top: 0,
     left: 0,
     height: '100vh',
-    background: 'linear-gradient(180deg, rgba(7,17,31,0.96), rgba(3,7,18,0.96))',
+    background: 'linear-gradient(180deg, rgba(12,17,15,0.97), rgba(8,11,10,0.97))',
     backdropFilter: 'blur(20px)',
     borderRight: '1px solid var(--border)',
     display: 'flex',
@@ -82,12 +82,14 @@ const s = {
     whiteSpace: 'nowrap',
   },
   logoSub: {
-    fontSize: 9,
+    fontSize: 8.5,
     fontWeight: 600,
+    fontFamily: 'var(--font-mono)',
     color: 'var(--primary)',
     textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginTop: -2,
+    letterSpacing: 2.4,
+    marginTop: -1,
+    whiteSpace: 'nowrap',
   },
   nav: {
     flex: 1,
@@ -96,12 +98,13 @@ const s = {
     padding: '8px 0',
   },
   sectionLabel: {
-    fontSize: 10,
-    fontWeight: 700,
+    fontSize: 9,
+    fontWeight: 600,
+    fontFamily: 'var(--font-mono)',
     textTransform: 'uppercase',
-    letterSpacing: 1.2,
-    color: 'var(--text-3)',
-    padding: '12px 16px 4px',
+    letterSpacing: 2.6,
+    color: 'var(--text-4)',
+    padding: '14px 16px 5px',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
   },
@@ -122,9 +125,9 @@ const s = {
     overflow: 'hidden',
   },
   itemActive: {
-    background: 'linear-gradient(90deg, rgba(245,177,76,0.16), rgba(57,230,208,0.08))',
+    background: 'linear-gradient(90deg, rgba(200,163,90,0.14), rgba(77,165,131,0.07))',
     color: 'var(--primary-hover)',
-    border: '1px solid rgba(245,177,76,0.18)',
+    border: '1px solid rgba(200,163,90,0.22)',
   },
   itemHover: {
     background: 'var(--surface-hover)',
@@ -165,8 +168,8 @@ const s = {
   avatar: {
     width: 32,
     height: 32,
-    borderRadius: 10,
-    background: 'linear-gradient(135deg, var(--primary-muted), rgba(85,194,195,0.25))',
+    borderRadius: 'var(--radius-md)',
+    background: 'linear-gradient(135deg, var(--primary-muted), rgba(77,165,131,0.25))',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -213,9 +216,9 @@ const s = {
 }
 
 const ROLE_COLORS = {
-  admin: { bg: 'rgba(14,165,233,0.15)', color: 'var(--primary-hover)' },
-  analyst: { bg: 'rgba(16,185,129,0.15)', color: 'var(--success-light)' },
-  investor: { bg: 'rgba(99,102,241,0.15)', color: '#a5b4fc' },
+  admin: { bg: 'rgba(200,163,90,0.15)', color: 'var(--primary-hover)' },
+  analyst: { bg: 'rgba(77,165,131,0.15)', color: 'var(--success-light)' },
+  investor: { bg: 'rgba(168,103,75,0.18)', color: '#d8a18b' },
 }
 
 function NavItem({ item, collapsed, active }) {
@@ -302,12 +305,12 @@ export default function Sidebar({ collapsed, onToggle }) {
       {/* Logo */}
       <Link to="/dashboard" style={s.logo}>
         <div style={s.logoIcon}>
-          <TrendingUp size={17} color="#0b111a" />
+          <TrendingUp size={17} color="#0a0e0d" />
         </div>
         {!collapsed && (
           <div>
           <div style={s.logoText}>FinanceIQ</div>
-          <div style={s.logoSub}>Research Terminal</div>
+          <div style={s.logoSub}>Research Instrument</div>
           </div>
         )}
       </Link>
