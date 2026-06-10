@@ -1,0 +1,189 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "TRY",
+          "symbol": "GUBRF.IS",
+          "exchangeName": "IST",
+          "fullExchangeName": "Istanbul",
+          "instrumentType": "EQUITY",
+          "firstTradeDate": 957940200,
+          "regularMarketTime": 1781015808,
+          "hasPrePostMarketData": false,
+          "gmtoffset": 10800,
+          "timezone": "TRT",
+          "exchangeTimezoneName": "Europe/Istanbul",
+          "regularMarketPrice": 482.0,
+          "fiftyTwoWeekHigh": 625.5,
+          "fiftyTwoWeekLow": 212.2,
+          "regularMarketDayHigh": 503.5,
+          "regularMarketDayLow": 480.0,
+          "regularMarketVolume": 2115234,
+          "longName": "G\u00fcbre Fabrikalari T\u00fcrk Anonim Sirketi",
+          "shortName": "GUBRE FABRIK.",
+          "chartPreviousClose": 327.0,
+          "priceHint": 2,
+          "currentTradingPeriod": {
+            "pre": {
+              "timezone": "TRT",
+              "end": 1780986600,
+              "start": 1780986600,
+              "gmtoffset": 10800
+            },
+            "regular": {
+              "timezone": "TRT",
+              "end": 1781017200,
+              "start": 1780986600,
+              "gmtoffset": 10800
+            },
+            "post": {
+              "timezone": "TRT",
+              "end": 1781017200,
+              "start": 1781017200,
+              "gmtoffset": 10800
+            }
+          },
+          "dataGranularity": "1d",
+          "range": "",
+          "validRanges": [
+            "1d",
+            "5d",
+            "1mo",
+            "3mo",
+            "6mo",
+            "1y",
+            "2y",
+            "5y",
+            "10y",
+            "ytd",
+            "max"
+          ]
+        },
+        "timestamp": [
+          1766385000,
+          1766471400,
+          1766557800,
+          1766644200,
+          1766730600,
+          1766989800,
+          1767076200,
+          1767162600,
+          1767335400,
+          1767594600,
+          1767681000,
+          1767767400,
+          1767853800,
+          1767940200
+        ],
+        "indicators": {
+          "quote": [
+            {
+              "high": [
+                340.75,
+                340.5,
+                349.75,
+                359.5,
+                362.75,
+                364.0,
+                353.5,
+                356.75,
+                352.25,
+                366.0,
+                368.25,
+                368.0,
+                367.75,
+                375.5
+              ],
+              "close": [
+                333.75,
+                339.0,
+                349.25,
+                351.0,
+                362.75,
+                352.0,
+                345.25,
+                348.0,
+                351.75,
+                363.0,
+                366.5,
+                362.0,
+                365.0,
+                374.75
+              ],
+              "open": [
+                330.75,
+                334.25,
+                340.75,
+                349.5,
+                352.25,
+                362.25,
+                352.0,
+                348.75,
+                349.5,
+                355.0,
+                363.0,
+                368.0,
+                364.5,
+                366.5
+              ],
+              "volume": [
+                3030911,
+                2100679,
+                2733602,
+                1819874,
+                2196373,
+                2110733,
+                2257656,
+                3300662,
+                1824150,
+                3138142,
+                2657676,
+                1621709,
+                1896236,
+                1764825
+              ],
+              "low": [
+                330.0,
+                331.5,
+                337.5,
+                348.75,
+                345.0,
+                350.0,
+                341.5,
+                342.0,
+                344.25,
+                351.75,
+                357.25,
+                361.0,
+                359.0,
+                364.25
+              ]
+            }
+          ],
+          "adjclose": [
+            {
+              "adjclose": [
+                333.75,
+                339.0,
+                349.25,
+                351.0,
+                362.75,
+                352.0,
+                345.25,
+                348.0,
+                351.75,
+                363.0,
+                366.5,
+                362.0,
+                365.0,
+                374.75
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "error": null
+  }
+}

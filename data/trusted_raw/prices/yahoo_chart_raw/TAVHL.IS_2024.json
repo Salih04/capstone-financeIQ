@@ -1,0 +1,189 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "TRY",
+          "symbol": "TAVHL.IS",
+          "exchangeName": "IST",
+          "fullExchangeName": "Istanbul",
+          "instrumentType": "EQUITY",
+          "firstTradeDate": 1172475000,
+          "regularMarketTime": 1781015796,
+          "hasPrePostMarketData": false,
+          "gmtoffset": 10800,
+          "timezone": "TRT",
+          "exchangeTimezoneName": "Europe/Istanbul",
+          "regularMarketPrice": 257.5,
+          "fiftyTwoWeekHigh": 369.0,
+          "fiftyTwoWeekLow": 212.8,
+          "regularMarketDayHigh": 259.75,
+          "regularMarketDayLow": 252.25,
+          "regularMarketVolume": 3103716,
+          "longName": "TAV Havalimanlari Holding A.S.",
+          "shortName": "TAV HAVALIMANLARI",
+          "chartPreviousClose": 285.0,
+          "priceHint": 2,
+          "currentTradingPeriod": {
+            "pre": {
+              "timezone": "TRT",
+              "end": 1780986600,
+              "start": 1780986600,
+              "gmtoffset": 10800
+            },
+            "regular": {
+              "timezone": "TRT",
+              "end": 1781017200,
+              "start": 1780986600,
+              "gmtoffset": 10800
+            },
+            "post": {
+              "timezone": "TRT",
+              "end": 1781017200,
+              "start": 1781017200,
+              "gmtoffset": 10800
+            }
+          },
+          "dataGranularity": "1d",
+          "range": "",
+          "validRanges": [
+            "1d",
+            "5d",
+            "1mo",
+            "3mo",
+            "6mo",
+            "1y",
+            "2y",
+            "5y",
+            "10y",
+            "ytd",
+            "max"
+          ]
+        },
+        "timestamp": [
+          1734676200,
+          1734935400,
+          1735021800,
+          1735108200,
+          1735194600,
+          1735281000,
+          1735540200,
+          1735626600,
+          1735799400,
+          1735885800,
+          1736145000,
+          1736231400,
+          1736317800,
+          1736404200
+        ],
+        "indicators": {
+          "quote": [
+            {
+              "low": [
+                281.5,
+                280.0,
+                276.25,
+                281.25,
+                281.25,
+                283.75,
+                272.5,
+                268.0,
+                272.25,
+                272.5,
+                267.75,
+                270.75,
+                276.0,
+                275.0
+              ],
+              "close": [
+                285.75,
+                281.5,
+                280.75,
+                281.75,
+                287.25,
+                284.25,
+                273.75,
+                274.0,
+                276.5,
+                272.5,
+                272.0,
+                276.0,
+                277.0,
+                277.0
+              ],
+              "open": [
+                284.25,
+                284.5,
+                281.25,
+                282.0,
+                282.0,
+                288.25,
+                283.5,
+                273.5,
+                274.5,
+                279.0,
+                273.25,
+                272.5,
+                276.75,
+                277.75
+              ],
+              "volume": [
+                698798,
+                1119809,
+                892705,
+                445324,
+                1631060,
+                758127,
+                1875121,
+                1369814,
+                1148837,
+                1831390,
+                1743988,
+                2211743,
+                1994459,
+                2138715
+              ],
+              "high": [
+                287.25,
+                287.75,
+                282.5,
+                284.25,
+                288.0,
+                289.25,
+                285.0,
+                277.0,
+                278.75,
+                282.25,
+                275.0,
+                278.25,
+                281.5,
+                281.0
+              ]
+            }
+          ],
+          "adjclose": [
+            {
+              "adjclose": [
+                285.75,
+                281.5,
+                280.75,
+                281.75,
+                287.25,
+                284.25,
+                273.75,
+                274.0,
+                276.5,
+                272.5,
+                272.0,
+                276.0,
+                277.0,
+                277.0
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "error": null
+  }
+}

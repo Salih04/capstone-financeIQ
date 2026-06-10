@@ -19,6 +19,7 @@ make extract-yearly-financials   # XLSX -> candidate manual file (validated)
 make data                        # build + validate modeling dataset
 make research                    # walk-forward experiments
 make full-research               # all three in order
+python scripts/fetch_yahoo_chart_prices.py --start-year 2020 --end-year 2025 # fetch Yahoo prices
 ```
 
 ## Reusing the yearly Excel files (honest extraction)

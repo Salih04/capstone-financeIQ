@@ -1,0 +1,189 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "TRY",
+          "symbol": "BRSAN.IS",
+          "exchangeName": "IST",
+          "fullExchangeName": "Istanbul",
+          "instrumentType": "EQUITY",
+          "firstTradeDate": 957940200,
+          "regularMarketTime": 1781015745,
+          "hasPrePostMarketData": false,
+          "gmtoffset": 10800,
+          "timezone": "TRT",
+          "exchangeTimezoneName": "Europe/Istanbul",
+          "regularMarketPrice": 605.5,
+          "fiftyTwoWeekHigh": 789.0,
+          "fiftyTwoWeekLow": 297.5,
+          "regularMarketDayHigh": 645.5,
+          "regularMarketDayLow": 602.0,
+          "regularMarketVolume": 2870760,
+          "longName": "Borusan Birlesik Boru Fabrikalari Sanayi ve Ticaret A.S.",
+          "shortName": "BORUSAN BORU SANAYI",
+          "chartPreviousClose": 437.75,
+          "priceHint": 2,
+          "currentTradingPeriod": {
+            "pre": {
+              "timezone": "TRT",
+              "end": 1780986600,
+              "start": 1780986600,
+              "gmtoffset": 10800
+            },
+            "regular": {
+              "timezone": "TRT",
+              "end": 1781017200,
+              "start": 1780986600,
+              "gmtoffset": 10800
+            },
+            "post": {
+              "timezone": "TRT",
+              "end": 1781017200,
+              "start": 1781017200,
+              "gmtoffset": 10800
+            }
+          },
+          "dataGranularity": "1d",
+          "range": "",
+          "validRanges": [
+            "1d",
+            "5d",
+            "1mo",
+            "3mo",
+            "6mo",
+            "1y",
+            "2y",
+            "5y",
+            "10y",
+            "ytd",
+            "max"
+          ]
+        },
+        "timestamp": [
+          1734676200,
+          1734935400,
+          1735021800,
+          1735108200,
+          1735194600,
+          1735281000,
+          1735540200,
+          1735626600,
+          1735799400,
+          1735885800,
+          1736145000,
+          1736231400,
+          1736317800,
+          1736404200
+        ],
+        "indicators": {
+          "quote": [
+            {
+              "high": [
+                442.75,
+                439.0,
+                452.5,
+                433.75,
+                439.75,
+                440.0,
+                443.0,
+                434.75,
+                435.0,
+                435.0,
+                445.5,
+                440.75,
+                432.5,
+                428.5
+              ],
+              "close": [
+                435.25,
+                421.25,
+                429.25,
+                432.0,
+                431.0,
+                438.5,
+                432.5,
+                431.0,
+                431.25,
+                434.5,
+                436.0,
+                429.0,
+                425.0,
+                427.5
+              ],
+              "low": [
+                435.25,
+                420.5,
+                426.0,
+                429.5,
+                430.75,
+                431.0,
+                431.5,
+                425.25,
+                425.0,
+                430.5,
+                435.0,
+                428.5,
+                423.5,
+                421.25
+              ],
+              "volume": [
+                402487,
+                435557,
+                1562578,
+                422975,
+                444387,
+                666834,
+                397620,
+                483087,
+                678540,
+                554918,
+                761793,
+                656066,
+                472227,
+                457749
+              ],
+              "open": [
+                439.0,
+                435.5,
+                433.25,
+                432.75,
+                434.25,
+                432.5,
+                440.75,
+                433.0,
+                431.75,
+                434.25,
+                436.75,
+                438.0,
+                428.75,
+                426.0
+              ]
+            }
+          ],
+          "adjclose": [
+            {
+              "adjclose": [
+                435.25,
+                421.25,
+                429.25,
+                432.0,
+                431.0,
+                438.5,
+                432.5,
+                431.0,
+                431.25,
+                434.5,
+                436.0,
+                429.0,
+                425.0,
+                427.5
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "error": null
+  }
+}
