@@ -10,7 +10,7 @@ const s = {
     top: 0,
     right: 0,
     height: 'var(--topbar-h)',
-    background: 'rgba(7,17,31,0.86)',
+    background: 'rgba(10,14,13,0.88)',
     backdropFilter: 'blur(18px)',
     borderBottom: '1px solid var(--border)',
     display: 'flex',
@@ -40,7 +40,9 @@ const s = {
     borderRadius: 'var(--radius-md)',
     padding: '8px 14px 8px 38px',
     color: 'var(--text-1)',
-    fontSize: 13.5,
+    fontSize: 12.5,
+    fontFamily: 'var(--font-mono)',
+    letterSpacing: '0.02em',
     outline: 'none',
     transition: 'border-color 0.15s, box-shadow 0.15s',
   },
@@ -233,11 +235,11 @@ export default function Topbar({ sidebarCollapsed }) {
                 padding: '9px 14px', cursor: 'pointer',
                 borderTop: '1px solid var(--border)',
                 fontSize: 12, fontWeight: 600, color: 'var(--primary)',
-        background: 'rgba(244,176,74,0.04)',
+        background: 'rgba(200,163,90,0.04)',
                 transition: 'background 0.12s',
               }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(244,176,74,0.1)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(244,176,74,0.04)'}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(200,163,90,0.1)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(200,163,90,0.04)'}
               onClick={() => {
                 navigate(`/research-agent?q=${encodeURIComponent(searchQuery)}`)
                 setSearchOpen(false)
