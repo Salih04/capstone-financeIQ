@@ -1,6 +1,6 @@
 # Data quality report
 
-- Rows: **240**  |  Features: **32**  |  Rows with target: **200**  |  Inference-only: **40**
+- Rows: **240**  |  Features: **27**  |  Rows with target: **200**  |  Inference-only: **40**
 - Benchmark available: **True**
 - Valid for T→T+1 modeling: **True**
 
@@ -16,22 +16,22 @@
 | 2025 | 40 | 40 | 0.0 |
 
 ## BIST100 benchmark
-- Source: **yahoo_chart_api**
+- Source: **yfinance**
 - Target years covered: [2021, 2022, 2023, 2024, 2025]
-- Return values: {2021: 24.23, 2022: 185.94, 2023: 31.96, 2024: 28.94, 2025: 13.05}
+- Return values: {2021: 24.23, 2022: 185.94, 2023: 31.96, 2024: 28.94, 2025: 12.64}
 - Excess/outperform targets enabled: **True**
 
 
 ## Manual financial history
 - Present: **True**
-- Files: ['candidate_from_yearly_snapshots.csv', 'corrected_balance_sheet_2024.csv', 'corrected_yearly_financials_candidate.csv', 'free_valuation_history_candidate.csv']
-- Rows ingested: 240
-- Accepted as features: ['gross_margin', 'ebitda_margin', 'net_margin', 'roe', 'roa', 'revenue', 'gross_profit', 'operating_income', 'ebitda', 'net_income', 'market_cap', 'enterprise_value', 'pe_ratio', 'pb_ratio', 'ev_ebitda']
+- Files: ['bist100_yfinance_candidate_clean.csv', 'candidate_from_yearly_snapshots.csv', 'corrected_balance_sheet_2024.csv', 'corrected_yearly_financials_candidate.csv', 'free_valuation_history_candidate.csv']
+- Rows ingested: 276
+- Accepted as features: ['revenue', 'gross_profit', 'operating_income', 'net_income', 'ebitda', 'roe', 'roa', 'gross_margin', 'net_margin', 'ebitda_margin']
 - Overrides from snapshot: {'total_assets': 40, 'current_assets': 40, 'non_current_assets': 40, 'short_term_liabilities': 40, 'long_term_liabilities': 40, 'equity': 40, 'working_capital': 40, 'net_debt': 40, 'current_ratio': 40, 'leverage_ratio': 40, 'net_debt_to_ebitda': 34}
 - Rejected: {}
 - Misaligned columns: []
 - Source note: Multiple manual sources detected. Corrected yearly source was prioritized for income/profitability fields; legacy snapshot source only filled fields it uniquely provided. This overlap is expected, not an error.
-- Issues: []
+- Issues: ["unknown tickers not in universe: ['AKSA', 'AKSEN', 'DOHOL', 'EKGYO', 'KCHOL', 'ODAS', 'SAHOL', 'SMRTG', 'VESTL']"]
 
 
 ## Source distinction (corrected yearly vs old snapshot)
@@ -50,7 +50,7 @@ daily_change_pct, ebitda, ebitda_margin_pct, enterprise_value, ev_ebitda, ev_sal
 
 ## Provisional feature columns (year-T, genuinely varying)
 
-current_assets, current_ratio, ebitda, ebitda_growth_pct, ebitda_margin, enterprise_value, equity, ev_ebitda, financial_debt_ratio, gross_margin, gross_profit, gross_profit_growth_pct, leverage_ratio, long_term_liabilities, market_cap, net_debt, net_debt_to_ebitda, net_income, net_income_growth_pct, net_margin, non_current_assets, operating_income, operating_income_growth_pct, pb_ratio, pe_ratio, revenue, revenue_growth_pct, roa, roe, short_term_liabilities, total_assets, working_capital
+current_assets, current_ratio, ebitda, ebitda_growth_pct, ebitda_margin, equity, financial_debt_ratio, gross_margin, gross_profit, gross_profit_growth_pct, leverage_ratio, long_term_liabilities, net_debt, net_debt_to_ebitda, net_income, net_income_growth_pct, net_margin, non_current_assets, operating_income, operating_income_growth_pct, revenue, revenue_growth_pct, roa, roe, short_term_liabilities, total_assets, working_capital
 
 ## Issues
 

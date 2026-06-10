@@ -18,16 +18,13 @@ target is the realized return in year T+1.
 | `ebitda` | feature_allowed | provisional_reference_fundamental |
 | `ebitda_growth_pct` | feature_allowed | provisional_reference_fundamental |
 | `ebitda_margin` | feature_allowed | provisional_reference_fundamental |
-| `enterprise_value` | feature_allowed | provisional_reference_fundamental |
 | `equity` | feature_allowed | provisional_reference_fundamental |
-| `ev_ebitda` | feature_allowed | provisional_reference_fundamental |
 | `financial_debt_ratio` | feature_allowed | provisional_reference_fundamental |
 | `gross_margin` | feature_allowed | provisional_reference_fundamental |
 | `gross_profit` | feature_allowed | provisional_reference_fundamental |
 | `gross_profit_growth_pct` | feature_allowed | provisional_reference_fundamental |
 | `leverage_ratio` | feature_allowed | provisional_reference_fundamental |
 | `long_term_liabilities` | feature_allowed | provisional_reference_fundamental |
-| `market_cap` | feature_allowed | provisional_reference_fundamental |
 | `net_debt` | feature_allowed | provisional_reference_fundamental |
 | `net_debt_to_ebitda` | feature_allowed | provisional_reference_fundamental |
 | `net_income` | feature_allowed | provisional_reference_fundamental |
@@ -36,8 +33,6 @@ target is the realized return in year T+1.
 | `non_current_assets` | feature_allowed | provisional_reference_fundamental |
 | `operating_income` | feature_allowed | provisional_reference_fundamental |
 | `operating_income_growth_pct` | feature_allowed | provisional_reference_fundamental |
-| `pb_ratio` | feature_allowed | provisional_reference_fundamental |
-| `pe_ratio` | feature_allowed | provisional_reference_fundamental |
 | `revenue` | feature_allowed | provisional_reference_fundamental |
 | `revenue_growth_pct` | feature_allowed | provisional_reference_fundamental |
 | `roa` | feature_allowed | provisional_reference_fundamental |

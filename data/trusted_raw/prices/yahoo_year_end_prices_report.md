@@ -1,6 +1,6 @@
 # Yahoo Finance Year-End Prices Report
 
-**Generated:** 2026-06-10 15:27:47
+**Generated:** 2026-06-10 15:40:57
 **Parameters:**
 - Start Year: 2020
 - End Year: 2025
@@ -10,7 +10,7 @@
 - **Total Records:** 294
 - **Successful:** 278
 - **Failed/Missing:** 16
-- **Skipped (API fetch):** 240 (Read from cache)
+- **Skipped (API fetch):** 294 (Read from cache)
 
 ## Errors & Missing Data
 | Ticker | Year | Error |

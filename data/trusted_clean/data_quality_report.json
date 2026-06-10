@@ -16,23 +16,20 @@
     "2024": 40,
     "2025": 40
   },
-  "n_features": 32,
+  "n_features": 27,
   "feature_columns": [
     "current_assets",
     "current_ratio",
     "ebitda",
     "ebitda_growth_pct",
     "ebitda_margin",
-    "enterprise_value",
     "equity",
-    "ev_ebitda",
     "financial_debt_ratio",
     "gross_margin",
     "gross_profit",
     "gross_profit_growth_pct",
     "leverage_ratio",
     "long_term_liabilities",
-    "market_cap",
     "net_debt",
     "net_debt_to_ebitda",
     "net_income",
@@ -41,8 +38,6 @@
     "non_current_assets",
     "operating_income",
     "operating_income_growth_pct",
-    "pb_ratio",
-    "pe_ratio",
     "revenue",
     "revenue_growth_pct",
     "roa",
@@ -184,23 +179,63 @@
       "return_3y",
       "return_5y"
     ],
+    "balance_2024_correction": {
+      "present": true,
+      "rows_corrected": 40,
+      "tickers": [
+        "AEFES",
+        "ARCLK",
+        "ASELS",
+        "ASTOR",
+        "BIMAS",
+        "BRSAN",
+        "BTCIM",
+        "CANTE",
+        "CCOLA",
+        "CIMSA",
+        "DOAS",
+        "DSTKF",
+        "ENKAI",
+        "EREGL",
+        "FROTO",
+        "GUBRF",
+        "HEKTS",
+        "KONTR",
+        "KRDMD",
+        "KUYAS",
+        "MAVI",
+        "MGROS",
+        "MIATK",
+        "OYAKC",
+        "PASEU",
+        "PETKM",
+        "PGSUS",
+        "SASA",
+        "SISE",
+        "TAVHL",
+        "TCELL",
+        "THYAO",
+        "TOASO",
+        "TRALT",
+        "TRMET",
+        "TSKB",
+        "TTKOM",
+        "TUPRS",
+        "TURSG",
+        "ULKER"
+      ]
+    },
     "free_valuation_builder": {
       "attempted": true,
       "shares_status": "manual",
       "target_column_status": {
-        "market_cap": "accepted",
-        "enterprise_value": "accepted",
-        "pe": "accepted",
-        "pb": "accepted",
-        "ev_ebitda": "accepted"
+        "market_cap": "missing",
+        "enterprise_value": "missing",
+        "pe": "missing",
+        "pb": "missing",
+        "ev_ebitda": "missing"
       },
-      "columns_entering_candidate": [
-        "market_cap",
-        "enterprise_value",
-        "pe",
-        "pb",
-        "ev_ebitda"
-      ]
+      "columns_entering_candidate": []
     },
     "old_snapshot_rejected_but_corrected_accepted": [
       "ebitda",
@@ -226,16 +261,13 @@
     "ebitda": 0.0,
     "ebitda_growth_pct": 0.0,
     "ebitda_margin": 0.0,
-    "enterprise_value": 0.221,
     "equity": 0.0,
-    "ev_ebitda": 0.275,
     "financial_debt_ratio": 0.0,
     "gross_margin": 0.0,
     "gross_profit": 0.0,
     "gross_profit_growth_pct": 0.0,
     "leverage_ratio": 0.0,
     "long_term_liabilities": 0.0,
-    "market_cap": 0.058,
     "net_debt": 0.0,
     "net_debt_to_ebitda": 0.0,
     "net_income": 0.0,
@@ -244,8 +276,6 @@
     "non_current_assets": 0.0,
     "operating_income": 0.0,
     "operating_income_growth_pct": 0.0,
-    "pb_ratio": 0.221,
-    "pe_ratio": 0.229,
     "revenue": 0.0,
     "revenue_growth_pct": 0.0,
     "roa": 0.0,
@@ -278,7 +308,7 @@
   "inference_only_rows": 40,
   "benchmark_available": true,
   "benchmark": {
-    "source": "yahoo_chart_api",
+    "source": "yfinance",
     "target_years_covered": [
       2021,
       2022,
@@ -291,7 +321,7 @@
       "2022": 185.94,
       "2023": 31.96,
       "2024": 28.94,
-      "2025": 13.05
+      "2025": 12.64
     },
     "excess_outperform_targets_enabled": true
   },
@@ -359,17 +389,7 @@
       "leakage_risk": "provisional_reference_fundamental"
     },
     {
-      "column": "enterprise_value",
-      "role": "feature_allowed",
-      "leakage_risk": "provisional_reference_fundamental"
-    },
-    {
       "column": "equity",
-      "role": "feature_allowed",
-      "leakage_risk": "provisional_reference_fundamental"
-    },
-    {
-      "column": "ev_ebitda",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -400,11 +420,6 @@
     },
     {
       "column": "long_term_liabilities",
-      "role": "feature_allowed",
-      "leakage_risk": "provisional_reference_fundamental"
-    },
-    {
-      "column": "market_cap",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -445,16 +460,6 @@
     },
     {
       "column": "operating_income_growth_pct",
-      "role": "feature_allowed",
-      "leakage_risk": "provisional_reference_fundamental"
-    },
-    {
-      "column": "pb_ratio",
-      "role": "feature_allowed",
-      "leakage_risk": "provisional_reference_fundamental"
-    },
-    {
-      "column": "pe_ratio",
       "role": "feature_allowed",
       "leakage_risk": "provisional_reference_fundamental"
     },
@@ -556,42 +561,48 @@
   ],
   "manual_financials": {
     "files": [
+      "bist100_yfinance_candidate_clean.csv",
       "candidate_from_yearly_snapshots.csv",
+      "corrected_balance_sheet_2024.csv",
       "corrected_yearly_financials_candidate.csv",
       "free_valuation_history_candidate.csv"
     ],
-    "rows_ingested": 240,
+    "rows_ingested": 276,
     "coverage_by_year": {
       "2020": 40,
       "2021": 40,
-      "2022": 40,
-      "2023": 40,
-      "2024": 40,
-      "2025": 40
+      "2022": 49,
+      "2023": 49,
+      "2024": 49,
+      "2025": 49
     },
     "columns_ingested": [
-      "gross_margin",
-      "ebitda_margin",
-      "net_margin",
-      "roe",
-      "roa",
       "revenue",
       "gross_profit",
       "operating_income",
-      "ebitda",
       "net_income",
-      "market_cap",
-      "enterprise_value",
-      "pe_ratio",
-      "pb_ratio",
-      "ev_ebitda"
-    ],
-    "unknown_columns_ignored": [
-      "roic",
-      "net_debt_to_ebitda",
+      "ebitda",
+      "total_assets",
+      "current_assets",
+      "non_current_assets",
+      "short_term_liabilities",
+      "long_term_liabilities",
+      "total_equity",
+      "working_capital",
+      "net_debt",
+      "roe",
+      "roa",
+      "gross_margin",
+      "net_margin",
+      "ebitda_margin",
       "current_ratio",
       "leverage_ratio",
-      "financial_debt_ratio",
+      "net_debt_to_ebitda"
+    ],
+    "unknown_columns_ignored": [
+      "source",
+      "retrieved_at",
+      "roic",
       "year_end_close",
       "shares_outstanding",
       "source_price",
@@ -601,27 +612,38 @@
       "validation_notes"
     ],
     "misaligned_columns_rejected": [],
-    "all_null_columns_rejected": [],
+    "all_null_columns_rejected": [
+      "financial_debt_ratio"
+    ],
     "source_note": "Multiple manual sources detected. Corrected yearly source was prioritized for income/profitability fields; legacy snapshot source only filled fields it uniquely provided. This overlap is expected, not an error.",
-    "issues": [],
+    "issues": [
+      "unknown tickers not in universe: ['AKSA', 'AKSEN', 'DOHOL', 'EKGYO', 'KCHOL', 'ODAS', 'SAHOL', 'SMRTG', 'VESTL']"
+    ],
     "present": true,
-    "overrides_from_snapshot": {},
+    "overrides_from_snapshot": {
+      "total_assets": 40,
+      "current_assets": 40,
+      "non_current_assets": 40,
+      "short_term_liabilities": 40,
+      "long_term_liabilities": 40,
+      "equity": 40,
+      "working_capital": 40,
+      "net_debt": 40,
+      "current_ratio": 40,
+      "leverage_ratio": 40,
+      "net_debt_to_ebitda": 34
+    },
     "accepted_feature_columns": [
-      "gross_margin",
-      "ebitda_margin",
-      "net_margin",
-      "roe",
-      "roa",
       "revenue",
       "gross_profit",
       "operating_income",
-      "ebitda",
       "net_income",
-      "market_cap",
-      "enterprise_value",
-      "pe_ratio",
-      "pb_ratio",
-      "ev_ebitda"
+      "ebitda",
+      "roe",
+      "roa",
+      "gross_margin",
+      "net_margin",
+      "ebitda_margin"
     ],
     "rejected_feature_columns": {}
   },

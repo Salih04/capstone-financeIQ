@@ -11,8 +11,8 @@
   "non_public_in_public_dataset": [],
   "validation_passed": true,
   "outputs": {
-    "training": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/modest-franklin-37915b/data/trusted_clean/modeling_dataset_training_2020_2025.csv",
-    "public": "/Users/salihcamci/Downloads/capstone-financeIQ/.claude/worktrees/modest-franklin-37915b/data/trusted_clean/modeling_dataset_public_2020_2025.csv"
+    "training": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+    "public": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_clean/modeling_dataset_public_2020_2025.csv"
   },
   "note": "Training universe has 9 extra tickers hidden from frontend endpoints."
 }
