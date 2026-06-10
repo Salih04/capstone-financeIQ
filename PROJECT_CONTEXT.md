@@ -6,7 +6,7 @@ FinanceIQ is a capstone project: an honest, leakage-safe **T→T+1 equity-resear
 system** for 40 BIST (Borsa Istanbul) companies, 2020–2025. It builds a validated
 modeling dataset (year-T features → year-(T+1) realized return), a BIST100 benchmark,
 a free-data valuation reconstruction, walk-forward experiments, an explainable hybrid
-research agent (optional local LLM), and a "Research Terminal" frontend. A legacy
+research agent (OpenRouter by default, local providers optional), and a "Research Terminal" frontend. A legacy
 sector-forecasting tool remains available at `/forecasting`.
 
 **Status: complete.** Honest finding: no reliable predictive edge on ~40 stocks/year

@@ -35,7 +35,15 @@ fast on an M1 Max, no full-weight updates, easy to discard/redo.
 4. **Only if needed**, try a 7B model. Stop when the rubric passes.
 
 ## Wiring back
-Point the backend at the trained model:
+Default hosted inference uses OpenRouter:
+```bash
+export RESEARCH_LLM_PROVIDER=openrouter
+export RESEARCH_LLM_BASE_URL=https://openrouter.ai/api/v1/chat/completions
+export RESEARCH_LLM_MODEL=openai/gpt-oss-120b:free
+export OPENAI_API_KEY=your-openrouter-key
+```
+
+Point the backend at a trained local model when testing adapters:
 ```bash
 export RESEARCH_LLM_PROVIDER=lmstudio        # or ollama
 export RESEARCH_LLM_BASE_URL=http://localhost:1234/v1/chat/completions
@@ -50,12 +58,12 @@ score ∈ [0,1] · mentions benchmark-missing when relevant · mentions frozen d
 when relevant · concise professional style.
 
 ## AutoResearch self-improving loop (no training in this repo)
-Run one iteration end-to-end (generate → validate → optional local-LLM eval →
+Run one iteration end-to-end (generate → validate → optional configured local-provider eval →
 collect failures → merged next dataset + report):
 ```bash
 make research-agent-dataset-1k          # or -5k / -20k
 make research-agent-dataset-validate
-make research-agent-eval-local          # needs LM Studio/Ollama up; skips cleanly if none
+make research-agent-eval-local          # needs configured local provider up; skips cleanly if none
 make research-agent-collect-failures
 make research-agent-autoresearch-iteration
 ```
@@ -71,6 +79,7 @@ make research-agent-autoresearch-iteration
   you feed to autoresearch-mlx LoRA tuning. **Nothing is trained or downloaded here.**
 
 ### After training
-LM Studio: load your fine-tuned model, then set `RESEARCH_LLM_MODEL` to its id and
-restart the backend. The service parses/clamps the JSON and falls back to the
-deterministic path on any malformed output — a weak adapter can never break the API.
+LM Studio: load your fine-tuned model, set `RESEARCH_LLM_PROVIDER=lmstudio`, set
+`RESEARCH_LLM_MODEL` to its id, and restart the backend. The service parses/clamps
+the JSON and falls back to the deterministic path on any malformed output — a weak
+adapter can never break the API.

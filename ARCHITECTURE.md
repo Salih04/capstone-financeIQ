@@ -168,6 +168,7 @@ All method scores are min-max normalized before weighting.
 
 - Docker Compose healthcheck on `db` (pg_isready) — backend waits for healthy db
 - Backend mounts `./2.backend:/app` and `./3.Datasets:/app/3.Datasets` as volumes
+- Backend startup runs `scripts/start_backend.sh`: wait for DB, run Alembic, load trusted data, start Uvicorn
 - Alembic handles schema migrations; startup `create_all` is a safety net only
 - `SECRET_KEY` in docker-compose is placeholder — must be replaced before any production use
 - CORS: `allow_origins=["*"]` — tighten before production

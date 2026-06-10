@@ -1,8 +1,9 @@
 # research_agent_training/
 
-Training-preparation assets for the local LLM research-support layer. **No model
-is trained here** — this only produces instruction data, the prompt policy, a
-schema, and an evaluation rubric. You train later with autoresearch-mlx.
+Training-preparation assets for the research-support LLM layer. **No model is
+trained here** — this only produces instruction data, the prompt policy, a schema,
+and an evaluation rubric. Production can use OpenRouter; local adapters can be
+trained later with autoresearch-mlx.
 
 ## Files
 | file | purpose |

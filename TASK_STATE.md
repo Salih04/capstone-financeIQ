@@ -1,6 +1,6 @@
 # TASK_STATE.md — FinanceIQ
 
-Last updated: 2026-06-08
+Last updated: 2026-06-10
 
 ## Status legend
 - `DONE` — shipped, tested
@@ -33,7 +33,7 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | Capital-event shares workflow | DONE | `shares_outstanding_events.csv` → carry-forward |
 | 2024 balance-sheet manual correction | DONE | `corrected_balance_sheet_2024.csv` (40 tickers) |
 | Walk-forward experiments | DONE | `experiments/`, honest weak-signal verdict |
-| Explainable research agent (+ optional local LLM) | DONE | `/research/*`, grounded intents, never advice |
+| Explainable research agent (+ optional OpenRouter/local LLM) | DONE | `/research/*`, grounded intents, never advice |
 | Research Terminal frontend | DONE | dashboard, research-agent, data-quality, experiments, benchmark, companies |
 | Forecasting (legacy) restored | DONE | filters union, friendly errors, re-clickable actions |
 | Tests | DONE | root 93 + backend 12 passing |
@@ -59,7 +59,8 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | Task | Status | Notes |
 |---|---|---|
 | Deterministic fallback (no LLM) | DONE | always works |
-| LM Studio / Ollama integration | DONE | robust JSON repair, never 500 |
+| OpenRouter integration | DONE | default `openai/gpt-oss-120b:free`, `OPENAI_API_KEY` accepted |
+| LM Studio / Ollama legacy integration | DONE | robust JSON repair, never 500 |
 | Grounded intents | DONE | benchmark outperformers, top-ranked, data-quality, valuation, diagnostics |
 | Hybrid score + decision-support verdict | DONE | bounded; deterministic warnings win |
 | Training prep (no training) | DONE | `research_agent_training/` generate/validate/evaluate/iterate |
@@ -71,9 +72,9 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | No reliable predictive edge | ~40 stocks/year; weak walk-forward signal — honest result |
 | Shares outstanding is manual | no free historical source; capital-event file required |
 | 2024 vendor export misaligned | corrected via manual file; upstream fix still ideal |
-| `SECRET_KEY` / CORS in compose | tighten before any external deployment |
+| `SECRET_KEY` / CORS in compose | tighten before any external backend deployment |
 
 ## Next steps (optional, beyond capstone scope)
 - Expand the universe (more BIST tickers, more years) to give the model a chance.
 - Quarterly fundamentals with genuine per-period variation (current quarterly exports are frozen).
-- Point the research agent at a fine-tuned local model (see `research_agent_training/mlx_training_plan.md`).
+- Optional: point the research agent at a fine-tuned local model (see `research_agent_training/mlx_training_plan.md`).

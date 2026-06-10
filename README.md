@@ -63,7 +63,7 @@ outstanding. Supply shares via the capital-event file
 `data/trusted_raw/financials/corrected_balance_sheet_2024.csv`. Targets are real;
 no value is fabricated or imputed.
 
-## Research Assistant (local-LLM-assisted)
+## Research Assistant (OpenRouter/local-LLM-assisted)
 
 A constrained research-support layer. The **structured ML pipeline stays the
 primary numerical model**; the LLM only reads validated structured evidence and
@@ -151,8 +151,9 @@ python -m scripts.load_trusted_yearly --summary      # DB summary, no write
 python -m scripts.validate_trusted_data
 ```
 
-On Docker startup the backend runs `python -m scripts.load_trusted_yearly`
-automatically (see `2.backend/Dockerfile` CMD).
+On Docker startup the backend runs Alembic migrations first, then
+`python -m scripts.load_trusted_yearly` automatically (see
+`2.backend/scripts/start_backend.sh`).
 
 ## Run with Docker
 
