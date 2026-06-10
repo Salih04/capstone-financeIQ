@@ -304,19 +304,11 @@ export default function ForecastingPage() {
 
       {/* ── Trained parameter weights ─────────────────────────── */}
       {trainResult && (
-<<<<<<< HEAD
-        <div style={{ ...panel, marginBottom: 12 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
-            <span style={sectionLabel}>Learned Feature Weights</span>
-            <span style={{ fontSize: 10.5, color: 'var(--text-4)', fontFamily: 'var(--font-mono)' }}>
-              {trainResult.total_training_rows} training rows · {trainResult.winner_rows} top-quartile rows
-=======
         <div className="fc-panel" style={{ marginBottom: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, flexWrap: 'wrap', gap: 6 }}>
             <span style={sectionLabel}>LEARNED FEATURE WEIGHTS</span>
             <span style={metaLine}>
-              {trainedWeights.total_training_rows} training rows · {trainedWeights.winner_rows} top-quartile rows
->>>>>>> local/nice-chatelet-dce077
+              {trainResult.total_training_rows} training rows · {trainResult.winner_rows} top-quartile rows
               · p{trainResult.winner_percentile * 100} threshold
               · years {trainResult.train_year_from}–{trainResult.train_year_to}
             </span>
