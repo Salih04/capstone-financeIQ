@@ -31,11 +31,17 @@ make shares                      # expand capital-event file → per-year shares
 make valuation                   # build market_cap/pe/pb/ev/ev_ebitda from prices × shares
 make data                        # ingest-corrected-yearly + build_all (40-ticker base dataset)
 make fetch-training-prices       # fetch Yahoo prices for full training universe (incl. pilot tickers)
-make integrate-pilot-tickers     # append 9 yfinance pilot tickers to base dataset (training-only)
+make integrate-pilot-tickers     # append all training-only yfinance tickers to base dataset
 make research                    # walk-forward experiments
 make split-datasets              # split into public_40 + training subsets
 make build-company-contexts      # generate RAG JSON per ticker/year (run after split-datasets)
-make collect-bist100-financials  # fetch BIST100 expansion financials via yfinance (unofficial)
+make validate-universe           # print public/training counts and coverage
+
+# yfinance BIST100 training expansion (run BEFORE make full-research-agent to expand universe)
+make collect-yfinance-bist100          # fetch yfinance financials for all bist100_candidates.csv (--missing-only)
+make collect-yfinance-bist100-force    # re-fetch all candidates (ignore existing raw data)
+make clean-yfinance-bist100            # clean raw → bist100_yfinance_candidate_clean.csv + report.md
+make update-training-universe-yfinance # add verified tickers to universe_training_bist100.csv
 ```
 
 ### Full pipeline order (`make full-research-agent`)
@@ -45,13 +51,29 @@ make collect-bist100-financials  # fetch BIST100 expansion financials via yfinan
 3. `ingest-corrected-yearly` — real per-year income/profitability
 4. `valuation` / `shares` — free valuation reconstruction
 5. `data` / `build_all` — 40-ticker base modeling dataset
-6. `fetch-training-prices` — Yahoo prices for training universe (public + pilot)
-7. `integrate-pilot-tickers` — append 9 pilot tickers → 49-ticker base
+6. `fetch-training-prices` — Yahoo prices for training universe (public + all training-only tickers)
+7. `integrate-pilot-tickers` — append all training-only tickers from clean financials CSV
 8. experiments — walk-forward CV (uses base/training dataset)
-9. `split-datasets` — training=49 tickers, public=40 tickers
+9. `split-datasets` — training=N tickers (all with data), public=40 tickers
 10. `build-company-contexts` — RAG JSON per ticker/year
 11. `research-agent-dataset` — instruction JSONL
 12. tests
+
+### BIST100 training expansion (one-time, run before step 1 above)
+
+```
+make collect-yfinance-bist100           # 1. fetch financials for all candidates
+make clean-yfinance-bist100             # 2. clean → valid rows only
+make update-training-universe-yfinance  # 3. add verified tickers to training universe
+make full-research-agent                # 4. full pipeline (preserves expansion)
+make validate-universe                  # 5. verify counts
+```
+
+Expected outcome after expansion: training tickers may increase toward ~80-100 (depending on yfinance coverage). Public universe stays exactly 40.
+
+**Candidate list:** `data/config/bist100_candidates.csv` — 44 curated candidates (9 existing pilots + 35 new, including banks). Banks flagged with `is_bank=true`; their revenue = net interest income and EBITDA is undefined.
+
+**KAP cross-check recommended** before trusting any yfinance value in research decisions.
 
 ## Reusing the yearly Excel files (honest extraction)
 

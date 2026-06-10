@@ -1,0 +1,60 @@
+# BIST100 expansion candidate list — static, manually curated.
+# Source: Borsa Istanbul BIST100 composition (2024-2025 reference).
+# These tickers are NOT in the public_40 universe.
+# is_bank=true: revenue = net interest income; EBITDA/gross_profit undefined.
+#   Banks are flagged but not excluded — they require special interpretation.
+# KAP cross-check (kap.borsaistanbul.com) recommended before trusting any yfinance value.
+#
+# USAGE:
+#   make collect-yfinance-bist100      # fetch financial data for all candidates
+#   make clean-yfinance-bist100        # clean raw → valid rows only
+#   make update-training-universe-yfinance   # add verified tickers to training universe
+#
+ticker,source,is_bank,notes
+# --- Existing pilot tickers (already integrated into training dataset) ---
+AKSA,yfinance_pilot,false,Aksa Akrilik Kimya — chemicals
+AKSEN,yfinance_pilot,false,Aksa Enerji Üretim — power generation
+DOHOL,yfinance_pilot,false,Doğan Holding — media and energy conglomerate
+EKGYO,yfinance_pilot,false,Emlak Konut GYO — state real estate investment trust
+KCHOL,yfinance_pilot,false,Koç Holding — largest Turkish conglomerate
+ODAS,yfinance_pilot,false,Odaş Elektrik Üretim Sanayi — power generation
+SAHOL,yfinance_pilot,false,Sabancı Holding — second-largest Turkish conglomerate
+SMRTG,yfinance_pilot,false,Smart Güneş Enerjisi — solar energy
+VESTL,yfinance_pilot,false,Vestel Elektronik — consumer electronics manufacturer
+# --- Non-bank expansion candidates ---
+KOZAL,bist100_candidate,false,Koza Altın İşletmeleri — gold mining
+ENJSA,bist100_candidate,false,Enerjisa Enerji — power distribution utility
+ZOREN,bist100_candidate,false,Zorlu Enerji Elektrik Üretimi — diversified energy
+AKENR,bist100_candidate,false,Ak Enerji Elektrik Üretimi — power generation
+SOKM,bist100_candidate,false,Şok Marketler — discount retail chain
+OTKAR,bist100_candidate,false,Otokar Otobüs Karoseri Sanayi — defense/military vehicles
+LOGO,bist100_candidate,false,Logo Yazılım — enterprise resource planning software
+ISGYO,bist100_candidate,false,İş Gayrimenkul Yatırım Ortaklığı — real estate investment trust
+RGYAS,bist100_candidate,false,Reysaş Taşımacılık ve Lojistik — logistics and GYO
+ALARK,bist100_candidate,false,Alarko Holding — diversified construction and energy conglomerate
+AGHOL,bist100_candidate,false,AG Anadolu Grubu Holding — diversified holding
+BERA,bist100_candidate,false,Bera Holding — diversified industrial holding
+DEVA,bist100_candidate,false,Deva Holding — pharmaceuticals manufacturing
+ULUSE,bist100_candidate,false,Ulusoy Elektrik — high-voltage electrical equipment
+CEMTS,bist100_candidate,false,Çemtaş Çelik Makine — steel pipe and fittings
+EGEEN,bist100_candidate,false,Ege Endüstri — industrial diversified
+EPLAS,bist100_candidate,false,Egeplast Ege Plastik Endüstrisi — plastic products
+SELEC,bist100_candidate,false,Selçuk Ecza Deposu — pharmaceutical wholesale distribution
+ANHYT,bist100_candidate,false,Anadolu Hayat Emeklilik — life and pension insurance
+AGESA,bist100_candidate,false,AgeSA Hayat ve Emeklilik — life and pension insurance
+MPARK,bist100_candidate,false,MLP Sağlık Hizmetleri — private hospital chain
+NTGAZ,bist100_candidate,false,Naturelgaz Sanayi ve Ticaret — natural gas distribution
+PRKME,bist100_candidate,false,Park Elektrik Madencilik — copper mining
+KRVGD,bist100_candidate,false,Kerevitaş Gıda — branded food products
+NETAS,bist100_candidate,false,NetaŞ Telekomünikasyon — telecom equipment and IT services
+TBORG,bist100_candidate,false,Türk Tuborg Bira ve Malt Sanayii — beverages (Carlsberg Group)
+# --- Banks (revenue = net interest income; ratios not comparable with non-banks) ---
+AKBNK,bist100_candidate,true,Akbank — major private commercial bank
+GARAN,bist100_candidate,true,Garanti BBVA Bankası — major private bank (BBVA subsidiary)
+ISCTR,bist100_candidate,true,Türkiye İş Bankası — major state-affiliated bank
+VAKBN,bist100_candidate,true,Vakıfbank — public bank
+YKBNK,bist100_candidate,true,Yapı Kredi Bankası — major private bank
+HALKB,bist100_candidate,true,Halkbank — public bank
+QNBFB,bist100_candidate,true,QNB Finansbank — Turkish subsidiary of QNB Group
+ALBRK,bist100_candidate,true,Albaraka Türk Katılım Bankası — participation (Islamic) bank
+SKBNK,bist100_candidate,true,Şekerbank — regional commercial bank

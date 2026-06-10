@@ -55,6 +55,7 @@ import datetime
 import json
 import logging
 import time
+from io import StringIO
 from pathlib import Path
 
 import pandas as pd
@@ -64,6 +65,7 @@ log = logging.getLogger("bist100_yf")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OUT_CSV = REPO_ROOT / "data" / "trusted_raw" / "financials" / "bist100_yfinance_candidate.csv"
+CANDIDATES_CSV = REPO_ROOT / "data" / "config" / "bist100_candidates.csv"
 REPORT_JSON = REPO_ROOT / "data" / "trusted_clean" / "bist100_yfinance_report.json"
 
 # Current public_40 — never re-fetch these; they already have corrected financials.
@@ -75,25 +77,41 @@ PUBLIC_40 = {
     "TOASO", "TRALT", "TRMET", "TSKB", "TTKOM", "TUPRS", "TURSG", "ULKER",
 }
 
-# Candidate BIST100 companies not in public_40.
+# Fallback candidate list used when --candidates-csv is not provided and no CSV exists.
 # Banks flagged separately — they need special handling (no gross_profit/EBITDA).
 DEFAULT_CANDIDATES = [
-    "VESTL",   # Vestel Elektronik — manufacturer
-    "KCHOL",   # Koç Holding — conglomerate
-    "SAHOL",   # Sabancı Holding — conglomerate
-    "AKSA",    # Aksa Akrilik — chemicals
-    "DOHOL",   # Doğan Holding — media/energy
-    "KOZAL",   # Koza Altın — mining
-    "EKGYO",   # Emlak Konut GYO — real estate
-    "ODAS",    # Odaş Elektrik — energy
-    "SMRTG",   # Smart Güneş Enerjisi — energy
-    "AKSEN",   # Aksa Enerji — energy
+    "VESTL", "KCHOL", "SAHOL", "AKSA", "DOHOL", "KOZAL",
+    "EKGYO", "ODAS", "SMRTG", "AKSEN",
 ]
 
 BANK_TICKERS = {
     "GARAN", "AKBNK", "ISCTR", "VAKBN", "YKBNK", "HALKB", "TSKB",
-    "QNBFB", "ALBRK", "DENIZ",
+    "QNBFB", "ALBRK", "SKBNK", "DENIZ",
 }
+
+# Required fields for a row to be considered "valid" (for --missing-only logic).
+_VALID_REQUIRED = ["revenue", "net_income", "total_assets", "equity"]
+
+
+def _load_candidates_csv(path: Path) -> list[str]:
+    """Load ticker list from bist100_candidates.csv, skipping comment lines."""
+    lines = [ln for ln in path.read_text().splitlines() if not ln.strip().startswith("#") and ln.strip()]
+    df = pd.read_csv(StringIO("\n".join(lines)))
+    df["ticker"] = df["ticker"].astype(str).str.strip().str.upper()
+    return df["ticker"].tolist()
+
+
+def _tickers_with_valid_data(raw_csv: Path) -> set[str]:
+    """Return tickers that already have ≥1 row with non-null core fields in the raw CSV."""
+    if not raw_csv.is_file():
+        return set()
+    df = pd.read_csv(raw_csv)
+    df["ticker"] = df["ticker"].astype(str).str.strip().str.upper()
+    for col in _VALID_REQUIRED:
+        if col not in df.columns:
+            df[col] = float("nan")
+    valid = df[df[_VALID_REQUIRED].notna().all(axis=1)]
+    return set(valid["ticker"].unique())
 
 # yfinance row → canonical pipeline column
 IS_FIELD_MAP = {
@@ -342,8 +360,20 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
         "--tickers", nargs="+", default=None,
-        help="BIST tickers to collect (without .IS suffix). "
-             "Default: predefined BIST100 candidates not in public_40.",
+        help="Explicit BIST tickers to collect (without .IS suffix). "
+             "Overrides --candidates-csv and the default list.",
+    )
+    ap.add_argument(
+        "--candidates-csv", type=Path, default=None,
+        help=f"CSV of candidates to collect (default: {CANDIDATES_CSV.relative_to(REPO_ROOT)} if it exists).",
+    )
+    ap.add_argument(
+        "--missing-only", action="store_true",
+        help="Skip tickers that already have ≥1 valid row in the raw output CSV.",
+    )
+    ap.add_argument(
+        "--force-refresh", action="store_true",
+        help="Re-fetch even tickers already present in the raw CSV (overrides --missing-only).",
     )
     ap.add_argument(
         "--delay", type=float, default=2.0,
@@ -355,7 +385,29 @@ def main(argv=None):
     )
     args = ap.parse_args(argv)
 
-    tickers = [t.upper().strip() for t in (args.tickers or DEFAULT_CANDIDATES)]
+    # Resolve ticker list
+    if args.tickers:
+        tickers = [t.upper().strip() for t in args.tickers]
+    elif args.candidates_csv or CANDIDATES_CSV.is_file():
+        csv_path = Path(args.candidates_csv) if args.candidates_csv else CANDIDATES_CSV
+        tickers = _load_candidates_csv(csv_path)
+        log.info(f"Loaded {len(tickers)} candidates from {csv_path.name}")
+    else:
+        tickers = [t.upper().strip() for t in DEFAULT_CANDIDATES]
+        log.info(f"Using built-in default candidates ({len(tickers)} tickers). "
+                 f"Create {CANDIDATES_CSV.relative_to(REPO_ROOT)} for the full list.")
+
+    # Apply --missing-only (skip tickers that already have valid data)
+    if args.missing_only and not args.force_refresh:
+        already_have = _tickers_with_valid_data(OUT_CSV)
+        before = len(tickers)
+        tickers = [t for t in tickers if t not in already_have]
+        skipped = before - len(tickers)
+        if skipped:
+            log.info(f"--missing-only: skipping {skipped} tickers with existing valid data.")
+        if not tickers:
+            log.info("All candidate tickers already have valid data. Nothing to fetch.")
+            return
 
     log.info(f"Targets: {tickers}")
     log.info(

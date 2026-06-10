@@ -1,6 +1,6 @@
 # TASK_STATE.md — FinanceIQ
 
-Last updated: 2026-06-10 (rev 3)
+Last updated: 2026-06-10 (rev 4)
 
 ## Status legend
 - `DONE` — shipped, tested
@@ -42,6 +42,7 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | BIST100 expansion investigation | DONE | Yahoo=price only confirmed; yfinance collector stub + manual template delivered |
 | yfinance pilot expansion (9 training-only tickers) | DONE | AKSA AKSEN DOHOL EKGYO KCHOL ODAS SAHOL SMRTG VESTL; base=276 rows/49 tickers |
 | Makefile pilot-ordering fix | DONE | `full-research` now calls `fetch-training-prices` + `integrate-pilot-tickers`; `check-pilot-financials` guard fails early if clean file missing |
+| BIST100 expansion preparation | DONE | `bist100_candidates.csv` (44 candidates), `clean_yfinance_candidate.py`, `update_training_universe_from_yfinance.py`, Makefile targets: collect/clean/update/validate |
 | Tests | DONE | root 93 + backend 12 passing |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
@@ -61,6 +62,8 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | Leakage + frozen-snapshot guards | DONE | enforced in `validate.py` / `manual_ingest.py` |
 | yfinance pilot integration (`make integrate-pilot-tickers`) | DONE | appends 9 training-only tickers; guarded by `check-pilot-financials` |
 | Pilot ordering in `full-research` / `full-research-agent` | DONE | `fetch-training-prices` → `integrate-pilot-tickers` wired into `full-research`; split in `full-research-agent` |
+| `integrate_pilot_tickers.py` generalized | DONE | now handles any training-only tickers; warns on missing financials; fails clearly if no rows; [pilot] → [integrate] |
+| `collect_bist100_financials_yfinance.py` expanded | DONE | `--candidates-csv`, `--missing-only`, `--force-refresh` flags; reads `bist100_candidates.csv` by default |
 
 ## Research agent
 
@@ -83,8 +86,23 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | `SECRET_KEY` / CORS in compose | tighten before any external backend deployment |
 
 ## Next steps (optional, beyond capstone scope)
-- Expand training universe: run `make collect-bist100-financials`, verify vs KAP,
-  add tickers to `universe_training_bist100.csv`, add return targets to reference CSV,
-  re-run `make data && make split-datasets`. Training tickers > 40 required before claiming success.
+
+### BIST100 training expansion (pipeline ready — run locally)
+
+```bash
+pip install yfinance
+make collect-yfinance-bist100           # 1. fetch financials for all 44 candidates
+make clean-yfinance-bist100             # 2. drop rows with missing core fields; write report
+make update-training-universe-yfinance  # 3. add verified tickers to universe_training_bist100.csv
+make fetch-training-prices              # 4. fetch Yahoo prices for expanded universe
+make full-research-agent                # 5. full pipeline (preserves expansion)
+make validate-universe                  # 6. verify counts
+```
+
+Expected: training tickers may increase toward ~80-100 (yfinance coverage-dependent). Public stays 40.
+Banks (AKBNK, GARAN, ISCTR, VAKBN, YKBNK, HALKB, QNBFB, ALBRK, SKBNK) flagged — revenue = net interest income; interpret separately.
+KAP cross-check recommended before claiming any result.
+
+### Other optional items
 - Quarterly fundamentals with genuine per-period variation (current quarterly exports are frozen).
 - Optional: point the research agent at a fine-tuned local model (see `research_agent_training/mlx_training_plan.md`).
