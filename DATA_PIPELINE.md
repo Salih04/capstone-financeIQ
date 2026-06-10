@@ -1,12 +1,16 @@
 # Data pipeline — T → T+1 modeling dataset
 
-> **Current state (2026-06): 32 validated features.** Full run is
-> `make full-research` (extract → benchmark → ingest-corrected-yearly → valuation →
-> data → experiments). Added since the original write-up: corrected per-year
-> income/profitability (17→27), free valuation reconstruction (Yahoo year-end price ×
-> manual shares → market_cap/P-E/P-B/EV/EV-EBITDA, 27→32), capital-event shares
-> (`make shares`), and a 2024 balance-sheet manual correction. Acceptance is
-> sparse-aware; frozen-snapshot and price/return leakage stay rejected.
+> **Current state (2026-06): 32 validated features, 49-ticker training universe.**
+> Full run is `make full-research-agent` (extract → benchmark → corrected yearly →
+> valuation → build_all → fetch training prices → integrate pilot tickers →
+> experiments → split → contexts → research-agent-dataset → tests).
+> `make full-research` covers steps 1–8 (through experiments).
+> Added since original write-up: corrected per-year income/profitability (17→27),
+> free valuation reconstruction (Yahoo year-end price × manual shares →
+> market_cap/P-E/P-B/EV/EV-EBITDA, 27→32), capital-event shares (`make shares`),
+> 2024 balance-sheet manual correction, and yfinance pilot expansion (9 training-only
+> tickers: AKSA AKSEN DOHOL EKGYO KCHOL ODAS SAHOL SMRTG VESTL).
+> Acceptance is sparse-aware; frozen-snapshot and price/return leakage stay rejected.
 
 Goal: study whether **year-T** financial metrics relate to **year-(T+1)**
 realized stock return for BIST companies. Research/educational only — **not
@@ -15,19 +19,39 @@ investment advice.**
 ## Commands
 
 ```bash
+make full-research-agent         # RECOMMENDED: complete pipeline (steps 1-12, see below)
+make full-research               # core pipeline through experiments (steps 1-8)
+
+# Individual steps
 make extract-yearly-financials   # XLSX -> candidate manual file (validated)
 make ingest-corrected-yearly     # ingest corrected income/profitability XLSX
 make benchmark                   # collect BIST100 yearly returns (Yahoo)
-make prices                      # fetch Yahoo year-end prices (OHLCV only)
+make prices                      # fetch Yahoo year-end prices (OHLCV only, public universe)
 make shares                      # expand capital-event file → per-year shares outstanding
 make valuation                   # build market_cap/pe/pb/ev/ev_ebitda from prices × shares
-make data                        # ingest-corrected-yearly + build_all (full modeling dataset)
+make data                        # ingest-corrected-yearly + build_all (40-ticker base dataset)
+make fetch-training-prices       # fetch Yahoo prices for full training universe (incl. pilot tickers)
+make integrate-pilot-tickers     # append 9 yfinance pilot tickers to base dataset (training-only)
 make research                    # walk-forward experiments
-make full-research               # all of the above in order + experiments
-make split-datasets              # split modeling_dataset into public_40 + training subsets
+make split-datasets              # split into public_40 + training subsets
 make build-company-contexts      # generate RAG JSON per ticker/year (run after split-datasets)
 make collect-bist100-financials  # fetch BIST100 expansion financials via yfinance (unofficial)
 ```
+
+### Full pipeline order (`make full-research-agent`)
+
+1. `extract-yearly-financials` — XLSX → candidate
+2. `benchmark` — BIST100 returns
+3. `ingest-corrected-yearly` — real per-year income/profitability
+4. `valuation` / `shares` — free valuation reconstruction
+5. `data` / `build_all` — 40-ticker base modeling dataset
+6. `fetch-training-prices` — Yahoo prices for training universe (public + pilot)
+7. `integrate-pilot-tickers` — append 9 pilot tickers → 49-ticker base
+8. experiments — walk-forward CV (uses base/training dataset)
+9. `split-datasets` — training=49 tickers, public=40 tickers
+10. `build-company-contexts` — RAG JSON per ticker/year
+11. `research-agent-dataset` — instruction JSONL
+12. tests
 
 ## Reusing the yearly Excel files (honest extraction)
 

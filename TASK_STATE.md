@@ -1,6 +1,6 @@
 # TASK_STATE.md — FinanceIQ
 
-Last updated: 2026-06-10 (rev 2)
+Last updated: 2026-06-10 (rev 3)
 
 ## Status legend
 - `DONE` — shipped, tested
@@ -40,6 +40,8 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | Universe split (public/training) | DONE | `make split-datasets`; `universe_public_40.csv` + `universe_training_bist100.csv` |
 | RAG context layer | DONE | `make build-company-contexts` → per-ticker/year JSON; injected into LLM prompt |
 | BIST100 expansion investigation | DONE | Yahoo=price only confirmed; yfinance collector stub + manual template delivered |
+| yfinance pilot expansion (9 training-only tickers) | DONE | AKSA AKSEN DOHOL EKGYO KCHOL ODAS SAHOL SMRTG VESTL; base=276 rows/49 tickers |
+| Makefile pilot-ordering fix | DONE | `full-research` now calls `fetch-training-prices` + `integrate-pilot-tickers`; `check-pilot-financials` guard fails early if clean file missing |
 | Tests | DONE | root 93 + backend 12 passing |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
@@ -57,6 +59,8 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | 2024 balance-sheet correction | DONE | money/ratio shape-validated; overrides only 2024 |
 | Sparse-aware feature acceptance | DONE | sparse-but-varying accepted; frozen/leakage rejected |
 | Leakage + frozen-snapshot guards | DONE | enforced in `validate.py` / `manual_ingest.py` |
+| yfinance pilot integration (`make integrate-pilot-tickers`) | DONE | appends 9 training-only tickers; guarded by `check-pilot-financials` |
+| Pilot ordering in `full-research` / `full-research-agent` | DONE | `fetch-training-prices` → `integrate-pilot-tickers` wired into `full-research`; split in `full-research-agent` |
 
 ## Research agent
 

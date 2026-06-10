@@ -1,7 +1,7 @@
 .PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research \
 	inspect-quarterly research-agent-dataset research-agent-check full-research-agent ingest-corrected-yearly \
 	prices valuation shares split-datasets build-company-contexts collect-bist100-financials \
-	integrate-pilot-tickers \
+	fetch-training-prices integrate-pilot-tickers check-pilot-financials \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration
@@ -79,15 +79,31 @@ ingest-corrected-yearly:
 collect-bist100-financials:
 	PYTHONPATH=. python scripts/data_collection/collect_bist100_financials_yfinance.py
 
-# Integrate yfinance pilot financials into the training dataset (training-only, no frontend impact).
-# Prerequisites: make data && make prices (with updated universe_training_bist100.csv)
-# After running: make split-datasets && make build-company-contexts
-integrate-pilot-tickers:
+# Guard: fail early if the pilot clean financials file is missing.
+# Run: make collect-bist100-financials, verify output, save as bist100_yfinance_candidate_clean.csv
+check-pilot-financials:
+	@test -f "data/trusted_raw/financials/bist100_yfinance_candidate_clean.csv" || \
+		{ echo ""; \
+		  echo "ERROR: Pilot clean financials not found:"; \
+		  echo "  data/trusted_raw/financials/bist100_yfinance_candidate_clean.csv"; \
+		  echo ""; \
+		  echo "Run: make collect-bist100-financials"; \
+		  echo "Then verify and save output as bist100_yfinance_candidate_clean.csv"; \
+		  echo ""; \
+		  exit 1; }
+
+# Fetch Yahoo year-end prices for the full training universe (public_40 + pilot tickers).
+# Required before integrate-pilot-tickers.
+fetch-training-prices:
 	python scripts/fetch_yahoo_chart_prices.py \
 		--start-year 2020 --end-year 2025 \
 		--universe-csv data/config/universe_training_bist100.csv
+
+# Integrate yfinance pilot financials into the base modeling dataset (training-only rows).
+# Prerequisites: make data && make fetch-training-prices
+# Run standalone: make fetch-training-prices integrate-pilot-tickers split-datasets build-company-contexts
+integrate-pilot-tickers: check-pilot-financials
 	PYTHONPATH=. python scripts/data_collection/integrate_pilot_tickers.py
-	PYTHONPATH=. python -m scripts.data_collection.split_universe_datasets
 
 # Collect free year-end prices from Yahoo (TICKER.IS) and cache them. No shares.
 prices:
@@ -133,11 +149,15 @@ split-datasets:
 build-company-contexts:
 	PYTHONPATH=. python scripts/build_company_contexts.py
 
-# Full pipeline: extract -> benchmark -> corrected yearly -> valuation -> build -> experiments.
+# Full pipeline: extract -> benchmark -> corrected yearly -> valuation -> build ->
+#   fetch training prices -> integrate pilot tickers -> experiments.
+# Pilot expansion is preserved: base dataset ends with 49 tickers (40 public + 9 training-only).
 full-research:
 	$(MAKE) extract-yearly-financials
 	$(MAKE) benchmark
 	$(MAKE) ingest-corrected-yearly
 	$(MAKE) valuation
 	$(MAKE) data
+	$(MAKE) fetch-training-prices
+	$(MAKE) integrate-pilot-tickers
 	PYTHONPATH=. python experiments/run_experiments.py
