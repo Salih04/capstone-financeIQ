@@ -1,0 +1,44 @@
+# BIST100 EXPANSION — MANUAL FINANCIAL STATEMENT TEMPLATE
+#
+# PURPOSE: Add financial statement data for BIST100 companies NOT in the
+#          current public_40 universe, to expand the training dataset.
+#
+# SOURCES (in preference order, all publicly available):
+#   1. KAP (kap.borsaistanbul.com) — official IFRS filings, Turkish
+#   2. Company annual reports (PDF → manual extraction)
+#   3. Fintables / İş Yatırım / Matriks export (if you have account)
+#   4. TradingView financials tab (manual export per company)
+#
+# RULES:
+#   - One row per ticker-year. No duplicates.
+#   - Leave cell BLANK if value is genuinely unknown. Never write 0 for unknown.
+#   - Values must reflect year-end of the stated `year` (TRY, actual IFRS).
+#   - Do NOT include return targets (next_year_return_pct etc.) — pipeline computes.
+#   - `source` and `retrieved_at` REQUIRED for traceability.
+#   - Do NOT include tickers already in public_40 (AEFES, ARCLK, ASELS, ASTOR,
+#     BIMAS, BRSAN, BTCIM, CANTE, CCOLA, CIMSA, DOAS, DSTKF, ENKAI, EREGL,
+#     FROTO, GUBRF, HEKTS, KONTR, KRDMD, KUYAS, MAVI, MGROS, MIATK, OYAKC,
+#     PASEU, PETKM, PGSUS, SASA, SISE, TAVHL, TCELL, THYAO, TOASO, TRALT,
+#     TRMET, TSKB, TTKOM, TUPRS, TURSG, ULKER).
+#
+# BANKS: GARAN, AKBNK, ISCTR, VAKBN, YKBNK — use net_interest_income as
+#        revenue. EBITDA is undefined for banks; leave ebitda blank.
+#
+# AFTER FILLING:
+#   1. Place this file (or a copy) in data/trusted_raw/financials/ with any name.
+#   2. Add verified tickers to data/config/universe_training_bist100.csv.
+#   3. Run: PYTHONPATH=. python -m scripts.data_collection.build_all
+#   4. Run: PYTHONPATH=. python -m scripts.data_collection.split_universe_datasets
+#   5. Confirm modeling_dataset_training_2020_2025.csv has > 40 tickers.
+#
+ticker,year,revenue,gross_profit,operating_income,ebitda,net_income,gross_margin,ebitda_margin,net_margin,roe,roa,total_assets,current_assets,non_current_assets,total_liabilities,short_term_liabilities,long_term_liabilities,equity,working_capital,net_debt,market_cap,enterprise_value,pe_ratio,pb_ratio,ev_ebitda,source,retrieved_at
+VESTL,2020,,,,,,,,,,,,,,,,,,,,,,,,,"KAP / company annual report",
+VESTL,2021,,,,,,,,,,,,,,,,,,,,,,,,,"KAP / company annual report",
+VESTL,2022,,,,,,,,,,,,,,,,,,,,,,,,,"KAP / company annual report",
+VESTL,2023,,,,,,,,,,,,,,,,,,,,,,,,,"KAP / company annual report",
+VESTL,2024,,,,,,,,,,,,,,,,,,,,,,,,,"KAP / company annual report",
+KCHOL,2020,,,,,,,,,,,,,,,,,,,,,,,,,"KAP / company annual report",
+KCHOL,2021,,,,,,,,,,,,,,,,,,,,,,,,,"KAP / company annual report",
+KCHOL,2022,,,,,,,,,,,,,,,,,,,,,,,,,"KAP / company annual report",
+KCHOL,2023,,,,,,,,,,,,,,,,,,,,,,,,,"KAP / company annual report",
+KCHOL,2024,,,,,,,,,,,,,,,,,,,,,,,,,"KAP / company annual report",
