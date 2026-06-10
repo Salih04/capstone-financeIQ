@@ -20,52 +20,6 @@
     }
   },
   "shares_status": "manual",
-  "corrected_balance_sheet_2024": {
-    "present": true,
-    "tickers_corrected": 40,
-    "tickers": [
-      "AEFES",
-      "ARCLK",
-      "ASELS",
-      "ASTOR",
-      "BIMAS",
-      "BRSAN",
-      "BTCIM",
-      "CANTE",
-      "CCOLA",
-      "CIMSA",
-      "DOAS",
-      "DSTKF",
-      "ENKAI",
-      "EREGL",
-      "FROTO",
-      "GUBRF",
-      "HEKTS",
-      "KONTR",
-      "KRDMD",
-      "KUYAS",
-      "MAVI",
-      "MGROS",
-      "MIATK",
-      "OYAKC",
-      "PASEU",
-      "PETKM",
-      "PGSUS",
-      "SASA",
-      "SISE",
-      "TAVHL",
-      "TCELL",
-      "THYAO",
-      "TOASO",
-      "TRALT",
-      "TRMET",
-      "TSKB",
-      "TTKOM",
-      "TUPRS",
-      "TURSG",
-      "ULKER"
-    ]
-  },
   "shares_template_path": null,
   "financial_dependency_coverage": {
     "net_income": 240,
@@ -81,11 +35,11 @@
     "ev_ebitda": "accepted"
   },
   "usable_values_by_column": {
-    "market_cap": 208,
-    "enterprise_value": 208,
-    "pe": 168,
-    "pb": 208,
-    "ev_ebitda": 192
+    "market_cap": 226,
+    "enterprise_value": 187,
+    "pe": 185,
+    "pb": 187,
+    "ev_ebitda": 174
   },
   "columns_entering_candidate": [
     "market_cap",
@@ -96,18 +50,22 @@
   ],
   "rejection_summary": {
     "market_cap": {
-      "missing_price": 14,
-      "missing_shares": 27
+      "missing_price": 14
     },
-    "enterprise_value": {},
+    "enterprise_value": {
+      "suspect_2024_net_debt": 39
+    },
     "pe": {
-      "non_positive_net_income": 35,
+      "non_positive_net_income": 36,
       "absurd_value": 5
     },
-    "pb": {},
+    "pb": {
+      "suspect_2024_equity": 39
+    },
     "ev_ebitda": {
-      "non_positive_ebitda": 9,
-      "absurd_value": 7
+      "missing_enterprise_value": 39,
+      "non_positive_ebitda": 7,
+      "absurd_value": 6
     }
   },
   "coverage_by_year": {

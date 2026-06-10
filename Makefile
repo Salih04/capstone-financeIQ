@@ -1,6 +1,6 @@
 .PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research \
 	inspect-quarterly research-agent-dataset research-agent-check full-research-agent ingest-corrected-yearly \
-	prices valuation shares split-datasets build-company-contexts \
+	prices valuation shares split-datasets build-company-contexts collect-bist100-financials \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration
@@ -70,6 +70,13 @@ extract-yearly-financials:
 # picks it up; valuation stays frozen-rejected, 2024 misalignment rejected.
 ingest-corrected-yearly:
 	PYTHONPATH=. python -m scripts.data_collection.ingest_corrected_yearly_financials
+
+# Collect BIST100 expansion financials via yfinance (unofficial; requires pip install yfinance).
+# Output: data/trusted_raw/financials/bist100_yfinance_candidate.csv
+# Cross-check output against KAP (kap.borsaistanbul.com) before trusting for training.
+# Training expansion NOT complete until tickers > 40 and return targets added.
+collect-bist100-financials:
+	PYTHONPATH=. python scripts/data_collection/collect_bist100_financials_yfinance.py
 
 # Collect free year-end prices from Yahoo (TICKER.IS) and cache them. No shares.
 prices:

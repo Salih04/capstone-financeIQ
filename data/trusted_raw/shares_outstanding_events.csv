@@ -6,64 +6,79 @@
 # capital_basis: issued_capital | paid_in_capital | share_count | unknown | free_float_only
 # confidence: high | medium | low
 ticker,effective_year,shares_outstanding,source,notes,confidence,capital_basis,nominal_value
-AEFES,2020,592105263,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1
-AEFES,2025,5921052630,user provided merged capital research,2025 900 percent bonus issue,medium,issued_capital,1
-ARCLK,2020,675728205,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1
-ASELS,2020,2280000000,user provided merged capital research,2020 year-end capital after 100 percent bonus issue,medium,issued_capital,1
-ASELS,2023,4560000000,user provided merged capital research,2023 100 percent bonus issue; included because earlier research had specific SPK/KAP timing,low,issued_capital,1
-ASTOR,2022,998000000,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1
-BIMAS,2020,607200000,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1
-BIMAS,2025,600000000,user provided merged capital research,capital reduction to 600m; 2026 bonus issue excluded from 2020-2025 model,low,issued_capital,1
+AEFES,2020,592105263.0,user provided merged capital research,stable issued capital until 2025 bonus issue,medium,issued_capital,1
+AEFES,2025,5921052630.0,user provided merged capital research,2025 900 percent bonus issue,medium,issued_capital,1
+ARCLK,2020,675728205.0,user provided merged capital research,stable issued capital 2020-2025; registered capital ceiling changed only,medium,issued_capital,1
+ASELS,2020,2280000000.0,user provided merged capital research,2020 year-end capital after 100 percent bonus issue,medium,issued_capital,1
+ASELS,2023,4560000000.0,user provided merged capital research,2023 100 percent bonus issue; included because earlier research had specific SPK/KAP timing,low,issued_capital,1
+ASTOR,2020,200000000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1
+ASTOR,2021,850000000.0,user provided merged capital research,2021 pre-IPO internal capital increase,medium,issued_capital,1
+ASTOR,2022,998000000.0,user provided merged capital research,IPO capital after new share issue; no 2020 row because listed later/source uncertain,low,issued_capital,1
+BIMAS,2020,607200000.0,user provided merged capital research,issued capital before later capital reduction,medium,issued_capital,1
+BIMAS,2025,600000000.0,user provided merged capital research,capital reduction to 600m; 2026 bonus issue excluded from 2020-2025 model,low,issued_capital,1
 BRSAN,2020,141771582.28,user provided merged capital research,stable around 141.8m after merger-related minor increase,medium,issued_capital,1
-BTCIM,2020,180000000,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1
-BTCIM,2025,5580000000,user provided merged capital research,2025 3000 percent bonus issue,medium,issued_capital,1
-CANTE,2021,320000000,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1
-CANTE,2025,7000000000,user provided merged capital research,capital reached 7bn by 2025/2026 process; exact effective year should be checked,low,issued_capital,1
-CCOLA,2020,254370782,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1
-CCOLA,2024,2798078602,user provided merged capital research,2024 1000 percent bonus issue,medium,issued_capital,1
-CIMSA,2020,135084442,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1
-CIMSA,2023,945591094,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1
-DOAS,2020,220000000,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
-DSTKF,2025,333333333,user provided merged capital research,2025 IPO capital after new share issue; no earlier rows because company was private,medium,issued_capital,1
-ENKAI,2020,5600000000,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1
-EREGL,2020,3500000000,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1
-EREGL,2024,7000000000,user provided merged capital research,2024 100 percent bonus issue,medium,issued_capital,1
-FROTO,2020,350910000,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1
-FROTO,2025,3509100000,user provided merged capital research,2025 900 percent bonus issue,medium,issued_capital,1
-GUBRF,2020,334000000,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1
-HEKTS,2020,860000000,user provided merged capital research,issued capital before 2022 capital increases,medium,issued_capital,1
-HEKTS,2022,2530000000,user provided merged capital research,2022 paid plus bonus capital increase,medium,issued_capital,1
-HEKTS,2024,8430000000,user provided merged capital research,2024 paid capital increase,medium,issued_capital,1
-KONTR,2020,200000000,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1
-KONTR,2024,650000000,user provided merged capital research,2024 paid plus bonus capital increase,medium,issued_capital,1
-KONTR,2025,1300000000,user provided merged capital research,2025 paid capital increase; verify final registration,medium,issued_capital,1
-KRDMD,2020,1140000000,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1
-KUYAS,2020,100000000,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1
-KUYAS,2024,400000000,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1
-MGROS,2020,181054233,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
-MIATK,2021,38000000,user provided merged capital research,IPO period capital; no 2020 row because listed later,medium,issued_capital,1
-MIATK,2023,494000000,user provided merged capital research,2023 1200 percent bonus issue,medium,issued_capital,1
-OYAKC,2020,1246578406,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1
-OYAKC,2024,4861655783,user provided merged capital research,2024 289.99999 percent bonus issue,medium,issued_capital,1
-PASEU,2020,168000000,user provided merged capital research,base capital before 2024 bonus issue; listed-year history should be checked,low,issued_capital,1
-PASEU,2024,672000000,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1
-PETKM,2020,2534400000,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1
-PGSUS,2020,102299707,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1
-PGSUS,2024,500000000,user provided merged capital research,2024 388.75995 percent bonus issue,medium,issued_capital,1
-SASA,2020,830000000,user provided merged capital research,issued capital in 2020 annual report,medium,issued_capital,1
-SASA,2021,1110000000,user provided merged capital research,capital shown in 2021 report,medium,issued_capital,1
-SASA,2022,2240000000,user provided merged capital research,2022 100 percent bonus issue,medium,issued_capital,1
+BTCIM,2020,180000000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1
+BTCIM,2025,5580000000.0,user provided merged capital research,2025 3000 percent bonus issue,medium,issued_capital,1
+CANTE,2020,252410000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1
+CANTE,2021,320000000.0,user provided merged capital research,IPO/post-offering capital; no 2020 row because reliable listed-year data missing,low,issued_capital,1
+CANTE,2025,7000000000.0,user provided merged capital research,capital reached 7bn by 2025/2026 process; exact effective year should be checked,low,issued_capital,1
+CCOLA,2020,254370782.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1
+CCOLA,2024,2798078602.0,user provided merged capital research,2024 1000 percent bonus issue,medium,issued_capital,1
+CIMSA,2020,135084442.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1
+CIMSA,2023,945591094.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1
+DOAS,2020,220000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
+DSTKF,2020,50000000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1
+DSTKF,2022,190000000.0,user provided merged capital research,2022 pre-IPO capital increase,low,issued_capital,1
+DSTKF,2023,250000000.0,user provided merged capital research,2023 pre-IPO internal capital increase,medium,issued_capital,1
+DSTKF,2025,333333333.0,user provided merged capital research,2025 IPO capital after new share issue,medium,issued_capital,1
+ENKAI,2020,5600000000.0,user provided merged capital research,2020 paid-in capital; later 2022 change uncertain so not added,low,issued_capital,1
+EREGL,2020,3500000000.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1
+EREGL,2024,7000000000.0,user provided merged capital research,2024 100 percent bonus issue,medium,issued_capital,1
+FROTO,2020,350910000.0,user provided merged capital research,issued capital before 2025 bonus issue,medium,issued_capital,1
+FROTO,2025,3509100000.0,user provided merged capital research,2025 900 percent bonus issue,medium,issued_capital,1
+GUBRF,2020,334000000.0,user provided merged capital research,stable issued capital 2020-2025; 2023 300 percent bonus issue application rejected by SPK,medium,issued_capital,1
+HEKTS,2020,860000000.0,user provided merged capital research,issued capital before 2022 capital increases,medium,issued_capital,1
+HEKTS,2022,2530000000.0,user provided merged capital research,2022 paid plus bonus capital increase,medium,issued_capital,1
+HEKTS,2024,8430000000.0,user provided merged capital research,2024 paid capital increase,medium,issued_capital,1
+KONTR,2020,200000000.0,user provided merged capital research,approximate 2020 year-end capital after IPO/tahsisli process; verify exact KAP amount,low,issued_capital,1
+KONTR,2024,650000000.0,user provided merged capital research,2024 paid plus bonus capital increase,medium,issued_capital,1
+KONTR,2025,1300000000.0,user provided merged capital research,2025 paid capital increase; verify final registration,medium,issued_capital,1
+KRDMD,2020,1140000000.0,user provided merged capital research,likely stable issued capital 2020-2025; conflicting source exists,low,issued_capital,1
+KUYAS,2020,100000000.0,user provided merged capital research,2020 year-end capital after paid capital increase; pre-increase capital was 54437596.32,low,issued_capital,1
+KUYAS,2024,400000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1
+MAVI,2020,49657000.0,user provided merged capital research,2020-2021 capital before later bonus issues,medium,issued_capital,1
+MAVI,2022,99314000.0,user provided merged capital research,2022 100 percent bonus issue,medium,issued_capital,1
+MAVI,2023,198628000.0,user provided merged capital research,2023 100 percent bonus issue,medium,issued_capital,1
+MAVI,2024,397256000.0,user provided merged capital research,2024 100 percent bonus issue,medium,issued_capital,1
+MAVI,2025,794512000.0,user provided merged capital research,2025 100 percent bonus issue,medium,issued_capital,1
+MGROS,2020,181054233.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
+MIATK,2020,30000000.0,user provided merged capital research,pre-IPO capital from user research,low,issued_capital,1
+MIATK,2021,38000000.0,user provided merged capital research,IPO period capital; no 2020 row because listed later,medium,issued_capital,1
+MIATK,2023,494000000.0,user provided merged capital research,2023 1200 percent bonus issue,medium,issued_capital,1
+OYAKC,2020,1246578406.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1
+OYAKC,2024,4861655783.0,user provided merged capital research,2024 289.99999 percent bonus issue,medium,issued_capital,1
+PASEU,2020,168000000.0,user provided merged capital research,base capital before 2024 bonus issue; listed-year history should be checked,low,issued_capital,1
+PASEU,2024,672000000.0,user provided merged capital research,2024 300 percent bonus issue,medium,issued_capital,1
+PETKM,2020,2534400000.0,user provided merged capital research,2020 year-end capital after 20 percent bonus issue,medium,issued_capital,1
+PGSUS,2020,102299707.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1
+PGSUS,2024,500000000.0,user provided merged capital research,2024 388.75995 percent bonus issue,medium,issued_capital,1
+SASA,2020,830000000.0,user provided merged capital research,issued capital in 2020 annual report,medium,issued_capital,1
+SASA,2021,1110000000.0,user provided merged capital research,capital shown in 2021 report,medium,issued_capital,1
+SASA,2022,2240000000.0,user provided merged capital research,2022 100 percent bonus issue,medium,issued_capital,1
 SASA,2023,5295959799.1,user provided merged capital research,2023 130 percent bonus issue proposal/result; verify final registered amount,medium,issued_capital,1
 SISE,2020,3063214056.17,user provided merged capital research,2020 year-end capital after merger,medium,issued_capital,1
-TAVHL,2020,363281250,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
-TCELL,2020,2200000000,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
-THYAO,2020,1380000000,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
-TOASO,2020,500000000,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
-TSKB,2020,2800000000,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1
-TTKOM,2020,3500000000,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
-TUPRS,2020,275256514,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1
-TUPRS,2023,1926795598,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1
-TURSG,2020,1161523363,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1
-TURSG,2024,5000000000,user provided merged capital research,2024 330.47 percent bonus issue,medium,issued_capital,1
-TURSG,2025,10000000000,user provided merged capital research,2025 100 percent bonus issue,medium,issued_capital,1
-ULKER,2020,342000000,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
+TAVHL,2020,363281250.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
+TCELL,2020,2200000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
+THYAO,2020,1380000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
+TOASO,2020,500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
+TRALT,2020,152500000.0,user provided merged capital research,former KOZAL; stable before 2023 bonus issue,medium,issued_capital,1
+TRALT,2023,3202500000.0,user provided merged capital research,2023 2000 percent bonus issue,medium,issued_capital,1
+TRMET,2020,388080000.0,user provided merged capital research,former KOZAA; stable issued capital 2020-2025,medium,issued_capital,1
+TSKB,2020,2800000000.0,user provided merged capital research,stable issued capital 2020-2025; 5.6bn claim not confirmed,low,issued_capital,1
+TTKOM,2020,3500000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
+TUPRS,2020,275256514.0,user provided merged capital research,issued capital before 2023 bonus issue,medium,issued_capital,1
+TUPRS,2023,1926795598.0,user provided merged capital research,2023 600 percent bonus issue,medium,issued_capital,1
+TURSG,2020,1161523363.0,user provided merged capital research,issued capital before 2024 bonus issue,medium,issued_capital,1
+TURSG,2024,5000000000.0,user provided merged capital research,2024 330.47 percent bonus issue,medium,issued_capital,1
+TURSG,2025,10000000000.0,user provided merged capital research,2025 100 percent bonus issue,medium,issued_capital,1
+ULKER,2020,342000000.0,user provided merged capital research,stable issued capital 2020-2025,medium,issued_capital,1
