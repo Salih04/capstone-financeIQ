@@ -16,10 +16,17 @@ investment advice.**
 
 ```bash
 make extract-yearly-financials   # XLSX -> candidate manual file (validated)
-make data                        # build + validate modeling dataset
+make ingest-corrected-yearly     # ingest corrected income/profitability XLSX
+make benchmark                   # collect BIST100 yearly returns (Yahoo)
+make prices                      # fetch Yahoo year-end prices (OHLCV only)
+make shares                      # expand capital-event file → per-year shares outstanding
+make valuation                   # build market_cap/pe/pb/ev/ev_ebitda from prices × shares
+make data                        # ingest-corrected-yearly + build_all (full modeling dataset)
 make research                    # walk-forward experiments
-make full-research               # all three in order
-python scripts/fetch_yahoo_chart_prices.py --start-year 2020 --end-year 2025 # fetch Yahoo prices
+make full-research               # all of the above in order + experiments
+make split-datasets              # split modeling_dataset into public_40 + training subsets
+make build-company-contexts      # generate RAG JSON per ticker/year (run after split-datasets)
+make collect-bist100-financials  # fetch BIST100 expansion financials via yfinance (unofficial)
 ```
 
 ## Reusing the yearly Excel files (honest extraction)
@@ -61,7 +68,11 @@ reference (data/trusted/stocks_2020_2025.csv, UNRELIABLE — bootstrap only)
    ├─ load_benchmark        → data/trusted_clean/bist100_benchmark_returns.csv
    │        MANUAL only (template shipped). Never fabricated.
    ├─ build_modeling_dataset→ data/trusted_clean/modeling_dataset_2020_2025.csv
-   └─ validate              → data_quality_report.json / .md, data_dictionary.md
+   ├─ validate              → data_quality_report.json / .md, data_dictionary.md
+   ├─ split_universe        → modeling_dataset_public_2020_2025.csv (40 tickers, inference)
+   │                          modeling_dataset_training_2020_2025.csv (experiments only)
+   └─ build_company_contexts→ data/trusted_clean/company_contexts/{ticker}_{year}.json
+                               (pre-built RAG context injected into research agent LLM prompt)
 ```
 
 ## How returns are calculated

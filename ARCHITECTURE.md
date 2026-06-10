@@ -44,7 +44,7 @@ main.py        App factory, middleware, router registration, startup hooks
 | `companies` | `/companies` | Company CRUD, search |
 | `financials` | `/financials` | Raw financial data |
 | `scoring` | `/score-runs` | Legacy scoring runs (v1/v2) |
-| `forecasting` | (root) | Core forecasting pipeline (v3) |
+| `forecasting` | (root) | CSV forecasting pipeline (primary) + legacy DB endpoints |
 | `fundamentals` | `/fundamentals` | Quarterly CSV upload + template |
 | `ingestion` | `/ingestion` | Data ingestion jobs |
 | `admin` | `/admin` | Admin-only ops |
@@ -53,46 +53,49 @@ main.py        App factory, middleware, router registration, startup hooks
 | `labeling` | `/labeling` | Manual data labeling |
 | `news` | `/news` | News updates + AI insight |
 
-### Key service: `forecasting_service.py`
+### Key service: `forecasting_csv_service.py` (primary, no DB required)
 
-Core pipeline called by forecasting router:
+CSV-backed forecasting pipeline — reads `modeling_dataset_public_2020_2025.csv` directly.
+All output is clearly marked experimental / not investment advice.
 
 ```
-import_winner_excel_preset(db, file_name)
-  └─ read xlsx → median impute → upsert WinnerCohortRow
+get_options()
+  └─ returns trainable_years, all_years, inference_years, feature_columns, ticker_count
 
-train_sector_success_model(db, year, sector, top_n)
-  └─ _parameter_scores()
-       ├─ _fundamentals_df_for_sector() → QuarterlyFundamental rows
-       ├─ _fundamentals_to_exact_ratios() → 17 computed ratios
-       └─ _compute_ml_method_scores()
-            ├─ Spearman, Pearson correlations
-            ├─ Mutual Info (sklearn)
-            ├─ Random Forest classifier (n=300)
-            ├─ RFE (LogisticRegression)
-            ├─ Lasso regression
-            ├─ SHAP TreeExplainer (fallback: RF importances)
-            └─ KMeans silhouette score
-  └─ ensemble_score = weighted sum of 8 method scores
-  └─ upsert SectorParameterRanking (top_n rows)
+train_parameters(train_year_from, train_year_to, top_n)
+  └─ loads public CSV → filters to training years
+  └─ computes top-quartile winners (WINNER_PERCENTILE = 0.75)
+  └─ per feature: effect_size = (winner_mean − overall_mean) / std × coverage_fraction
+  └─ returns top_parameters [{name, weight, rank}], winner_rows, total_training_rows
 
-run_forecast_for_sector(db, year, sector, model_type, ...)
-  └─ load SectorParameterRanking (auto-trains if missing)
-  └─ for each stock: weighted normalized ratio sum → score (0–100)
-  └─ model_type adjusts raw value transform:
-       scoring (default) | xgboost (^1.15) | arima (momentum blend)
-       prophet (trend blend) | dbscan (distance-to-center) | gmm (gaussian)
+run_forecast(year, trained_weights, risk_level, user_type)
+  └─ loads public CSV → filters to target year
+  └─ for each ticker: percentile rank per feature (within year) × weight = score
   └─ risk_level multiplier: low=0.85 / medium=1.0 / high=1.15
-  └─ persist ForecastRun + ForecastPrediction rows
-  └─ return ranked items + run_id
+  └─ returns ranked items with ticker, score, confidence, top_parameters, warnings
+  └─ inference rows (2025) flagged; no buy/sell signals ever
 
-run_time_cv_evaluation(db, sector, model_type, window_size)
-  └─ rolling window over available years (2020–2025)
-  └─ per fold: train previous years, predict two adjacent years
-  └─ rank_stability = 1 - mean_rank_diff / window
-  └─ overlap_at_k = |top-K intersection| / min(|A|,|B|)
-  └─ persist ForecastEvaluationRun + ForecastEvaluationFold
+explain_ticker(ticker, year)
+  └─ returns top_features, bottom_features, missing_features, data_quality guardrails
 ```
+
+### Legacy service: `forecasting_service.py` (DB-dependent)
+
+Requires `WinnerCohortRow` + `QuarterlyFundamental` tables to be populated.
+In production environments these tables are empty — legacy endpoints return empty results.
+
+```
+import_winner_excel_preset(db, file_name) → upsert WinnerCohortRow
+train_sector_success_model(db, ...)       → 8-method ML ensemble → SectorParameterRanking
+run_forecast_for_sector(db, ...)          → ForecastRun + ForecastPrediction rows
+run_time_cv_evaluation(db, ...)           → ForecastEvaluationRun + folds
+```
+
+### Other key services
+
+- **`research_agent.py`** — hybrid score (0.65·ML + 0.20·confidence + 0.15·LLM), grounded intents,
+  OpenRouter (`openai/gpt-oss-120b:free`) + legacy LM Studio/Ollama, deterministic fallback.
+  Reads public CSV for inference; loads pre-built RAG context JSON preferentially.
 
 ### Parameter catalog (17 ratios, 5 categories)
 
@@ -131,10 +134,22 @@ forecast_evaluation_folds — one per fold
 /ai-search       → AISearchPage
 /data-health     → DataHealthPage
 /labeling        → LabelingLabPage
-/forecasting     → ForecastingPage
+/forecasting     → ForecastingPage  [CSV pipeline: options → train → rank → explain]
 /forecasting/detail → ForecastingDetailPage
 /news            → NewsUpdatesPage
 *                → redirect /dashboard
+```
+
+### ForecastingPage flow
+
+```
+mount → GET /forecasting/options (CSV-backed, no DB)
+  └─ Step 1: set train_year_from/to, top_n → POST /forecasting/train
+       └─ returns top_parameters with feature weights
+  └─ Step 2: set forecast_year → POST /forecasting/run
+       └─ returns ranked tickers with scores (no buy/sell signals; experimental)
+  └─ click ticker → GET /forecasting/explain/{ticker}
+       └─ score drivers, feature coverage, data quality warnings
 ```
 
 All routes except `/login` wrapped in `<ProtectedRoute>` → `<AppShell>`.

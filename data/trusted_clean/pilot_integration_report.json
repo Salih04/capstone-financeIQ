@@ -1,0 +1,94 @@
+{
+  "pilot_tickers_integrated": [
+    "AKSA",
+    "AKSEN",
+    "DOHOL",
+    "EKGYO",
+    "KCHOL",
+    "ODAS",
+    "SAHOL",
+    "SMRTG",
+    "VESTL"
+  ],
+  "pilot_tickers_skipped_already_present": [],
+  "pilot_rows_added": 36,
+  "final_dataset_rows": 276,
+  "final_dataset_tickers": 49,
+  "existing_tickers": 40,
+  "return_coverage": {
+    "AKSA": 3,
+    "AKSEN": 3,
+    "DOHOL": 3,
+    "EKGYO": 3,
+    "KCHOL": 3,
+    "ODAS": 3,
+    "SAHOL": 3,
+    "SMRTG": 3,
+    "VESTL": 3
+  },
+  "years_per_ticker": {
+    "AKSA": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "AKSEN": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "DOHOL": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "EKGYO": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "KCHOL": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "ODAS": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "SAHOL": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "SMRTG": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "VESTL": [
+      2022,
+      2023,
+      2024,
+      2025
+    ]
+  },
+  "source": "yfinance_unofficial",
+  "disclaimer": "yfinance pilot expansion \u2014 NOT official KAP/IFRS data. KAP cross-check recommended. Training only. Not investment advice.",
+  "caveats": [
+    "yfinance is unofficial. KAP cross-check recommended.",
+    "FY2020 and FY2021 not available for pilot tickers.",
+    "Pilot tickers are training-only (is_public_universe=false).",
+    "Cross-sectional ranks for pilot tickers computed within pilot cohort only.",
+    "Run split_universe_datasets to update training/public splits."
+  ]
+}
