@@ -46,6 +46,38 @@ All notable changes to FinanceIQ, most recent first.
 
 ---
 
+## [3.3.0] — 2026-06-10
+
+### Added
+- **yfinance pilot expansion** — 9 BIST100 tickers added to the TRAINING dataset only.
+  Public dataset (40 tickers, frontend) is completely unchanged.
+  - `scripts/data_collection/integrate_pilot_tickers.py`: post-processing script that
+    appends pilot-ticker rows to `modeling_dataset_2020_2025.csv`. Reads yfinance
+    financial features + derives return targets from Yahoo Chart adj_close year-end
+    prices. Never overwrites public_40 rows. Pilot tickers flagged
+    `is_public_universe=false`.
+  - `data/trusted_raw/financials/bist100_yfinance_candidate_clean.csv`: 36 rows × 22
+    columns (9 tickers × FY2022–2025); all core fields non-null; 4 empty 2021 stubs
+    dropped; no imputation.
+  - `data/config/universe_training_bist100.csv`: AKSA, AKSEN, DOHOL, EKGYO, KCHOL,
+    ODAS, SAHOL, SMRTG, VESTL added with `is_public_universe=false`,
+    `is_training_universe=true`, `notes=yfinance_unofficial_pilot`.
+  - `data/trusted_clean/bist100_yfinance_pilot_report.md`: pilot expansion report.
+  - `make integrate-pilot-tickers`: fetches prices + integrates + splits in one command.
+  - Training universe: **40 → 49 tickers** (9 training-only). Public: 40 (unchanged).
+  - Return targets: derived from Yahoo Chart adj_close (2022→2024 feature years
+    each have next_year_return_pct; 2025 is inference-only). No data fabricated.
+  - Source caveat: yfinance is unofficial; KAP cross-check recommended.
+
+### Notes
+- Training tickers = **49** (9 pilot: FY2022–2025 only). Public = 40 (unchanged).
+- Pilot expansion is NOT full BIST100 expansion — FY2020/2021 unavailable from
+  yfinance; KAP cross-check not yet done. Pilot data must not be treated as
+  authoritative until verified against official filings.
+- Walk-forward Spearman expected to remain weak; honest result.
+
+---
+
 ## [3.2.0] — 2026-06-10
 
 ### Added

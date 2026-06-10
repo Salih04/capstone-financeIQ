@@ -27,6 +27,7 @@ make full-research               # all of the above in order + experiments
 make split-datasets              # split modeling_dataset into public_40 + training subsets
 make build-company-contexts      # generate RAG JSON per ticker/year (run after split-datasets)
 make collect-bist100-financials  # fetch BIST100 expansion financials via yfinance (unofficial)
+make integrate-pilot-tickers     # fetch prices + append pilot rows to modeling dataset + split (training only)
 ```
 
 ## Reusing the yearly Excel files (honest extraction)

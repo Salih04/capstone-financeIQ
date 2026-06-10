@@ -36,7 +36,7 @@ Investors (individual, corporate) and admins. Role stored on `User.role` (invest
 | `data/trusted_raw/prices/yahoo_year_end_prices.csv` | Yahoo Chart year-end prices (OHLCV only — no financial statements) |
 | `data/trusted_clean/bist100_benchmark_returns.csv` | BIST100 annual returns → excess-return / outperform targets |
 | `data/config/universe_public_40.csv` | 40-ticker public inference universe |
-| `data/config/universe_training_bist100.csv` | Training universe config (currently identical to public_40) |
+| `data/config/universe_training_bist100.csv` | Training universe config — 49 tickers (40 public_40 + 9 yfinance pilot: AKSA, AKSEN, DOHOL, EKGYO, KCHOL, ODAS, SAHOL, SMRTG, VESTL) |
 | `data/trusted_clean/company_contexts/` | Pre-built RAG JSON per ticker/year — injected into LLM research prompt |
 | Quarterly fundamentals CSV | 28-column fundamentals per stock/period (uploaded via UI; legacy DB path) |
 

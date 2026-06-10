@@ -1,6 +1,6 @@
 # TASK_STATE.md — FinanceIQ
 
-Last updated: 2026-06-10 (rev 2)
+Last updated: 2026-06-10 (rev 3)
 
 ## Status legend
 - `DONE` — shipped, tested
@@ -40,6 +40,7 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 | Universe split (public/training) | DONE | `make split-datasets`; `universe_public_40.csv` + `universe_training_bist100.csv` |
 | RAG context layer | DONE | `make build-company-contexts` → per-ticker/year JSON; injected into LLM prompt |
 | BIST100 expansion investigation | DONE | Yahoo=price only confirmed; yfinance collector stub + manual template delivered |
+| yfinance pilot expansion (training) | DONE | 9 training-only tickers (AKSA, AKSEN, DOHOL, EKGYO, KCHOL, ODAS, SAHOL, SMRTG, VESTL); public_40 unchanged; `make integrate-pilot-tickers` |
 | Tests | DONE | root 93 + backend 12 passing |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
@@ -73,14 +74,14 @@ rigorous, transparent pipeline and an honest negative result, not alpha.
 
 | Item | Notes |
 |---|---|
-| No reliable predictive edge | ~40 stocks/year; weak walk-forward signal — honest result |
+| No reliable predictive edge | pilot brings 49 training tickers (FY2022–2024 only); signal still expected weak — honest result |
 | Shares outstanding is manual | no free historical source; capital-event file required |
 | 2024 vendor export misaligned | corrected via manual file; upstream fix still ideal |
 | `SECRET_KEY` / CORS in compose | tighten before any external backend deployment |
 
 ## Next steps (optional, beyond capstone scope)
-- Expand training universe: run `make collect-bist100-financials`, verify vs KAP,
-  add tickers to `universe_training_bist100.csv`, add return targets to reference CSV,
-  re-run `make data && make split-datasets`. Training tickers > 40 required before claiming success.
+- KAP cross-check pilot tickers: yfinance data is unofficial; validate AKSA/AKSEN/DOHOL/EKGYO/KCHOL/ODAS/SAHOL/SMRTG/VESTL against kap.borsaistanbul.com IFRS filings.
+- Re-run experiments with 49-ticker training set: `PYTHONPATH=. python experiments/run_experiments.py`. Check if walk-forward signal improves over public_40 baseline.
+- Add more BIST100 tickers: run `make collect-bist100-financials --tickers <NEW>`, add to `universe_training_bist100.csv`, run `make integrate-pilot-tickers`.
 - Quarterly fundamentals with genuine per-period variation (current quarterly exports are frozen).
 - Optional: point the research agent at a fine-tuned local model (see `research_agent_training/mlx_training_plan.md`).
