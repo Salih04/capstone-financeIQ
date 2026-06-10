@@ -243,9 +243,9 @@ def run_forecast(
             continue
         ranked = numeric.rank(pct=True, na_option="keep")
         pct_maps[col] = {
-            row["ticker"]: float(ranked.loc[idx])
+            str(row["ticker"]).upper(): float(ranked.loc[idx])
             for idx, row in year_df.iterrows()
-            if not math.isnan(ranked.loc[idx]) if not pd.isna(ranked.loc[idx]) else False
+            if pd.notna(ranked.loc[idx])
         }
 
     scored: list[dict[str, Any]] = []
