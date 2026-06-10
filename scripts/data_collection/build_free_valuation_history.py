@@ -9,8 +9,12 @@ Targets (year T, 2020-2025, current 40 tickers):
     ev_ebitda         = enterprise_value / ebitda     (reject if ebitda     <= 0)
 
 Sources (all free / public, no Fintables, no aggressive scraping):
-    year_end_close      Yahoo Finance chart API (TICKER.IS), cached to disk;
-                        manual fallback CSV if Yahoo unavailable.
+    year_end_close      Yahoo Finance chart API (TICKER.IS).  Preferred source:
+                        fetch_yahoo_chart_prices.py -> yahoo_year_end_prices.csv
+                        (new format with status/close/price_date/yahoo_symbol).
+                        Uses close (not adjclose) as the canonical price.
+                        Falls back to old-format cache or fresh fetch if new
+                        format is absent.
     shares_outstanding  manual file (data/trusted_raw/shares_outstanding_manual.csv);
                         a template is generated when missing. NOT fabricated.
     net_income/equity/  validated modeling dataset (already accepted, leakage-safe).
@@ -24,14 +28,20 @@ Honesty rules:
       are rejected, never imputed.
     * Price/return columns never become raw model features; only the derived year-T
       valuation ratios are candidates.
+    * close is used as the price (not adjclose). adjclose is preserved in the new
+      format CSV as reference but never mixed into price-based calculations.
 
 Outputs:
-    data/trusted_raw/prices/yahoo_year_end_prices.csv            (cache)
+    data/trusted_raw/prices/yahoo_year_end_prices.csv            (new-format cache)
     data/trusted_raw/shares_outstanding_manual_template.csv      (if manual missing)
     data/trusted_raw/financials/free_valuation_history_candidate.csv
     data/trusted_clean/free_valuation_history_report.{json,md}
 
 Run:
+    # Step 1 (one-time or refresh): fetch fresh Yahoo prices
+    python scripts/fetch_yahoo_chart_prices.py --start-year 2020 --end-year 2025
+
+    # Step 2: build valuation features
     PYTHONPATH=. python -m scripts.data_collection.build_free_valuation_history [--prices-only]
 """
 
@@ -78,6 +88,70 @@ def _tickers() -> list[str]:
     return sorted(df["ticker"].astype(str).str.upper().unique())
 
 
+# --------------------------------------------------------------------------- #
+# Internal new-format loader — called by collect_year_end_prices only.
+# --------------------------------------------------------------------------- #
+def _load_yahoo_prices_new_format(path: Path) -> tuple[pd.DataFrame | None, dict]:
+    """Load from the new-format CSV (fetch_yahoo_chart_prices.py output).
+
+    New format columns: ticker, yahoo_symbol, year, target_date, price_date,
+    close, adjclose, currency, source, status, error.
+
+    Returns (DataFrame with ticker/year/year_end_close/price_date/yahoo_symbol/
+    price_source, meta dict) or (None, meta) if absent or old format.
+    Uses close as the canonical price — never adjclose.
+    """
+    meta: dict = {
+        "format": "none",
+        "rows_loaded": 0,
+        "success_rows": 0,
+        "error_rows": 0,
+        "rows_after_filter": 0,
+    }
+    if not path.is_file():
+        return None, meta
+    try:
+        df = pd.read_csv(path)
+    except Exception:
+        return None, meta
+
+    if "status" not in df.columns:
+        meta["format"] = "old_format"
+        return None, meta
+
+    meta["format"] = "new_format"
+    meta["rows_loaded"] = int(len(df))
+    meta["success_rows"] = int((df["status"] == "success").sum())
+    meta["error_rows"] = int((df["status"] != "success").sum())
+
+    success = df[df["status"] == "success"].copy()
+    success["ticker"] = success["ticker"].astype(str).str.upper().str.strip()
+    success["year"] = pd.to_numeric(success["year"], errors="coerce")
+    success["close"] = pd.to_numeric(success["close"], errors="coerce")
+    success = success.dropna(subset=["year", "close"])
+    success = success[success["close"] > 0]
+    success["year"] = success["year"].astype(int)
+
+    out = pd.DataFrame({
+        "ticker": success["ticker"].values,
+        "year": success["year"].values,
+        "year_end_close": success["close"].round(6).values,
+        "price_date": (success["price_date"].values
+                       if "price_date" in success.columns else np.full(len(success), np.nan)),
+        "yahoo_symbol": (success["yahoo_symbol"].values
+                         if "yahoo_symbol" in success.columns
+                         else np.full(len(success), np.nan)),
+        "price_source": "yahoo_chart_api",
+    })
+    out = out.drop_duplicates(["ticker", "year"], keep="last")
+    meta["rows_after_filter"] = int(len(out))
+    return out, meta
+
+
+# --------------------------------------------------------------------------- #
+# Primary price loader — collect_year_end_prices is the single entry point.
+# Tests monkeypatch this function directly; always call it from build().
+# --------------------------------------------------------------------------- #
 def _fetch_yahoo_daily(symbol: str, timeout: float = 8.0) -> pd.DataFrame | None:
     """Daily close 2020-01-01..2025-12-31 from Yahoo chart API. None on failure."""
     p1 = int(pd.Timestamp("2019-12-15").timestamp())
@@ -107,15 +181,58 @@ def _fetch_yahoo_daily(symbol: str, timeout: float = 8.0) -> pd.DataFrame | None
 
 def collect_year_end_prices(tickers: list[str], use_cache: bool = True,
                             log=print) -> tuple[pd.DataFrame, dict]:
-    """One row per ticker-year: last trading close in the calendar year."""
-    meta = {"attempted": 0, "yahoo_ok": 0, "from_cache": 0, "from_manual": 0, "failed": []}
+    """One row per ticker-year: last trading close in the calendar year.
+
+    Priority:
+    1. New-format CSV (fetch_yahoo_chart_prices.py) — uses close, not adjclose.
+       Returns immediately if it covers the given tickers.
+    2. Old-format cache (fallback, uses adjclose for compat).
+    3. Fresh Yahoo API fetch.
+    4. Manual fallback CSV.
+
+    Returns DataFrame with ticker/year/year_end_close/price_date/yahoo_symbol/
+    price_source columns, plus a meta dict.
+
+    NOTE: tests monkeypatch this function directly. The new-format path is
+    implemented here (not in build()) so monkeypatching continues to work.
+    """
+    meta: dict = {
+        "format": "legacy",
+        "attempted": 0, "yahoo_ok": 0, "from_cache": 0, "from_manual": 0,
+        "failed": [],
+        "rows_loaded": 0, "success_rows": 0, "error_rows": 0,
+    }
+
+    # ---- Try new-format CSV first ----
+    if use_cache:
+        new_df, new_meta = _load_yahoo_prices_new_format(PRICES_CACHE)
+        if new_df is not None and not new_df.empty:
+            tickers_upper = {str(t).upper() for t in tickers}
+            matched = new_df[new_df["ticker"].isin(tickers_upper)].copy()
+            if not matched.empty:
+                meta.update({
+                    "format": new_meta["format"],
+                    "rows_loaded": new_meta["rows_loaded"],
+                    "success_rows": new_meta["success_rows"],
+                    "error_rows": new_meta["error_rows"],
+                    "from_cache": int(matched["ticker"].nunique()),
+                })
+                log(f"[prices] new-format CSV: loaded={new_meta['rows_loaded']} "
+                    f"success={new_meta['success_rows']} error={new_meta['error_rows']} "
+                    f"usable_for_tickers={len(matched)}")
+                return matched.reset_index(drop=True), meta
+
+    # ---- Old-format cache or fresh fetch fallback ----
     cache = None
     if use_cache and PRICES_CACHE.is_file():
         try:
-            cache = pd.read_csv(PRICES_CACHE)
-            cache["ticker"] = cache["ticker"].astype(str).str.upper()
+            c = pd.read_csv(PRICES_CACHE)
+            if "status" not in c.columns:   # old format only
+                cache = c
+                cache["ticker"] = cache["ticker"].astype(str).str.upper()
         except Exception:
             cache = None
+
     manual = None
     if PRICES_MANUAL.is_file():
         try:
@@ -126,17 +243,19 @@ def collect_year_end_prices(tickers: list[str], use_cache: bool = True,
 
     rows = []
     for t in tickers:
-        # cache first (already-collected, avoids hammering Yahoo / 429s)
-        if cache is not None and (cache["ticker"] == t).any():
-            for _, r in cache[cache["ticker"] == t].iterrows():
-                rows.append({"ticker": t, "year": int(r["year"]),
+        t_up = str(t).upper()
+        if cache is not None and (cache["ticker"] == t_up).any():
+            for _, r in cache[cache["ticker"] == t_up].iterrows():
+                rows.append({"ticker": t_up, "year": int(r["year"]),
                              "year_end_close": _num(r.get("year_end_close")),
-                             "date": r.get("date"), "source": r.get("source", "cache")})
+                             "price_date": r.get("date"),
+                             "yahoo_symbol": yahoo_symbol(t_up),
+                             "price_source": r.get("source", "cache")})
             meta["from_cache"] += 1
             continue
         meta["attempted"] += 1
-        daily = _fetch_yahoo_daily(yahoo_symbol(t))
-        time.sleep(0.4)  # polite spacing, never hammer
+        daily = _fetch_yahoo_daily(yahoo_symbol(t_up))
+        time.sleep(0.4)
         if daily is not None and len(daily):
             meta["yahoo_ok"] += 1
             daily["year"] = daily["date"].dt.year
@@ -145,26 +264,31 @@ def collect_year_end_prices(tickers: list[str], use_cache: bool = True,
                 if yr.empty:
                     continue
                 last = yr.sort_values("date").iloc[-1]
+                # legacy collector uses adjclose for historical compat
                 px = last.get("adjclose") if pd.notna(last.get("adjclose")) else last.get("close")
-                rows.append({"ticker": t, "year": y, "year_end_close": _num(px),
-                             "date": str(last["date"].date()), "source": "yahoo_chart_api"})
-        elif manual is not None and (manual["ticker"] == t).any():
-            for _, r in manual[manual["ticker"] == t].iterrows():
-                rows.append({"ticker": t, "year": int(r["year"]),
+                rows.append({"ticker": t_up, "year": y, "year_end_close": _num(px),
+                             "price_date": str(last["date"].date()),
+                             "yahoo_symbol": yahoo_symbol(t_up),
+                             "price_source": "yahoo_chart_api"})
+        elif manual is not None and (manual["ticker"] == t_up).any():
+            for _, r in manual[manual["ticker"] == t_up].iterrows():
+                rows.append({"ticker": t_up, "year": int(r["year"]),
                              "year_end_close": _num(r.get("year_end_close")),
-                             "date": r.get("date"), "source": "manual"})
+                             "price_date": r.get("date"),
+                             "yahoo_symbol": yahoo_symbol(t_up),
+                             "price_source": "manual"})
             meta["from_manual"] += 1
         else:
-            meta["failed"].append(t)
+            meta["failed"].append(t_up)
 
     df = pd.DataFrame(rows)
     if not df.empty:
         df = df.drop_duplicates(["ticker", "year"], keep="last")
-        df = df[(pd.to_numeric(df["year_end_close"], errors="coerce") > 0)]
-        PRICES_CACHE.parent.mkdir(parents=True, exist_ok=True)
-        df.sort_values(["ticker", "year"]).to_csv(PRICES_CACHE, index=False)
-    log(f"[prices] tickers={len(tickers)} yahoo_ok={meta['yahoo_ok']} cache={meta['from_cache']} "
-        f"manual={meta['from_manual']} failed={len(meta['failed'])} rows={len(df)}")
+        df = df[pd.to_numeric(df["year_end_close"], errors="coerce") > 0]
+
+    log(f"[prices] legacy: tickers={len(tickers)} yahoo_ok={meta['yahoo_ok']} "
+        f"cache={meta['from_cache']} manual={meta['from_manual']} "
+        f"failed={len(meta['failed'])} rows={len(df)}")
     return df, meta
 
 
@@ -184,9 +308,6 @@ def _rel(path: Path) -> str:
 
 # --------------------------------------------------------------------------- #
 def ensure_shares_template(tickers: list[str]) -> bool:
-    """Write a manual shares template (per ticker-year) if the real manual file is
-    absent. The preferred workflow is the capital-EVENT file (fewer rows); this
-    full template stays as a fallback. Returns True if a real manual file exists."""
     if SHARES_MANUAL.is_file():
         return True
     SHARES_TEMPLATE.parent.mkdir(parents=True, exist_ok=True)
@@ -207,8 +328,6 @@ def ensure_shares_template(tickers: list[str]) -> bool:
 
 
 def load_shares() -> tuple[pd.DataFrame | None, str]:
-    """Load TOTAL shares outstanding. free_float_only rows are rejected (free float
-    is not total shares and would understate market cap)."""
     if not SHARES_MANUAL.is_file():
         return None, "missing"
     try:
@@ -227,8 +346,6 @@ def load_shares() -> tuple[pd.DataFrame | None, str]:
 
 
 def load_corrected_bs_2024() -> set[str]:
-    """Tickers whose 2024 equity AND net_debt are present (money-shaped) in the
-    manual correction file. Returns the set of tickers with usable 2024 values."""
     if not CORRECTED_BS_2024.is_file():
         return set()
     try:
@@ -242,14 +359,11 @@ def load_corrected_bs_2024() -> set[str]:
     df = df[pd.to_numeric(df["year"], errors="coerce") == 2024]
     eq = pd.to_numeric(df["equity"], errors="coerce")
     nd = pd.to_numeric(df["net_debt"], errors="coerce")
-    # money-shaped: equity magnitude must look like money, not a ratio
     ok = eq.notna() & nd.notna() & (eq.abs() >= 1000)
     return set(df.loc[ok, "ticker"])
 
 
 def _load_financials() -> pd.DataFrame:
-    """net_income, equity, ebitda, net_debt from the validated modeling dataset,
-    with 2024 equity/net_debt overridden by the manual correction file where valid."""
     cols = ["ticker", "year", "net_income", "equity", "ebitda", "net_debt"]
     df = pd.read_csv(MODELING_CSV)
     have = [c for c in cols if c in df.columns]
@@ -260,7 +374,6 @@ def _load_financials() -> pd.DataFrame:
             f[c] = pd.to_numeric(f[c], errors="coerce")
         else:
             f[c] = np.nan
-    # override 2024 equity/net_debt from the corrected balance-sheet file
     if CORRECTED_BS_2024.is_file():
         try:
             c = pd.read_csv(CORRECTED_BS_2024, comment="#")
@@ -282,55 +395,84 @@ def _load_financials() -> pd.DataFrame:
 def build(log=print) -> dict:
     tickers = _tickers()
     prices, price_meta = collect_year_end_prices(tickers, log=log)
-    # If the per-year manual file is missing but a capital-EVENT file exists, expand
-    # events -> manual first (the user-friendly path: enter changes, not 240 rows).
+
+    # Expand capital events -> shares if needed
     events = RAW / "shares_outstanding_events.csv"
     if not SHARES_MANUAL.is_file() and events.is_file():
         try:
             from scripts.data_collection import expand_shares_outstanding_events as EXP
             EXP.expand(log=log)
-        except Exception as exc:  # noqa - never crash valuation on expansion error
+        except Exception as exc:
             log(f"[valuation] event expansion failed: {exc}")
+
     have_shares = ensure_shares_template(tickers)
     shares, shares_status = load_shares()
     fin = _load_financials()
-    corrected_bs_2024 = load_corrected_bs_2024()   # tickers with usable corrected 2024 equity/net_debt
+    corrected_bs_2024 = load_corrected_bs_2024()
 
+    # Build base ticker-year grid
     base = pd.DataFrame([(t, y) for t in tickers for y in YEARS], columns=["ticker", "year"])
-    base = base.merge(prices[["ticker", "year", "year_end_close", "source"]].rename(columns={"source": "source_price"}),
-                      on=["ticker", "year"], how="left") if not prices.empty else base.assign(year_end_close=np.nan, source_price=None)
+
+    # Merge prices
+    price_merge_cols = ["ticker", "year", "year_end_close", "price_source", "price_date", "yahoo_symbol"]
+    avail_price_cols = [c for c in price_merge_cols if c in prices.columns] if not prices.empty else []
+    if avail_price_cols:
+        base = base.merge(prices[avail_price_cols], on=["ticker", "year"], how="left")
+    else:
+        for c in ["year_end_close", "price_source", "price_date", "yahoo_symbol"]:
+            base[c] = np.nan
+
+    # Legacy: old prices frame may have 'source' instead of 'price_source'
+    if "price_source" not in base.columns and "source" in (prices.columns if not prices.empty else []):
+        base = base.merge(prices[["ticker", "year", "source"]].rename(
+            columns={"source": "price_source"}), on=["ticker", "year"], how="left")
+
+    # Merge shares
     if shares is not None:
         base = base.merge(shares, on=["ticker", "year"], how="left")
         base["source_shares"] = np.where(base["shares_outstanding"].notna(), "manual", None)
     else:
         base["shares_outstanding"] = np.nan
         base["source_shares"] = None
+
+    # Merge financials
     base = base.merge(fin, on=["ticker", "year"], how="left")
 
+    # Compute valuation
     rows, rejections = [], {c: {} for c in TARGET_COLS}
 
     def rej(col, reason):
         rejections[col][reason] = rejections[col].get(reason, 0) + 1
 
+    missing_no_price: list[str] = []
+    missing_no_shares: list[str] = []
+
     for _, r in base.iterrows():
-        y = int(r["year"])
-        px, sh = _num(r.get("year_end_close")), _num(r.get("shares_outstanding"))
+        t, y = str(r["ticker"]), int(r["year"])
+        px = _num(r.get("year_end_close"))
+        sh = _num(r.get("shares_outstanding"))
         ni, eq, eb, nd = (_num(r.get("net_income")), _num(r.get("equity")),
                           _num(r.get("ebitda")), _num(r.get("net_debt")))
         notes = []
         mc = pe = pb = ev = ev_ebitda = None
 
         if px is None:
-            rej("market_cap", "missing_price"); notes.append("missing_price")
+            rej("market_cap", "missing_price")
+            notes.append("missing_price")
+            missing_no_price.append(f"{t}/{y}")
         if sh is None:
-            rej("market_cap", "missing_shares"); notes.append("missing_shares")
+            rej("market_cap", "missing_shares")
+            notes.append("missing_shares")
+            if px is not None:
+                missing_no_shares.append(f"{t}/{y}")
         if px is not None and sh is not None:
             mc = round(px * sh, 4)
             if mc <= 0:
-                mc = None; rej("market_cap", "non_positive"); notes.append("market_cap_non_positive")
+                mc = None
+                rej("market_cap", "non_positive")
+                notes.append("market_cap_non_positive")
 
-        # 2024 balance-sheet block is misaligned -> distrust equity/net_debt for 2024,
-        # UNLESS a valid manual correction (corrected_balance_sheet_2024.csv) supplies it.
+        # 2024 balance-sheet block is suspected misaligned unless manually corrected
         bs_2024_suspect = (y == 2024) and (r["ticker"] not in corrected_bs_2024)
 
         if mc is not None:
@@ -338,27 +480,35 @@ def build(log=print) -> dict:
             if ni is None:
                 rej("pe", "missing_net_income")
             elif ni <= 0:
-                rej("pe", "non_positive_net_income"); notes.append("pe_non_positive_net_income")
+                rej("pe", "non_positive_net_income")
+                notes.append("pe_non_positive_net_income")
             else:
                 pe = round(mc / ni, 4)
                 if abs(pe) > PE_ABS_MAX:
-                    pe = None; rej("pe", "absurd_value"); notes.append("pe_absurd")
+                    pe = None
+                    rej("pe", "absurd_value")
+                    notes.append("pe_absurd")
             # P/B
             if eq is None:
                 rej("pb", "missing_equity")
             elif bs_2024_suspect:
-                rej("pb", "suspect_2024_equity"); notes.append("pb_2024_suspect")
+                rej("pb", "suspect_2024_equity")
+                notes.append("pb_2024_suspect")
             elif eq <= 0:
-                rej("pb", "non_positive_equity"); notes.append("pb_non_positive_equity")
+                rej("pb", "non_positive_equity")
+                notes.append("pb_non_positive_equity")
             else:
                 pb = round(mc / eq, 4)
                 if abs(pb) > PB_ABS_MAX:
-                    pb = None; rej("pb", "absurd_value"); notes.append("pb_absurd")
+                    pb = None
+                    rej("pb", "absurd_value")
+                    notes.append("pb_absurd")
             # EV
             if nd is None:
                 rej("enterprise_value", "missing_net_debt")
             elif bs_2024_suspect:
-                rej("enterprise_value", "suspect_2024_net_debt"); notes.append("ev_2024_suspect")
+                rej("enterprise_value", "suspect_2024_net_debt")
+                notes.append("ev_2024_suspect")
             else:
                 ev = round(mc + nd, 4)
                 if ev <= 0:
@@ -368,11 +518,14 @@ def build(log=print) -> dict:
                 if eb is None:
                     rej("ev_ebitda", "missing_ebitda")
                 elif eb <= 0:
-                    rej("ev_ebitda", "non_positive_ebitda"); notes.append("ev_ebitda_non_positive_ebitda")
+                    rej("ev_ebitda", "non_positive_ebitda")
+                    notes.append("ev_ebitda_non_positive_ebitda")
                 else:
                     ev_ebitda = round(ev / eb, 4)
                     if abs(ev_ebitda) > EV_EBITDA_ABS_MAX:
-                        ev_ebitda = None; rej("ev_ebitda", "absurd_value"); notes.append("ev_ebitda_absurd")
+                        ev_ebitda = None
+                        rej("ev_ebitda", "absurd_value")
+                        notes.append("ev_ebitda_absurd")
             else:
                 rej("ev_ebitda", "missing_enterprise_value")
 
@@ -381,7 +534,10 @@ def build(log=print) -> dict:
             "ticker": r["ticker"], "year": y,
             "market_cap": mc, "enterprise_value": ev, "pe": pe, "pb": pb, "ev_ebitda": ev_ebitda,
             "year_end_close": px, "shares_outstanding": sh,
-            "source_price": r.get("source_price"), "source_shares": r.get("source_shares"),
+            "price_source": r.get("price_source"),
+            "price_date": r.get("price_date"),
+            "yahoo_symbol": r.get("yahoo_symbol"),
+            "source_shares": r.get("source_shares"),
             "source_financials": "modeling_dataset",
             "validation_status": status,
             "validation_notes": ";".join(notes) if notes else "",
@@ -389,8 +545,7 @@ def build(log=print) -> dict:
 
     cand = pd.DataFrame(rows)
 
-    # Column-level acceptance: a target column enters the candidate only if it has
-    # usable, year-varying values for most tickers (not all-null, not frozen).
+    # Column-level acceptance
     col_status, usable = {}, {}
     for c in TARGET_COLS:
         vals = pd.to_numeric(cand[c], errors="coerce")
@@ -399,27 +554,51 @@ def build(log=print) -> dict:
         if n_usable == 0:
             col_status[c] = "missing"
             continue
-        # frozen check: varies across years for >=50% of tickers that have values
         varying = cand.dropna(subset=[c]).groupby("ticker")[c].nunique()
         frozen_frac = float((varying <= 1).mean()) if len(varying) else 1.0
         col_status[c] = "accepted" if frozen_frac < 0.5 else "rejected_frozen"
 
-    # The candidate CSV only carries target columns that are at least partially usable;
-    # fully-missing columns are dropped so manual_ingest won't see empty noise.
-    keep_targets = [c for c in TARGET_COLS if col_status[c] in ("accepted",)]
+    keep_targets = [c for c in TARGET_COLS if col_status[c] == "accepted"]
     out_cols = (["ticker", "year"] + keep_targets +
-                ["year_end_close", "shares_outstanding", "source_price", "source_shares",
-                 "source_financials", "validation_status", "validation_notes"])
+                ["year_end_close", "shares_outstanding",
+                 "price_source", "price_date", "yahoo_symbol",
+                 "source_shares", "source_financials",
+                 "validation_status", "validation_notes"])
     CANDIDATE.parent.mkdir(parents=True, exist_ok=True)
     cand[out_cols].to_csv(CANDIDATE, index=False)
+
+    # Dedup missing lists for report
+    missing_no_price_uniq = sorted(set(missing_no_price))
+    missing_no_shares_uniq = sorted(set(missing_no_shares))
+    mc_ok = int(cand["market_cap"].notna().sum())
+    ev_ok = int(cand["enterprise_value"].notna().sum())
+    pe_ok = int(cand["pe"].notna().sum())
+    pb_ok = int(cand["pb"].notna().sum())
+    ev_ebitda_ok = int(cand["ev_ebitda"].notna().sum())
 
     report = {
         "tickers_covered": len(tickers),
         "years_covered": YEARS,
         "price_coverage": {
+            "format": price_meta.get("format", "unknown"),
+            "yahoo_price_rows_loaded": price_meta.get("rows_loaded", price_meta.get("yahoo_ok", 0)),
+            "yahoo_success_rows": price_meta.get("success_rows", price_meta.get("yahoo_ok", 0)),
+            "yahoo_error_rows": price_meta.get("error_rows", len(price_meta.get("failed", []))),
             "rows_with_price": int(cand["year_end_close"].notna().sum()),
             "total_rows": int(len(cand)),
-            "yahoo_meta": price_meta,
+        },
+        "valuation_coverage": {
+            "successful_market_cap": mc_ok,
+            "successful_enterprise_value": ev_ok,
+            "successful_pe_ratio": pe_ok,
+            "successful_pb_ratio": pb_ok,
+            "successful_ev_ebitda": ev_ebitda_ok,
+        },
+        "missing_ticker_years": {
+            "no_yahoo_price": missing_no_price_uniq,
+            "no_yahoo_price_count": len(missing_no_price_uniq),
+            "no_shares_outstanding": missing_no_shares_uniq,
+            "no_shares_outstanding_count": len(missing_no_shares_uniq),
         },
         "shares_status": shares_status,
         "corrected_balance_sheet_2024": {
@@ -442,8 +621,8 @@ def build(log=print) -> dict:
         "limitations": (
             "Shares outstanding is the binding gap: without a real per-ticker-year share count "
             "(KAP/company reports), market_cap cannot be computed and all derived ratios stay null. "
-            "Yahoo provides only year-end PRICE freely, not historical shares. 2024 equity/net_debt are "
-            "misaligned and were rejected, not imputed."),
+            "Yahoo provides year-end PRICE (close) freely; adjclose is also captured but not used for "
+            "price-based calculations. 2024 equity/net_debt are misaligned and were rejected, not imputed."),
         "not_investment_advice": True,
     }
     REPORT_JSON.write_text(json.dumps(report, indent=2, default=str))
@@ -453,23 +632,38 @@ def build(log=print) -> dict:
 
 def _write_md(r: dict, have_shares: bool) -> None:
     cs = r["target_column_status"]
+    vc = r["valuation_coverage"]
+    pc = r["price_coverage"]
+    mt = r["missing_ticker_years"]
     lines = [
         "# Free valuation history report", "",
         "Reconstruct missing valuation columns from FREE sources (no Fintables). "
         "Research/educational only — NOT investment advice.", "",
         f"- Tickers: **{r['tickers_covered']}**  Years: {r['years_covered'][0]}–{r['years_covered'][-1]}",
-        f"- Year-end price rows: **{r['price_coverage']['rows_with_price']}/{r['price_coverage']['total_rows']}** "
-        f"(Yahoo ok for {r['price_coverage']['yahoo_meta'].get('yahoo_ok', 0)} tickers)",
+        f"- Price CSV format: **{pc['format']}**",
+        f"- Yahoo price rows loaded: **{pc['yahoo_price_rows_loaded']}**  "
+        f"success: **{pc['yahoo_success_rows']}**  error: **{pc['yahoo_error_rows']}**",
+        f"- Rows with price in grid: **{pc['rows_with_price']}/{pc['total_rows']}**",
         f"- Shares outstanding: **{r['shares_status']}**"
         + (f"  → fill template `{r['shares_template_path']}`" if r.get("shares_template_path") else ""),
-        "", "## Target valuation columns", "", "| column | formula | status | usable values |",
+        "", "## Valuation coverage", "",
+        f"- successful market_cap: **{vc['successful_market_cap']}**",
+        f"- successful enterprise_value: **{vc['successful_enterprise_value']}**",
+        f"- successful pe_ratio: **{vc['successful_pe_ratio']}**",
+        f"- successful pb_ratio: **{vc['successful_pb_ratio']}**",
+        f"- successful ev_ebitda: **{vc['successful_ev_ebitda']}**",
+        "",
+        f"- missing ticker-years (no Yahoo price): **{mt['no_yahoo_price_count']}**",
+        f"- missing ticker-years (no shares outstanding): **{mt['no_shares_outstanding_count']}**",
+        "",
+        "## Target valuation columns", "", "| column | formula | status | usable values |",
         "|---|---|---|---|",
         f"| market_cap | year_end_close × shares_outstanding | {cs['market_cap']} | {r['usable_values_by_column']['market_cap']} |",
         f"| pe | market_cap / net_income | {cs['pe']} | {r['usable_values_by_column']['pe']} |",
         f"| pb | market_cap / equity | {cs['pb']} | {r['usable_values_by_column']['pb']} |",
         f"| enterprise_value | market_cap + net_debt | {cs['enterprise_value']} | {r['usable_values_by_column']['enterprise_value']} |",
         f"| ev_ebitda | enterprise_value / ebitda | {cs['ev_ebitda']} | {r['usable_values_by_column']['ev_ebitda']} |",
-        "", f"## Columns entering the model candidate", "",
+        "", "## Columns entering the model candidate", "",
         ", ".join(r["columns_entering_candidate"]) or "**none** (dependency missing)",
         "", "## Rejection summary", "",
     ]
@@ -487,18 +681,35 @@ def _write_md(r: dict, have_shares: bool) -> None:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--prices-only", action="store_true", help="collect year-end prices + cache, then stop")
+    ap.add_argument("--prices-only", action="store_true",
+                    help="report price CSV status, then stop (no valuation build)")
     a = ap.parse_args(argv)
     if a.prices_only:
         tickers = _tickers()
-        _, meta = collect_year_end_prices(tickers)
-        print(f"[prices-only] {json.dumps({k: v for k, v in meta.items() if k != 'failed'})}")
+        prices, meta = collect_year_end_prices(tickers, log=lambda *_: None)
+        fmt = meta.get("format", "unknown")
+        if fmt == "new_format":
+            print(f"[prices-only] new-format CSV: loaded={meta['rows_loaded']} "
+                  f"success={meta['success_rows']} error={meta['error_rows']} "
+                  f"usable={len(prices)}")
+        else:
+            print(f"[prices-only] legacy format: "
+                  f"{json.dumps({k: v for k, v in meta.items() if k != 'failed'})}")
         return 0
     rep = build()
+    vc = rep["valuation_coverage"]
+    pc = rep["price_coverage"]
     print(f"[valuation] target_status={rep['target_column_status']}")
     print(f"[valuation] columns_entering_candidate={rep['columns_entering_candidate']}")
-    print(f"[valuation] shares_status={rep['shares_status']} "
-          f"price_rows={rep['price_coverage']['rows_with_price']}/{rep['price_coverage']['total_rows']}")
+    print(f"[valuation] price_format={pc['format']} "
+          f"yahoo_success={pc['yahoo_success_rows']} yahoo_error={pc['yahoo_error_rows']} "
+          f"rows_with_price={pc['rows_with_price']}/{pc['total_rows']}")
+    print(f"[valuation] market_cap={vc['successful_market_cap']} "
+          f"ev={vc['successful_enterprise_value']} "
+          f"pe={vc['successful_pe_ratio']} pb={vc['successful_pb_ratio']} "
+          f"ev_ebitda={vc['successful_ev_ebitda']}")
+    print(f"[valuation] missing_no_price={rep['missing_ticker_years']['no_yahoo_price_count']} "
+          f"missing_no_shares={rep['missing_ticker_years']['no_shares_outstanding_count']}")
     print(f"[valuation] wrote {CANDIDATE.name}, {REPORT_JSON.name}, {REPORT_MD.name}")
     return 0
 

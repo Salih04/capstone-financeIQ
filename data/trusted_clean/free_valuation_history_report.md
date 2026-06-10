@@ -3,8 +3,21 @@
 Reconstruct missing valuation columns from FREE sources (no Fintables). Research/educational only — NOT investment advice.
 
 - Tickers: **40**  Years: 2020–2025
-- Year-end price rows: **226/240** (Yahoo ok for 0 tickers)
+- Price CSV format: **new_format**
+- Yahoo price rows loaded: **240**  success: **226**  error: **14**
+- Rows with price in grid: **226/240**
 - Shares outstanding: **manual**
+
+## Valuation coverage
+
+- successful market_cap: **208**
+- successful enterprise_value: **208**
+- successful pe_ratio: **168**
+- successful pb_ratio: **208**
+- successful ev_ebitda: **192**
+
+- missing ticker-years (no Yahoo price): **14**
+- missing ticker-years (no shares outstanding): **18**
 
 ## Target valuation columns
 
@@ -28,4 +41,4 @@ market_cap, enterprise_value, pe, pb, ev_ebitda
 
 ## Limitation
 
-Shares outstanding is the binding gap: without a real per-ticker-year share count (KAP/company reports), market_cap cannot be computed and all derived ratios stay null. Yahoo provides only year-end PRICE freely, not historical shares. 2024 equity/net_debt are misaligned and were rejected, not imputed.
+Shares outstanding is the binding gap: without a real per-ticker-year share count (KAP/company reports), market_cap cannot be computed and all derived ratios stay null. Yahoo provides year-end PRICE (close) freely; adjclose is also captured but not used for price-based calculations. 2024 equity/net_debt are misaligned and were rejected, not imputed.

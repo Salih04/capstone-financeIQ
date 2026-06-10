@@ -1,0 +1,186 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "TRY",
+          "symbol": "DSTKF.IS",
+          "exchangeName": "IST",
+          "fullExchangeName": "Istanbul",
+          "instrumentType": "EQUITY",
+          "firstTradeDate": 1738823400,
+          "regularMarketTime": 1781015819,
+          "hasPrePostMarketData": false,
+          "gmtoffset": 10800,
+          "timezone": "TRT",
+          "exchangeTimezoneName": "Europe/Istanbul",
+          "regularMarketPrice": 2522.5,
+          "fiftyTwoWeekHigh": 2895.0,
+          "fiftyTwoWeekLow": 265.25,
+          "regularMarketDayHigh": 2560.0,
+          "regularMarketDayLow": 2450.0,
+          "regularMarketVolume": 327116,
+          "shortName": "DESTEK FINANS FAKTORING",
+          "chartPreviousClose": 532.5,
+          "priceHint": 2,
+          "currentTradingPeriod": {
+            "pre": {
+              "timezone": "TRT",
+              "end": 1780986600,
+              "start": 1780986600,
+              "gmtoffset": 10800
+            },
+            "regular": {
+              "timezone": "TRT",
+              "end": 1781017200,
+              "start": 1780986600,
+              "gmtoffset": 10800
+            },
+            "post": {
+              "timezone": "TRT",
+              "end": 1781017200,
+              "start": 1781017200,
+              "gmtoffset": 10800
+            }
+          },
+          "dataGranularity": "1d",
+          "range": "",
+          "validRanges": [
+            "1d",
+            "5d",
+            "1mo",
+            "3mo",
+            "6mo",
+            "1y",
+            "2y",
+            "ytd",
+            "max"
+          ]
+        },
+        "timestamp": [
+          1766385000,
+          1766471400,
+          1766557800,
+          1766644200,
+          1766730600,
+          1766989800,
+          1767076200,
+          1767162600,
+          1767335400,
+          1767594600,
+          1767681000,
+          1767767400,
+          1767853800,
+          1767940200
+        ],
+        "indicators": {
+          "quote": [
+            {
+              "open": [
+                544.0,
+                567.0,
+                567.0,
+                592.0,
+                608.0,
+                605.0,
+                602.5,
+                577.5,
+                559.0,
+                561.0,
+                625.5,
+                635.0,
+                640.0,
+                667.5
+              ],
+              "close": [
+                561.5,
+                567.0,
+                590.0,
+                602.5,
+                596.0,
+                602.0,
+                581.0,
+                555.0,
+                560.0,
+                616.0,
+                629.0,
+                636.5,
+                678.5,
+                667.5
+              ],
+              "high": [
+                574.0,
+                571.0,
+                620.0,
+                615.0,
+                615.5,
+                619.0,
+                625.0,
+                591.5,
+                569.5,
+                616.0,
+                638.0,
+                669.5,
+                693.0,
+                688.5
+              ],
+              "volume": [
+                10291333,
+                1414503,
+                1906257,
+                1290462,
+                6290843,
+                8575147,
+                9100164,
+                14256755,
+                1429455,
+                1837995,
+                1674327,
+                3067820,
+                5946565,
+                3359743
+              ],
+              "low": [
+                528.5,
+                556.0,
+                566.0,
+                590.5,
+                596.0,
+                601.0,
+                542.0,
+                528.5,
+                552.0,
+                561.0,
+                614.0,
+                625.0,
+                637.0,
+                667.0
+              ]
+            }
+          ],
+          "adjclose": [
+            {
+              "adjclose": [
+                561.5,
+                567.0,
+                590.0,
+                602.5,
+                596.0,
+                602.0,
+                581.0,
+                555.0,
+                560.0,
+                616.0,
+                629.0,
+                636.5,
+                678.5,
+                667.5
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "error": null
+  }
+}

@@ -15,11 +15,34 @@ investment advice.**
 ## Commands
 
 ```bash
+# Full pipeline in order:
+python scripts/fetch_yahoo_chart_prices.py --start-year 2020 --end-year 2025
+make shares        # expand capital events -> shares_outstanding_manual.csv
+make valuation     # Yahoo prices + shares -> valuation candidate CSV
+make data          # build + validate modeling dataset
+make full-research-agent  # all pipeline steps + experiments + tests
+
+# Individual steps:
 make extract-yearly-financials   # XLSX -> candidate manual file (validated)
-make data                        # build + validate modeling dataset
-make research                    # walk-forward experiments
-make full-research               # all three in order
+make research                    # walk-forward experiments only
+make full-research               # extract -> benchmark -> ingest -> valuation -> data -> experiments
 ```
+
+### Price fetch step
+
+`scripts/fetch_yahoo_chart_prices.py` fetches year-end close prices from the
+Yahoo Finance Chart API (no API key). Outputs:
+
+- `data/trusted_raw/prices/yahoo_year_end_prices.csv` — one row per
+  ticker-year with columns `ticker, yahoo_symbol, year, target_date, price_date,
+  close, adjclose, currency, source, status, error`
+- `data/trusted_raw/prices/yahoo_chart_raw/<SYMBOL>_<YEAR>.json` — raw JSON
+  cache (idempotent; re-running only fetches missing files)
+
+Uses `close` (not adjclose) as the canonical price in valuation calculations.
+Retry policy: 429/5xx retry with exponential backoff; 400/401/403/404 do not
+retry (permanent failure).  Expected missing rows: ASTOR 2020–2022, CANTE 2020,
+DSTKF 2020–2024, MIATK 2020, PASEU 2020–2023 (not-yet-listed years).
 
 ## Reusing the yearly Excel files (honest extraction)
 

@@ -9,15 +9,59 @@
     2025
   ],
   "price_coverage": {
+    "format": "new_format",
+    "yahoo_price_rows_loaded": 240,
+    "yahoo_success_rows": 226,
+    "yahoo_error_rows": 14,
     "rows_with_price": 226,
-    "total_rows": 240,
-    "yahoo_meta": {
-      "attempted": 0,
-      "yahoo_ok": 0,
-      "from_cache": 40,
-      "from_manual": 0,
-      "failed": []
-    }
+    "total_rows": 240
+  },
+  "valuation_coverage": {
+    "successful_market_cap": 208,
+    "successful_enterprise_value": 208,
+    "successful_pe_ratio": 168,
+    "successful_pb_ratio": 208,
+    "successful_ev_ebitda": 192
+  },
+  "missing_ticker_years": {
+    "no_yahoo_price": [
+      "ASTOR/2020",
+      "ASTOR/2021",
+      "ASTOR/2022",
+      "CANTE/2020",
+      "DSTKF/2020",
+      "DSTKF/2021",
+      "DSTKF/2022",
+      "DSTKF/2023",
+      "DSTKF/2024",
+      "MIATK/2020",
+      "PASEU/2020",
+      "PASEU/2021",
+      "PASEU/2022",
+      "PASEU/2023"
+    ],
+    "no_yahoo_price_count": 14,
+    "no_shares_outstanding": [
+      "MAVI/2020",
+      "MAVI/2021",
+      "MAVI/2022",
+      "MAVI/2023",
+      "MAVI/2024",
+      "MAVI/2025",
+      "TRALT/2020",
+      "TRALT/2021",
+      "TRALT/2022",
+      "TRALT/2023",
+      "TRALT/2024",
+      "TRALT/2025",
+      "TRMET/2020",
+      "TRMET/2021",
+      "TRMET/2022",
+      "TRMET/2023",
+      "TRMET/2024",
+      "TRMET/2025"
+    ],
+    "no_shares_outstanding_count": 18
   },
   "shares_status": "manual",
   "corrected_balance_sheet_2024": {
@@ -121,6 +165,6 @@
   "feature_count_before": 27,
   "feature_count_after_if_accepted": 32,
   "candidate_csv": "data/trusted_raw/financials/free_valuation_history_candidate.csv",
-  "limitations": "Shares outstanding is the binding gap: without a real per-ticker-year share count (KAP/company reports), market_cap cannot be computed and all derived ratios stay null. Yahoo provides only year-end PRICE freely, not historical shares. 2024 equity/net_debt are misaligned and were rejected, not imputed.",
+  "limitations": "Shares outstanding is the binding gap: without a real per-ticker-year share count (KAP/company reports), market_cap cannot be computed and all derived ratios stay null. Yahoo provides year-end PRICE (close) freely; adjclose is also captured but not used for price-based calculations. 2024 equity/net_debt are misaligned and were rejected, not imputed.",
   "not_investment_advice": true
 }

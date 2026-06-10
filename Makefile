@@ -1,6 +1,6 @@
 .PHONY: data data-validate data-benchmark benchmark extract-yearly-financials research full-research \
 	inspect-quarterly research-agent-dataset research-agent-check full-research-agent ingest-corrected-yearly \
-	prices valuation shares \
+	prices valuation shares fetch-prices \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration
@@ -69,7 +69,13 @@ extract-yearly-financials:
 ingest-corrected-yearly:
 	PYTHONPATH=. python -m scripts.data_collection.ingest_corrected_yearly_financials
 
-# Collect free year-end prices from Yahoo (TICKER.IS) and cache them. No shares.
+# Fetch year-end prices from Yahoo Finance Chart API -> yahoo_year_end_prices.csv (new format).
+# Uses raw JSON cache; only hits network for missing ticker-years.
+# Run this once (or when refreshing prices) before `make valuation`.
+fetch-prices:
+	python scripts/fetch_yahoo_chart_prices.py --start-year 2020 --end-year 2025
+
+# Report price CSV status (reads existing cache, does not fetch).
 prices:
 	PYTHONPATH=. python -m scripts.data_collection.build_free_valuation_history --prices-only
 

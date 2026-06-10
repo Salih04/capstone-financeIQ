@@ -8,7 +8,7 @@
       "n": 40,
       "mae": 35.2,
       "rmse": 75.78,
-      "spearman": -0.034,
+      "spearman": -0.029,
       "precision_at_5": 0.2,
       "top_bucket_avg_return": 42.96,
       "median_actual_return": 1.64,
@@ -19,7 +19,7 @@
       "n": 40,
       "mae": 35.2,
       "rmse": 75.78,
-      "spearman": -0.034,
+      "spearman": -0.029,
       "precision_at_5": 0.2,
       "top_bucket_avg_return": 42.96,
       "median_actual_return": 1.64,
@@ -28,31 +28,31 @@
     "linear_regression": {
       "kind": "ml",
       "n": 40,
-      "mae": 119.32,
-      "rmse": 148.12,
-      "spearman": 0.032,
+      "mae": 118.95,
+      "rmse": 147.44,
+      "spearman": 0.015,
       "precision_at_5": 0.0,
-      "top_bucket_avg_return": 25.05,
+      "top_bucket_avg_return": 25.4,
       "median_actual_return": 1.64,
       "directional_acc": 0.45
     },
     "ridge": {
       "kind": "ml",
       "n": 40,
-      "mae": 107.18,
-      "rmse": 121.39,
-      "spearman": -0.173,
+      "mae": 107.15,
+      "rmse": 121.68,
+      "spearman": -0.175,
       "precision_at_5": 0.0,
       "top_bucket_avg_return": -3.57,
       "median_actual_return": 1.64,
-      "directional_acc": 0.45
+      "directional_acc": 0.5
     },
     "lasso": {
       "kind": "ml",
       "n": 40,
-      "mae": 111.59,
-      "rmse": 130.48,
-      "spearman": -0.114,
+      "mae": 112.23,
+      "rmse": 131.86,
+      "spearman": -0.113,
       "precision_at_5": 0.0,
       "top_bucket_avg_return": 4.42,
       "median_actual_return": 1.64,
@@ -61,9 +61,9 @@
     "elasticnet": {
       "kind": "ml",
       "n": 40,
-      "mae": 104.56,
-      "rmse": 116.13,
-      "spearman": -0.29,
+      "mae": 104.46,
+      "rmse": 116.17,
+      "spearman": -0.299,
       "precision_at_5": 0.0,
       "top_bucket_avg_return": -3.57,
       "median_actual_return": 1.64,
@@ -72,13 +72,13 @@
     "random_forest": {
       "kind": "ml",
       "n": 40,
-      "mae": 109.54,
-      "rmse": 128.48,
-      "spearman": -0.244,
-      "precision_at_5": 0.2,
-      "top_bucket_avg_return": 74.56,
+      "mae": 107.4,
+      "rmse": 125.6,
+      "spearman": -0.272,
+      "precision_at_5": 0.4,
+      "top_bucket_avg_return": 107.21,
       "median_actual_return": 1.64,
-      "directional_acc": 0.4
+      "directional_acc": 0.35
     }
   }
 }

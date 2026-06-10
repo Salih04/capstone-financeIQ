@@ -1,0 +1,189 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "TRY",
+          "symbol": "BRSAN.IS",
+          "exchangeName": "IST",
+          "fullExchangeName": "Istanbul",
+          "instrumentType": "EQUITY",
+          "firstTradeDate": 957940200,
+          "regularMarketTime": 1781015814,
+          "hasPrePostMarketData": false,
+          "gmtoffset": 10800,
+          "timezone": "TRT",
+          "exchangeTimezoneName": "Europe/Istanbul",
+          "regularMarketPrice": 605.5,
+          "fiftyTwoWeekHigh": 789.0,
+          "fiftyTwoWeekLow": 297.5,
+          "regularMarketDayHigh": 645.5,
+          "regularMarketDayLow": 602.0,
+          "regularMarketVolume": 2879060,
+          "longName": "Borusan Birlesik Boru Fabrikalari Sanayi ve Ticaret A.S.",
+          "shortName": "BORUSAN BORU SANAYI",
+          "chartPreviousClose": 504.5,
+          "priceHint": 2,
+          "currentTradingPeriod": {
+            "pre": {
+              "timezone": "TRT",
+              "start": 1780986600,
+              "end": 1780986600,
+              "gmtoffset": 10800
+            },
+            "regular": {
+              "timezone": "TRT",
+              "start": 1780986600,
+              "end": 1781017200,
+              "gmtoffset": 10800
+            },
+            "post": {
+              "timezone": "TRT",
+              "start": 1781017200,
+              "end": 1781017200,
+              "gmtoffset": 10800
+            }
+          },
+          "dataGranularity": "1d",
+          "range": "",
+          "validRanges": [
+            "1d",
+            "5d",
+            "1mo",
+            "3mo",
+            "6mo",
+            "1y",
+            "2y",
+            "5y",
+            "10y",
+            "ytd",
+            "max"
+          ]
+        },
+        "timestamp": [
+          1766385000,
+          1766471400,
+          1766557800,
+          1766644200,
+          1766730600,
+          1766989800,
+          1767076200,
+          1767162600,
+          1767335400,
+          1767594600,
+          1767681000,
+          1767767400,
+          1767853800,
+          1767940200
+        ],
+        "indicators": {
+          "quote": [
+            {
+              "high": [
+                545.0,
+                534.0,
+                529.0,
+                541.0,
+                524.0,
+                536.5,
+                533.5,
+                561.5,
+                573.5,
+                586.5,
+                575.0,
+                579.0,
+                577.0,
+                581.0
+              ],
+              "open": [
+                538.0,
+                523.0,
+                520.0,
+                527.5,
+                523.0,
+                514.5,
+                528.0,
+                529.5,
+                559.5,
+                572.5,
+                574.0,
+                567.5,
+                563.5,
+                576.5
+              ],
+              "close": [
+                525.0,
+                519.5,
+                525.5,
+                523.5,
+                513.5,
+                528.5,
+                529.5,
+                555.0,
+                569.5,
+                571.0,
+                566.0,
+                562.5,
+                573.5,
+                568.5
+              ],
+              "low": [
+                515.5,
+                513.0,
+                513.0,
+                523.5,
+                513.5,
+                511.5,
+                511.5,
+                528.0,
+                555.0,
+                558.0,
+                565.0,
+                560.5,
+                548.5,
+                563.0
+              ],
+              "volume": [
+                2370472,
+                1366308,
+                1101336,
+                699742,
+                692608,
+                1752003,
+                1289188,
+                2180844,
+                1701667,
+                1758942,
+                1016076,
+                1213154,
+                1262762,
+                1345180
+              ]
+            }
+          ],
+          "adjclose": [
+            {
+              "adjclose": [
+                525.0,
+                519.5,
+                525.5,
+                523.5,
+                513.5,
+                528.5,
+                529.5,
+                555.0,
+                569.5,
+                571.0,
+                566.0,
+                562.5,
+                573.5,
+                568.5
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "error": null
+  }
+}
