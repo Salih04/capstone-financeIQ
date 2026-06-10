@@ -10,6 +10,8 @@ from app.database import get_db
 from app.models.user import User
 from app.schemas.forecasting import (
     AvailableFiltersResponse,
+    CsvTrainRequest,
+    CsvRunRequest,
     EvaluationOut,
     EvaluationRequest,
     ExplanationResponse,
@@ -43,6 +45,7 @@ from app.services.forecasting_service import (
     run_forecast_for_sector,
     train_sector_success_model,
 )
+from app.services import forecasting_csv_service as _csv_svc
 
 router = APIRouter(tags=["forecasting"])
 
@@ -261,3 +264,58 @@ def get_filters(
     _: User = Depends(get_current_user),
 ):
     return get_available_filters(db)
+
+
+# ── CSV-backed pipeline endpoints (no DB required) ────────────────────────────
+
+@router.get("/forecasting/options")
+def csv_options(_: User = Depends(get_current_user)):
+    try:
+        return _csv_svc.get_options()
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@router.post("/forecasting/train")
+def csv_train(body: CsvTrainRequest, _: User = Depends(get_current_user)):
+    try:
+        return _csv_svc.train_parameters(
+            train_year_from=body.train_year_from,
+            train_year_to=body.train_year_to,
+            top_n=body.top_n,
+        )
+    except (ValueError, FileNotFoundError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    except Exception as exc:
+        logger.exception("forecasting/train failed")
+        raise HTTPException(status_code=400, detail=f"Training failed. ({type(exc).__name__}: {exc})")
+
+
+@router.post("/forecasting/run")
+def csv_run(body: CsvRunRequest, _: User = Depends(get_current_user)):
+    try:
+        return _csv_svc.run_forecast(
+            year=body.year,
+            trained_weights=body.trained_weights,
+            risk_level=body.risk_level,
+            user_type=body.user_type,
+        )
+    except (ValueError, FileNotFoundError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    except Exception as exc:
+        logger.exception("forecasting/run failed")
+        raise HTTPException(status_code=400, detail=f"Forecast failed. ({type(exc).__name__}: {exc})")
+
+
+@router.get("/forecasting/explain/{ticker}")
+def csv_explain(
+    ticker: str,
+    year: int | None = None,
+    _: User = Depends(get_current_user),
+):
+    try:
+        return _csv_svc.explain_ticker(ticker=ticker, year=year)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))

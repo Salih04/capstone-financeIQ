@@ -216,3 +216,18 @@ class WinnerCohortRowOut(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+# ── CSV-backed pipeline (no DB required) ──────────────────────────────────────
+
+class CsvTrainRequest(BaseModel):
+    train_year_from: int = 2020
+    train_year_to: int = 2024
+    top_n: int = 12
+
+
+class CsvRunRequest(BaseModel):
+    year: int
+    trained_weights: dict[str, float]
+    risk_level: str = "medium"
+    user_type: str = "individual"
