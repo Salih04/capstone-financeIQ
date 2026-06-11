@@ -29,9 +29,26 @@ class Settings(BaseSettings):
 
     # Optional Supabase Auth compatibility for frontend-managed sessions.
     # Legacy backend JWT auth remains supported for tests and old clients.
+    # SUPABASE_JWT_SECRET → HS256 (legacy shared secret).
+    # New Supabase "JWT Signing Keys" are asymmetric (RS256/ES256) and verified
+    # via JWKS: set SUPABASE_URL (JWKS URL is derived) or SUPABASE_JWKS_URL.
     SUPABASE_JWT_SECRET: str | None = None
     SUPABASE_JWT_AUDIENCE: str = "authenticated"
     SUPABASE_AUTO_CREATE_USERS: bool = True
+    SUPABASE_URL: str | None = None
+    SUPABASE_JWKS_URL: str | None = None
+
+    def supabase_jwks_url(self) -> str | None:
+        if self.SUPABASE_JWKS_URL:
+            return self.SUPABASE_JWKS_URL.strip()
+        if self.SUPABASE_URL:
+            return f"{self.SUPABASE_URL.rstrip('/')}/auth/v1/.well-known/jwks.json"
+        return None
+
+    def supabase_issuer(self) -> str | None:
+        if self.SUPABASE_URL:
+            return f"{self.SUPABASE_URL.rstrip('/')}/auth/v1"
+        return None
 
     # ── Private/demo access control ──
     # Defaults preserve current behavior (open demo) so nothing breaks on deploy
