@@ -35,7 +35,7 @@ claim.
 | Walk-forward experiments | DONE | `experiments/`, honest weak-signal verdict |
 | Explainable research agent (+ optional OpenRouter/local LLM) | DONE | `/research/*`, grounded intents, never advice |
 | Research Terminal frontend | DONE | Fable 5: dashboard, research-agent, companies, experiments, score explorer, data-quality, benchmark, forecasting |
-| Frontend session cache | DONE | `frontend/src/utils/sessionCache.js`, 5-minute in-memory TTL, hard refresh still fetches |
+| Frontend cache layer | DONE | Centralized `frontend/src/api/cache.js` (sessionStorage, SWR, dedupe, TTL SHORT/MEDIUM/LONG) + `useCachedResource` + `CacheTag`; `utils/sessionCache.js` is a shim. Never caches auth/`/research/ask`/errors; hard refresh fetches |
 | Secondary page caveats | DONE | CompanyPage, ComparePage, ScoreResultPage, CompanyResearchDetailPage, DataHealthPage use TerminalFx caveat strips |
 | Forecasting (legacy) restored | DONE | filters union, friendly errors, re-clickable actions |
 | Forecasting CSV pipeline | DONE | CSV-backed; no DB required; train→rank→explain functional |
@@ -47,7 +47,12 @@ claim.
 | BIST100 expansion preparation | DONE | `bist100_candidates.csv` (44 candidates), `clean_yfinance_candidate.py`, `update_training_universe_from_yfinance.py`, Makefile targets: collect/clean/update/validate |
 | Pipeline audit + feature report | DONE | `pipeline_audit_report.*`, `feature_engineering_report.*`, feature/coverage/stability experiment CSVs |
 | AI availability diagnostics | DONE | `/research/ai-status`, structured "AI not configured" response, no secret hardcoding |
-| Tests | DONE | root 97 + backend 15 passing |
+| Public demo endpoints | DONE | research + CSV-forecasting use `optional_user` (DB-free, never 401/403); fixes "no data after login" |
+| Runtime data diagnostic | DONE | public `GET /research/runtime-status` — rows/tickers, contexts, missing files, AI config, no secrets |
+| 2026 forward forecast | DONE | public `GET /forecasting/inference?year=2025` → 40-row 2026 ranking (unevaluated); 3-stage Forecasting page (Training 2020–2024 → Prediction 2025 → 2026 ranking) |
+| Experimental 2025 partial-target mode | DONE | opt-in `target_mode=include_partial_2025`; labeled non-comparable; separate from forward forecast; needs real `partial_2026_ytd_returns.csv` (absent → unavailable, no fabrication) |
+| Render Docker deploy | DONE | `render.yaml` (Docker, repo-root context), `$PORT`-aware Dockerfile CMD, docs aligned |
+| Tests | DONE | root 97 + backend 32 passing |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
 ---

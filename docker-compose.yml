@@ -26,7 +26,9 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/capstone_db
-      SECRET_KEY: CHANGE_ME_IN_PRODUCTION_supersecretkey123
+      # Dev-only fallback. NEVER deploy with this value — set SECRET_KEY in your
+      # environment (.env / host) so JWTs are signed with a real secret.
+      SECRET_KEY: ${SECRET_KEY:-dev-insecure-do-not-use-in-production}
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: 1440
       # Trusted yearly dataset paths (loaded on startup, see backend Dockerfile CMD).

@@ -21,24 +21,9 @@ from typing import Any
 
 import pandas as pd
 
-def _resolve_repo_root() -> Path:
-    """Find the dir that actually holds data/trusted_clean.
+from app.core.paths import resolve_repo_root
 
-    Works in the repo (parents[3]) and in Docker (WORKDIR /app with data mounted),
-    and honours an explicit RESEARCH_REPO_ROOT override.
-    """
-    candidates = []
-    env = os.environ.get("RESEARCH_REPO_ROOT")
-    if env:
-        candidates.append(Path(env))
-    candidates += [Path(__file__).resolve().parents[3], Path("/app"), Path.cwd()]
-    for c in candidates:
-        if (c / "data" / "trusted_clean").is_dir():
-            return c
-    return Path(__file__).resolve().parents[3]
-
-
-REPO_ROOT = _resolve_repo_root()
+REPO_ROOT = resolve_repo_root()
 CLEAN = REPO_ROOT / "data" / "trusted_clean"
 MODELING_CSV = CLEAN / "modeling_dataset_2020_2025.csv"
 PUBLIC_MODELING_CSV = CLEAN / "modeling_dataset_public_2020_2025.csv"
@@ -195,6 +180,79 @@ def ai_status(smoke: bool = False) -> dict:
     elif smoke:
         result["smoke_test"] = {"ok": False, "error": reason}
     return result
+
+
+def runtime_status() -> dict:
+    """Safe data + AI runtime diagnostic. Verifies what the backend actually
+    loads (not just file existence) and never exposes secrets.
+    """
+    from app.core import paths as _paths
+
+    pub = _paths.get_public_modeling_dataset_path()
+    train = _paths.get_training_modeling_dataset_path()
+    contexts = _paths.get_company_contexts_dir()
+
+    def _coverage(p: Path) -> dict:
+        if not p.is_file():
+            return {"exists": False, "rows": 0, "tickers": 0, "target_rows": 0, "years": []}
+        try:
+            df = pd.read_csv(p)
+            years = sorted(int(y) for y in df["year"].dropna().unique()) if "year" in df.columns else []
+            tcol = "ticker" if "ticker" in df.columns else df.columns[0]
+            target_rows = int(df["has_target"].sum()) if "has_target" in df.columns else 0
+            return {"exists": True, "rows": int(len(df)), "tickers": int(df[tcol].nunique()),
+                    "target_rows": target_rows, "years": years}
+        except Exception as exc:  # noqa - diagnostic must never raise
+            return {"exists": True, "error": f"{type(exc).__name__}: {exc}", "rows": 0,
+                    "tickers": 0, "target_rows": 0, "years": []}
+
+    pub_cov = _coverage(pub)
+    train_cov = _coverage(train)
+    n_contexts = len(list(contexts.glob("*.json"))) if contexts.is_dir() else 0
+    sample_tickers = []
+    if pub_cov.get("exists") and not pub_cov.get("error"):
+        try:
+            df = pd.read_csv(pub)
+            tcol = "ticker" if "ticker" in df.columns else df.columns[0]
+            sample_tickers = sorted(df[tcol].astype(str).str.upper().unique().tolist())[:8]
+        except Exception:
+            sample_tickers = []
+
+    cfg = get_config()
+    ai = ai_status(smoke=False)
+
+    # Report repo-relative paths only — never leak the absolute server filesystem
+    # layout on this public diagnostic endpoint.
+    def _rel(p: Path) -> str:
+        try:
+            return str(p.relative_to(REPO_ROOT))
+        except ValueError:
+            return p.name
+
+    return {
+        "repo_root_resolved": True,
+        "trusted_clean_exists": _paths.get_trusted_clean_dir().is_dir(),
+        "public_dataset_path": _rel(pub),
+        "public_dataset_exists": pub_cov.get("exists", False),
+        "training_dataset_path": _rel(train),
+        "training_dataset_exists": train_cov.get("exists", False),
+        "company_contexts_path": _rel(contexts),
+        "company_contexts_exists": contexts.is_dir(),
+        "public_rows": pub_cov.get("rows", 0),
+        "public_tickers": pub_cov.get("tickers", 0),
+        "public_target_rows": pub_cov.get("target_rows", 0),
+        "training_rows": train_cov.get("rows", 0),
+        "training_tickers": train_cov.get("tickers", 0),
+        "training_target_rows": train_cov.get("target_rows", 0),
+        "years": pub_cov.get("years", []),
+        "company_contexts_count": n_contexts,
+        "sample_tickers": sample_tickers,
+        "missing_required_files": _paths.missing_required_runtime_files(),
+        "ai_provider_configured": bool(ai.get("configured")),
+        "ai_provider": cfg["provider"],
+        "llm_fallback_available": True,
+        "disclaimer": NOT_ADVICE,
+    }
 
 
 SYSTEM_PROMPT = """You are a financial research assistant for an academic BIST (Borsa Istanbul) research project.

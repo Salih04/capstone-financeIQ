@@ -113,6 +113,41 @@ Enforced in `app/services/research/feature_registry.py`:
 - Selected year never silently falls back to the latest year.
 - 2025 is inference-only unless explicit validated T+1 outcomes are added.
 
+## Forward forecast: 2025 → 2026 (inference, not a backtest)
+
+The training/backtest window ends at **2024** because finalized T+1 labels are
+available through 2025. 2025 is **not missing** — its rows are used as
+**inference inputs**:
+
+- Train the signal on finalized annual T+1 targets, 2020–2024.
+- Apply the learned weights to 2025 financial rows → a **2026 forward-looking
+  ranking** of the 40 public companies.
+- 2026 realized returns do not exist yet, so this ranking is
+  `unevaluated_forward_forecast` — never presented as a backtest or realized result.
+
+Endpoint: `GET /forecasting/inference?year=2025` (public). Each row carries
+`input_year=2025`, `target_year=2026`, `is_inference=true`,
+`realized_return_available=false`. This is the main forward output and is kept
+separate from the experimental partial-target mode below.
+
+## Experimental: 2025 partial 2026-YTD target mode (opt-in)
+
+The headline methodology is **finalized annual T+1 only** (2020–2024 training). It
+is the sole basis for every model-quality claim (Spearman, IC, walk-forward).
+
+An OPTIONAL experimental mode (`target_mode=include_partial_2025`) can include
+2025 using a **partial 2026 year-to-date return** as a stand-in target:
+
+- `target_year = 2026`, `target_status = "partial_ytd"`, `comparable_to_full_year = false`.
+- Warning attached everywhere: *"2025 uses partial 2026 YTD return and is not
+  directly comparable to finalized annual targets."*
+- It is **never** mixed into the headline finalized result. Any Spearman/IC that
+  uses partial 2025 must be reported separately and labeled experimental/partial.
+- 2025 never appears as a normal finalized training year; `trainable_years`
+  stays 2020–2024 in all modes.
+- Requires real 2026 price data (`data/trusted_clean/partial_2026_ytd_returns.csv`).
+  Absent by default → mode reports unavailable and excludes 2025. No fabrication.
+
 ## Limitations
 
 - Small dataset, even after expansion. All out-of-sample numbers are noisy;

@@ -9,7 +9,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from app.core.dependencies import get_current_user
+from app.core.dependencies import optional_user
 from app.models.user import User
 from app.services import research_agent as RA
 
@@ -17,12 +17,12 @@ router = APIRouter(prefix="/research", tags=["research-agent"])
 
 
 @router.get("/summary")
-def summary(_: User = Depends(get_current_user)):
+def summary(_: User | None = Depends(optional_user)):
     return RA.generate_summary_insight()
 
 
 @router.get("/model-diagnostics")
-def model_diagnostics(_: User = Depends(get_current_user)):
+def model_diagnostics(_: User | None = Depends(optional_user)):
     state = RA.load_research_state()
     return {"diagnostics": RA.build_model_diagnostics_context(state),
             "confidence": RA.confidence_score(state),
@@ -30,37 +30,43 @@ def model_diagnostics(_: User = Depends(get_current_user)):
 
 
 @router.get("/data-quality")
-def data_quality(_: User = Depends(get_current_user)):
+def data_quality(_: User | None = Depends(optional_user)):
     return {"data_quality": RA.build_data_quality_context(), "disclaimer": RA.NOT_ADVICE}
 
 
 @router.get("/ai-status")
-def ai_status(smoke: bool = False, _: User = Depends(get_current_user)):
+def ai_status(smoke: bool = False, _: User | None = Depends(optional_user)):
     return RA.ai_status(smoke=smoke)
 
 
+@router.get("/runtime-status")
+def runtime_status(_: User | None = Depends(optional_user)):
+    """Public data + AI runtime diagnostic. No secrets exposed."""
+    return RA.runtime_status()
+
+
 @router.get("/experiments")
-def experiments(_: User = Depends(get_current_user)):
+def experiments(_: User | None = Depends(optional_user)):
     return RA.experiments_payload()
 
 
 @router.get("/benchmark")
-def benchmark(_: User = Depends(get_current_user)):
+def benchmark(_: User | None = Depends(optional_user)):
     return RA.benchmark_payload()
 
 
 @router.get("/companies")
-def companies(_: User = Depends(get_current_user)):
+def companies(_: User | None = Depends(optional_user)):
     return RA.companies_payload()
 
 
 @router.get("/frozen-evidence")
-def frozen_evidence(_: User = Depends(get_current_user)):
+def frozen_evidence(_: User | None = Depends(optional_user)):
     return RA.frozen_evidence_payload()
 
 
 @router.get("/company/{ticker}")
-def company(ticker: str, _: User = Depends(get_current_user)):
+def company(ticker: str, _: User | None = Depends(optional_user)):
     state = RA.load_research_state()
     try:
         ctx = RA.build_company_context(ticker, state)
@@ -74,7 +80,7 @@ def company(ticker: str, _: User = Depends(get_current_user)):
 
 
 @router.get("/company/{ticker}/score")
-def company_score(ticker: str, _: User = Depends(get_current_user)):
+def company_score(ticker: str, _: User | None = Depends(optional_user)):
     try:
         return RA.generate_company_insight(ticker)
     except KeyError as exc:
@@ -90,7 +96,7 @@ class AskBody(BaseModel):
 
 
 @router.post("/ask")
-def ask(body: AskBody, _: User = Depends(get_current_user)):
+def ask(body: AskBody, _: User | None = Depends(optional_user)):
     if not body.question.strip():
         raise HTTPException(422, "question is required")
     try:

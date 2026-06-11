@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
-import { researchApi } from '../api/researchApi'
+import { useMemo, useState } from 'react'
+import { useCachedResource, CACHE_TTL } from '../api/useCachedResource'
+import CacheTag from '../components/CacheTag'
 
 // ---------------------------------------------------------------------------
 // Benchmark — THE TIDE CHART.
@@ -24,12 +25,9 @@ const fmtIc = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}`
 const tlog = (v) => Math.sign(v) * Math.log10(1 + Math.abs(v))
 
 export default function BenchmarkPage() {
-  const [api, setApi] = useState(null)
+  const { data: api, fromCache, refreshing, savedAt, refresh } =
+    useCachedResource('/research/benchmark', { ttlMs: CACHE_TTL.LONG })
   const [hovered, setHovered] = useState(null)
-
-  useEffect(() => {
-    researchApi.benchmark().then((r) => setApi(r.data)).catch(() => {})
-  }, [])
 
   // merge: live BIST100 returns override mock when present
   const rows = useMemo(() => {
@@ -79,6 +77,7 @@ export default function BenchmarkPage() {
           <span><i className="td-dot is-emerald" /> MODEL TOP-10</span>
           <span><i className="td-dot is-copper" /> IC MARKER (SIZE = |IC|)</span>
           {api?.available === false && <span className="td-mocknote">benchmark API unavailable — evaluation constants shown</span>}
+          <CacheTag fromCache={fromCache} refreshing={refreshing} savedAt={savedAt} onRefresh={refresh} />
         </div>
       </header>
 

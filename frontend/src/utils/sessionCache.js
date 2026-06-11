@@ -1,26 +1,17 @@
-const DEFAULT_TTL_MS = 5 * 60 * 1000
-const cache = new Map()
+// Backward-compatible shim. The real cache now lives in src/api/cache.js
+// (sessionStorage-backed, SWR, in-flight dedupe). Existing callers
+// (getCached/setCached/hasCached) keep working but share one consolidated store.
+import { clearCache, getCached, getEntry, isExpired, setCached as _setCached } from '../api/cache'
 
-function isFresh(entry) {
-  return entry && (entry.expiresAt === null || entry.expiresAt > Date.now())
-}
+const DEFAULT_TTL_MS = 5 * 60 * 1000
 
 export function hasCached(key) {
-  const entry = cache.get(key)
-  if (isFresh(entry)) return true
-  cache.delete(key)
-  return false
+  const e = getEntry(key)
+  return !!(e && !isExpired(e))
 }
 
-export function getCached(key) {
-  if (!hasCached(key)) return undefined
-  return cache.get(key).value
-}
+export { getCached, clearCache }
 
 export function setCached(key, value, ttlMs = DEFAULT_TTL_MS) {
-  cache.set(key, {
-    value,
-    expiresAt: ttlMs === null ? null : Date.now() + ttlMs,
-  })
-  return value
+  return _setCached(key, value, ttlMs)
 }

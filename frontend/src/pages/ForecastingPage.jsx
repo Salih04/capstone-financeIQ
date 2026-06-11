@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import api from '../api/client'
+import { cachedGet, cachedPost, CACHE_TTL } from '../api/cache'
+import CacheTag from '../components/CacheTag'
 
 // ---------------------------------------------------------------------------
 // Forecasting — THE SIGNAL TUNER. Experimental, always labeled so.
@@ -48,6 +50,8 @@ export default function ForecastingPage() {
   const [trainFrom, setTrainFrom] = useState(2020)
   const [trainTo, setTrainTo] = useState(2023)
   const [topN, setTopN] = useState(12)
+  // Experimental opt-in: include 2025 using partial 2026 YTD target.
+  const [partialMode, setPartialMode] = useState(false)
   const [training, setTraining] = useState(false)
   const [trainResult, setTrainResult] = useState(null)
   const [trainError, setTrainError] = useState('')
@@ -61,17 +65,60 @@ export default function ForecastingPage() {
   const [explain, setExplain] = useState(null)
   const [explaining, setExplaining] = useState(false)
 
-  useEffect(() => {
-    api.get('/forecasting/options')
-      .then(({ data }) => {
-        if (!data?.trainable_years?.length) { setMockMode(true); return }
-        setOptions(data)
-        setTrainFrom(data.trainable_years[0])
-        setTrainTo(data.trainable_years[data.trainable_years.length - 1])
-        if (data.all_years?.length) setForecastYear(String(data.all_years[data.all_years.length - 1]))
-      })
-      .catch(() => setMockMode(true))
+  const targetMode = partialMode ? 'include_partial_2025' : 'finalized_only'
+  const [optMeta, setOptMeta] = useState({ fromCache: false, refreshing: false, savedAt: null })
+
+  const applyOptions = useCallback((data) => {
+    if (!data?.trainable_years?.length) { setMockMode(true); return }
+    setMockMode(false)
+    setOptions(data)
+    // trainable_years is always finalized (2020–2024); 2025 is never here.
+    setTrainFrom(data.trainable_years[0])
+    setTrainTo(data.trainable_years[data.trainable_years.length - 1])
+    if (data.all_years?.length) setForecastYear(String(data.all_years[data.all_years.length - 1]))
   }, [])
+
+  // Cached by target_mode → finalized_only and include_partial_2025 never collide.
+  const loadOptions = useCallback(async (force = false) => {
+    const r = await cachedGet('/forecasting/options', { params: { target_mode: targetMode } },
+      { ttlMs: CACHE_TTL.LONG, forceRefresh: force })
+    setOptMeta({ fromCache: r.fromCache, refreshing: !!r.refreshing, savedAt: r.savedAt })
+    if (r.value === undefined && r.error) { setMockMode(true); return }
+    applyOptions(r.value)
+    if (r.revalidate) {
+      const fresh = await r.revalidate
+      if (fresh) { applyOptions(fresh); setOptMeta((m) => ({ ...m, fromCache: false, refreshing: false, savedAt: Date.now() })) }
+      else setOptMeta((m) => ({ ...m, refreshing: false }))
+    }
+  }, [targetMode, applyOptions])
+
+  useEffect(() => { loadOptions(false) }, [loadOptions])
+
+  // ── forward 2026 forecast (2025 inference rows → 2026 ranking) ──
+  const [forecast, setForecast] = useState(null)
+  const [fcMeta, setFcMeta] = useState({ fromCache: false, refreshing: false, savedAt: null })
+  const loadForecast = useCallback(async (force = false) => {
+    const r = await cachedGet('/forecasting/inference', { params: { year: 2025 } },
+      { ttlMs: CACHE_TTL.LONG, forceRefresh: force })
+    setFcMeta({ fromCache: r.fromCache, refreshing: !!r.refreshing, savedAt: r.savedAt })
+    if (r.value !== undefined) setForecast(r.value)
+    if (r.revalidate) {
+      const f = await r.revalidate
+      if (f) { setForecast(f); setFcMeta((m) => ({ ...m, fromCache: false, refreshing: false, savedAt: Date.now() })) }
+      else setFcMeta((m) => ({ ...m, refreshing: false }))
+    }
+  }, [])
+  useEffect(() => { loadForecast(false) }, [loadForecast])
+  const refreshAll = () => { loadOptions(true); loadForecast(true) }
+
+  // Partial mode availability (real 2026 YTD data present in repo?)
+  const partialIncluded = !mockMode && !!options?.includes_partial_targets
+  const partialUnavailable = partialMode && !mockMode && options && !options.includes_partial_targets
+  const partialWarning = options?.partial_target_warning
+    || 'Experimental: 2025 uses partial 2026 year-to-date return. It is not directly comparable to finalized full-year T+1 targets.'
+  const partialUnavailableReason = (options?.excluded_years || [])
+    .find((e) => e.year === 2025)?.reason
+    || 'Partial 2026 YTD data is not available yet.'
 
   const trainable = mockMode ? FORECASTING_MOCK.options.trainable_years : (options?.trainable_years || [])
   const allYears = mockMode ? FORECASTING_MOCK.options.forecast_years : (options?.all_years || [])
@@ -86,12 +133,16 @@ export default function ForecastingPage() {
       return
     }
     setTraining(true); setTrainError(''); setTrainResult(null); setForecastResult(null); setExplain(null)
-    try {
-      const { data } = await api.post('/forecasting/train', {
-        train_year_from: trainFrom, train_year_to: trainTo, top_n: topN,
-      })
-      setTrainResult(data)
-    } catch (e) { setTrainError(errText(e, 'Training failed.')) } finally { setTraining(false) }
+    const body = {
+      train_year_from: trainFrom, train_year_to: partialIncluded ? 2025 : trainTo,
+      top_n: topN, target_mode: targetMode,
+    }
+    // Cached LONG, keyed by the full body → distinct windows/top_n/target_mode
+    // each get their own entry; repeat trains are instant.
+    const r = await cachedPost('/forecasting/train', body, { ttlMs: CACHE_TTL.LONG })
+    if (r.value !== undefined) setTrainResult(r.value)
+    else setTrainError(errText(r.error, 'Training failed.'))
+    setTraining(false)
   }
 
   const runForecast = async () => {
@@ -174,11 +225,70 @@ export default function ForecastingPage() {
             as a historical pattern, never a forward claim.
           </p>
         </div>
-        <div className="ft-expbadge">EXPERIMENTAL{(mockMode || trainResult?.demo) ? ' · DEMO DATA' : ''}</div>
+        <div className="ft-headmeta">
+          <div className="ft-expbadge">EXPERIMENTAL{(mockMode || trainResult?.demo) ? ' · DEMO DATA' : ''}</div>
+          {!mockMode && <CacheTag fromCache={optMeta.fromCache && fcMeta.fromCache} refreshing={optMeta.refreshing || fcMeta.refreshing} savedAt={fcMeta.savedAt || optMeta.savedAt} onRefresh={refreshAll} />}
+        </div>
       </header>
 
       <div className="ft-grid">
         <div className="ft-left">
+          {/* ── FORWARD FORECAST: training 2020–2024 → 2025 inference → 2026 ranking ── */}
+          <section className="ff">
+            <div className="ff-flow">
+              <div className="ff-stage is-train">
+                <div className="ff-stage-label">TRAINING WINDOW</div>
+                <div className="ff-stage-years">2020–2024</div>
+                <div className="ff-stage-sub">finalized T+1 targets</div>
+                <div className="ff-stage-note">Model learns from finalized annual T+1 targets. 2025 is excluded from training because its 2026 realized return is not finalized.</div>
+              </div>
+              <div className="ff-arrow" aria-hidden="true">→</div>
+              <div className="ff-stage is-predict">
+                <div className="ff-stage-label">PREDICTION YEAR</div>
+                <div className="ff-stage-years">2025 → 2026</div>
+                <div className="ff-stage-sub">2025 financial rows → 2026 forecast</div>
+                <div className="ff-stage-note">2025 financial rows are used as inference inputs. This is a forward-looking model output, not an evaluated result.</div>
+              </div>
+            </div>
+
+            <div className="ff-rank">
+              <div className="ff-rank-head">
+                <div>
+                  <div className="ff-step">2026 FORECAST RANKING</div>
+                  <div className="ff-rank-sub">Ranking generated from 2025 company fundamentals and model signal.</div>
+                </div>
+                <div className="ff-rank-meta">
+                  <span className="ff-statustag">2026 FORECAST · NOT REALIZED</span>
+                  <CacheTag fromCache={fcMeta.fromCache} refreshing={fcMeta.refreshing} savedAt={fcMeta.savedAt} onRefresh={() => loadForecast(true)} />
+                </div>
+              </div>
+
+              {!forecast && <div className="ff-empty">Loading 2026 forecast…</div>}
+              {forecast && forecast.available === false && (
+                <div className="ff-empty">2025 inference rows are not available in the public modeling dataset.<span>{forecast.reason}</span></div>
+              )}
+              {forecast?.available && (
+                <>
+                  <div className="ff-field">
+                    {forecast.rankings.map((r, i) => (
+                      <div key={r.ticker} className={`ff-row sig-${String(r.signal_label || '').toLowerCase()}`} style={{ animationDelay: `${Math.min(i, 20) * 0.03}s` }}>
+                        <span className="ff-row-rank">#{r.rank}</span>
+                        <span className="ff-row-ticker">{r.ticker}</span>
+                        <span className="ff-row-trace"><span style={{ width: `${Math.round((r.score || 0) * 100)}%` }} /></span>
+                        <span className="ff-row-score">{(r.score * 100).toFixed(1)}</span>
+                        <span className="ff-row-conf">{Math.round((r.confidence || 0) * 100)}%</span>
+                        <span className="ff-row-sig">{r.signal_label}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="ff-rank-foot">Unevaluated forward ranking — realized 2026 returns are not available yet. {forecast.methodology_note}</p>
+                </>
+              )}
+            </div>
+
+            <div className="ff-divider"><span>EXPERIMENT BELOW · manual signal tuner + optional partial-target mode</span></div>
+          </section>
+
           {/* ── STEP 1: calibration ── */}
           <section className="ft-panel">
             <div className="ft-step">STEP 1 · CALIBRATE TRAINING WINDOW</div>
@@ -198,7 +308,10 @@ export default function ForecastingPage() {
                 <input type="range" min={yMin} max={yMax} value={trainTo} aria-label="Train to year"
                   onChange={(e) => setTrainTo(Math.max(parseInt(e.target.value, 10), trainFrom))} />
               </div>
-              <div className="ft-range-ticks">{trainable.map((y) => <span key={y}>{y}</span>)}</div>
+              <div className="ft-range-ticks">
+                {trainable.map((y) => <span key={y}>{y}</span>)}
+                {partialIncluded && <span className="ft-tick-partial">2025*</span>}
+              </div>
             </div>
             <div className="ft-dial">
               <div className="ft-dial-label">TOP FEATURES <strong>{topN}</strong></div>
@@ -207,6 +320,25 @@ export default function ForecastingPage() {
               <datalist id="ft-notches">{[4, 8, 12, 16, 20].map((n) => <option key={n} value={n} />)}</datalist>
               <div className="ft-range-ticks">{[4, 8, 12, 16, 20].map((n) => <span key={n}>{n}</span>)}</div>
             </div>
+            {/* ── experimental partial 2025 toggle ── */}
+            <div className="ft-partial">
+              <button type="button" role="switch" aria-checked={partialMode}
+                className={`ft-toggle ${partialMode ? 'is-on' : ''}`}
+                onClick={() => setPartialMode((v) => !v)}>
+                <span className="ft-toggle-knob" />
+              </button>
+              <div className="ft-partial-label">
+                <span>Include <strong>2025*</strong> partial 2026 YTD target</span>
+                <em>*experimental · partial 2026 YTD target</em>
+              </div>
+            </div>
+            <div className="ft-partial-sep">Partial target mode is for experimental evaluation only. The 2026 Forecast Ranking above is the live inference output.</div>
+            {partialMode && !partialUnavailable && (
+              <div className="ft-partial-warn">{partialWarning}</div>
+            )}
+            {partialUnavailable && (
+              <div className="ft-partial-na">⚠ {partialUnavailableReason}</div>
+            )}
             <button type="button" className="ft-btn" disabled={training} onClick={trainModel}>
               {training ? 'DERIVING WEIGHTS…' : 'TRAIN PARAMETERS'}
             </button>
@@ -290,7 +422,8 @@ export default function ForecastingPage() {
           {!focus && (
             <>
               <div className="ft-readout-tag">INSTRUMENT STANDBY</div>
-              <div className="ft-readout-row"><span>TRAIN WINDOW</span><strong>{trainFrom}–{trainTo}</strong></div>
+              <div className="ft-readout-row"><span>TARGET MODE</span><strong style={{ color: partialIncluded ? '#c8a35a' : '#4da583' }}>{partialIncluded ? 'PARTIAL YTD · EXPERIMENTAL' : 'FINALIZED ANNUAL'}</strong></div>
+              <div className="ft-readout-row"><span>TRAIN WINDOW</span><strong>{trainFrom}–{partialIncluded ? '2025*' : trainTo}</strong></div>
               <div className="ft-readout-row"><span>TOP FEATURES</span><strong>{topN}</strong></div>
               <div className="ft-readout-row"><span>UNIVERSE</span><strong>{mockMode ? FORECASTING_MOCK.options.ticker_count : (options?.ticker_count ?? '—')} TICKERS</strong></div>
               <div className="ft-readout-row"><span>WALK-FORWARD IC</span><strong style={{ color: '#c8a35a' }}>≈ 0</strong></div>
@@ -461,6 +594,79 @@ const CSS = `
   border: 1px solid rgba(200,163,90,0.5); border-radius: 2px; padding: 9px 16px;
   box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
 .ft-caveat-pulse { width: 7px; height: 7px; border-radius: 50%; background: #c8a35a; animation: ftPulse 2.2s ease-in-out infinite; flex-shrink: 0; }
+
+.ft-headmeta { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+
+/* ── forward forecast band ── */
+.ff { border: 1px solid rgba(77,165,131,0.32); border-radius: 3px; padding: 18px 20px;
+  background: linear-gradient(180deg, rgba(13,20,18,0.78), rgba(10,14,13,0.62));
+  background-image: radial-gradient(680px 220px at 88% -20%, rgba(77,165,131,0.08), transparent 65%); }
+.ff-flow { display: flex; align-items: stretch; gap: 14px; flex-wrap: wrap; }
+.ff-stage { flex: 1; min-width: 180px; border: 1px solid rgba(200,211,202,0.14); border-radius: 2px;
+  padding: 12px 14px; background: rgba(11,16,15,0.55); }
+.ff-stage.is-train { border-left: 3px solid var(--ft-faint); }
+.ff-stage.is-predict { border-left: 3px solid #4da583;
+  background-image: repeating-linear-gradient(0deg, rgba(77,165,131,0.04) 0 1px, transparent 1px 5px); }
+.ff-stage-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.26em; color: var(--ft-faint); }
+.ff-stage-years { font-family: var(--font-mono); font-size: 18px; font-weight: 700; margin: 6px 0 2px; letter-spacing: 0.03em; }
+.ff-stage.is-predict .ff-stage-years { color: #4da583; }
+.ff-stage-sub { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.06em; color: var(--ft-dim); }
+.ff-stage-note { margin-top: 8px; font-size: 11px; line-height: 1.5; color: var(--ft-dim); }
+.ff-arrow { display: flex; align-items: center; font-size: 22px; color: #4da583; opacity: 0.7; }
+@media (max-width: 620px) { .ff-arrow { transform: rotate(90deg); justify-content: center; width: 100%; } }
+
+.ff-rank { margin-top: 16px; }
+.ff-rank-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+.ff-step { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.24em; color: var(--ft-paper); }
+.ff-rank-sub { font-size: 11.5px; color: var(--ft-dim); margin-top: 4px; max-width: 52ch; }
+.ff-rank-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.ff-statustag { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; color: #c8a35a;
+  border: 1px solid rgba(200,163,90,0.5); border-radius: 2px; padding: 5px 9px; background: rgba(14,20,19,0.7);
+  animation: ftPulse 2.6s ease-in-out infinite; }
+.ff-empty { font-family: var(--font-mono); font-size: 11px; color: var(--ft-dim); padding: 14px 0; display: flex; flex-direction: column; gap: 4px; }
+.ff-empty span { font-size: 10px; color: var(--ft-faint); }
+.ff-field { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px 14px; margin-top: 12px; max-height: 420px; overflow-y: auto; padding-right: 4px; }
+@media (max-width: 700px) { .ff-field { grid-template-columns: 1fr; } }
+.ff-row { display: grid; grid-template-columns: 34px 60px 1fr 48px 40px 54px; gap: 10px; align-items: center;
+  padding: 7px 10px; border: 1px solid rgba(200,211,202,0.1); border-radius: 2px; background: rgba(14,20,19,0.5);
+  opacity: 0; animation: ftCrystal 0.5s ease forwards; }
+.ff-row-rank { font-family: var(--font-mono); font-size: 10px; color: var(--ft-faint); }
+.ff-row-ticker { font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.05em; }
+.ff-row-trace { height: 6px; background: rgba(200,211,202,0.07); border-radius: 1px; overflow: hidden; }
+.ff-row-trace span { display: block; height: 100%; background: #4da583; border-radius: 1px; transition: width 0.6s ease; }
+.ff-row-score { font-family: var(--font-mono); font-size: 11px; font-weight: 700; text-align: right; color: #4da583; }
+.ff-row-conf { font-family: var(--font-mono); font-size: 9px; color: var(--ft-faint); text-align: right; }
+.ff-row-sig { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; color: var(--ft-faint); text-align: right; }
+.ff-row.sig-high { border-left: 2px solid #4da583; }
+.ff-row.sig-high .ff-row-sig { color: #4da583; }
+.ff-row.sig-medium { border-left: 2px solid #c8a35a; }
+.ff-row.sig-medium .ff-row-sig { color: #c8a35a; }
+.ff-row.sig-low { border-left: 2px solid #a8674b; }
+.ff-row.sig-low .ff-row-sig, .ff-row.sig-low .ff-row-trace span { color: #a8674b; }
+.ff-row.sig-low .ff-row-trace span { background: #a8674b; }
+.ff-rank-foot { margin: 12px 0 0; font-size: 11px; line-height: 1.55; color: var(--ft-dim); }
+.ff-divider { margin-top: 16px; text-align: center; font-family: var(--font-mono); font-size: 8.5px;
+  letter-spacing: 0.2em; color: var(--ft-faint); border-top: 1px dashed rgba(200,211,202,0.18); padding-top: 12px; }
+
+.ft-partial-sep { margin: -4px 0 12px; font-size: 10.5px; line-height: 1.5; color: var(--ft-faint);
+  border-left: 2px solid rgba(200,211,202,0.2); padding-left: 10px; }
+.ft-partial { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; }
+.ft-toggle { flex-shrink: 0; width: 38px; height: 20px; border-radius: 11px; border: 1px solid rgba(200,211,202,0.3);
+  background: rgba(200,211,202,0.08); padding: 0; cursor: pointer; position: relative; transition: background 0.18s, border-color 0.18s; }
+.ft-toggle .ft-toggle-knob { position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--ft-faint); transition: transform 0.18s, background 0.18s; }
+.ft-toggle.is-on { background: rgba(200,163,90,0.25); border-color: rgba(200,163,90,0.6); }
+.ft-toggle.is-on .ft-toggle-knob { transform: translateX(18px); background: #c8a35a; }
+.ft-toggle:focus-visible { outline: 1px solid #c8a35a; outline-offset: 2px; }
+.ft-partial-label { display: flex; flex-direction: column; gap: 2px; }
+.ft-partial-label span { font-size: 12px; color: var(--ft-dim); }
+.ft-partial-label strong { color: #c8a35a; }
+.ft-partial-label em { font-family: var(--font-mono); font-style: normal; font-size: 8.5px; letter-spacing: 0.1em; color: var(--ft-faint); }
+.ft-partial-warn { margin-bottom: 12px; font-size: 11px; line-height: 1.5; color: #c8a35a;
+  border: 1px solid rgba(200,163,90,0.4); border-radius: 2px; padding: 8px 10px; background: rgba(200,163,90,0.06); }
+.ft-partial-na { margin-bottom: 12px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.04em; color: var(--ft-dim);
+  border: 1px dashed rgba(200,211,202,0.3); border-radius: 2px; padding: 8px 10px; }
+.ft-tick-partial { color: #c8a35a !important; font-weight: 700; }
 
 @keyframes ftIn { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: blur(0); } }
 @keyframes ftCrystal { from { opacity: 0; filter: blur(5px); } to { opacity: 1; filter: blur(0); } }

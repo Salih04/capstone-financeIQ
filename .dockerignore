@@ -1,0 +1,39 @@
+# Build context = repo root (backend/Dockerfile). Keep secrets, VCS, caches,
+# and local virtualenvs OUT of the image. Without this, `COPY backend/ .` would
+# bake a developer's backend/.env (DB password, SECRET_KEY, LLM API key) into
+# the published image.
+
+# Secrets / env (never ship real values; .env.example is intentionally tracked)
+**/.env
+**/.env.*
+!**/.env.example
+
+# Version control
+.git
+.gitignore
+.github
+
+# Python caches / virtualenvs
+**/__pycache__/
+**/*.py[cod]
+**/.venv/
+**/venv/
+.venv/
+**/.pytest_cache/
+**/.mypy_cache/
+
+# Node / frontend build artifacts (frontend image builds from ./frontend)
+**/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Editor / OS noise
+.idea/
+.vscode/
+.DS_Store
+*.swp
+
+# Local worktrees, logs, dbs
+.claude/
+*.log
+*.db

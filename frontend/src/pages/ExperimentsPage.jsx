@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
-import { researchApi } from '../api/researchApi'
-import { getCached, setCached } from '../utils/sessionCache'
+import { useMemo, useState } from 'react'
+import { useCachedResource, CACHE_TTL } from '../api/useCachedResource'
+import CacheTag from '../components/CacheTag'
 
 // ---------------------------------------------------------------------------
 // Experiments — THE SEISMOGRAPH.
@@ -24,7 +24,6 @@ const EXPERIMENTS_MOCK = {
   mean_ic_all_models: 0.033,
   mean_ic_baseline: 0.070,
 }
-const EXPERIMENTS_CACHE_KEY = 'page:experiments'
 
 const MODEL_LABELS = {
   baseline_equal_weight: 'Equal-weight',
@@ -151,35 +150,11 @@ function TraceBand({ trace, years, hovered, onHover }) {
 }
 
 export default function ExperimentsPage() {
-  const cachedPage = useMemo(() => getCached(EXPERIMENTS_CACHE_KEY), [])
-  const [exp, setExp] = useState(() => cachedPage?.exp ?? null)
-  const [failed, setFailed] = useState(false)
+  const { data: exp, error, fromCache, refreshing, savedAt, refresh } =
+    useCachedResource('/research/experiments', { ttlMs: CACHE_TTL.LONG })
   const [hovered, setHovered] = useState(null)
 
-  useEffect(() => {
-    let mounted = true
-
-    researchApi.experiments()
-      .then((r) => {
-        if (r.data) {
-          setCached(EXPERIMENTS_CACHE_KEY, { exp: r.data })
-          if (mounted) {
-            setExp(r.data)
-            setFailed(false)
-          }
-        } else if (!cachedPage?.exp && mounted) {
-          setFailed(true)
-        }
-      })
-      .catch(() => {
-        if (!cachedPage?.exp && mounted) setFailed(true)
-      })
-
-    return () => {
-      mounted = false
-    }
-  }, [cachedPage])
-
+  const failed = !!error && !exp
   const { traces, fromApi } = useMemo(() => buildTraces(failed ? null : exp), [exp, failed])
   const years = useMemo(
     () => [...new Set(traces.flatMap((t) => t.points.map((p) => p.year)))].sort((a, b) => a - b),
@@ -223,6 +198,7 @@ export default function ExperimentsPage() {
             <strong className="is-gold">{fmtIc(meanBase ?? EXPERIMENTS_MOCK.mean_ic_baseline)}</strong>
           </div>
           {!fromApi && <div className="xp-mocknote">demo data — experiments API returned no folds</div>}
+          <CacheTag fromCache={fromCache} refreshing={refreshing} savedAt={savedAt} onRefresh={refresh} />
         </div>
       </header>
 

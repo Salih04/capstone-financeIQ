@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.core.dependencies import get_current_user
+from app.core.dependencies import optional_user
 from app.models.user import User
 from app.services.research import (
     benchmark,
@@ -30,12 +30,12 @@ def _guard_year(year: int) -> None:
 
 
 @router.get("/years")
-def years(_: User = Depends(get_current_user)):
+def years(_: User | None = Depends(optional_user)):
     return {"years": data.available_years(), "supported": list(data.SUPPORTED_YEARS)}
 
 
 @router.get("/scores")
-def scores(year: int = Query(...), _: User = Depends(get_current_user)):
+def scores(year: int = Query(...), _: User | None = Depends(optional_user)):
     _guard_year(year)
     return company.year_overview(year)
 
@@ -44,7 +44,7 @@ def scores(year: int = Query(...), _: User = Depends(get_current_user)):
 def company_detail(
     ticker: str = Query(...),
     year: int = Query(...),
-    _: User = Depends(get_current_user),
+    _: User | None = Depends(optional_user),
 ):
     _guard_year(year)
     try:
@@ -54,26 +54,26 @@ def company_detail(
 
 
 @router.get("/validation")
-def validation_all(_: User = Depends(get_current_user)):
+def validation_all(_: User | None = Depends(optional_user)):
     return validation.validate_all()
 
 
 @router.get("/dashboard")
-def dashboard(_: User = Depends(get_current_user)):
+def dashboard(_: User | None = Depends(optional_user)):
     return company.dashboard()
 
 
 @router.get("/profit-consistency")
-def profit_consistency(year: int = Query(...), _: User = Depends(get_current_user)):
+def profit_consistency(year: int = Query(...), _: User | None = Depends(optional_user)):
     _guard_year(year)
     return profit.profit_consistency(year)
 
 
 @router.get("/benchmark/status")
-def benchmark_status(_: User = Depends(get_current_user)):
+def benchmark_status(_: User | None = Depends(optional_user)):
     return benchmark.status()
 
 
 @router.get("/feature-registry")
-def registry(_: User = Depends(get_current_user)):
+def registry(_: User | None = Depends(optional_user)):
     return {"features": feature_registry.registry_as_dicts()}

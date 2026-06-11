@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
 
+    # CORS allowed origins (comma-separated). Default "*" keeps the public demo
+    # working; set explicit origins in production. Credentials are auto-disabled
+    # when "*" is used (see app/main.py).
+    CORS_ALLOW_ORIGINS: str = "*"
+
     # Optional local research LLM support. If unavailable, the app falls back
     # to deterministic validated-report answers.
     research_llm_provider: str = "none"

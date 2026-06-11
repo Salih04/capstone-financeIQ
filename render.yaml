@@ -1,0 +1,59 @@
+# Render Blueprint — FinanceIQ backend (Docker).
+#
+# The backend Dockerfile copies backend/, data/, experiments/, and
+# research_agent_training/ from the REPO ROOT, so the Docker build context MUST
+# be the repo root (dockerContext: .). Do NOT set Render's "Root Directory" to
+# backend — that breaks `COPY data/ ...` and produces backend/backend/Dockerfile.
+#
+# Equivalent manual Render dashboard settings (if not using this Blueprint):
+#   Root Directory:                (empty / repo root)
+#   Dockerfile Path:               backend/Dockerfile
+#   Docker Build Context Directory: .
+#   Docker Command:                (blank — Dockerfile CMD honors $PORT)
+
+databases:
+  - name: financeiq-db
+    plan: free
+
+services:
+  - type: web
+    name: financeiq-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: financeiq-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      # Repo-root resolution inside the container (Dockerfile WORKDIR /app).
+      - key: RESEARCH_REPO_ROOT
+        value: /app
+      - key: TRUSTED_DATASETS_DIR
+        value: /app/data/raw/yearly_xlsx
+      - key: TRUSTED_OUT_DIR
+        value: /app/data/trusted
+      - key: TRUSTED_COMBINED_CSV
+        value: /app/data/trusted/stocks_2020_2025.csv
+      # Research agent: default off → deterministic fallback. Set provider+key to enable.
+      - key: RESEARCH_LLM_PROVIDER
+        value: none
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      # Optional Supabase JWT verification for legacy protected endpoints.
+      # Research/forecasting-CSV endpoints are public regardless of this.
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+      - key: SUPABASE_JWT_AUDIENCE
+        value: authenticated
+      - key: SUPABASE_AUTO_CREATE_USERS
+        value: "true"
