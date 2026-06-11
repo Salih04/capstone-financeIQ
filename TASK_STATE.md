@@ -49,9 +49,10 @@ claim.
 | AI availability diagnostics | DONE | `/research/ai-status`, structured "AI not configured" response, no secret hardcoding |
 | Public demo endpoints | DONE | research + CSV-forecasting use `optional_user` (DB-free, never 401/403); fixes "no data after login" |
 | Runtime data diagnostic | DONE | public `GET /research/runtime-status` — rows/tickers, contexts, missing files, AI config, no secrets |
-| Experimental 2025 partial-target mode | DONE | opt-in `target_mode=include_partial_2025`; labeled non-comparable; needs real `partial_2026_ytd_returns.csv` (absent → unavailable, no fabrication) |
+| 2026 forward forecast | DONE | public `GET /forecasting/inference?year=2025` → 40-row 2026 ranking (unevaluated); 3-stage Forecasting page (Training 2020–2024 → Prediction 2025 → 2026 ranking) |
+| Experimental 2025 partial-target mode | DONE | opt-in `target_mode=include_partial_2025`; labeled non-comparable; separate from forward forecast; needs real `partial_2026_ytd_returns.csv` (absent → unavailable, no fabrication) |
 | Render Docker deploy | DONE | `render.yaml` (Docker, repo-root context), `$PORT`-aware Dockerfile CMD, docs aligned |
-| Tests | DONE | root 97 + backend 27 passing |
+| Tests | DONE | root 97 + backend 32 passing |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
 ---

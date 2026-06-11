@@ -280,6 +280,13 @@ def get_options(target_mode: str = TARGET_MODE_FINALIZED) -> dict[str, Any]:
         "trainable_years": [y for y in finalized_trainable if y <= FINALIZED_TRAIN_YEAR_TO],
         "all_years": all_years,
         "inference_years": [y for y in all_years if y > FINALIZED_TRAIN_YEAR_TO],
+        "default_prediction_year": PARTIAL_YEAR,
+        "default_target_year": PARTIAL_TARGET_YEAR,
+        "inference_explanation": (
+            f"{PARTIAL_YEAR} is excluded from finalized training because its "
+            f"{PARTIAL_TARGET_YEAR} realized return is unavailable, but it is used as "
+            f"inference input for the {PARTIAL_TARGET_YEAR} forecast."
+        ),
         "feature_columns": feat_cols,
         "ticker_count": len(tickers),
         "tickers": tickers,
@@ -549,6 +556,89 @@ def run_forecast(
         "risk_level": risk_level,
         "stock_count": len(scored),
         "items": scored,
+        "disclaimer": DISCLAIMER,
+    }
+
+
+def _signal_label(score: float) -> str:
+    if score >= 0.66:
+        return "HIGH"
+    if score >= 0.40:
+        return "MEDIUM"
+    return "LOW"
+
+
+def inference_forecast(input_year: int = PARTIAL_YEAR, top_n: int = 12) -> dict[str, Any]:
+    """Forward-looking ranking: train on finalized T+1 targets (2020–2024), then
+    apply the learned signal to ``input_year`` financial rows to rank the next year.
+
+    This is the MAIN forward forecast (e.g. 2025 rows → 2026 ranking). It is NOT a
+    backtest: ``input_year``'s realized next-year return does not exist yet, so
+    nothing here is evaluated. Always uses finalized_only training — never the
+    experimental partial-2025 target mode.
+    """
+    target_year = input_year + 1
+    df = _load_public_df()
+    year_df = df[df["year"] == input_year]
+    if year_df.empty:
+        return {
+            "input_year": input_year,
+            "target_year": target_year,
+            "mode": "inference",
+            "available": False,
+            "reason": (
+                f"{input_year} inference rows are not available in the public modeling dataset."
+            ),
+            "training_window": {"start_year": 2020, "end_year": FINALIZED_TRAIN_YEAR_TO,
+                                "target_status": "finalized_annual"},
+            "prediction_status": "unavailable",
+            "count": 0,
+            "rankings": [],
+            "disclaimer": DISCLAIMER,
+        }
+
+    # Train on finalized targets only, then rank the inference year.
+    trained = train_parameters(
+        train_year_from=2020, train_year_to=FINALIZED_TRAIN_YEAR_TO,
+        top_n=top_n, target_mode=TARGET_MODE_FINALIZED,
+    )
+    weights = {p["name"]: p["weight"] for p in trained["top_parameters"]}
+    run = run_forecast(year=input_year, trained_weights=weights)
+
+    # Realized next-year return exists only for finalized years (≤2024).
+    realized = input_year <= FINALIZED_TRAIN_YEAR_TO
+    rankings = []
+    for it in run["items"]:
+        rankings.append({
+            "rank": it["rank"],
+            "ticker": it["ticker"],
+            "score": it["score"],
+            "confidence": it["confidence"],
+            "confidence_label": it["confidence_label"],
+            "signal_label": _signal_label(it["score"]),
+            "top_parameters": it.get("top_parameters", [])[:3],
+            "input_year": input_year,
+            "target_year": target_year,
+            "is_inference": bool(it.get("is_inference_row", True)),
+            "realized_return_available": realized,
+        })
+
+    return {
+        "input_year": input_year,
+        "target_year": target_year,
+        "mode": "inference",
+        "available": True,
+        "training_window": {"start_year": 2020, "end_year": FINALIZED_TRAIN_YEAR_TO,
+                            "target_status": "finalized_annual"},
+        "prediction_status": "unevaluated_forward_forecast",
+        "methodology_note": (
+            f"{input_year} financial rows are used as inference inputs to generate a "
+            f"{target_year} forward-looking ranking. {target_year} realized returns are "
+            "not available, so this is not a backtest result."
+        ),
+        "top_features_used": trained["top_parameters"],
+        "count": len(rankings),
+        "rankings": rankings,
         "disclaimer": DISCLAIMER,
     }
 

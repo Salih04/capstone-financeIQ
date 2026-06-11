@@ -311,6 +311,23 @@ def csv_run(body: CsvRunRequest, _: User | None = Depends(optional_user)):
         raise HTTPException(status_code=400, detail=f"Forecast failed. ({type(exc).__name__}: {exc})")
 
 
+@router.get("/forecasting/inference")
+def csv_inference(
+    year: int = 2025,
+    top_n: int = 12,
+    _: User | None = Depends(optional_user),
+):
+    """Forward 2026 forecast: train finalized 2020–2024, rank `year` inference rows.
+    Public. Unevaluated forward output — never a backtest."""
+    try:
+        return _csv_svc.inference_forecast(input_year=year, top_n=top_n)
+    except (ValueError, FileNotFoundError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    except Exception as exc:
+        logger.exception("forecasting/inference failed")
+        raise HTTPException(status_code=400, detail=f"Inference failed. ({type(exc).__name__}: {exc})")
+
+
 @router.get("/forecasting/explain/{ticker}")
 def csv_explain(
     ticker: str,

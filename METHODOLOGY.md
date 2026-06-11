@@ -113,6 +113,23 @@ Enforced in `app/services/research/feature_registry.py`:
 - Selected year never silently falls back to the latest year.
 - 2025 is inference-only unless explicit validated T+1 outcomes are added.
 
+## Forward forecast: 2025 → 2026 (inference, not a backtest)
+
+The training/backtest window ends at **2024** because finalized T+1 labels are
+available through 2025. 2025 is **not missing** — its rows are used as
+**inference inputs**:
+
+- Train the signal on finalized annual T+1 targets, 2020–2024.
+- Apply the learned weights to 2025 financial rows → a **2026 forward-looking
+  ranking** of the 40 public companies.
+- 2026 realized returns do not exist yet, so this ranking is
+  `unevaluated_forward_forecast` — never presented as a backtest or realized result.
+
+Endpoint: `GET /forecasting/inference?year=2025` (public). Each row carries
+`input_year=2025`, `target_year=2026`, `is_inference=true`,
+`realized_return_available=false`. This is the main forward output and is kept
+separate from the experimental partial-target mode below.
+
 ## Experimental: 2025 partial 2026-YTD target mode (opt-in)
 
 The headline methodology is **finalized annual T+1 only** (2020–2024 training). It

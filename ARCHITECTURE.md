@@ -77,6 +77,12 @@ run_forecast(year, trained_weights, risk_level, user_type)
 
 explain_ticker(ticker, year)
   └─ returns top_features, bottom_features, missing_features, data_quality guardrails
+
+inference_forecast(input_year=2025, top_n)   →  GET /forecasting/inference?year=2025
+  └─ trains finalized 2020–2024, ranks input_year rows → forward next-year ranking
+  └─ prediction_status="unevaluated_forward_forecast"; rows carry input_year,
+     target_year, is_inference, realized_return_available=false. NOT a backtest.
+     Always finalized_only — independent of the experimental partial-target mode.
 ```
 
 ### Legacy service: `forecasting_service.py` (DB-dependent)

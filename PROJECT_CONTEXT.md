@@ -46,7 +46,7 @@ Key pages:
 | `/research` | Score Explorer / dissection table | Preserves `/research/years`, `/research/scores`, `/research/company`; composite score unfolds to feature/category detail. |
 | `/data-quality` | Specimen archive | Uses `dataQuality()`, `summary()`, `frozenEvidence()`; `LEAKAGE`/`FROZEN`/`ALL-NULL` stamps; avoids false accepted=0 loading states. |
 | `/benchmark` | Tide chart | Preserves `researchApi.benchmark()`; sign-preserving log scale keeps 2022 +196% readable; IC markers stay small. |
-| `/forecasting` | Signal tuner | Preserves options/train/run/explain pipeline; feature weights as frequency spectrum; inference-only rows pulse amber. |
+| `/forecasting` | Signal tuner + 2026 forecast | Top section makes the mental model explicit: Training Window 2020–2024 → Prediction Year 2025 → **2026 Forecast Ranking** from `GET /forecasting/inference?year=2025` (unevaluated forward output). Below it the manual options/train/run/explain tuner and the separate experimental partial-target toggle remain. |
 
 Session cache: centralized in `frontend/src/api/cache.js` — sessionStorage-backed,
 stale-while-revalidate, in-flight dedupe, TTL constants (SHORT/MEDIUM/LONG). The

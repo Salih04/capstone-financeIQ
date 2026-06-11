@@ -5,6 +5,15 @@ All notable changes to FinanceIQ, most recent first.
 ## Unreleased
 
 ### Added
+- **2026 forward forecast / inference** — public `GET /forecasting/inference?year=2025`
+  trains finalized 2020–2024 then ranks 2025 rows into a 2026 forward-looking
+  ranking (`unevaluated_forward_forecast`; rows carry `input_year`, `target_year`,
+  `is_inference`, `realized_return_available=false`). `/forecasting/options` now
+  exposes `inference_years`, `default_prediction_year=2025`,
+  `default_target_year=2026`, and an inference explanation. Forecasting page gains
+  a three-stage layout — Training Window 2020–2024 → Prediction Year 2025 → 2026
+  Forecast Ranking — so users no longer think 2025 is missing. No 2026 realized
+  return is fabricated; partial-target mode stays separate.
 - **Centralized frontend cache layer** — `frontend/src/api/cache.js`
   (sessionStorage-backed, stale-while-revalidate, in-flight dedupe, TTL
   constants SHORT/MEDIUM/LONG), `useCachedResource` hook, and a Fable 5

@@ -176,6 +176,16 @@ quarterly fundamentals work. Not yet wired into the yearly T→T+1 pipeline.
 - The validator fails if any target or same-year column leaks into the feature
   set (`data_quality_report.json → issues`).
 
+## Forward forecast: 2025 inference → 2026 ranking
+
+2025 rows (`has_target=false`, `is_inference_row=true`) are the inference inputs
+for the next-year forecast. `GET /forecasting/inference?year=2025` trains
+finalized 2020–2024, then ranks the 40 public 2025 rows to produce the
+**2026 forecast ranking** (`prediction_status="unevaluated_forward_forecast"`).
+No 2026 realized return is fabricated; the ranking is unevaluated until real 2026
+returns exist. `/forecasting/options` exposes `inference_years=[2025]`,
+`default_prediction_year=2025`, `default_target_year=2026`.
+
 ## Experimental: 2025 partial 2026-YTD target (opt-in)
 
 Default pipeline: 2025 is `is_inference_row` (no finalized full-year 2026 T+1
