@@ -108,11 +108,19 @@ class ResearchAgentApiTests(unittest.TestCase):
         r = self.client.get("/research/runtime-status")
         self.assertEqual(r.status_code, 200)
         b = r.json()
-        for k in ("repo_root", "public_dataset_exists", "public_rows",
+        for k in ("repo_root_resolved", "public_dataset_exists", "public_rows",
                   "training_rows", "company_contexts_count", "missing_required_files",
                   "ai_provider_configured", "llm_fallback_available"):
             self.assertIn(k, b)
         self.assertTrue(b["llm_fallback_available"])
+
+    def test_runtime_status_no_absolute_paths(self):
+        # Public endpoint must not leak the absolute server filesystem layout.
+        r = self.client.get("/research/runtime-status")
+        b = r.json()
+        for key in ("public_dataset_path", "training_dataset_path", "company_contexts_path"):
+            self.assertFalse(str(b[key]).startswith("/"), f"{key} leaks absolute path: {b[key]}")
+        self.assertNotIn("repo_root", b)
 
     def test_ai_status_masks_secrets(self):
         # configure a provider+key, confirm the key value is never echoed back

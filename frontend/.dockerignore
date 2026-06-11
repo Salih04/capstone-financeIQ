@@ -1,0 +1,11 @@
+# Frontend image builds from ./frontend context (COPY . .). Keep secrets and
+# local artifacts out of the build — VITE_* values are injected as build ARGs,
+# not copied from .env files.
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+.vite/
+.DS_Store
+*.log

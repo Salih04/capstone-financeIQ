@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
+from app.config import settings
 from app.database import engine
 from app.models import *  # noqa: F401,F403 – registers all models with Base
 from app.database import Base
@@ -55,10 +56,16 @@ app = FastAPI(
     description="Capstone – Stock Scoring System V3: Model Governance · Explainability · Validation Lab · Labeling Lab · Data Health",
 )
 
+# CORS origins are configurable via CORS_ALLOW_ORIGINS (comma-separated). Default
+# "*" keeps the public demo working, but credentials are disabled whenever the
+# wildcard is used: auth is Bearer-token based (no cookies), and "*" +
+# allow_credentials is invalid per the CORS spec and would broaden exposure.
+_cors_origins = [o.strip() for o in settings.CORS_ALLOW_ORIGINS.split(",") if o.strip()]
+_cors_wildcard = "*" in _cors_origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_cors_origins or ["*"],
+    allow_credentials=not _cors_wildcard,
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -221,14 +221,22 @@ def runtime_status() -> dict:
     cfg = get_config()
     ai = ai_status(smoke=False)
 
+    # Report repo-relative paths only — never leak the absolute server filesystem
+    # layout on this public diagnostic endpoint.
+    def _rel(p: Path) -> str:
+        try:
+            return str(p.relative_to(REPO_ROOT))
+        except ValueError:
+            return p.name
+
     return {
-        "repo_root": str(REPO_ROOT),
+        "repo_root_resolved": True,
         "trusted_clean_exists": _paths.get_trusted_clean_dir().is_dir(),
-        "public_dataset_path": str(pub),
+        "public_dataset_path": _rel(pub),
         "public_dataset_exists": pub_cov.get("exists", False),
-        "training_dataset_path": str(train),
+        "training_dataset_path": _rel(train),
         "training_dataset_exists": train_cov.get("exists", False),
-        "company_contexts_path": str(contexts),
+        "company_contexts_path": _rel(contexts),
         "company_contexts_exists": contexts.is_dir(),
         "public_rows": pub_cov.get("rows", 0),
         "public_tickers": pub_cov.get("tickers", 0),
