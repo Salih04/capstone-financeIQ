@@ -65,6 +65,26 @@ SUPABASE_AUTO_CREATE_USERS=true
 
 Do not commit `.env` files or service-role keys.
 
+## Private production lockdown (optional)
+
+Defaults serve the open read-only demo. To restrict to approved, owner-created
+users, set on the Render service:
+
+```bash
+PUBLIC_DEMO_MODE=false
+REQUIRE_APPROVED_USER=true
+APPROVED_EMAILS=owner@example.com,teammate@example.com
+SUPABASE_JWT_SECRET=<Supabase Project Settings → API → JWT Secret>   # REQUIRED — backend verifies sessions
+ENABLE_PUBLIC_DOCS=false
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_REQUESTS_PER_MINUTE=60
+CORS_ALLOW_ORIGINS=https://capstone-finance-iq.vercel.app
+```
+
+In private mode without `SUPABASE_JWT_SECRET` the backend cannot verify Supabase
+tokens and denies all access (fail closed). Empty `APPROVED_EMAILS` with
+`REQUIRE_APPROVED_USER=true` also denies all. `/health` stays public.
+
 ## Note on native Python deploys
 
 If you instead use Render's native Python runtime (`Root Directory: backend`,

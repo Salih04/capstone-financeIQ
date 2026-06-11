@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 logger = logging.getLogger("forecasting")
 
-from app.core.dependencies import get_current_user, optional_user
+from app.core.dependencies import get_current_user, require_access
+from app.core.rate_limit import rate_limit
 from app.database import get_db
 from app.models.user import User
 from app.schemas.forecasting import (
@@ -271,7 +272,7 @@ def get_filters(
 @router.get("/forecasting/options")
 def csv_options(
     target_mode: str = "finalized_only",
-    _: User | None = Depends(optional_user),
+    _: User | None = Depends(require_access),
 ):
     try:
         return _csv_svc.get_options(target_mode=target_mode)
@@ -280,7 +281,8 @@ def csv_options(
 
 
 @router.post("/forecasting/train")
-def csv_train(body: CsvTrainRequest, _: User | None = Depends(optional_user)):
+def csv_train(body: CsvTrainRequest, _: User | None = Depends(require_access),
+              __: None = Depends(rate_limit("forecast-train"))):
     try:
         return _csv_svc.train_parameters(
             train_year_from=body.train_year_from,
@@ -296,7 +298,7 @@ def csv_train(body: CsvTrainRequest, _: User | None = Depends(optional_user)):
 
 
 @router.post("/forecasting/run")
-def csv_run(body: CsvRunRequest, _: User | None = Depends(optional_user)):
+def csv_run(body: CsvRunRequest, _: User | None = Depends(require_access)):
     try:
         return _csv_svc.run_forecast(
             year=body.year,
@@ -315,7 +317,8 @@ def csv_run(body: CsvRunRequest, _: User | None = Depends(optional_user)):
 def csv_inference(
     year: int = 2025,
     top_n: int = 12,
-    _: User | None = Depends(optional_user),
+    _: User | None = Depends(require_access),
+    __: None = Depends(rate_limit("forecast-inference")),
 ):
     """Forward 2026 forecast: train finalized 2020–2024, rank `year` inference rows.
     Public. Unevaluated forward output — never a backtest."""
@@ -332,7 +335,8 @@ def csv_inference(
 def csv_explain(
     ticker: str,
     year: int | None = None,
-    _: User | None = Depends(optional_user),
+    _: User | None = Depends(require_access),
+    __: None = Depends(rate_limit("forecast-explain")),
 ):
     try:
         return _csv_svc.explain_ticker(ticker=ticker, year=year)

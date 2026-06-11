@@ -50,10 +50,15 @@ def _ensure_backward_compatible_columns() -> None:
 
 _ensure_backward_compatible_columns()
 
+# Disable interactive docs + schema in private production (ENABLE_PUBLIC_DOCS=false).
+_docs_enabled = settings.ENABLE_PUBLIC_DOCS
 app = FastAPI(
     title="Stock Scoring V3 API",
     version="3.0.0",
     description="Capstone – Stock Scoring System V3: Model Governance · Explainability · Validation Lab · Labeling Lab · Data Health",
+    docs_url="/docs" if _docs_enabled else None,
+    redoc_url="/redoc" if _docs_enabled else None,
+    openapi_url="/openapi.json" if _docs_enabled else None,
 )
 
 # CORS origins are configurable via CORS_ALLOW_ORIGINS (comma-separated). Default

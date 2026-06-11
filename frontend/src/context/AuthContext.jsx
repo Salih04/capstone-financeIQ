@@ -1,6 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import api from '../api/client'
 import { authRedirectUrl, isSupabaseConfigured, supabase } from '../lib/supabaseClient'
+import { clearCache } from '../api/cache'
+import { ENABLE_GOOGLE_AUTH, isApproved } from '../lib/authConfig'
 
 const AuthContext = createContext(null)
 
@@ -24,6 +26,7 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(isSupabaseConfigured)
   const [authEvent, setAuthEvent] = useState(null)
+  const prevUserId = useRef(null)
 
   useEffect(() => {
     if (!supabase) {
@@ -35,10 +38,18 @@ export function AuthProvider({ children }) {
     supabase.auth.getSession().then(({ data }) => {
       if (!alive) return
       setSession(data.session ?? null)
+      prevUserId.current = data.session?.user?.id ?? null
       setLoading(false)
     })
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      // Drop cached API data on sign-out or when the identity changes, so one
+      // user never sees another user's (or a logged-out) cached responses.
+      const nextId = nextSession?.user?.id ?? null
+      if (event === 'SIGNED_OUT' || nextId !== prevUserId.current) {
+        clearCache()
+      }
+      prevUserId.current = nextId
       setAuthEvent(event)
       setSession(nextSession ?? null)
       setLoading(false)
@@ -71,6 +82,7 @@ export function AuthProvider({ children }) {
   }
 
   const loginWithGoogle = async () => {
+    if (!ENABLE_GOOGLE_AUTH) throw new Error('Google sign-in is disabled for this deployment.')
     if (!supabase) throw new Error('Supabase Auth is not configured.')
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -99,7 +111,9 @@ export function AuthProvider({ children }) {
   }
 
   const logout = async () => {
+    clearCache()
     if (supabase) await supabase.auth.signOut()
+    prevUserId.current = null
     setSession(null)
     setAuthEvent('SIGNED_OUT')
   }
@@ -117,6 +131,7 @@ export function AuthProvider({ children }) {
       token: session?.access_token ?? null,
       loading,
       authEvent,
+      approved: isApproved(user?.email),
       supabaseConfigured: isSupabaseConfigured,
       login,
       register,

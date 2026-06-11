@@ -353,8 +353,42 @@ Docker volumes created before Alembic are stamped once, then upgraded normally.
 | `TRUSTED_COMBINED_CSV` | Combined CSV path used by the loader |
 | `RUN_DB_MIGRATIONS` | Run Alembic on Docker startup (`1` default, set `0` to skip) |
 | `LOAD_TRUSTED_DATA` | Load trusted yearly data on Docker startup (`1` default, set `0` to skip) |
+| `PUBLIC_DEMO_MODE` | `true` (default) = open read-only demo; `false` = private (auth required) |
+| `REQUIRE_APPROVED_USER` | In private mode, require verified email in `APPROVED_EMAILS` |
+| `APPROVED_EMAILS` | Comma-separated allowlist (case-insensitive); empty + require = deny all |
+| `ENABLE_PUBLIC_DOCS` | `true` (default) serves `/docs` + `/openapi.json`; `false` disables |
+| `RATE_LIMIT_ENABLED` / `RATE_LIMIT_REQUESTS_PER_MINUTE` | In-memory throttle on expensive endpoints (default off / 60) |
+| `CORS_ALLOW_ORIGINS` | Comma-separated allowed origins; wildcard auto-disables credentials |
+| `VITE_ENABLE_GOOGLE_AUTH` / `VITE_ENABLE_SIGNUP` | Frontend: show Google/signup UI (default off) |
+| `VITE_REQUIRE_APPROVED_USER` / `VITE_APPROVED_EMAILS` | Frontend approval gate (UX mirror of backend) |
 
 No real secrets are committed. `.env` is gitignored.
+
+### Private production lockdown
+
+Defaults keep the open demo so nothing breaks on deploy or in dev. To lock the
+deployment down to manually-created, approved users:
+
+```bash
+# Render (backend)
+PUBLIC_DEMO_MODE=false
+REQUIRE_APPROVED_USER=true
+APPROVED_EMAILS=owner@example.com,teammate@example.com
+SUPABASE_JWT_SECRET=<Supabase Project Settings → API → JWT Secret>   # REQUIRED in private mode
+ENABLE_PUBLIC_DOCS=false
+RATE_LIMIT_ENABLED=true
+CORS_ALLOW_ORIGINS=https://capstone-finance-iq.vercel.app
+
+# Vercel (frontend)
+VITE_ENABLE_GOOGLE_AUTH=false
+VITE_ENABLE_SIGNUP=false
+VITE_REQUIRE_APPROVED_USER=true
+VITE_APPROVED_EMAILS=owner@example.com,teammate@example.com
+```
+
+Supabase dashboard (owner-managed): OAuth/Google OFF, email signup OFF, users
+created manually. The backend is the real boundary; frontend flags are UX only.
+See [`SECURITY.md`](SECURITY.md).
 
 ## What was removed / quarantined
 
