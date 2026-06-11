@@ -26,10 +26,14 @@ Do not use the Supabase service-role key in frontend env.
 4. Authentication -> URL Configuration:
    - Site URL for local Vite: `http://localhost:5173`
    - Local Docker frontend: `http://localhost:3000`
+   - Production Site URL: `https://your-production-frontend`
    - Redirect URLs:
      - `http://localhost:5173/auth/callback`
      - `http://localhost:3000/auth/callback`
      - `https://your-production-frontend/auth/callback`
+   - After changing Site URL or redirect URLs, send a fresh confirmation or
+     password-recovery email. Old localhost confirmation links keep their old
+     redirect target and should not be reused for production verification.
 5. Google Cloud OAuth client:
    - Authorized JavaScript origins:
      - `http://localhost:5173`

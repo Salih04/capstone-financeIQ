@@ -21,11 +21,11 @@ You are working only on:
 - login page
 
 Allowed files:
-- 1.frontend/src/components/layout/Sidebar.jsx
-- 1.frontend/src/components/layout/Topbar.jsx
-- 1.frontend/src/components/layout/AppShell.jsx
-- 1.frontend/src/pages/LoginPage.jsx
-- 1.frontend/src/pages/DashboardPage.jsx only if a tiny alignment fix is necessary
+- frontend/src/components/layout/Sidebar.jsx
+- frontend/src/components/layout/Topbar.jsx
+- frontend/src/components/layout/AppShell.jsx
+- frontend/src/pages/LoginPage.jsx
+- frontend/src/pages/DashboardPage.jsx only if a tiny alignment fix is necessary
 
 Do not touch:
 - backend

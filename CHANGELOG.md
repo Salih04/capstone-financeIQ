@@ -5,6 +5,9 @@ All notable changes to FinanceIQ, most recent first.
 ## Unreleased
 
 ### Added
+- **Render deployment guide** — `docs/RENDER_DEPLOY.md` documents the backend
+  service settings after the folder migration: root directory `backend`, native
+  Python build, and `$PORT`-aware Uvicorn start command.
 - **Fable 5 frontend documentation pass** — docs now describe the completed dark
   research-terminal redesign: deep ink surfaces, subtle grain, muted emerald
   signal states, oxidized copper/amber warning states, monospace data typography,
@@ -19,6 +22,8 @@ All notable changes to FinanceIQ, most recent first.
   `● [page context] · Research only · Not investment advice`.
 
 ### Changed
+- Deployment docs now describe the migrated folder layout for Render, Vercel,
+  Docker Compose, and Supabase production callback URLs.
 - Research Agent docs now call out the preserved `POST /research/ask` contract
   with body `{ question: "<query text>" }`, instrument-style response blocks,
   five intent selectors, restored free-text query, hybrid weights, and

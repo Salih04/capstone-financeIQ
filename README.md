@@ -208,12 +208,49 @@ The trusted dataset is mounted (`./data/raw/yearly_xlsx`) and loaded on boot. Pa
 the container are set via `TRUSTED_DATASETS_DIR`, `TRUSTED_OUT_DIR`,
 `TRUSTED_COMBINED_CSV` in `docker-compose.yml`.
 
+## Deploy backend on Render
+
+This repo has no `render.yaml`. Configure Render manually:
+
+```text
+Root Directory: backend
+Build Command: pip install -r requirements.txt
+Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+Use `backend`, never a retired numbered backend path. Set backend env vars in
+Render, including `DATABASE_URL`, `SECRET_KEY`, and optional
+`SUPABASE_JWT_SECRET`. When Render runs from `backend/`, keep data paths relative
+to that directory:
+
+```bash
+TRUSTED_DATASETS_DIR=../data/raw/yearly_xlsx
+TRUSTED_OUT_DIR=../data/trusted
+TRUSTED_COMBINED_CSV=../data/trusted/stocks_2020_2025.csv
+RESEARCH_REPO_ROOT=..
+```
+
+See [`docs/RENDER_DEPLOY.md`](docs/RENDER_DEPLOY.md).
+
 ## Deploy frontend on Vercel
 
 Vercel deploys the React frontend only. The FastAPI backend must be running on a
 public URL (Railway, Render, Fly.io, a VPS, or another host). Authentication is
 handled by Supabase Auth in the browser; backend endpoints can also accept
 Supabase JWTs when `SUPABASE_JWT_SECRET` is configured.
+
+Recommended Vercel project settings:
+
+```text
+Root Directory: frontend
+Install Command: npm install
+Build Command: npm run build
+Output Directory: dist
+```
+
+If importing the repository root instead, the root `vercel.json` already points
+Vercel at `frontend/` with `npm install --prefix frontend`,
+`npm run build --prefix frontend`, and `frontend/dist`.
 
 Set these Vercel environment variables, then redeploy:
 
@@ -274,6 +311,12 @@ OAuth, email confirmation redirects, and password recovery. Configure:
 - Redirect URLs in Authentication → URL Configuration:
   `http://localhost:5173/auth/callback`,
   `http://localhost:3000/auth/callback`, and production frontend callback URL.
+- Production Site URL must be the deployed frontend URL, for example
+  `https://your-frontend-domain`.
+- Production Redirect URL must be
+  `https://your-frontend-domain/auth/callback`.
+- After changing Supabase URL settings, send fresh confirmation/recovery emails;
+  old localhost confirmation links should not be reused.
 - Optional backend JWT compatibility: set `SUPABASE_JWT_SECRET` from Supabase
   Project Settings → API → JWT Secret. If your project uses asymmetric signing
   keys, keep frontend-only auth or add JWKS verification before protecting APIs.

@@ -3,11 +3,11 @@
 Use the current implemented FinanceIQ visual language as the source of truth.
 
 Read these files first:
-- 1.frontend/src/pages/DashboardPage.jsx
-- 1.frontend/src/components/layout/Sidebar.jsx
-- 1.frontend/src/components/layout/Topbar.jsx
-- 1.frontend/src/pages/LoginPage.jsx
-- 1.frontend/index.html
+- frontend/src/pages/DashboardPage.jsx
+- frontend/src/components/layout/Sidebar.jsx
+- frontend/src/components/layout/Topbar.jsx
+- frontend/src/pages/LoginPage.jsx
+- frontend/index.html
 
 The app now has a strong “Signal from noise / research terminal” visual system:
 - deep ink / graphite background

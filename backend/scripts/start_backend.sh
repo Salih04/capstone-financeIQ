@@ -35,4 +35,9 @@ else
   echo "Skipping trusted yearly data load because LOAD_TRUSTED_DATA=${LOAD_TRUSTED_DATA}."
 fi
 
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn_args="app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+if [ "${BACKEND_RELOAD:-1}" = "1" ]; then
+  uvicorn_args="$uvicorn_args --reload"
+fi
+
+exec uvicorn $uvicorn_args
