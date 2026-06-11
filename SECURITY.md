@@ -17,13 +17,36 @@ for the public repository.
 - If a key is ever exposed, rotate it (OpenRouter dashboard, Supabase Project
   Settings → API/Database, regenerate `SECRET_KEY`).
 
-## Intentionally public endpoints
+## Access modes (demo vs private)
 
-Read-only research endpoints (`/research/*`) and the CSV-backed forecasting
-endpoints (`/forecasting/options|train|run|explain|inference`) use the
-`optional_user` dependency and are **public by design** for the demo. They serve
-only validated, already-public BIST research data and never mutate state. DB-backed,
-admin, upload, and auth endpoints remain authenticated (`get_current_user`).
+Research (`/research/*`) and CSV-forecasting (`/forecasting/options|train|run|
+explain|inference`) endpoints go through the `require_access` dependency, gated
+by env:
+
+- **Demo (default, `PUBLIC_DEMO_MODE=true`)** — open read-only access. Serves only
+  validated, already-public BIST research data; never mutates state. Preserves the
+  current deployment and local dev.
+- **Private (`PUBLIC_DEMO_MODE=false`)** — requires a verified authenticated user.
+  Anonymous → 401, unapproved → 403. With `REQUIRE_APPROVED_USER=true` the
+  verified email must be in `APPROVED_EMAILS` (case-insensitive); an empty
+  allowlist denies everyone (**fail closed**). Verification uses token signatures
+  only — `SUPABASE_JWT_SECRET` must be set so the backend can verify Supabase
+  sessions; without it, private mode denies all (fail closed). Error responses
+  never leak the allowlist or token claims.
+
+DB-backed, admin, upload, and auth endpoints always require `get_current_user`.
+`/health` is always public. The frontend (`ProtectedRoute` + `isApproved`) mirrors
+this for UX, but is **not** the security boundary — the backend is.
+
+Other private-production controls (all env-gated, default off to preserve dev):
+
+- `ENABLE_PUBLIC_DOCS=false` disables `/docs`, `/redoc`, `/openapi.json`.
+- `RATE_LIMIT_ENABLED=true` adds in-memory per-identity throttling on expensive
+  endpoints (`/research/ask`, `/forecasting/train|inference`, company score/explain;
+  `RATE_LIMIT_REQUESTS_PER_MINUTE`, default 60) → 429 on exceed. No Redis.
+- `CORS_ALLOW_ORIGINS` pins allowed origins; wildcard auto-disables credentials.
+- Frontend: `VITE_ENABLE_GOOGLE_AUTH` / `VITE_ENABLE_SIGNUP` (default off) hide
+  Google/signup UI; API cache is cleared on logout and identity change.
 
 ## CORS
 

@@ -33,6 +33,26 @@ class Settings(BaseSettings):
     SUPABASE_JWT_AUDIENCE: str = "authenticated"
     SUPABASE_AUTO_CREATE_USERS: bool = True
 
+    # ── Private/demo access control ──
+    # Defaults preserve current behavior (open demo) so nothing breaks on deploy
+    # or in local dev. Production locks down by setting PUBLIC_DEMO_MODE=false
+    # (plus SUPABASE_JWT_SECRET so the backend can verify Supabase sessions).
+    PUBLIC_DEMO_MODE: bool = True
+    # When private (PUBLIC_DEMO_MODE=false) and this is true, the verified user's
+    # email must be in APPROVED_EMAILS. Empty allowlist => deny all (fail closed).
+    REQUIRE_APPROVED_USER: bool = False
+    APPROVED_EMAILS: str = ""  # comma-separated, case-insensitive
+
+    # Swagger /docs + /openapi.json. Disable in private production.
+    ENABLE_PUBLIC_DOCS: bool = True
+
+    # In-memory rate limiting for expensive endpoints (no external infra).
+    RATE_LIMIT_ENABLED: bool = False
+    RATE_LIMIT_REQUESTS_PER_MINUTE: int = 60
+
+    def approved_emails_set(self) -> set[str]:
+        return {e.strip().lower() for e in self.APPROVED_EMAILS.split(",") if e.strip()}
+
     class Config:
         env_file = ".env"
 

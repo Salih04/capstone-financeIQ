@@ -12,8 +12,11 @@ import {
   Radar,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { ENABLE_GOOGLE_AUTH, ENABLE_SIGNUP } from '../lib/authConfig'
 
 const MODES = new Set(['login', 'signup', 'forgot', 'reset-password'])
+// signup is only reachable when explicitly enabled — otherwise it collapses to login.
+const normalizeMode = (m) => (m === 'signup' && !ENABLE_SIGNUP ? 'login' : m)
 
 function messageFrom(error) {
   if (!error) return 'Authentication failed.'
@@ -26,7 +29,7 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const queryMode = new URLSearchParams(location.search).get('mode')
-  const initialMode = MODES.has(queryMode) ? queryMode : 'login'
+  const initialMode = normalizeMode(MODES.has(queryMode) ? queryMode : 'login')
 
   const [mode, setMode] = useState(initialMode)
   const [email, setEmail] = useState('')
@@ -46,7 +49,7 @@ export default function LoginPage() {
   }, [])
 
   useEffect(() => {
-    if (MODES.has(queryMode)) setMode(queryMode)
+    if (MODES.has(queryMode)) setMode(normalizeMode(queryMode))
   }, [queryMode])
 
   const activeTitle = useMemo(() => {
@@ -86,6 +89,7 @@ export default function LoginPage() {
     setWorking(mode)
     try {
       if (mode === 'signup') {
+        if (!ENABLE_SIGNUP) { setError('Account creation is disabled for this deployment.'); return }
         await auth.register(email, password)
         setPassword('')
         setSuccess('Check your email to confirm your account before signing in.')
@@ -293,19 +297,23 @@ export default function LoginPage() {
 
         {!isResetMode && (
           <>
-            <button className="fiq-google" type="button" onClick={handleGoogle} disabled={disabled}>
-              {working === 'google' ? <Loader2 className="fiq-spin" size={16} /> : <Chrome size={16} />}
-              CONTINUE WITH GOOGLE
-            </button>
+            {ENABLE_GOOGLE_AUTH && (
+              <button className="fiq-google" type="button" onClick={handleGoogle} disabled={disabled}>
+                {working === 'google' ? <Loader2 className="fiq-spin" size={16} /> : <Chrome size={16} />}
+                CONTINUE WITH GOOGLE
+              </button>
+            )}
             <div className="fiq-links">
               {mode !== 'login' && <button type="button" onClick={() => switchMode('login')}>Sign in</button>}
-              {mode !== 'signup' && <button type="button" onClick={() => switchMode('signup')}>Create account</button>}
+              {ENABLE_SIGNUP && mode !== 'signup' && <button type="button" onClick={() => switchMode('signup')}>Create account</button>}
               {mode !== 'forgot' && <button type="button" onClick={() => switchMode('forgot')}>Forgot password</button>}
             </div>
           </>
         )}
 
-        <div className="fiq-caveat">Research only · Supabase Auth · No fabricated users</div>
+        <div className="fiq-caveat">
+          {ENABLE_SIGNUP ? 'Research only · Supabase Auth' : 'Private deployment · Approved users only · Accounts created by the owner'}
+        </div>
       </section>
     </div>
   )
