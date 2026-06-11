@@ -5,9 +5,31 @@ All notable changes to FinanceIQ, most recent first.
 ## Unreleased
 
 ### Added
-- **Render deployment guide** — `docs/RENDER_DEPLOY.md` documents the backend
-  service settings after the folder migration: root directory `backend`, native
-  Python build, and `$PORT`-aware Uvicorn start command.
+- **Centralized frontend cache layer** — `frontend/src/api/cache.js`
+  (sessionStorage-backed, stale-while-revalidate, in-flight dedupe, TTL
+  constants SHORT/MEDIUM/LONG), `useCachedResource` hook, and a Fable 5
+  `CacheTag` chip (cached / refreshing / last-updated + force-refresh). Old
+  `utils/sessionCache.js` is now a thin shim over it. Integrated into Benchmark,
+  Experiments, Data Quality, Forecasting (options keyed by `target_mode`, train
+  keyed by body), and Company Research Detail (per-ticker). Auth/session/token
+  endpoints and `POST /research/ask` are never cached; failures never cached.
+- **Public runtime diagnostic** — `GET /research/runtime-status` reports loaded
+  dataset rows/tickers, company-context count, missing required files, and AI
+  provider configuration without exposing secrets.
+- **Repo-root path resolver helpers** — `backend/app/core/paths.py` exposes
+  `get_trusted_clean_dir`, `get_public/training_modeling_dataset_path`,
+  `get_company_contexts_dir`, and `assert_required_runtime_files`; research
+  services resolve all data paths through this single strategy.
+- **Experimental 2025 partial 2026-YTD target mode** — opt-in
+  `target_mode=include_partial_2025` on `/forecasting/options` and
+  `/forecasting/train`. Clearly labeled, never comparable to finalized annual
+  targets, requires real `data/trusted_clean/partial_2026_ytd_returns.csv`
+  (absent by default → reports unavailable, excludes 2025, no fabrication).
+  Frontend: toggle, `2025*` marker, warning copy, target-mode readout.
+- **Render Docker Blueprint** — `render.yaml` (Docker runtime, repo-root build
+  context, Postgres + env vars). `docs/RENDER_DEPLOY.md` documents the backend
+  service: Docker, Dockerfile path `backend/Dockerfile`, build context `.`, and
+  `$PORT`-aware Uvicorn start command.
 - **Fable 5 frontend documentation pass** — docs now describe the completed dark
   research-terminal redesign: deep ink surfaces, subtle grain, muted emerald
   signal states, oxidized copper/amber warning states, monospace data typography,
@@ -35,12 +57,21 @@ All notable changes to FinanceIQ, most recent first.
   described as preserved.
 
 ### Fixed
-- Frontend page navigation now keeps already-loaded Research Terminal data in a
-  lightweight in-memory session cache, so returning to data-quality,
-  experiments, research, or companies pages no longer resets to full loading
-  states during the same app session.
-  Cache lives in `frontend/src/utils/sessionCache.js`, uses a 5-minute TTL, and
-  hard refresh still fetches normally.
+- **Backend research data not loading after login** — research and CSV-forecasting
+  endpoints required `get_current_user`, but the backend could not verify the
+  Supabase JWT unless `SUPABASE_JWT_SECRET` was set, so the frontend got 403 and
+  pages fell back to demo data. These demo-public endpoints now use an
+  `optional_user` dependency (DB-free, never 401/403). Login-gated frontend routes
+  and DB-backed legacy forecasting endpoints are unchanged.
+- **Render Docker path/context** — Dockerfile CMD now honors `$PORT`; `render.yaml`
+  and docs pin the repo-root build context required by the Dockerfile's
+  `COPY data/ experiments/ research_agent_training/`.
+- Frontend page navigation keeps already-loaded Research Terminal data in a
+  session cache, so returning to data-quality, experiments, research, or companies
+  pages no longer resets to full loading states. The cache is now centralized in
+  `frontend/src/api/cache.js` (sessionStorage, SWR, dedupe);
+  `frontend/src/utils/sessionCache.js` is a backward-compatible shim. Hard refresh
+  still fetches normally.
 
 ---
 

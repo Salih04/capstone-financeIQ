@@ -48,9 +48,14 @@ Key pages:
 | `/benchmark` | Tide chart | Preserves `researchApi.benchmark()`; sign-preserving log scale keeps 2022 +196% readable; IC markers stay small. |
 | `/forecasting` | Signal tuner | Preserves options/train/run/explain pipeline; feature weights as frequency spectrum; inference-only rows pulse amber. |
 
-Session cache: `frontend/src/utils/sessionCache.js` is a lightweight in-memory
-cache used by Data Quality, Experiments, Research, and Search/Companies pages.
-TTL is 5 minutes; hard refresh fetches normally.
+Session cache: centralized in `frontend/src/api/cache.js` — sessionStorage-backed,
+stale-while-revalidate, in-flight dedupe, TTL constants (SHORT/MEDIUM/LONG). The
+`useCachedResource` hook + Fable 5 `CacheTag` chip (cached / refreshing / last
+updated + force-refresh) drive Benchmark, Experiments, Data Quality, Forecasting
+(options keyed by `target_mode`, train keyed by body), and Company Research Detail
+(per-ticker). `frontend/src/utils/sessionCache.js` is a backward-compatible shim
+over it. Auth/session/token endpoints and `POST /research/ask` are never cached;
+failed responses are never cached; hard refresh fetches normally.
 
 ## Users
 

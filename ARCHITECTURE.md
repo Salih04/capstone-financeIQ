@@ -98,6 +98,16 @@ run_time_cv_evaluation(db, ...)           → ForecastEvaluationRun + folds
   Reads public CSV for inference; loads pre-built RAG context JSON preferentially.
   `/research/ai-status` reports provider/model configuration without exposing secrets and
   returns structured "AI not configured" diagnostics when no provider/key is available.
+  `/research/runtime-status` is a public diagnostic for loaded dataset coverage and missing files.
+
+### Endpoint protection
+
+Research (`/research/*`) and CSV-forecasting (`/forecasting/options|train|run|explain`)
+endpoints are **intentionally public for the demo** via the `optional_user` dependency
+(DB-free, never 401/403). The Supabase-gated frontend still protects routes; the backend
+serves validated research data even when it cannot verify the Supabase JWT. DB-backed
+legacy forecasting endpoints keep `get_current_user`. All data paths resolve through the
+single `app/core/paths.py` repo-root strategy (`RESEARCH_REPO_ROOT` override → `data/` probe).
 
 ### Parameter catalog (17 ratios, 5 categories)
 
