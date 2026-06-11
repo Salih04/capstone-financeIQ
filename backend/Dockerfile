@@ -15,4 +15,5 @@ ENV TRUSTED_OUT_DIR=/app/data/trusted
 ENV TRUSTED_COMBINED_CSV=/app/data/trusted/stocks_2020_2025.csv
 ENV RESEARCH_REPO_ROOT=/app
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Honor Render's injected $PORT; fall back to 8000 for local docker-compose.
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

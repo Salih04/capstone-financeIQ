@@ -83,6 +83,49 @@ class ResearchAgentApiTests(unittest.TestCase):
         for bad in FORBIDDEN:
             self.assertNotIn(bad, blob)
 
+    # ── public-demo access: research endpoints must work WITHOUT a token ──
+    def test_summary_public_no_token(self):
+        r = self.client.get("/research/summary")  # no Authorization header
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("context", r.json())
+
+    def test_ask_public_no_token(self):
+        r = self.client.post("/research/ask", json={"question": "Top ranked companies"})
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("answer", r.json())
+
+    def test_company_public_no_token(self):
+        r = self.client.get("/research/company/THYAO")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()["context"]["ticker"], "THYAO")
+
+    def test_invalid_token_still_public(self):
+        bad = {"Authorization": "Bearer not.a.real.token"}
+        r = self.client.get("/research/summary", headers=bad)
+        self.assertEqual(r.status_code, 200)
+
+    def test_runtime_status_shape(self):
+        r = self.client.get("/research/runtime-status")
+        self.assertEqual(r.status_code, 200)
+        b = r.json()
+        for k in ("repo_root", "public_dataset_exists", "public_rows",
+                  "training_rows", "company_contexts_count", "missing_required_files",
+                  "ai_provider_configured", "llm_fallback_available"):
+            self.assertIn(k, b)
+        self.assertTrue(b["llm_fallback_available"])
+
+    def test_ai_status_masks_secrets(self):
+        # configure a provider+key, confirm the key value is never echoed back
+        os.environ["RESEARCH_LLM_PROVIDER"] = "openrouter"
+        os.environ["OPENROUTER_API_KEY"] = "sk-should-not-leak-xyz"
+        try:
+            r = self.client.get("/research/ai-status")
+            self.assertEqual(r.status_code, 200)
+            self.assertNotIn("sk-should-not-leak-xyz", r.text)
+        finally:
+            os.environ["RESEARCH_LLM_PROVIDER"] = "none"
+            os.environ.pop("OPENROUTER_API_KEY", None)
+
 
 if __name__ == "__main__":
     unittest.main()

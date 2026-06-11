@@ -1,70 +1,61 @@
 # Render Deploy
 
 FinanceIQ backend lives in `backend/`. Do not use any retired numbered backend
-folder in Render settings. A `render.yaml` Blueprint is now present at repo root
-and will configure new Render services automatically.
+folder in Render settings.
 
-## CRITICAL: Stale Render Dashboard Setting
+The committed `render.yaml` Blueprint deploys the backend with the **Docker**
+runtime using the repo root as build context. The `backend/Dockerfile` copies
+`backend/`, `data/`, `experiments/`, and `research_agent_training/` from the repo
+root, so the build context **must** be the repo root.
 
-**Pushing code cannot fix a Root Directory already saved in the Render
-Dashboard.** If your existing Render service was created with Root Directory set
-to `2.backend` (or any retired path), that value lives in the Render UI and must
-be changed manually — `render.yaml` only controls *new* services created via the
-Blueprint flow.
+## Option A — Blueprint (recommended)
 
-### Fix an existing service manually
+Point Render at this repo and let it read `render.yaml`. It provisions a free
+Postgres database and the Docker web service with all required env vars.
 
-1. Open the Render Dashboard → your `financeiq-backend` service → **Settings**.
-2. Under **Build & Deploy**, update:
-   - **Root Directory**: `backend`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-3. Click **Save Changes**.
-4. Then click **Manual Deploy → Clear build cache & deploy** to force a clean
-   rebuild from the correct path.
+## Option B — Manual Docker Web Service
 
-## New Service via Blueprint
-
-To create a new service that picks up `render.yaml` automatically, click
-**New → Blueprint** in Render and point it at this repo. The Blueprint will
-configure Root Directory, build/start commands, and env var stubs.
-
-## Manual Render Settings (reference)
-
-If not using the Blueprint, create a Web Service from this repository with:
+Create a Web Service from this repository with the **Docker** runtime:
 
 ```text
-Root Directory: backend
-Build Command: pip install -r requirements.txt
-Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+Root Directory:                 (empty / repo root)
+Dockerfile Path:                backend/Dockerfile
+Docker Build Context Directory: .
+Docker Command:                 (blank — Dockerfile CMD honors $PORT)
 ```
 
-Use the native Python runtime. The frontend deploys separately on Vercel.
+### Wrong settings (these break the build)
+
+- `Root Directory: backend` + `Dockerfile Path: backend/Dockerfile`
+  → resolves to `backend/backend/Dockerfile` (not found).
+- `Docker Build Context Directory: backend`
+  → `COPY data/ ...`, `COPY experiments/ ...`, `COPY research_agent_training/ ...` fail.
 
 ## Environment Variables
 
 Required:
 
 ```bash
-DATABASE_URL=postgresql://...
+DATABASE_URL=postgresql://...        # from the Render Postgres instance
 SECRET_KEY=replace-with-a-long-random-string
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=1440
 ```
 
-Recommended data path variables when Render runs from `backend/`:
+Data path resolution inside the container (Dockerfile already sets these; keep
+them if overriding):
 
 ```bash
-TRUSTED_DATASETS_DIR=../data/raw/yearly_xlsx
-TRUSTED_OUT_DIR=../data/trusted
-TRUSTED_COMBINED_CSV=../data/trusted/stocks_2020_2025.csv
-RESEARCH_REPO_ROOT=..
+RESEARCH_REPO_ROOT=/app
+TRUSTED_DATASETS_DIR=/app/data/raw/yearly_xlsx
+TRUSTED_OUT_DIR=/app/data/trusted
+TRUSTED_COMBINED_CSV=/app/data/trusted/stocks_2020_2025.csv
 ```
 
 Optional research-agent / auth compatibility:
 
 ```bash
-RESEARCH_LLM_PROVIDER=none
+RESEARCH_LLM_PROVIDER=none           # or openrouter / openai / lmstudio / ollama
 OPENROUTER_API_KEY=
 OPENAI_API_KEY=
 SUPABASE_JWT_SECRET=
@@ -74,12 +65,24 @@ SUPABASE_AUTO_CREATE_USERS=true
 
 Do not commit `.env` files or service-role keys.
 
+## Note on native Python deploys
+
+If you instead use Render's native Python runtime (`Root Directory: backend`,
+`Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT`), do **not**
+also set a Dockerfile — pick one strategy. With native Python from `backend/`,
+set `RESEARCH_REPO_ROOT=..` and the `TRUSTED_*` paths relative to `backend/`.
+The repo-root resolver (`backend/app/core/paths.py`) honors `RESEARCH_REPO_ROOT`
+first, so either strategy works as long as the data tree is reachable.
+
 ## Health Check
 
 After deploy:
 
 ```bash
 curl https://your-render-service.onrender.com/health
+curl https://your-render-service.onrender.com/research/runtime-status
 ```
 
-Then set Vercel `VITE_API_URL` to the Render backend URL.
+`/research/runtime-status` reports loaded dataset rows/tickers, company-context
+count, and any missing required files — use it to confirm the Docker image
+shipped the `data/` tree. Then set Vercel `VITE_API_URL` to the Render backend URL.

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 logger = logging.getLogger("forecasting")
 
-from app.core.dependencies import get_current_user
+from app.core.dependencies import get_current_user, optional_user
 from app.database import get_db
 from app.models.user import User
 from app.schemas.forecasting import (
@@ -269,7 +269,7 @@ def get_filters(
 # ── CSV-backed pipeline endpoints (no DB required) ────────────────────────────
 
 @router.get("/forecasting/options")
-def csv_options(_: User = Depends(get_current_user)):
+def csv_options(_: User | None = Depends(optional_user)):
     try:
         return _csv_svc.get_options()
     except FileNotFoundError as exc:
@@ -277,7 +277,7 @@ def csv_options(_: User = Depends(get_current_user)):
 
 
 @router.post("/forecasting/train")
-def csv_train(body: CsvTrainRequest, _: User = Depends(get_current_user)):
+def csv_train(body: CsvTrainRequest, _: User | None = Depends(optional_user)):
     try:
         return _csv_svc.train_parameters(
             train_year_from=body.train_year_from,
@@ -292,7 +292,7 @@ def csv_train(body: CsvTrainRequest, _: User = Depends(get_current_user)):
 
 
 @router.post("/forecasting/run")
-def csv_run(body: CsvRunRequest, _: User = Depends(get_current_user)):
+def csv_run(body: CsvRunRequest, _: User | None = Depends(optional_user)):
     try:
         return _csv_svc.run_forecast(
             year=body.year,
@@ -311,7 +311,7 @@ def csv_run(body: CsvRunRequest, _: User = Depends(get_current_user)):
 def csv_explain(
     ticker: str,
     year: int | None = None,
-    _: User = Depends(get_current_user),
+    _: User | None = Depends(optional_user),
 ):
     try:
         return _csv_svc.explain_ticker(ticker=ticker, year=year)

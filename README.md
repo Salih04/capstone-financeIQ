@@ -210,25 +210,26 @@ the container are set via `TRUSTED_DATASETS_DIR`, `TRUSTED_OUT_DIR`,
 
 ## Deploy backend on Render
 
-A `render.yaml` Blueprint is included. For an existing service with a stale Root Directory, update it manually in the Render Dashboard — see [`docs/RENDER_DEPLOY.md`](docs/RENDER_DEPLOY.md). Manual settings:
+This repo ships a `render.yaml` Blueprint using the **Docker** runtime with the
+repo root as build context (the `backend/Dockerfile` copies `data/`,
+`experiments/`, and `research_agent_training/` from the repo root). Point Render
+at the repo and it reads `render.yaml`, or configure a Docker Web Service manually:
 
 ```text
-Root Directory: backend
-Build Command: pip install -r requirements.txt
-Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+Root Directory:                 (empty / repo root)
+Dockerfile Path:                backend/Dockerfile
+Docker Build Context Directory: .
+Docker Command:                 (blank — Dockerfile CMD honors $PORT)
 ```
 
-Use `backend`, never a retired numbered backend path. Set backend env vars in
-Render, including `DATABASE_URL`, `SECRET_KEY`, and optional
-`SUPABASE_JWT_SECRET`. When Render runs from `backend/`, keep data paths relative
-to that directory:
+Do **not** set `Root Directory: backend` for the Docker strategy — it produces
+`backend/backend/Dockerfile` and a build context that cannot see `data/`. The
+Dockerfile already sets in-container data paths (`RESEARCH_REPO_ROOT=/app`,
+`TRUSTED_*=/app/data/...`). Set `DATABASE_URL`, `SECRET_KEY`, and optional
+`SUPABASE_JWT_SECRET` in Render.
 
-```bash
-TRUSTED_DATASETS_DIR=../data/raw/yearly_xlsx
-TRUSTED_OUT_DIR=../data/trusted
-TRUSTED_COMBINED_CSV=../data/trusted/stocks_2020_2025.csv
-RESEARCH_REPO_ROOT=..
-```
+Backend research/forecasting-CSV endpoints are intentionally public for the demo;
+verify data shipped with `GET /research/runtime-status`.
 
 See [`docs/RENDER_DEPLOY.md`](docs/RENDER_DEPLOY.md).
 
