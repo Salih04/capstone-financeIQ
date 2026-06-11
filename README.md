@@ -374,7 +374,8 @@ deployment down to manually-created, approved users:
 PUBLIC_DEMO_MODE=false
 REQUIRE_APPROVED_USER=true
 APPROVED_EMAILS=owner@example.com,teammate@example.com
-SUPABASE_JWT_SECRET=<Supabase Project Settings → API → JWT Secret>   # REQUIRED in private mode
+SUPABASE_URL=https://<project-ref>.supabase.co   # REQUIRED in private mode (JWKS verification of Supabase Signing Keys)
+# SUPABASE_JWT_SECRET=<legacy HS256 secret>       # only if your project still issues HS256 tokens
 ENABLE_PUBLIC_DOCS=false
 RATE_LIMIT_ENABLED=true
 CORS_ALLOW_ORIGINS=https://capstone-finance-iq.vercel.app

@@ -74,16 +74,20 @@ users, set on the Render service:
 PUBLIC_DEMO_MODE=false
 REQUIRE_APPROVED_USER=true
 APPROVED_EMAILS=owner@example.com,teammate@example.com
-SUPABASE_JWT_SECRET=<Supabase Project Settings → API → JWT Secret>   # REQUIRED — backend verifies sessions
+SUPABASE_URL=https://<project-ref>.supabase.co   # REQUIRED — JWKS verification of Supabase JWT Signing Keys
+# SUPABASE_JWT_SECRET=<legacy HS256 secret>        # only if the project still issues HS256 tokens
 ENABLE_PUBLIC_DOCS=false
 RATE_LIMIT_ENABLED=true
 RATE_LIMIT_REQUESTS_PER_MINUTE=60
 CORS_ALLOW_ORIGINS=https://capstone-finance-iq.vercel.app
 ```
 
-In private mode without `SUPABASE_JWT_SECRET` the backend cannot verify Supabase
-tokens and denies all access (fail closed). Empty `APPROVED_EMAILS` with
-`REQUIRE_APPROVED_USER=true` also denies all. `/health` stays public.
+New Supabase projects sign access tokens with asymmetric **JWT Signing Keys**
+(RS256/ES256); the backend verifies them against the project JWKS derived from
+`SUPABASE_URL`. In private mode with neither `SUPABASE_URL` (JWKS) nor a matching
+`SUPABASE_JWT_SECRET` the backend cannot verify tokens and denies all access
+(fail closed). Empty `APPROVED_EMAILS` with `REQUIRE_APPROVED_USER=true` also
+denies all. `/health` stays public.
 
 ## Note on native Python deploys
 

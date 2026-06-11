@@ -30,9 +30,12 @@ by env:
   Anonymous → 401, unapproved → 403. With `REQUIRE_APPROVED_USER=true` the
   verified email must be in `APPROVED_EMAILS` (case-insensitive); an empty
   allowlist denies everyone (**fail closed**). Verification uses token signatures
-  only — `SUPABASE_JWT_SECRET` must be set so the backend can verify Supabase
-  sessions; without it, private mode denies all (fail closed). Error responses
-  never leak the allowlist or token claims.
+  only: Supabase **JWT Signing Keys** (RS256/ES256) are verified against the
+  project JWKS derived from `SUPABASE_URL` (cached in memory), and legacy HS256
+  tokens via `SUPABASE_JWT_SECRET`. The JWKS path never accepts HS256 (no
+  alg-confusion). With no usable verifier configured, private mode denies all
+  (fail closed). Email/claims are read only after the signature verifies; error
+  responses never leak the allowlist or token claims.
 
 DB-backed, admin, upload, and auth endpoints always require `get_current_user`.
 `/health` is always public. The frontend (`ProtectedRoute` + `isApproved`) mirrors
