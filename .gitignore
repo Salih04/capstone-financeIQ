@@ -67,3 +67,6 @@ node_modules/
 frontend/.env
 
 backend/.env
+# Local assistant / workspace artifacts
+.claude/
+baslat.txt
