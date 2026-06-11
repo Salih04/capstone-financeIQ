@@ -210,7 +210,7 @@ the container are set via `TRUSTED_DATASETS_DIR`, `TRUSTED_OUT_DIR`,
 
 ## Deploy backend on Render
 
-This repo has no `render.yaml`. Configure Render manually:
+A `render.yaml` Blueprint is included. For an existing service with a stale Root Directory, update it manually in the Render Dashboard — see [`docs/RENDER_DEPLOY.md`](docs/RENDER_DEPLOY.md). Manual settings:
 
 ```text
 Root Directory: backend

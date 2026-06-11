@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: financeiq-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.15
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: TRUSTED_DATASETS_DIR
+        value: ../data/raw/yearly_xlsx
+      - key: TRUSTED_OUT_DIR
+        value: ../data/trusted
+      - key: TRUSTED_COMBINED_CSV
+        value: ../data/trusted/stocks_2020_2025.csv
+      - key: RESEARCH_REPO_ROOT
+        value: ..
