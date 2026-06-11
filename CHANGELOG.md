@@ -5,6 +5,24 @@ All notable changes to FinanceIQ, most recent first.
 ## Unreleased
 
 ### Added
+- **Private production access mode** — env-gated `require_access` dependency on all
+  research/forecasting-CSV endpoints. `PUBLIC_DEMO_MODE=true` (default) keeps the
+  open read-only demo; `PUBLIC_DEMO_MODE=false` requires a verified user (401 anon,
+  403 unapproved). `REQUIRE_APPROVED_USER` + `APPROVED_EMAILS` (case-insensitive)
+  gate access; empty allowlist denies all (fail closed). `ENABLE_PUBLIC_DOCS=false`
+  disables `/docs`+`/openapi.json`; `/health` stays public. In-memory per-identity
+  rate limiting (`RATE_LIMIT_ENABLED`, 429) on `/research/ask`,
+  `/forecasting/train|inference`, company score/explain. Frontend: env flags hide
+  Google/signup (`VITE_ENABLE_GOOGLE_AUTH`/`VITE_ENABLE_SIGNUP`, default off),
+  `ProtectedRoute` approval gate + blocked state, API cache cleared on logout /
+  identity change. Vercel security headers (nosniff, frame-ancestors, referrer,
+  permissions).
+- **Supabase JWT Signing Keys (JWKS) verification** — backend verifies asymmetric
+  Supabase access tokens (RS256/ES256) against the project JWKS derived from
+  `SUPABASE_URL` (cached, key-rotation aware), with `aud`/`iss`/`exp` checks and
+  HS256 legacy fallback via `SUPABASE_JWT_SECRET`. Fixes approved users getting
+  401 after Supabase migrated off the legacy shared secret. JWKS path never accepts
+  HS256 (no alg-confusion); claims read only after signature verification.
 - **2026 forward forecast / inference** — public `GET /forecasting/inference?year=2025`
   trains finalized 2020–2024 then ranks 2025 rows into a 2026 forward-looking
   ranking (`unevaluated_forward_forecast`; rows carry `input_year`, `target_year`,
