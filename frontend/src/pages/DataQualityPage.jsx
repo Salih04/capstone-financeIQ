@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { researchApi } from '../api/researchApi'
 import { getCached, setCached } from '../utils/sessionCache'
+import { clearCache, getEntry } from '../api/cache'
+import CacheTag from '../components/CacheTag'
 
 // ---------------------------------------------------------------------------
 // Data Quality — THE SPECIMEN ARCHIVE.
@@ -185,12 +187,19 @@ export default function DataQualityPage() {
   const [rejectedLoading, setRejectedLoading] = useState(() => !hasCachedSpecimens)
   const [frozenEvidenceLoading, setFrozenEvidenceLoading] = useState(() => !cachedPage?.evi)
   const [hovered, setHovered] = useState(null)
+  // cache metadata + manual refresh
+  const [reloadKey, setReloadKey] = useState(0)
+  const [refreshing, setRefreshing] = useState(false)
+  const [savedAt, setSavedAt] = useState(() => getEntry(DATA_QUALITY_CACHE_KEY)?.savedAt ?? null)
+  const servedFromCache = hasCachedSpecimens && reloadKey === 0
+  const doRefresh = () => { clearCache(DATA_QUALITY_CACHE_KEY); setRefreshing(true); setReloadKey((k) => k + 1) }
 
   useEffect(() => {
     let mounted = true
-    let nextDq = cachedPage?.dq ?? null
-    let nextSummary = cachedPage?.summary ?? null
-    let nextEvi = cachedPage?.evi ?? null
+    const seed = getCached(DATA_QUALITY_CACHE_KEY)
+    let nextDq = seed?.dq ?? null
+    let nextSummary = seed?.summary ?? null
+    let nextEvi = seed?.evi ?? null
 
     const persist = () => {
       setCached(DATA_QUALITY_CACHE_KEY, {
@@ -198,6 +207,7 @@ export default function DataQualityPage() {
         summary: nextSummary,
         evi: nextEvi,
       })
+      if (mounted) setSavedAt(getEntry(DATA_QUALITY_CACHE_KEY)?.savedAt ?? Date.now())
     }
 
     const dataQualityRequest = researchApi.dataQuality().then(
@@ -242,6 +252,10 @@ export default function DataQualityPage() {
       setRejectedLoading(false)
     })
 
+    Promise.allSettled([dataQualityRequest, summaryRequest, frozenEvidenceRequest]).then(() => {
+      if (mounted) setRefreshing(false)
+    })
+
     frozenEvidenceRequest.finally(() => {
       if (mounted) setFrozenEvidenceLoading(false)
     })
@@ -249,7 +263,7 @@ export default function DataQualityPage() {
     return () => {
       mounted = false
     }
-  }, [cachedPage])
+  }, [reloadKey])
 
   const { accepted, rejected, fromApi } = useMemo(
     () => buildSpecimens(dq, summary, { allowFallback: !acceptedLoading && !rejectedLoading }),
@@ -288,6 +302,7 @@ export default function DataQualityPage() {
           <div><strong className="is-gold">{leakCount}</strong><span>LEAKAGE-GUARDED</span></div>
           <div><strong className="is-copper">{frozenCountLabel}</strong><span>FROZEN-EXCLUDED</span></div>
           {!fromApi && <div className="spx-mocknote">demo data — quality API returned no columns</div>}
+          <div className="spx-cachetag"><CacheTag fromCache={servedFromCache} refreshing={refreshing} savedAt={savedAt} onRefresh={doRefresh} /></div>
         </div>
       </header>
 
@@ -439,6 +454,7 @@ const CSS = `
 .is-gold { color: var(--sp-gold); }
 .is-copper { color: var(--sp-copper); }
 .spx-mocknote { font-size: 9.5px !important; color: var(--sp-copper) !important; letter-spacing: 0.04em !important; }
+.spx-cachetag { flex-basis: 100%; display: flex; justify-content: flex-end; margin-top: 2px; }
 
 .spx-main { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
 @media (max-width: 1000px) { .spx-main { grid-template-columns: 1fr; } }

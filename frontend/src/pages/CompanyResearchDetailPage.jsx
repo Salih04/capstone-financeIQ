@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Building2 } from 'lucide-react'
 import { EmptyState } from '../components/ui'
-import { researchApi } from '../api/researchApi'
+import { cachedGet, CACHE_TTL } from '../api/cache'
+import CacheTag from '../components/CacheTag'
 import { humanizeWarning, asText } from '../utils/safeRender'
 
 // ---------------------------------------------------------------------------
@@ -46,11 +47,22 @@ export default function CompanyResearchDetailPage() {
   const [score, setScore] = useState(null)
   const [err, setErr] = useState(null)
   const [focus, setFocus] = useState(null) // {type:'rail'|'feature', ...}
+  const [meta, setMeta] = useState({ fromCache: false, refreshing: false, savedAt: null })
 
-  useEffect(() => {
-    researchApi.company(ticker).then((r) => (r.error ? setErr(r.error) : setDetail(r.data)))
-    researchApi.companyScore(ticker).then((r) => setScore(r.data))
+  // Per-ticker cache keys (path-based) — ASELS and THYAO never collide.
+  const load = useCallback(async (force = false) => {
+    const enc = encodeURIComponent(ticker)
+    const rd = await cachedGet(`/research/company/${enc}`, undefined, { ttlMs: CACHE_TTL.MEDIUM, forceRefresh: force })
+    if (rd.value !== undefined) { setDetail(rd.value); setErr(null) } else if (rd.error) setErr(rd.error)
+    setMeta({ fromCache: rd.fromCache, refreshing: !!rd.refreshing, savedAt: rd.savedAt })
+    const rs = await cachedGet(`/research/company/${enc}/score`, undefined, { ttlMs: CACHE_TTL.MEDIUM, forceRefresh: force })
+    if (rs.value !== undefined) setScore(rs.value)
+    // background revalidation (stale-while-revalidate)
+    if (rd.revalidate) { const f = await rd.revalidate; if (f) { setDetail(f); setMeta((m) => ({ ...m, fromCache: false, refreshing: false, savedAt: Date.now() })) } }
+    if (rs.revalidate) { const f = await rs.revalidate; if (f) setScore(f) }
   }, [ticker])
+
+  useEffect(() => { load(false) }, [load])
 
   if (err) return <EmptyState icon={Building2} title={`${ticker} not found`} description={asText(err)} />
 
@@ -95,6 +107,7 @@ export default function CompanyResearchDetailPage() {
           <button type="button" className="ca-back" onClick={() => nav('/research/companies')}>
             ← RETURN TO UNIVERSE
           </button>
+          <div className="ca-cachetag"><CacheTag fromCache={meta.fromCache} refreshing={meta.refreshing} savedAt={meta.savedAt} onRefresh={() => load(true)} /></div>
         </div>
       </header>
 
@@ -300,6 +313,7 @@ const CSS = `
 .ca-back:hover { background: rgba(77,165,131,0.1); box-shadow: 0 0 14px rgba(77,165,131,0.18); }
 .ca-back:active { transform: translateY(1px); }
 .ca-back:focus-visible { outline: 1px solid var(--ca-emerald); outline-offset: 2px; }
+.ca-cachetag { display: flex; justify-content: flex-end; margin-top: 6px; }
 
 /* ── layout ── */
 .ca-main { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }

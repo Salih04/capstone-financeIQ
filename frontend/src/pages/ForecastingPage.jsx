@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import api from '../api/client'
+import { cachedGet, cachedPost, CACHE_TTL } from '../api/cache'
+import CacheTag from '../components/CacheTag'
 
 // ---------------------------------------------------------------------------
 // Forecasting — THE SIGNAL TUNER. Experimental, always labeled so.
@@ -64,19 +66,33 @@ export default function ForecastingPage() {
   const [explaining, setExplaining] = useState(false)
 
   const targetMode = partialMode ? 'include_partial_2025' : 'finalized_only'
+  const [optMeta, setOptMeta] = useState({ fromCache: false, refreshing: false, savedAt: null })
 
-  useEffect(() => {
-    api.get('/forecasting/options', { params: { target_mode: targetMode } })
-      .then(({ data }) => {
-        if (!data?.trainable_years?.length) { setMockMode(true); return }
-        setOptions(data)
-        // trainable_years is always finalized (2020–2024); 2025 is never here.
-        setTrainFrom(data.trainable_years[0])
-        setTrainTo(data.trainable_years[data.trainable_years.length - 1])
-        if (data.all_years?.length) setForecastYear(String(data.all_years[data.all_years.length - 1]))
-      })
-      .catch(() => setMockMode(true))
-  }, [targetMode])
+  const applyOptions = useCallback((data) => {
+    if (!data?.trainable_years?.length) { setMockMode(true); return }
+    setMockMode(false)
+    setOptions(data)
+    // trainable_years is always finalized (2020–2024); 2025 is never here.
+    setTrainFrom(data.trainable_years[0])
+    setTrainTo(data.trainable_years[data.trainable_years.length - 1])
+    if (data.all_years?.length) setForecastYear(String(data.all_years[data.all_years.length - 1]))
+  }, [])
+
+  // Cached by target_mode → finalized_only and include_partial_2025 never collide.
+  const loadOptions = useCallback(async (force = false) => {
+    const r = await cachedGet('/forecasting/options', { params: { target_mode: targetMode } },
+      { ttlMs: CACHE_TTL.LONG, forceRefresh: force })
+    setOptMeta({ fromCache: r.fromCache, refreshing: !!r.refreshing, savedAt: r.savedAt })
+    if (r.value === undefined && r.error) { setMockMode(true); return }
+    applyOptions(r.value)
+    if (r.revalidate) {
+      const fresh = await r.revalidate
+      if (fresh) { applyOptions(fresh); setOptMeta((m) => ({ ...m, fromCache: false, refreshing: false, savedAt: Date.now() })) }
+      else setOptMeta((m) => ({ ...m, refreshing: false }))
+    }
+  }, [targetMode, applyOptions])
+
+  useEffect(() => { loadOptions(false) }, [loadOptions])
 
   // Partial mode availability (real 2026 YTD data present in repo?)
   const partialIncluded = !mockMode && !!options?.includes_partial_targets
@@ -100,13 +116,16 @@ export default function ForecastingPage() {
       return
     }
     setTraining(true); setTrainError(''); setTrainResult(null); setForecastResult(null); setExplain(null)
-    try {
-      const { data } = await api.post('/forecasting/train', {
-        train_year_from: trainFrom, train_year_to: partialIncluded ? 2025 : trainTo,
-        top_n: topN, target_mode: targetMode,
-      })
-      setTrainResult(data)
-    } catch (e) { setTrainError(errText(e, 'Training failed.')) } finally { setTraining(false) }
+    const body = {
+      train_year_from: trainFrom, train_year_to: partialIncluded ? 2025 : trainTo,
+      top_n: topN, target_mode: targetMode,
+    }
+    // Cached LONG, keyed by the full body → distinct windows/top_n/target_mode
+    // each get their own entry; repeat trains are instant.
+    const r = await cachedPost('/forecasting/train', body, { ttlMs: CACHE_TTL.LONG })
+    if (r.value !== undefined) setTrainResult(r.value)
+    else setTrainError(errText(r.error, 'Training failed.'))
+    setTraining(false)
   }
 
   const runForecast = async () => {
@@ -189,7 +208,10 @@ export default function ForecastingPage() {
             as a historical pattern, never a forward claim.
           </p>
         </div>
-        <div className="ft-expbadge">EXPERIMENTAL{(mockMode || trainResult?.demo) ? ' · DEMO DATA' : ''}</div>
+        <div className="ft-headmeta">
+          <div className="ft-expbadge">EXPERIMENTAL{(mockMode || trainResult?.demo) ? ' · DEMO DATA' : ''}</div>
+          {!mockMode && <CacheTag fromCache={optMeta.fromCache} refreshing={optMeta.refreshing} savedAt={optMeta.savedAt} onRefresh={() => loadOptions(true)} />}
+        </div>
       </header>
 
       <div className="ft-grid">
@@ -499,6 +521,7 @@ const CSS = `
   box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
 .ft-caveat-pulse { width: 7px; height: 7px; border-radius: 50%; background: #c8a35a; animation: ftPulse 2.2s ease-in-out infinite; flex-shrink: 0; }
 
+.ft-headmeta { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 .ft-partial { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; }
 .ft-toggle { flex-shrink: 0; width: 38px; height: 20px; border-radius: 11px; border: 1px solid rgba(200,211,202,0.3);
   background: rgba(200,211,202,0.08); padding: 0; cursor: pointer; position: relative; transition: background 0.18s, border-color 0.18s; }
