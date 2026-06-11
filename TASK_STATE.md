@@ -35,7 +35,7 @@ claim.
 | Walk-forward experiments | DONE | `experiments/`, honest weak-signal verdict |
 | Explainable research agent (+ optional OpenRouter/local LLM) | DONE | `/research/*`, grounded intents, never advice |
 | Research Terminal frontend | DONE | Fable 5: dashboard, research-agent, companies, experiments, score explorer, data-quality, benchmark, forecasting |
-| Frontend session cache | DONE | `1.frontend/src/utils/sessionCache.js`, 5-minute in-memory TTL, hard refresh still fetches |
+| Frontend session cache | DONE | `frontend/src/utils/sessionCache.js`, 5-minute in-memory TTL, hard refresh still fetches |
 | Secondary page caveats | DONE | CompanyPage, ComparePage, ScoreResultPage, CompanyResearchDetailPage, DataHealthPage use TerminalFx caveat strips |
 | Forecasting (legacy) restored | DONE | filters union, friendly errors, re-clickable actions |
 | Forecasting CSV pipeline | DONE | CSV-backed; no DB required; train→rank→explain functional |

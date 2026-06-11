@@ -7,7 +7,7 @@
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration
 
-# Diagnose whether new_data_quarter/ files vary per period (they are frozen).
+# Diagnose whether data/raw/quarterly_fintables/ files vary per period (they are frozen).
 inspect-quarterly:
 	PYTHONPATH=. python -m scripts.data_collection.inspect_quarterly_snapshots
 

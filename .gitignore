@@ -15,6 +15,13 @@ __pycache__/
 backend/.venv/
 venv/
 .env
+.env.*
+!.env.example
+frontend/.env.local
+backend/.env.local
+*.pem
+*.key
+*.secret
 
 # Docker
 *.log
@@ -51,4 +58,12 @@ node_modules/
 *.db
 
 
+.env
 
+.env.local
+
+*.env
+
+frontend/.env
+
+backend/.env

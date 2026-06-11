@@ -8,4 +8,4 @@ export RESEARCH_LLM_TIMEOUT_SECONDS=15
 export RESEARCH_SCORE_LLM_WEIGHT=0.15
 
 source .venv/bin/activate
-PYTHONPATH=2.backend uvicorn app.main:app --port 8000
+PYTHONPATH=backend uvicorn app.main:app --port 8000

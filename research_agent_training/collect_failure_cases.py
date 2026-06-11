@@ -17,7 +17,7 @@ from collections import Counter
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT / "2.backend"))
+sys.path.insert(0, str(REPO_ROOT / "backend"))
 
 from app.services import research_agent as RA  # noqa: E402
 

@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "2.backend"))
+sys.path.insert(0, str(REPO / "backend"))
 
 from scripts.data_collection import manual_ingest as M  # noqa: E402
 from scripts.data_collection import build_free_valuation_history as V  # noqa: E402

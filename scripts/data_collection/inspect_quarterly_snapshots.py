@@ -1,4 +1,4 @@
-"""Inspect the new_data_quarter/ Fintables quarterly exports for usability.
+"""Inspect the data/raw/quarterly_fintables/ Fintables quarterly exports for usability.
 
 Answers one question honestly: do the quarterly files contain genuinely
 per-quarter (or per-year) varying fundamentals, or are they a single frozen
@@ -17,7 +17,7 @@ from pathlib import Path
 import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-QDIR = REPO_ROOT / "new_data_quarter"
+QDIR = REPO_ROOT / "data/raw/quarterly_fintables"
 OUT_JSON = REPO_ROOT / "data" / "trusted_clean" / "quarterly_snapshot_inspection.json"
 OUT_MD = REPO_ROOT / "data" / "trusted_clean" / "quarterly_snapshot_inspection.md"
 

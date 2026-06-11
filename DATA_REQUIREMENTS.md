@@ -61,7 +61,7 @@ both locations (`*.template.csv`). When present, the pipeline adds
 ### Reusing the yearly Excel files
 
 `make extract-yearly-financials` pulls any genuinely year-varying columns from
-`3.Datasets/20YYstocks.xlsx` into a candidate manual file. Frozen
+`data/raw/yearly_xlsx/20YYstocks.xlsx` into a candidate manual file. Frozen
 (snapshot) and return/momentum columns are auto-rejected — see the migration
 report. This does **not** replace supplying real per-year statements above.
 

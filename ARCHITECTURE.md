@@ -8,11 +8,11 @@ Three-container Docker application. Frontend serves static build via nginx; back
 Browser
   │  HTTP :3000
   ▼
-nginx (1.frontend)
+nginx (frontend)
   │  proxy /api → :8000  (not configured yet — direct calls in dev)
   │
   ▼
-FastAPI (2.backend :8000)
+FastAPI (backend :8000)
   │  SQLAlchemy 2.0
   ▼
 PostgreSQL 16 (:5432)
@@ -20,7 +20,7 @@ PostgreSQL 16 (:5432)
 
 ---
 
-## Backend — `2.backend/app/`
+## Backend — `backend/app/`
 
 ### Layer structure
 
@@ -118,7 +118,7 @@ forecast_evaluation_folds — one per fold
 
 ---
 
-## Frontend — `1.frontend/src/`
+## Frontend — `frontend/src/`
 
 ### Visual system
 
@@ -199,14 +199,27 @@ mount → GET /forecasting/options (CSV-backed, no DB)
        └─ score drivers, feature coverage, data quality warnings
 ```
 
-All routes except `/login` wrapped in `<ProtectedRoute>` → `<AppShell>`.
+All routes except `/login` and `/auth/callback` are wrapped in
+`<ProtectedRoute>` → `<AppShell>`.
 
 ### Auth
 
-JWT stored in localStorage. `ProtectedRoute` reads token; redirects to `/login`
-if absent. Token lifetime: 1440 min (24h). Treat login as a restricted research
-workspace. Do not describe open public signup unless a deployment explicitly
-implements reviewer/user allowlisting.
+Frontend auth uses Supabase Auth:
+
+- `frontend/src/lib/supabaseClient.js` creates the browser client from
+  `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+- `AuthProvider` restores Supabase sessions, listens to `onAuthStateChange`,
+  supports email/password login, signup confirmation, Google OAuth, password
+  recovery, logout, and exposes a compact app user shape.
+- `ProtectedRoute` waits for session restore, then redirects unauthenticated
+  users to `/login`.
+- `/auth/callback` receives Supabase email/OAuth redirects and sends confirmed
+  users to `/dashboard`.
+
+Legacy FastAPI `/auth/login` remains for backend tests and old clients. Existing
+protected API routes can accept Supabase JWTs when `SUPABASE_JWT_SECRET` is set;
+without it, frontend route protection still works, but legacy backend JWT auth is
+the only API verifier.
 
 ---
 
@@ -232,7 +245,7 @@ All method scores are min-max normalized before weighting.
 ## Infrastructure notes
 
 - Docker Compose healthcheck on `db` (pg_isready) — backend waits for healthy db
-- Backend mounts `./2.backend:/app` and `./3.Datasets:/app/3.Datasets` as volumes
+- Backend mounts `./backend:/app`, `./data:/app/data`, and `./experiments:/app/experiments` as volumes
 - Backend startup runs `scripts/start_backend.sh`: wait for DB, run Alembic, load trusted data, start Uvicorn
 - Alembic handles schema migrations; startup `create_all` is a safety net only
 - `SECRET_KEY` in docker-compose is placeholder — must be replaced before any production use

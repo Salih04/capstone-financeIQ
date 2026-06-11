@@ -1,7 +1,7 @@
 """Frozen-column evidence report for the data provider / stakeholders.
 
 Proves, with raw numbers, that valuation/profitability/income-statement columns
-in BOTH the yearly XLSX-derived data and the new_data_quarter quarterly files are
+in BOTH the yearly XLSX-derived data and the data/raw/quarterly_fintables quarterly files are
 a repeated point-in-time snapshot (identical across periods per ticker) — so they
 cannot be used as historical T->T+1 features. No fabrication.
 
@@ -18,7 +18,7 @@ import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 YEARLY_CSV = REPO_ROOT / "data" / "trusted" / "stocks_2020_2025.csv"
-QDIR = REPO_ROOT / "new_data_quarter"
+QDIR = REPO_ROOT / "data/raw/quarterly_fintables"
 OUT_JSON = REPO_ROOT / "data" / "trusted_clean" / "frozen_column_evidence.json"
 OUT_MD = REPO_ROOT / "data" / "trusted_clean" / "frozen_column_evidence.md"
 

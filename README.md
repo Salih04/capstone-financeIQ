@@ -20,7 +20,7 @@ valuation and price/return leakage are rejected.
 ## Architecture
 
 ```
-React (1.frontend) ──HTTP──▶ FastAPI (2.backend) ──SQLAlchemy──▶ PostgreSQL
+React (frontend) ──HTTP──▶ FastAPI (backend) ──SQLAlchemy──▶ PostgreSQL
 ```
 
 Three Docker services: `db`, `backend`, `frontend`. The backend converts the
@@ -152,10 +152,10 @@ the modeling dataset. Research-support only not investment advice.
 
 ## Trusted data source (legacy reference)
 
-The yearly XLSX set in `3.Datasets/` (reference/bootstrap, see warning above):
+The yearly XLSX set in `data/raw/yearly_xlsx/` (reference/bootstrap, see warning above):
 
 ```
-3.Datasets/2020stocks.xlsx … 2025stocks.xlsx   (40 BIST companies × 54 columns)
+data/raw/yearly_xlsx/2020stocks.xlsx … 2025stocks.xlsx   (40 BIST companies × 54 columns)
 ```
 
 These are converted, deterministically and without fabrication, to:
@@ -167,7 +167,7 @@ data/trusted/stocks_2020_2025.csv              combined, with a `year` column
 
 and loaded into the `yearly_stocks` Postgres table (one row per ticker-year).
 
-The data contract lives in [`2.backend/app/trusted_data.py`](2.backend/app/trusted_data.py):
+The data contract lives in [`backend/app/trusted_data.py`](backend/app/trusted_data.py):
 column map, required/optional columns, percent vs. monetary fields, safe numeric
 parsing (BOM, thousands separators, negatives), and validation. Missing values
 stay null they are never invented.
@@ -175,7 +175,7 @@ stay null they are never invented.
 ### Pipeline commands
 
 ```bash
-cd 2.backend
+cd backend
 
 # 1. Convert XLSX -> clean CSVs (writes data/trusted/)
 python -m scripts.convert_trusted_xlsx
@@ -192,7 +192,7 @@ python -m scripts.validate_trusted_data
 
 On Docker startup the backend runs Alembic migrations first, then
 `python -m scripts.load_trusted_yearly` automatically (see
-`2.backend/scripts/start_backend.sh`).
+`backend/scripts/start_backend.sh`).
 
 ## Run with Docker
 
@@ -204,21 +204,24 @@ export OPENAI_API_KEY=your-openrouter-key
 docker compose up --build
 ```
 
-The trusted dataset is mounted (`./3.Datasets`) and loaded on boot. Paths inside
+The trusted dataset is mounted (`./data/raw/yearly_xlsx`) and loaded on boot. Paths inside
 the container are set via `TRUSTED_DATASETS_DIR`, `TRUSTED_OUT_DIR`,
 `TRUSTED_COMBINED_CSV` in `docker-compose.yml`.
 
 ## Deploy frontend on Vercel
 
 Vercel deploys the React frontend only. The FastAPI backend must be running on a
-public URL (Railway, Render, Fly.io, a VPS, or another host). If `VITE_API_URL`
-is missing, the browser posts login requests to the Vercel static site at
-`/api/auth/login`, which returns `405 Method Not Allowed`.
+public URL (Railway, Render, Fly.io, a VPS, or another host). Authentication is
+handled by Supabase Auth in the browser; backend endpoints can also accept
+Supabase JWTs when `SUPABASE_JWT_SECRET` is configured.
 
 Set these Vercel environment variables, then redeploy:
 
 ```bash
 VITE_API_URL=https://your-backend-domain
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-or-publishable-key
+VITE_SUPABASE_AUTH_REDIRECT_URL=https://your-frontend-domain/auth/callback
 ```
 
 Backend environment must include:
@@ -227,6 +230,7 @@ Backend environment must include:
 OPENAI_API_KEY=your-openrouter-key
 RESEARCH_LLM_PROVIDER=openrouter
 RESEARCH_LLM_MODEL=openai/gpt-oss-120b:free
+SUPABASE_JWT_SECRET=your-supabase-jwt-secret   # optional but needed for protected API calls
 ```
 
 Quick check:
@@ -240,7 +244,7 @@ curl https://your-backend-domain/health
 ### Backend
 
 ```bash
-cd 2.backend
+cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env          # set DATABASE_URL and SECRET_KEY
@@ -252,15 +256,34 @@ uvicorn app.main:app --reload --port 8000
 ### Frontend
 
 ```bash
-cd 1.frontend
+cd frontend
 npm install
+cp .env.example .env.local    # set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 npm run dev
 ```
+
+### Supabase Auth
+
+Frontend auth uses Supabase session persistence, email/password signup, Google
+OAuth, email confirmation redirects, and password recovery. Configure:
+
+- Supabase project URL and anon/publishable key in `frontend/.env.local`.
+- Email provider enabled in Authentication → Providers → Email.
+- Google provider enabled in Authentication → Providers → Google with Google
+  OAuth client ID/secret.
+- Redirect URLs in Authentication → URL Configuration:
+  `http://localhost:5173/auth/callback`,
+  `http://localhost:3000/auth/callback`, and production frontend callback URL.
+- Optional backend JWT compatibility: set `SUPABASE_JWT_SECRET` from Supabase
+  Project Settings → API → JWT Secret. If your project uses asymmetric signing
+  keys, keep frontend-only auth or add JWKS verification before protecting APIs.
+
+See [`docs/SUPABASE_AUTH.md`](docs/SUPABASE_AUTH.md).
 
 ### Database migrations (Alembic)
 
 ```bash
-cd 2.backend
+cd backend
 alembic upgrade head        # head includes 20260406_0006 (yearly_stocks)
 ```
 
@@ -275,9 +298,13 @@ Docker volumes created before Alembic are stamped once, then upgraded normally.
 | `DATABASE_URL` | Postgres connection string |
 | `SECRET_KEY` | JWT signing key. **Not committed.** If unset, a random per-process key is generated (JWTs reset on restart) set it explicitly in production. |
 | `OPENROUTER_API_KEY` / `OPENAI_API_KEY` | OpenRouter API key for AI research support |
+| `VITE_SUPABASE_URL` | Supabase project URL for frontend auth |
+| `VITE_SUPABASE_ANON_KEY` | Supabase browser-safe anon/publishable key |
+| `VITE_SUPABASE_AUTH_REDIRECT_URL` | Optional explicit frontend auth callback URL |
+| `SUPABASE_JWT_SECRET` | Optional backend verifier secret for Supabase JWTs; never expose in frontend |
 | `RESEARCH_LLM_PROVIDER` | `openrouter`, `lmstudio`, `ollama`, or `none` |
 | `RESEARCH_LLM_MODEL` | Chat model id (default `openai/gpt-oss-120b:free` for OpenRouter) |
-| `TRUSTED_DATASETS_DIR` | Dir of trusted XLSX (default `3.Datasets/`) |
+| `TRUSTED_DATASETS_DIR` | Dir of trusted XLSX (default `data/raw/yearly_xlsx/`) |
 | `TRUSTED_OUT_DIR` | Output dir for generated CSVs (default `data/trusted/`) |
 | `TRUSTED_COMBINED_CSV` | Combined CSV path used by the loader |
 | `RUN_DB_MIGRATIONS` | Run Alembic on Docker startup (`1` default, set `0` to skip) |

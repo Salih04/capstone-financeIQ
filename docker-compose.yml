@@ -18,7 +18,9 @@ services:
       retries: 10
 
   backend:
-    build: ./2.backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     restart: unless-stopped
     ports:
       - "8000:8000"
@@ -28,8 +30,8 @@ services:
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: 1440
       # Trusted yearly dataset paths (loaded on startup, see backend Dockerfile CMD).
-      # In the container /app == 2.backend, so paths are explicit.
-      TRUSTED_DATASETS_DIR: /app/3.Datasets
+      # In the container /app == backend app root, with repo data mounted under /app/data.
+      TRUSTED_DATASETS_DIR: /app/data/raw/yearly_xlsx
       TRUSTED_OUT_DIR: /app/data/trusted
       TRUSTED_COMBINED_CSV: /app/data/trusted/stocks_2020_2025.csv
       # Research-agent LLM (optional). OpenRouter uses OPENROUTER_API_KEY or
@@ -42,21 +44,29 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENROUTER_HTTP_REFERER: ${OPENROUTER_HTTP_REFERER:-http://localhost:3000}
       OPENROUTER_APP_TITLE: ${OPENROUTER_APP_TITLE:-FinanceIQ}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:-}
+      SUPABASE_JWT_AUDIENCE: ${SUPABASE_JWT_AUDIENCE:-authenticated}
+      SUPABASE_AUTO_CREATE_USERS: ${SUPABASE_AUTO_CREATE_USERS:-true}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_healthy
     volumes:
-    - ./2.backend:/app
-    - ./3.Datasets:/app/3.Datasets
+    - ./backend:/app
     # Research-agent reads these generated artifacts (research_agent paths
     # resolve to /app when data is mounted here).
     - ./data:/app/data
     - ./experiments:/app/experiments
 
   frontend:
-    build: ./1.frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/api}
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-}
+        VITE_SUPABASE_AUTH_REDIRECT_URL: ${VITE_SUPABASE_AUTH_REDIRECT_URL:-http://localhost:3000/auth/callback}
     restart: unless-stopped
     ports:
       - "3000:80"

@@ -9,7 +9,7 @@ import pandas as pd
 import pytest
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "2.backend"))
+sys.path.insert(0, str(REPO / "backend"))
 
 from scripts.data_collection import build_free_valuation_history as V  # noqa: E402
 

@@ -34,7 +34,7 @@ All notable changes to FinanceIQ, most recent first.
   lightweight in-memory session cache, so returning to data-quality,
   experiments, research, or companies pages no longer resets to full loading
   states during the same app session.
-  Cache lives in `1.frontend/src/utils/sessionCache.js`, uses a 5-minute TTL, and
+  Cache lives in `frontend/src/utils/sessionCache.js`, uses a 5-minute TTL, and
   hard refresh still fetches normally.
 
 ---

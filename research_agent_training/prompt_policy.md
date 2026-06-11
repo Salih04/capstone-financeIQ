@@ -1,7 +1,7 @@
 # Research-agent prompt policy
 
 The single source of truth is `SYSTEM_PROMPT` in
-`2.backend/app/services/research_agent.py`. Training targets must obey it.
+`backend/app/services/research_agent.py`. Training targets must obey it.
 
 ## Must
 - Use ONLY the supplied structured context.

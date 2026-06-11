@@ -159,7 +159,7 @@ Yearly return = `(last_close(Y)/first_close(Y) - 1) * 100`. Output
 `next_year_excess_return_vs_bist100`, `next_year_outperform_bist100`. Report:
 `data/trusted_clean/bist100_benchmark_report.{json,md}`. Never fabricated.
 
-## new_data_quarter/
+## data/raw/quarterly_fintables/
 
 Raw Fintables **quarterly** stock exports (2020Q1–2021Q4), added for future
 quarterly fundamentals work. Not yet wired into the yearly T→T+1 pipeline.

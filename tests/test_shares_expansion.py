@@ -9,7 +9,7 @@ import pandas as pd
 import pytest
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "2.backend"))
+sys.path.insert(0, str(REPO / "backend"))
 
 from scripts.data_collection import expand_shares_outstanding_events as E  # noqa: E402
 

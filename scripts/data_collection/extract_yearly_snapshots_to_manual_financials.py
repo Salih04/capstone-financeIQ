@@ -40,7 +40,7 @@ DEFAULT_SEARCH_DIRS = [
     REPO_ROOT / "data" / "raw",
     REPO_ROOT / "data" / "trusted_raw",
     REPO_ROOT / "data" / "trusted_raw" / "yearly_snapshots",
-    REPO_ROOT / "3.Datasets",
+    REPO_ROOT / "data/raw/yearly_xlsx",
 ]
 OUTPUT_FILE = REPO_ROOT / "data" / "trusted_raw" / "financials" / "candidate_from_yearly_snapshots.csv"
 MIGRATION_JSON = REPO_ROOT / "data" / "trusted_clean" / "yearly_snapshot_migration_report.json"

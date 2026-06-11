@@ -10,12 +10,12 @@
 
 ## Selected file per year
 
-- 2020: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2020stocks.xlsx` (rows 40, annual-return col: None)
-- 2021: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2021stocks.xlsx` (rows 40, annual-return col: None)
-- 2022: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2022stocks.xlsx` (rows 40, annual-return col: None)
-- 2023: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2023stocks.xlsx` (rows 40, annual-return col: None)
-- 2024: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2024stocks.xlsx` (rows 40, annual-return col: None)
-- 2025: `/Users/salihcamci/Downloads/capstone-financeIQ/3.Datasets/2025stocks.xlsx` (rows 40, annual-return col: None)
+- 2020: `/Users/salihcamci/Downloads/capstone-financeIQ/data/raw/yearly_xlsx/2020stocks.xlsx` (rows 40, annual-return col: None)
+- 2021: `/Users/salihcamci/Downloads/capstone-financeIQ/data/raw/yearly_xlsx/2021stocks.xlsx` (rows 40, annual-return col: None)
+- 2022: `/Users/salihcamci/Downloads/capstone-financeIQ/data/raw/yearly_xlsx/2022stocks.xlsx` (rows 40, annual-return col: None)
+- 2023: `/Users/salihcamci/Downloads/capstone-financeIQ/data/raw/yearly_xlsx/2023stocks.xlsx` (rows 40, annual-return col: None)
+- 2024: `/Users/salihcamci/Downloads/capstone-financeIQ/data/raw/yearly_xlsx/2024stocks.xlsx` (rows 40, annual-return col: None)
+- 2025: `/Users/salihcamci/Downloads/capstone-financeIQ/data/raw/yearly_xlsx/2025stocks.xlsx` (rows 40, annual-return col: None)
 
 ## Columns skipped (per year, with reason)
 

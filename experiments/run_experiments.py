@@ -30,7 +30,7 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "2.backend"))
+sys.path.insert(0, str(ROOT / "backend"))
 
 from app.services.research import data, feature_registry as reg, scoring  # noqa: E402
 
