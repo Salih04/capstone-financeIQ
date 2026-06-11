@@ -269,9 +269,12 @@ def get_filters(
 # ── CSV-backed pipeline endpoints (no DB required) ────────────────────────────
 
 @router.get("/forecasting/options")
-def csv_options(_: User | None = Depends(optional_user)):
+def csv_options(
+    target_mode: str = "finalized_only",
+    _: User | None = Depends(optional_user),
+):
     try:
-        return _csv_svc.get_options()
+        return _csv_svc.get_options(target_mode=target_mode)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
 
@@ -283,6 +286,7 @@ def csv_train(body: CsvTrainRequest, _: User | None = Depends(optional_user)):
             train_year_from=body.train_year_from,
             train_year_to=body.train_year_to,
             top_n=body.top_n,
+            target_mode=body.target_mode,
         )
     except (ValueError, FileNotFoundError) as exc:
         raise HTTPException(status_code=422, detail=str(exc))

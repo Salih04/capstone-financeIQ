@@ -48,6 +48,8 @@ export default function ForecastingPage() {
   const [trainFrom, setTrainFrom] = useState(2020)
   const [trainTo, setTrainTo] = useState(2023)
   const [topN, setTopN] = useState(12)
+  // Experimental opt-in: include 2025 using partial 2026 YTD target.
+  const [partialMode, setPartialMode] = useState(false)
   const [training, setTraining] = useState(false)
   const [trainResult, setTrainResult] = useState(null)
   const [trainError, setTrainError] = useState('')
@@ -61,17 +63,29 @@ export default function ForecastingPage() {
   const [explain, setExplain] = useState(null)
   const [explaining, setExplaining] = useState(false)
 
+  const targetMode = partialMode ? 'include_partial_2025' : 'finalized_only'
+
   useEffect(() => {
-    api.get('/forecasting/options')
+    api.get('/forecasting/options', { params: { target_mode: targetMode } })
       .then(({ data }) => {
         if (!data?.trainable_years?.length) { setMockMode(true); return }
         setOptions(data)
+        // trainable_years is always finalized (2020–2024); 2025 is never here.
         setTrainFrom(data.trainable_years[0])
         setTrainTo(data.trainable_years[data.trainable_years.length - 1])
         if (data.all_years?.length) setForecastYear(String(data.all_years[data.all_years.length - 1]))
       })
       .catch(() => setMockMode(true))
-  }, [])
+  }, [targetMode])
+
+  // Partial mode availability (real 2026 YTD data present in repo?)
+  const partialIncluded = !mockMode && !!options?.includes_partial_targets
+  const partialUnavailable = partialMode && !mockMode && options && !options.includes_partial_targets
+  const partialWarning = options?.partial_target_warning
+    || 'Experimental: 2025 uses partial 2026 year-to-date return. It is not directly comparable to finalized full-year T+1 targets.'
+  const partialUnavailableReason = (options?.excluded_years || [])
+    .find((e) => e.year === 2025)?.reason
+    || 'Partial 2026 YTD data is not available yet.'
 
   const trainable = mockMode ? FORECASTING_MOCK.options.trainable_years : (options?.trainable_years || [])
   const allYears = mockMode ? FORECASTING_MOCK.options.forecast_years : (options?.all_years || [])
@@ -88,7 +102,8 @@ export default function ForecastingPage() {
     setTraining(true); setTrainError(''); setTrainResult(null); setForecastResult(null); setExplain(null)
     try {
       const { data } = await api.post('/forecasting/train', {
-        train_year_from: trainFrom, train_year_to: trainTo, top_n: topN,
+        train_year_from: trainFrom, train_year_to: partialIncluded ? 2025 : trainTo,
+        top_n: topN, target_mode: targetMode,
       })
       setTrainResult(data)
     } catch (e) { setTrainError(errText(e, 'Training failed.')) } finally { setTraining(false) }
@@ -198,7 +213,10 @@ export default function ForecastingPage() {
                 <input type="range" min={yMin} max={yMax} value={trainTo} aria-label="Train to year"
                   onChange={(e) => setTrainTo(Math.max(parseInt(e.target.value, 10), trainFrom))} />
               </div>
-              <div className="ft-range-ticks">{trainable.map((y) => <span key={y}>{y}</span>)}</div>
+              <div className="ft-range-ticks">
+                {trainable.map((y) => <span key={y}>{y}</span>)}
+                {partialIncluded && <span className="ft-tick-partial">2025*</span>}
+              </div>
             </div>
             <div className="ft-dial">
               <div className="ft-dial-label">TOP FEATURES <strong>{topN}</strong></div>
@@ -207,6 +225,24 @@ export default function ForecastingPage() {
               <datalist id="ft-notches">{[4, 8, 12, 16, 20].map((n) => <option key={n} value={n} />)}</datalist>
               <div className="ft-range-ticks">{[4, 8, 12, 16, 20].map((n) => <span key={n}>{n}</span>)}</div>
             </div>
+            {/* ── experimental partial 2025 toggle ── */}
+            <div className="ft-partial">
+              <button type="button" role="switch" aria-checked={partialMode}
+                className={`ft-toggle ${partialMode ? 'is-on' : ''}`}
+                onClick={() => setPartialMode((v) => !v)}>
+                <span className="ft-toggle-knob" />
+              </button>
+              <div className="ft-partial-label">
+                <span>Include <strong>2025*</strong> partial 2026 YTD target</span>
+                <em>*experimental · partial 2026 YTD target</em>
+              </div>
+            </div>
+            {partialMode && !partialUnavailable && (
+              <div className="ft-partial-warn">{partialWarning}</div>
+            )}
+            {partialUnavailable && (
+              <div className="ft-partial-na">⚠ {partialUnavailableReason}</div>
+            )}
             <button type="button" className="ft-btn" disabled={training} onClick={trainModel}>
               {training ? 'DERIVING WEIGHTS…' : 'TRAIN PARAMETERS'}
             </button>
@@ -290,7 +326,8 @@ export default function ForecastingPage() {
           {!focus && (
             <>
               <div className="ft-readout-tag">INSTRUMENT STANDBY</div>
-              <div className="ft-readout-row"><span>TRAIN WINDOW</span><strong>{trainFrom}–{trainTo}</strong></div>
+              <div className="ft-readout-row"><span>TARGET MODE</span><strong style={{ color: partialIncluded ? '#c8a35a' : '#4da583' }}>{partialIncluded ? 'PARTIAL YTD · EXPERIMENTAL' : 'FINALIZED ANNUAL'}</strong></div>
+              <div className="ft-readout-row"><span>TRAIN WINDOW</span><strong>{trainFrom}–{partialIncluded ? '2025*' : trainTo}</strong></div>
               <div className="ft-readout-row"><span>TOP FEATURES</span><strong>{topN}</strong></div>
               <div className="ft-readout-row"><span>UNIVERSE</span><strong>{mockMode ? FORECASTING_MOCK.options.ticker_count : (options?.ticker_count ?? '—')} TICKERS</strong></div>
               <div className="ft-readout-row"><span>WALK-FORWARD IC</span><strong style={{ color: '#c8a35a' }}>≈ 0</strong></div>
@@ -461,6 +498,24 @@ const CSS = `
   border: 1px solid rgba(200,163,90,0.5); border-radius: 2px; padding: 9px 16px;
   box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
 .ft-caveat-pulse { width: 7px; height: 7px; border-radius: 50%; background: #c8a35a; animation: ftPulse 2.2s ease-in-out infinite; flex-shrink: 0; }
+
+.ft-partial { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; }
+.ft-toggle { flex-shrink: 0; width: 38px; height: 20px; border-radius: 11px; border: 1px solid rgba(200,211,202,0.3);
+  background: rgba(200,211,202,0.08); padding: 0; cursor: pointer; position: relative; transition: background 0.18s, border-color 0.18s; }
+.ft-toggle .ft-toggle-knob { position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--ft-faint); transition: transform 0.18s, background 0.18s; }
+.ft-toggle.is-on { background: rgba(200,163,90,0.25); border-color: rgba(200,163,90,0.6); }
+.ft-toggle.is-on .ft-toggle-knob { transform: translateX(18px); background: #c8a35a; }
+.ft-toggle:focus-visible { outline: 1px solid #c8a35a; outline-offset: 2px; }
+.ft-partial-label { display: flex; flex-direction: column; gap: 2px; }
+.ft-partial-label span { font-size: 12px; color: var(--ft-dim); }
+.ft-partial-label strong { color: #c8a35a; }
+.ft-partial-label em { font-family: var(--font-mono); font-style: normal; font-size: 8.5px; letter-spacing: 0.1em; color: var(--ft-faint); }
+.ft-partial-warn { margin-bottom: 12px; font-size: 11px; line-height: 1.5; color: #c8a35a;
+  border: 1px solid rgba(200,163,90,0.4); border-radius: 2px; padding: 8px 10px; background: rgba(200,163,90,0.06); }
+.ft-partial-na { margin-bottom: 12px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.04em; color: var(--ft-dim);
+  border: 1px dashed rgba(200,211,202,0.3); border-radius: 2px; padding: 8px 10px; }
+.ft-tick-partial { color: #c8a35a !important; font-weight: 700; }
 
 @keyframes ftIn { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: blur(0); } }
 @keyframes ftCrystal { from { opacity: 0; filter: blur(5px); } to { opacity: 1; filter: blur(0); } }

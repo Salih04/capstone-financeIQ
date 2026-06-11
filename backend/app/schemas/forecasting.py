@@ -224,6 +224,8 @@ class CsvTrainRequest(BaseModel):
     train_year_from: int = 2020
     train_year_to: int = 2024
     top_n: int = 12
+    # "finalized_only" (default) | "include_partial_2025" (experimental)
+    target_mode: str = "finalized_only"
 
 
 class CsvRunRequest(BaseModel):
