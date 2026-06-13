@@ -5,7 +5,6 @@ import { EmptyState } from '../components/ui'
 import { cachedGet, CACHE_TTL } from '../api/cache'
 import api from '../api/client'
 import CacheTag from '../components/CacheTag'
-import DemoDataBadge from '../components/DemoDataBadge'
 import { humanizeWarning, asText } from '../utils/safeRender'
 
 // ---------------------------------------------------------------------------
@@ -169,7 +168,6 @@ export default function CompanyResearchDetailPage() {
   return (
     <div className={`ca ${lowConfidence ? 'is-grainy-specimen' : ''}`}>
       <style>{CSS}</style>
-      <DemoDataBadge demo={false} />
       <div className="ca-scan" aria-hidden="true" />
 
       {/* ── specimen header ── */}
