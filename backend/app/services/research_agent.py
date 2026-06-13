@@ -99,21 +99,13 @@ def get_config() -> dict:
     provider = os.environ.get("RESEARCH_LLM_PROVIDER", "none").lower()
     if provider in {"openrouter", "openai"}:
         default_base = "https://openrouter.ai/api/v1/chat/completions"
-    elif provider == "lmstudio":
-        default_base = "http://localhost:1234/v1/chat/completions"
-    elif provider == "ollama":
-        default_base = "http://localhost:11434/api/chat"
     else:
         default_base = ""
     base = os.environ.get("RESEARCH_LLM_BASE_URL") or default_base
     w_ml = _env_float("RESEARCH_SCORE_ML_WEIGHT", 0.65)
     w_conf = _env_float("RESEARCH_SCORE_CONFIDENCE_WEIGHT", 0.20)
     w_llm = _env_float("RESEARCH_SCORE_LLM_WEIGHT", 0.15)
-    default_model = (
-        "openai/gpt-oss-120b:free"
-        if provider in {"openrouter", "openai"}
-        else "local-model"
-    )
+    default_model = "openai/gpt-oss-120b:free"
     return {
         "provider": provider, "base_url": base,
         "model": os.environ.get("RESEARCH_LLM_MODEL", default_model),
@@ -140,7 +132,7 @@ def ai_status(smoke: bool = False) -> dict:
 
     reason = None
     if provider == "none":
-        reason = "AI not configured: set RESEARCH_LLM_PROVIDER to openrouter, openai, lmstudio, or ollama."
+        reason = "AI not configured: set RESEARCH_LLM_PROVIDER to openrouter or openai."
     elif missing:
         reason = f"AI not configured: missing {', '.join(missing)}."
     elif not cfg.get("base_url"):
@@ -166,7 +158,7 @@ def ai_status(smoke: bool = False) -> dict:
         "guide": "docs/research_agent_guide.md",
     }
     if smoke and configured:
-        probe = call_local_llm(
+        probe = call_llm(
             [{"role": "system", "content": "Return JSON only."},
              {"role": "user", "content": "{\"ping\":\"FinanceIQ AI status\"}"}],
             cfg,
@@ -576,8 +568,14 @@ def _company_warnings(state: dict) -> list[str]:
 # --------------------------------------------------------------------------- #
 def confidence_score(state: dict | None = None) -> dict:
     state = state or load_research_state()
-    q = state["quality"]
-    diag = build_model_diagnostics_context(state)
+    q = state.get("quality") or {}
+    # Diagnostics depend on the optional leaderboard/experiments artifacts. If
+    # they are missing or malformed in a deployment, confidence must still
+    # compute (conservatively) rather than raise and 500 the whole score.
+    try:
+        diag = build_model_diagnostics_context(state)
+    except Exception:  # noqa - degrade to the conservative defaults below
+        diag = {"small_sample": True, "weak_backtest": True}
     man = q.get("manual_financials", {}) or {}
     bench = q.get("benchmark", {}) or {}
     score, reasons = 1.0, []
@@ -713,53 +711,28 @@ def _openrouter_headers(cfg: dict) -> dict:
     return {k: v for k, v in headers.items() if v}
 
 
-def call_local_llm(messages: list[dict], cfg: dict | None = None) -> dict:
+def call_llm(messages: list[dict], cfg: dict | None = None) -> dict:
+    """Call the configured OpenRouter/OpenAI-compatible endpoint.
+
+    Returns {"ok": False, ...} on any failure; callers fall back to the
+    deterministic research agent. Never raises.
+    """
     cfg = cfg or get_config()
     if cfg["provider"] == "none" or not cfg["base_url"]:
         return {"ok": False, "provider": "none", "error": "no provider configured"}
-    timeout = cfg["timeout"]
-    # ---- Ollama -----------------------------------------------------------
-    if cfg["provider"] == "ollama":
-        try:
-            payload = {"model": cfg["model"], "messages": messages, "stream": False,
-                       "options": {"temperature": 0.2}}
-            data = _http_post_json(cfg["base_url"], payload, timeout)
-            return {"ok": True, "provider": "ollama",
-                    "content": _strip_think(data.get("message", {}).get("content", ""))}
-        except Exception as exc:  # noqa
-            return {"ok": False, "provider": "ollama", "error": str(exc)}
-    # ---- OpenRouter / OpenAI-compatible -----------------------------------
-    if cfg["provider"] in {"openrouter", "openai"}:
-        if not cfg.get("api_key"):
-            return {"ok": False, "provider": cfg["provider"], "error": "missing OPENROUTER_API_KEY or OPENAI_API_KEY"}
-        try:
-            payload = {"model": cfg["model"], "messages": messages, "temperature": 0.2,
-                       "max_tokens": int(cfg.get("max_tokens", 700))}
-            data = _http_post_json(cfg["base_url"], payload, timeout, headers=_openrouter_headers(cfg))
-            content = _strip_think(data["choices"][0]["message"]["content"])
-            return {"ok": True, "provider": "openrouter", "content": content}
-        except Exception as exc:  # noqa
-            return {"ok": False, "provider": "openrouter", "error": str(exc)}
-    # ---- LM Studio / OpenAI-compatible primary ----------------------------
+    if cfg["provider"] not in {"openrouter", "openai"}:
+        return {"ok": False, "provider": cfg["provider"],
+                "error": f"unsupported provider '{cfg['provider']}': use openrouter or openai"}
+    if not cfg.get("api_key"):
+        return {"ok": False, "provider": cfg["provider"], "error": "missing OPENROUTER_API_KEY or OPENAI_API_KEY"}
     try:
         payload = {"model": cfg["model"], "messages": messages, "temperature": 0.2,
                    "max_tokens": int(cfg.get("max_tokens", 700))}
-        data = _http_post_json(cfg["base_url"], payload, timeout)
+        data = _http_post_json(cfg["base_url"], payload, cfg["timeout"], headers=_openrouter_headers(cfg))
         content = _strip_think(data["choices"][0]["message"]["content"])
-        return {"ok": True, "provider": cfg["provider"], "content": content}
-    except Exception as primary_exc:  # noqa - try LM Studio native endpoint
-        try:
-            alt = cfg["base_url"].replace("/v1/chat/completions", "/api/v1/chat")
-            if alt == cfg["base_url"]:
-                raise primary_exc
-            sys_txt = "\n".join(m["content"] for m in messages if m["role"] == "system")
-            usr_txt = "\n".join(m["content"] for m in messages if m["role"] != "system")
-            data = _http_post_json(alt, {"model": cfg["model"], "system_prompt": sys_txt,
-                                         "input": usr_txt}, timeout)
-            content = data["output"][0]["content"] if isinstance(data.get("output"), list) else data.get("content", "")
-            return {"ok": True, "provider": cfg["provider"], "content": _strip_think(content), "endpoint": "native"}
-        except Exception as alt_exc:  # noqa
-            return {"ok": False, "provider": cfg["provider"], "error": f"{primary_exc} | alt: {alt_exc}"}
+        return {"ok": True, "provider": "openrouter", "content": content}
+    except Exception as exc:  # noqa
+        return {"ok": False, "provider": "openrouter", "error": str(exc)}
 
 
 LLM_RESULT_SCHEMA: dict[str, Any] = {
@@ -971,7 +944,11 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
 
     # Prefer the pre-built structured RAG context (richer: financials, valuation,
     # benchmarks, data_quality). Fall back to the lighter build_company_context dict.
-    rag_ctx = load_company_context_json(ticker)
+    # A missing/corrupt context file must not break scoring.
+    try:
+        rag_ctx = load_company_context_json(ticker)
+    except Exception:  # noqa - optional enrichment only
+        rag_ctx = None
     if rag_ctx is not None:
         # Merge ml_score/rank into the RAG context model block
         rag_ctx.setdefault("model", {})
@@ -987,7 +964,7 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
     if cfg["provider"] != "none":
         msg = [{"role": "system", "content": SYSTEM_PROMPT},
                {"role": "user", "content": json.dumps({"task": "company_insight", "context": llm_context})}]
-        res = call_local_llm(msg, cfg)
+        res = call_llm(msg, cfg)
         if res.get("ok"):
             parsed = _parse_llm_json(res["content"])
             if parsed:
@@ -1002,8 +979,20 @@ def generate_company_insight(ticker: str, state: dict | None = None) -> dict:
 
     llm_score = llm_out.get("llm_research_score")
     comp = composite_score(ml.get("ml_score"), conf["confidence_score"], llm_score, cfg)
-    diag = build_model_diagnostics_context(state)
-    ds = decision_support(comp["final_research_score"], conf["confidence_level"], ctx["warnings"], diag)
+    # Diagnostics + decision-support read optional artifacts (leaderboard,
+    # experiments). They must never take down the core score: a missing or
+    # malformed artifact degrades these blocks to safe defaults instead of
+    # raising and turning the whole /score response into a 500 → frontend N/A.
+    try:
+        diag = build_model_diagnostics_context(state)
+    except Exception:  # noqa - optional context only
+        diag = {"small_sample": True, "weak_backtest": True, "splits": [],
+                "context_error": "model diagnostics unavailable"}
+    try:
+        ds = decision_support(comp["final_research_score"], conf["confidence_level"], ctx["warnings"], diag)
+    except Exception:  # noqa - optional verdict only
+        ds = {"decision_support_verdict": None, "decision_support_reasoning": None,
+              "blocking_limitations": [], "required_next_data": []}
     # Flat, explicit score block (PHASE 5 contract) — components never hidden.
     score = {
         "ticker": ctx["ticker"], "year": ctx["latest_year"],
@@ -1062,7 +1051,7 @@ def generate_summary_insight(state: dict | None = None) -> dict:
     if cfg["provider"] != "none":
         msg = [{"role": "system", "content": SYSTEM_PROMPT},
                {"role": "user", "content": json.dumps({"task": "summary", "context": {**ctx, **conf, "diagnostics": diag}})}]
-        res = call_local_llm(msg, cfg)
+        res = call_llm(msg, cfg)
         if res.get("ok"):
             parsed = _parse_llm_json(res["content"])
             if parsed:
@@ -1491,7 +1480,7 @@ def answer_research_question(question: str, ticker: str | None = None,
     if cfg["provider"] != "none":
         msg = [{"role": "system", "content": SYSTEM_PROMPT},
                {"role": "user", "content": json.dumps({"question": question, "intent": intent, "context": ctx})}]
-        res = call_local_llm(msg, cfg)
+        res = call_llm(msg, cfg)
         if res.get("ok"):
             parsed = _parse_llm_json(res["content"])
             if parsed:

@@ -3,7 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Building2 } from 'lucide-react'
 import { EmptyState } from '../components/ui'
 import { cachedGet, CACHE_TTL } from '../api/cache'
+import api from '../api/client'
 import CacheTag from '../components/CacheTag'
+import DemoDataBadge from '../components/DemoDataBadge'
 import { humanizeWarning, asText } from '../utils/safeRender'
 
 // ---------------------------------------------------------------------------
@@ -16,15 +18,52 @@ import { humanizeWarning, asText } from '../utils/safeRender'
 
 const hw = (items) => (Array.isArray(items) ? items.map(humanizeWarning) : [])
 
+// Safe numeric parse: tolerates null/undefined/""/"NaN"/numeric strings; 0 is valid.
+const numOrNull = (v) => {
+  if (v === null || v === undefined || v === '') return null
+  const n = typeof v === 'number' ? v : Number(v)
+  return Number.isFinite(n) ? n : null
+}
 const pctOf = (v) => {
-  const n = Number(v)
-  if (!Number.isFinite(n)) return null
+  const n = numOrNull(v)
+  if (n == null) return null
+  // Backend layers are 0–1; tolerate an already-0–100 value without double-scaling.
   return Math.max(0, Math.min(100, n <= 1 ? n * 100 : n))
 }
 const fmtVal = (v) => {
-  const n = Number(v)
-  if (!Number.isFinite(n)) return asText(v)
+  const n = numOrNull(v)
+  if (n == null) return asText(v)
   return n <= 1 ? n.toFixed(2) : n.toFixed(1)
+}
+
+// Single normalized view model — every field the JSX reads is derived here once,
+// instead of reaching into inconsistent raw API shapes throughout the markup.
+function buildViewModel(detail, score) {
+  const ctx = detail?.context || {}
+  const sc = score?.score || {}
+  const llm = score?.llm || {}
+  return {
+    ctx,
+    hasScore: !!score && !!score.score,
+    layers: {
+      ml: numOrNull(sc.ml_score),
+      confidence: numOrNull(sc.confidence_score),
+      llm: numOrNull(sc.llm_research_score),
+      final: numOrNull(sc.final_research_score),
+    },
+    confidenceLevel: sc.confidence_level ?? null,
+    modelName: sc.model_name ?? null,
+    targetName: sc.target_name ?? null,
+    scoreSource: sc.score_source ?? null,
+    providerUsed: score?.provider_used ?? null,
+    fallbackUsed: score?.fallback_used,
+    summary: llm.summary ?? null,
+    reasoning: llm.reasoning ?? null,
+    limitations: hw(sc.limitations || llm.limitations),
+    warnings: hw(sc.warnings || ctx.warnings),
+    positives: Object.entries(ctx.top_positive_features || {}),
+    negatives: Object.entries(ctx.top_negative_features || {}),
+  }
 }
 
 const RAIL_WHY = {
@@ -40,53 +79,97 @@ function railColor(pct, kind) {
   return pct >= 60 ? 'var(--ca-emerald)' : pct >= 40 ? 'var(--ca-gold)' : 'var(--ca-copper)'
 }
 
+// Distinguish endpoint-failure classes from an axios-style error object.
+function errInfo(error) {
+  const status = error?.response?.status
+  const detail = error?.response?.data?.detail
+  if (status === 404) return { kind: 'not_found', status, message: typeof detail === 'string' ? detail : 'record not found' }
+  if (status === 401 || status === 403) return { kind: 'auth', status, message: 'session expired or access denied — sign in again' }
+  if (status) return { kind: 'server', status, message: typeof detail === 'string' ? detail : `server error (${status})` }
+  return { kind: 'network', status: null, message: 'could not reach the API — check your connection and retry' }
+}
+
 export default function CompanyResearchDetailPage() {
   const { ticker } = useParams()
   const nav = useNavigate()
   const [detail, setDetail] = useState(null)
   const [score, setScore] = useState(null)
-  const [err, setErr] = useState(null)
+  const [err, setErr] = useState(null)            // company endpoint failure (page-level)
+  const [scoreErr, setScoreErr] = useState(null)  // score endpoint failure (panel-level)
+  const [scoreLoading, setScoreLoading] = useState(true)
   const [focus, setFocus] = useState(null) // {type:'rail'|'feature', ...}
   const [meta, setMeta] = useState({ fromCache: false, refreshing: false, savedAt: null })
+  const [noteBusy, setNoteBusy] = useState(false)
+
+  const generateNote = async () => {
+    if (noteBusy) return
+    setNoteBusy(true)
+    try {
+      const res = await api.get(`/api/research-note/${encodeURIComponent(ticker)}`, { responseType: 'blob' })
+      const dispo = res.headers['content-disposition'] || ''
+      const m = dispo.match(/filename="?([^";]+)"?/)
+      const url = URL.createObjectURL(res.data)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = m ? m[1] : `${ticker}_research_note.pdf`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch { /* non-critical: page stays alive */ }
+    finally { setNoteBusy(false) }
+  }
 
   // Per-ticker cache keys (path-based) — ASELS and THYAO never collide.
+  // The two requests are independent: the score panel must not blank the
+  // feature evidence (and vice-versa). Each tracks its own error.
   const load = useCallback(async (force = false) => {
     const enc = encodeURIComponent(ticker)
+    setScoreLoading(true)
     const rd = await cachedGet(`/research/company/${enc}`, undefined, { ttlMs: CACHE_TTL.MEDIUM, forceRefresh: force })
     if (rd.value !== undefined) { setDetail(rd.value); setErr(null) } else if (rd.error) setErr(rd.error)
     setMeta({ fromCache: rd.fromCache, refreshing: !!rd.refreshing, savedAt: rd.savedAt })
+
     const rs = await cachedGet(`/research/company/${enc}/score`, undefined, { ttlMs: CACHE_TTL.MEDIUM, forceRefresh: force })
-    if (rs.value !== undefined) setScore(rs.value)
+    if (rs.value !== undefined) { setScore(rs.value); setScoreErr(null) }
+    else if (rs.error) setScoreErr(errInfo(rs.error))
+    setScoreLoading(false)
+
     // background revalidation (stale-while-revalidate)
     if (rd.revalidate) { const f = await rd.revalidate; if (f) { setDetail(f); setMeta((m) => ({ ...m, fromCache: false, refreshing: false, savedAt: Date.now() })) } }
-    if (rs.revalidate) { const f = await rs.revalidate; if (f) setScore(f) }
+    if (rs.revalidate) { const f = await rs.revalidate; if (f) { setScore(f); setScoreErr(null) } }
   }, [ticker])
 
   useEffect(() => { load(false) }, [load])
 
-  if (err) return <EmptyState icon={Building2} title={`${ticker} not found`} description={asText(err)} />
-
-  const ctx = detail?.context || {}
-  const sc = score?.score || {}
-  const llm = score?.llm || {}
   const tk = String(ticker || '').toUpperCase()
 
+  // Company-endpoint failure is page-level: distinguish "not found" from a
+  // real network/server fault so we never imply the ticker is missing on a 5xx.
+  if (err && !detail) {
+    const info = errInfo(err)
+    return info.kind === 'not_found'
+      ? <EmptyState icon={Building2} title={`${tk} not found`} description="No validated record exists for this ticker." />
+      : <EmptyState icon={Building2} title={`${tk} — data unavailable`}
+          description={`${info.message}. The company record could not be loaded.`} />
+  }
+
+  const vm = buildViewModel(detail, score)
+  const { ctx, layers, positives, negatives, limitations, warnings } = vm
+
   const rails = [
-    { key: 'ml', label: 'ML SCORE', value: sc.ml_score },
-    { key: 'confidence', label: 'CONFIDENCE', value: sc.confidence_score },
-    { key: 'llm', label: 'LLM SUPPORT', value: sc.llm_research_score },
-    { key: 'final', label: 'FINAL RESEARCH SCORE', value: sc.final_research_score, final: true },
+    { key: 'ml', label: 'ML SCORE', value: layers.ml },
+    { key: 'confidence', label: 'CONFIDENCE', value: layers.confidence },
+    { key: 'llm', label: 'LLM SUPPORT', value: layers.llm },
+    { key: 'final', label: 'FINAL RESEARCH SCORE', value: layers.final, final: true },
   ]
-  const positives = Object.entries(ctx.top_positive_features || {})
-  const negatives = Object.entries(ctx.top_negative_features || {})
-  const limitations = hw(sc.limitations || llm.limitations)
-  const warnings = hw(sc.warnings || ctx.warnings)
-  const finalPct = pctOf(sc.final_research_score)
-  const lowConfidence = (pctOf(sc.confidence_score) ?? 100) < 50
+  const finalPct = pctOf(layers.final)
+  const lowConfidence = (pctOf(layers.confidence) ?? 100) < 50
 
   return (
     <div className={`ca ${lowConfidence ? 'is-grainy-specimen' : ''}`}>
       <style>{CSS}</style>
+      <DemoDataBadge demo={false} />
       <div className="ca-scan" aria-hidden="true" />
 
       {/* ── specimen header ── */}
@@ -107,6 +190,9 @@ export default function CompanyResearchDetailPage() {
           <button type="button" className="ca-back" onClick={() => nav('/research/companies')}>
             ← RETURN TO UNIVERSE
           </button>
+          <button type="button" className="ca-back" onClick={generateNote} disabled={noteBusy}>
+            {noteBusy ? 'GENERATING NOTE…' : '⤓ GENERATE NOTE (PDF)'}
+          </button>
           <div className="ca-cachetag"><CacheTag fromCache={meta.fromCache} refreshing={meta.refreshing} savedAt={meta.savedAt} onRefresh={() => load(true)} /></div>
         </div>
       </header>
@@ -116,7 +202,21 @@ export default function CompanyResearchDetailPage() {
           {/* ── score anatomy ── */}
           <section className="ca-panel">
             <div className="ca-panel-label">SCORE ANATOMY · DISSECTED LAYERS</div>
-            {rails.map((r) => {
+            {scoreLoading && !vm.hasScore && !scoreErr && (
+              <p className="ca-panel-note">Loading score layers…</p>
+            )}
+            {scoreErr && !vm.hasScore && (
+              <div className="ca-scoreerr">
+                <div className="ca-scoreerr-head">SCORE LAYERS UNAVAILABLE</div>
+                <p>
+                  {scoreErr.message}
+                  {scoreErr.status ? ` (HTTP ${scoreErr.status})` : ''}. This is a request failure, not a
+                  missing value — feature evidence below is still valid.
+                </p>
+                <button type="button" className="ca-back" onClick={() => load(true)}>↻ RETRY SCORE</button>
+              </div>
+            )}
+            {vm.hasScore && rails.map((r) => {
               const pct = pctOf(r.value)
               const color = railColor(pct, r.key)
               const on = focus?.type === 'rail' && focus.key === r.key
@@ -139,7 +239,9 @@ export default function CompanyResearchDetailPage() {
                 </button>
               )
             })}
-            <p className="ca-panel-note">Diagnostic layers, not a prediction. Walk-forward IC ≈ 0 across the universe.</p>
+            {vm.hasScore && (
+              <p className="ca-panel-note">Diagnostic layers, not a prediction. Walk-forward IC ≈ 0 across the universe.</p>
+            )}
           </section>
 
           {/* ── feature evidence field ── */}
@@ -184,12 +286,20 @@ export default function CompanyResearchDetailPage() {
             <div className="ca-transcript">
               <div className="ca-block">
                 <div className="ca-block-tag">SUMMARY</div>
-                <p>{asText(llm.summary)}</p>
+                <p>
+                  {vm.summary
+                    ? asText(vm.summary)
+                    : scoreErr
+                      ? `Agent explanation unavailable — the score request failed (${scoreErr.message}).`
+                      : scoreLoading
+                        ? 'Loading agent explanation…'
+                        : 'No agent summary was returned for this ticker.'}
+                </p>
               </div>
-              {llm.reasoning && (
+              {vm.reasoning && (
                 <div className="ca-block">
                   <div className="ca-block-tag">EVIDENCE</div>
-                  <p>{asText(llm.reasoning)}</p>
+                  <p>{asText(vm.reasoning)}</p>
                 </div>
               )}
               {(limitations.length > 0 || warnings.length > 0) && (
@@ -203,13 +313,19 @@ export default function CompanyResearchDetailPage() {
               )}
               <div className="ca-block is-meta">
                 <div className="ca-block-tag">SOURCE / MODEL CONTEXT</div>
-                <div className="ca-meta-grid">
-                  <span>PROVIDER</span><strong>{asText(score?.provider_used)}</strong>
-                  <span>FALLBACK</span><strong>{asText(score?.fallback_used)}</strong>
-                  <span>MODEL</span><strong>{asText(sc.model_name)}</strong>
-                  <span>TARGET</span><strong>{asText(sc.target_name)}</strong>
-                  <span>SCORE SOURCE</span><strong>{asText(sc.score_source)}</strong>
-                </div>
+                {vm.hasScore ? (
+                  <div className="ca-meta-grid">
+                    <span>PROVIDER</span><strong>{asText(vm.providerUsed)}</strong>
+                    <span>FALLBACK</span><strong>{asText(vm.fallbackUsed)}</strong>
+                    <span>MODEL</span><strong>{asText(vm.modelName)}</strong>
+                    <span>TARGET</span><strong>{asText(vm.targetName)}</strong>
+                    <span>SCORE SOURCE</span><strong>{asText(vm.scoreSource)}</strong>
+                  </div>
+                ) : (
+                  <p className="ca-meta-empty">
+                    {scoreErr ? 'Model context unavailable while the score request is failing.' : 'Model context loads with the score.'}
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -222,14 +338,15 @@ export default function CompanyResearchDetailPage() {
             <>
               <div className="ca-readout-name">{tk}</div>
               <div className="ca-readout-big" style={{ color: railColor(finalPct, 'final') }}>
-                {finalPct == null ? '—' : fmtVal(sc.final_research_score)}
+                {finalPct == null ? '—' : fmtVal(layers.final)}
                 <em>FINAL RESEARCH SCORE</em>
               </div>
-              <div className="ca-readout-row"><span>CONFIDENCE</span><strong>{asText(sc.confidence_level || sc.confidence_score)}</strong></div>
+              <div className="ca-readout-row"><span>CONFIDENCE</span><strong>{asText(vm.confidenceLevel ?? layers.confidence)}</strong></div>
               <div className="ca-readout-row"><span>LATEST YEAR</span><strong>{asText(ctx.latest_year)}</strong></div>
-              <div className="ca-readout-row"><span>MODEL</span><strong>{asText(sc.model_name)}</strong></div>
-              <div className="ca-readout-row"><span>SOURCE</span><strong>{asText(sc.score_source)}</strong></div>
-              <div className="ca-readout-warn">HISTORICAL RANKING SIGNAL ONLY</div>
+              <div className="ca-readout-row"><span>MODEL</span><strong>{asText(vm.modelName)}</strong></div>
+              <div className="ca-readout-row"><span>SOURCE</span><strong>{asText(vm.scoreSource)}</strong></div>
+              {scoreErr && !vm.hasScore && <div className="ca-readout-warn">SCORE REQUEST FAILED — RETRY ABOVE</div>}
+              {!scoreErr && <div className="ca-readout-warn">HISTORICAL RANKING SIGNAL ONLY</div>}
             </>
           )}
           {focus?.type === 'rail' && (
@@ -322,6 +439,10 @@ const CSS = `
 .ca-panel { border: 1px solid rgba(200,211,202,0.16); border-radius: 3px; background: rgba(11,16,15,0.6); padding: 18px 20px; }
 .ca-panel-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.28em; color: var(--ca-faint); margin-bottom: 14px; }
 .ca-panel-note { margin: 12px 0 0; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--ca-gold); }
+.ca-scoreerr { border: 1px solid var(--ca-copper); border-left: 3px solid var(--ca-copper); background: rgba(168,103,75,0.08); border-radius: 3px; padding: 12px 14px; margin: 4px 0 2px; }
+.ca-scoreerr-head { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.22em; color: var(--ca-copper); margin-bottom: 6px; }
+.ca-scoreerr p { margin: 0 0 10px; font-size: 12px; line-height: 1.5; color: var(--ca-dim, #9fae9f); }
+.ca-meta-empty { margin: 4px 0 0; font-family: var(--font-mono); font-size: 10px; color: var(--ca-faint); }
 
 /* ── score rails ── */
 .ca-rail { display: grid; grid-template-columns: 190px 1fr 64px; gap: 14px; align-items: center; width: 100%;

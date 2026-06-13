@@ -6,6 +6,8 @@ OpenRouter/local LLM support is optional and fails safe. Never investment advice
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
@@ -13,6 +15,8 @@ from app.core.dependencies import require_access
 from app.core.rate_limit import rate_limit
 from app.models.user import User
 from app.services import research_agent as RA
+
+logger = logging.getLogger("financeiq.research_agent")
 
 router = APIRouter(prefix="/research", tags=["research-agent"])
 
@@ -89,6 +93,12 @@ def company_score(ticker: str, _: User | None = Depends(require_access),
         raise HTTPException(404, str(exc))
     except ValueError as exc:
         raise HTTPException(422, str(exc))
+    except Exception as exc:  # noqa - never a bare 500: give the client an actionable, distinct error
+        logger.exception("company_score failed ticker=%s", ticker.upper())
+        raise HTTPException(
+            503,
+            f"score temporarily unavailable for {ticker.upper()}: {type(exc).__name__}",
+        )
 
 
 class AskBody(BaseModel):
