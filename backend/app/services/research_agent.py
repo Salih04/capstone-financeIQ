@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -1290,7 +1291,10 @@ def classify_intent(question: str) -> str:
                             "shares outstanding", "shares", "free float", "free-float", "fiili", "dolas",
                             "issued capital", "paid-in", "paid in capital", "fill shares")):
         return "valuation"
-    if any(k in q for k in ("why", "weak", "signal", "reliable", "edge", "backtest", "diagnostic")):
+    if any(k in q for k in ("why", "weak", "signal", "reliable", "edge", "backtest", "diagnostic",
+                            "walk-forward", "walk forward", "spearman", "information coefficient",
+                            " ic ", " ic?", "ic ", "fold", "baseline", "out-of-sample", "out of sample",
+                            "model validation", "predictive performance", "predictive power")):
         return "diagnostics"
     if any(k in q for k in ("accept", "reject", "feature", "column", "frozen", "valuation",
                             "missing", "corrected", "data quality", "snapshot", "leakage")):
@@ -1301,6 +1305,138 @@ def classify_intent(question: str) -> str:
 def _year_in(question: str):
     m = _YEAR_RE.search(question or "")
     return int(m.group(1)) if m else None
+
+
+# --------------------------------------------------------------------------- #
+# visualization metadata (drives the frontend result renderer)
+# --------------------------------------------------------------------------- #
+# Map the internal classify_intent label → the visualization type the frontend
+# dispatcher understands. Anything not listed renders as a plain text answer.
+_VIZ_TYPE_BY_INTENT = {
+    "top_ranked": "company_ranking",
+    "benchmark_outperformers": "benchmark_performance",
+    "benchmark_status": "benchmark_performance",
+    "diagnostics": "model_diagnostics",
+    "data_quality": "data_quality",
+    "valuation": "valuation_screen",
+    "company": "company_performance",
+    "general": "general_answer",
+}
+
+_RANKING_KEYWORDS = ("rank", "top ", "highest", "best ", "best stocks", "leaders",
+                     "which compan", "screen", "lowest")
+_COMPARE_KEYWORDS = ("compare", "versus", " vs ", " vs. ", "against ", "difference between")
+
+
+def _known_tickers(state: dict) -> set[str]:
+    df = state.get("modeling")
+    if df is None or "ticker" not in getattr(df, "columns", []):
+        return set()
+    return {str(t).upper() for t in df["ticker"].dropna().unique()}
+
+
+def _extract_tickers(question: str, state: dict) -> list[str]:
+    """Tickers named in the question, validated against the universe. Ordered, deduped."""
+    known = _known_tickers(state)
+    if not known:
+        return []
+    out: list[str] = []
+    for tok in re.findall(r"[A-Za-z]{3,6}", question or ""):
+        up = tok.upper()
+        if up in known and up not in out:
+            out.append(up)
+    return out
+
+
+def company_performance_payload(ticker: str, year: int | None, state: dict) -> dict:
+    """One company's realized performance for a year. Only fields that exist;
+    nothing fabricated. `available=False` with a reason when the row is absent."""
+    tk = (ticker or "").upper()
+    df = state.get("modeling")
+    if df is None:
+        return {"available": False, "ticker": tk, "year": year, "reason": "modeling dataset not loaded"}
+    rows = df[df["ticker"].astype(str).str.upper() == tk]
+    if rows.empty:
+        return {"available": False, "ticker": tk, "year": year,
+                "reason": f"{tk} is not in the validated public universe"}
+    years = sorted(int(y) for y in rows["year"].dropna().unique())
+    use_year = year if (year in years) else years[-1]
+    row = rows[rows["year"] == use_year].iloc[0]
+
+    def g(col):
+        if col not in row or pd.isna(row[col]):
+            return None
+        v = row[col]
+        try:
+            return round(float(v), 3)
+        except (TypeError, ValueError):
+            return v
+
+    field_specs = [
+        ("realized_return_pct", "same_year_return_pct", "%"),
+        ("next_year_return_pct", "next_year_return_pct", "%"),
+        ("benchmark_return_pct", "next_year_bist100_return_pct", "%"),
+        ("excess_return_vs_bist100_pct", "next_year_excess_return_vs_bist100", "%"),
+        ("next_year_rank_by_return", "next_year_rank_by_return", "#"),
+        ("roe", "roe", ""), ("roa", "roa", ""),
+        ("net_margin", "net_margin", ""),
+        ("revenue_growth_pct", "revenue_growth_pct", "%"),
+        ("price_momentum_1y_pct", "price_momentum_1y_pct", "%"),
+    ]
+    metrics = [{"key": label, "value": g(col), "unit": unit}
+               for (label, col, unit) in field_specs if g(col) is not None]
+    inference_only = (g("next_year_return_pct") is None) and (use_year == years[-1])
+    return {
+        "available": True, "ticker": tk, "year": use_year,
+        "requested_year": year, "year_adjusted": (year is not None and year != use_year),
+        "years_available": years,
+        "inference_only": inference_only,
+        "metrics": metrics,
+    }
+
+
+def _build_visualization(intent: str, question: str, ticker: str | None,
+                         det: dict | None, state: dict, tickers: list[str]) -> dict:
+    """Structured render metadata so the frontend never falls back to the
+    generic ranking table unless the query truly asks for a ranking."""
+    q = (question or "").lower()
+    primary = ticker.upper() if ticker else (tickers[0] if tickers else None)
+    year = _year_in(question)
+
+    # explicit comparison: two+ named tickers
+    if len(tickers) >= 2:
+        return {"type": "company_comparison", "tickers": tickers[:6], "year": year,
+                "companies": [company_performance_payload(t, year, state) for t in tickers[:6]]}
+
+    # a named company with no ranking ask → company-specific performance panel
+    if primary and intent not in ("top_ranked",) and not any(k in q for k in _RANKING_KEYWORDS):
+        perf = company_performance_payload(primary, year, state)
+        return {"type": "company_performance", "ticker": primary,
+                "year": perf.get("year"), "performance": perf}
+
+    viz_type = _VIZ_TYPE_BY_INTENT.get(intent, "general_answer")
+    payload: dict[str, Any] = {"type": viz_type}
+
+    if viz_type == "company_ranking":
+        t = (det or {}).get("intent_data") or {}
+        payload["year"] = t.get("year")
+        payload["ranking"] = [
+            {"ticker": r.get("ticker"), "rank": r.get("ml_rank"),
+             "score": r.get("ml_score"), "score_source": r.get("score_source")}
+            for r in (t.get("top_ranked") or [])
+        ]
+    elif viz_type == "benchmark_performance":
+        payload["intent_data"] = (det or {}).get("intent_data")
+        payload["ticker"] = primary
+        payload["year"] = year
+    elif viz_type == "model_diagnostics":
+        payload["diagnostics"] = build_model_diagnostics_context(state)
+    elif viz_type == "data_quality":
+        payload["intent_data"] = (det or {}).get("intent_data")
+    elif viz_type == "valuation_screen":
+        payload["intent_data"] = (det or {}).get("intent_data")
+        payload["ticker"] = primary
+    return payload
 
 
 def _intent_answer(intent: str, question: str, state: dict, ticker: str | None) -> dict | None:
@@ -1457,7 +1593,13 @@ def answer_research_question(question: str, ticker: str | None = None,
     state = state or load_research_state()
     cfg = get_config()
     intent = classify_intent(question)
-    if intent == "general" and ticker:
+    tickers = _extract_tickers(question, state)
+    if not ticker and tickers:
+        ticker = tickers[0]
+    ql = (question or "").lower()
+    # A named company with no ranking ask → answer about THAT company, not the
+    # generic ranking. (Don't override an explicit ranking/valuation/etc. ask.)
+    if intent == "general" and ticker and not any(k in ql for k in _RANKING_KEYWORDS):
         intent = "company"
 
     det = _intent_answer(intent, question, state, ticker)
@@ -1510,10 +1652,14 @@ def answer_research_question(question: str, ticker: str | None = None,
     else:
         answer = grounded or _human_answer(llm_result)
 
+    visualization = _build_visualization(intent, question, ticker, det, state, tickers)
+
     return {
         "answer": answer,
         "grounded_answer": grounded,
         "intent": intent,
+        "visualization": visualization,
+        "tickers_detected": tickers,
         "mode": "llm" if llm_used else "fallback",
         "llm_used": llm_used,
         "model": cfg["model"] if llm_used else None,

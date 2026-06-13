@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import api from '../api/client'
 
 // ---------------------------------------------------------------------------
@@ -231,6 +231,177 @@ function SignalReadout({ r, ai }) {
   )
 }
 
+// ── result visualization dispatcher ────────────────────────────────────────
+// The bottom result area is driven by the query's visualization intent, NOT a
+// static ranking table. Ranking only renders when the query asks for one.
+const fmtMetric = (m) => {
+  if (m.value == null) return '—'
+  const n = Number(m.value)
+  if (!Number.isFinite(n)) return String(m.value)
+  const s = m.unit === '#' ? String(Math.round(n)) : (Math.abs(n) >= 100 ? n.toFixed(0) : n.toFixed(2))
+  return m.unit === '%' ? `${n >= 0 ? '+' : ''}${s}%` : m.unit === '#' ? `#${s}` : s
+}
+const prettyKey = (k) => String(k).replace(/_/g, ' ').replace(/pct/gi, '%').toUpperCase()
+
+function MetricList({ metrics }) {
+  if (!metrics || metrics.length === 0) return <p className="ra-viz-empty">No validated metrics available.</p>
+  return (
+    <div className="ra-viz-metrics">
+      {metrics.map((m) => (
+        <div key={m.key} className="ra-viz-metric">
+          <span className="ra-viz-metric-k">{prettyKey(m.key)}</span>
+          <span className="ra-viz-metric-v">{fmtMetric(m)}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function ResultVisualization({ visualization }) {
+  const viz = visualization || { type: 'general_answer' }
+  const t = viz.type
+
+  if (t === 'general_answer') return null // text answer block above is the whole result
+
+  if (t === 'company_ranking') {
+    const rows = viz.ranking || []
+    if (rows.length === 0) return <p className="ra-viz-empty">No ranked companies available for this query.</p>
+    const max = Math.max(...rows.map((r) => Number(r.score) || 0), 1)
+    return (
+      <div className="ra-viz">
+        <div className="ra-viz-head">RANKED COMPANIES{viz.year ? ` · ${viz.year}` : ''}</div>
+        {rows.map((r) => {
+          const pct = ((Number(r.score) || 0) / max) * 100
+          return (
+            <div key={r.ticker} className="ra-row is-static">
+              <span className="ra-row-rank">#{r.rank ?? '—'}</span>
+              <span className="ra-row-ticker">{r.ticker}</span>
+              <span className="ra-row-trace"><span className="ra-row-fill" style={{ width: `${pct}%`, background: scoreColor(pct) }} /></span>
+              <span className="ra-row-score" style={{ color: scoreColor(pct) }}>{r.score == null ? '—' : Number(r.score).toFixed(3)}</span>
+              <span className="ra-row-cov">{r.score_source || ''}</span>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  if (t === 'company_performance') {
+    const p = viz.performance || {}
+    if (!p.available) {
+      return <div className="ra-viz"><div className="ra-viz-head">{viz.ticker} · PERFORMANCE</div>
+        <p className="ra-viz-empty">{p.reason || 'No validated data for this company.'}</p></div>
+    }
+    return (
+      <div className="ra-viz">
+        <div className="ra-viz-head">
+          {p.ticker} · PERFORMANCE · {p.year}
+          {p.year_adjusted && <span className="ra-viz-note"> (requested {p.requested_year} unavailable — showing {p.year})</span>}
+          {p.inference_only && <span className="ra-viz-note"> · INFERENCE-ONLY · NO REALIZED T+1</span>}
+        </div>
+        <MetricList metrics={p.metrics} />
+      </div>
+    )
+  }
+
+  if (t === 'company_comparison') {
+    const companies = (viz.companies || []).filter((c) => c.available)
+    if (companies.length === 0) return <p className="ra-viz-empty">No validated data for the requested companies.</p>
+    const keys = [...new Set(companies.flatMap((c) => (c.metrics || []).map((m) => m.key)))]
+    return (
+      <div className="ra-viz">
+        <div className="ra-viz-head">COMPARISON{viz.year ? ` · ${viz.year}` : ''}</div>
+        <div className="ra-viz-cmp" style={{ gridTemplateColumns: `minmax(120px,1.4fr) repeat(${companies.length}, 1fr)` }}>
+          <span className="ra-viz-cmp-h" />
+          {companies.map((c) => <span key={c.ticker} className="ra-viz-cmp-h">{c.ticker} · {c.year}</span>)}
+          {keys.map((k) => (
+            <Fragment key={k}>
+              <span className="ra-viz-cmp-k">{prettyKey(k)}</span>
+              {companies.map((c) => {
+                const m = (c.metrics || []).find((x) => x.key === k)
+                return <span key={c.ticker + k} className="ra-viz-cmp-v">{m ? fmtMetric(m) : '—'}</span>
+              })}
+            </Fragment>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (t === 'model_diagnostics') {
+    const d = viz.diagnostics || {}
+    const splits = d.splits || []
+    return (
+      <div className="ra-viz">
+        <div className="ra-viz-head">MODEL DIAGNOSTICS</div>
+        <div className="ra-viz-metrics">
+          <div className="ra-viz-metric"><span className="ra-viz-metric-k">MEAN SPEARMAN IC</span><span className="ra-viz-metric-v">{d.mean_spearman == null ? '—' : Number(d.mean_spearman).toFixed(3)}</span></div>
+          <div className="ra-viz-metric"><span className="ra-viz-metric-k">WEAK BACKTEST</span><span className="ra-viz-metric-v">{String(d.weak_backtest ?? '—')}</span></div>
+        </div>
+        {splits.map((s) => (
+          <div key={s.split} className="ra-row is-static">
+            <span className="ra-row-ticker">{s.split}</span>
+            <span className="ra-row-cov">ML {s.best_ml_spearman ?? '—'} · base {s.baseline_spearman ?? '—'}</span>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  if (t === 'benchmark_performance') {
+    const d = viz.intent_data
+    const rows = d?.outperformers || []
+    return (
+      <div className="ra-viz">
+        <div className="ra-viz-head">BENCHMARK PERFORMANCE{d?.target_year ? ` · ${d.target_year}` : ''}</div>
+        {d?.benchmark_return_pct != null && (
+          <div className="ra-viz-metric"><span className="ra-viz-metric-k">BIST100 RETURN</span><span className="ra-viz-metric-v">{d.benchmark_return_pct >= 0 ? '+' : ''}{Number(d.benchmark_return_pct).toFixed(1)}%</span></div>
+        )}
+        {rows.map((r) => (
+          <div key={r.ticker} className="ra-row is-static">
+            <span className="ra-row-ticker">{r.ticker}</span>
+            <span className="ra-row-score" style={{ color: 'var(--ra-emerald)' }}>+{Number(r.excess_return_vs_bist100_pct).toFixed(1)}%</span>
+            <span className="ra-row-cov">vs BIST100</span>
+          </div>
+        ))}
+        {rows.length === 0 && <p className="ra-viz-empty">Benchmark-relative results not available for this query.</p>}
+      </div>
+    )
+  }
+
+  if (t === 'data_quality') {
+    const d = viz.intent_data || {}
+    const accepted = d.accepted_corrected_yearly_features || []
+    const missing = d.still_missing_valuation_features || []
+    return (
+      <div className="ra-viz">
+        <div className="ra-viz-head">DATA QUALITY</div>
+        <div className="ra-viz-metrics">
+          <div className="ra-viz-metric"><span className="ra-viz-metric-k">FEATURES (AFTER CORRECTION)</span><span className="ra-viz-metric-v">{d.feature_count_after_corrected_yearly ?? '—'}</span></div>
+          <div className="ra-viz-metric"><span className="ra-viz-metric-k">ACCEPTED CORRECTED</span><span className="ra-viz-metric-v">{accepted.length}</span></div>
+          <div className="ra-viz-metric"><span className="ra-viz-metric-k">STILL MISSING / REJECTED</span><span className="ra-viz-metric-v">{missing.length}</span></div>
+        </div>
+        {missing.length > 0 && <p className="ra-viz-empty">Rejected/missing: {missing.join(', ')}</p>}
+      </div>
+    )
+  }
+
+  if (t === 'valuation_screen') {
+    const d = viz.intent_data || {}
+    const entered = d.columns_entering_candidate || []
+    return (
+      <div className="ra-viz">
+        <div className="ra-viz-head">VALUATION{viz.ticker ? ` · ${viz.ticker}` : ''}</div>
+        <p className="ra-viz-empty">
+          {entered.length ? `Valuation columns in the model: ${entered.join(', ')}.` : 'Valuation columns are not available (shares outstanding missing).'}
+        </p>
+      </div>
+    )
+  }
+
+  return null
+}
+
 export default function AIResearchAssistantPage() {
   const reduceMotion = useMemo(
     () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -415,7 +586,11 @@ export default function AIResearchAssistantPage() {
                 </div>
               </div>
             )}
-            {phase === 'ready' && results.map((r, i) => {
+            {/* query result → visualization dispatched by intent (no generic ranking unless asked) */}
+            {phase === 'ready' && answer && <ResultVisualization visualization={answer.visualization} />}
+
+            {/* pre-query preview only: the static intent sample, never after a real answer */}
+            {phase === 'ready' && !answer && !askErr && results.map((r, i) => {
               const color = scoreColor(r.hybrid_score)
               const isActive = active?.ticker === r.ticker
               const grainy = r.coverage < 0.55
@@ -597,6 +772,24 @@ const CSS = `
   transition: opacity 0.25s;
 }
 .ra-results.resolving .ra-noise { opacity: 1; animation: raStatic 0.18s steps(3) infinite; }
+
+.ra-viz { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.ra-viz-head { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; color: var(--ra-faint); margin-bottom: 4px; }
+.ra-viz-note { color: var(--ra-gold); letter-spacing: 0.04em; }
+.ra-viz-empty { font-family: var(--font-mono); font-size: 11px; color: var(--ra-dim); line-height: 1.5; margin: 4px 0 0; }
+.ra-viz-metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
+.ra-viz-metric { display: flex; justify-content: space-between; gap: 10px; align-items: baseline;
+  border: 1px solid rgba(200,211,202,0.12); border-radius: 2px; background: rgba(14,20,19,0.55); padding: 9px 12px; }
+.ra-viz-metric-k { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.12em; color: var(--ra-faint); }
+.ra-viz-metric-v { font-family: var(--font-mono); font-size: 13px; color: var(--ra-paper); }
+.ra-viz-cmp { display: grid; gap: 1px; background: rgba(200,211,202,0.08); border: 1px solid rgba(200,211,202,0.12); }
+.ra-viz-cmp-h { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; color: var(--ra-gold);
+  background: rgba(14,20,19,0.85); padding: 8px 10px; }
+.ra-viz-cmp-k { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em; color: var(--ra-faint);
+  background: rgba(14,20,19,0.7); padding: 7px 10px; }
+.ra-viz-cmp-v { font-family: var(--font-mono); font-size: 12px; color: var(--ra-paper);
+  background: rgba(14,20,19,0.55); padding: 7px 10px; }
+.ra-row.is-static { opacity: 1; animation: none; cursor: default; }
 
 .ra-row {
   display: grid; grid-template-columns: 40px 70px 1fr 56px 72px; gap: 12px; align-items: center;
