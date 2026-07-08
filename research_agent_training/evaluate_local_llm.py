@@ -126,7 +126,7 @@ def main(argv=None) -> int:
     for q in questions:
         msg = [{"role": "system", "content": RA.SYSTEM_PROMPT},
                {"role": "user", "content": json.dumps({"question": q, "context": RA.build_summary_context()})}]
-        res = RA.call_local_llm(msg, cfg)
+        res = RA.call_llm(msg, cfg)
         if not res.get("ok"):
             rec = {"valid_json": False, "parse_error": True, "transport_error": res.get("error")}
             for k in agg:

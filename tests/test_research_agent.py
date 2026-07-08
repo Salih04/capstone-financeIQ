@@ -90,16 +90,16 @@ def test_composite_ml_null_redistributes():
 
 # 10 LLM provider failure fallback
 def test_llm_provider_none_fails_safe():
-    res = RA.call_local_llm([{"role": "user", "content": "hi"}],
-                            {"provider": "none", "base_url": "", "model": "x", "timeout": 1,
-                             "weights": {"ml": .65, "confidence": .2, "llm": .15}})
+    res = RA.call_llm([{"role": "user", "content": "hi"}],
+                      {"provider": "none", "base_url": "", "model": "x", "timeout": 1,
+                       "weights": {"ml": .65, "confidence": .2, "llm": .15}})
     assert res["ok"] is False and res["provider"] == "none"
 
 
 def test_llm_bad_url_fails_safe():
-    res = RA.call_local_llm([{"role": "user", "content": "hi"}],
-                            {"provider": "lmstudio", "base_url": "http://127.0.0.1:9/x",
-                             "model": "x", "timeout": 1, "weights": {"ml": .65, "confidence": .2, "llm": .15}})
+    res = RA.call_llm([{"role": "user", "content": "hi"}],
+                      {"provider": "lmstudio", "base_url": "http://127.0.0.1:9/x",
+                       "model": "x", "timeout": 1, "weights": {"ml": .65, "confidence": .2, "llm": .15}})
     assert res["ok"] is False  # connection refused -> safe
 
 
