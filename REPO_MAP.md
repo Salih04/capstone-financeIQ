@@ -10,17 +10,18 @@ Three layers sharing one repo: (1) a Python data/experiment pipeline run from th
 |---|---|
 | `backend/app/` | FastAPI app: `main.py`, `config.py`, `database.py`, `trusted_data.py` (data contract) |
 | `backend/app/routers/` | API routes: `research.py`, `research_agent.py`, `forecasting.py`, `auth.py`, `companies.py`, `scoring.py`, … |
-| `backend/app/services/` | Business logic, ~1:1 with routers; `research/` subpackage, `forecasting_csv_service.py` |
-| `backend/scripts/` | `convert_trusted_xlsx.py`, `load_trusted_yearly.py`, `validate_trusted_data.py`, `start_backend.sh` (Docker entry) |
+| `backend/app/services/` | Business logic. Roughly — not strictly — 1:1 with routers: `research/` is a subpackage (`scoring.py`, `company.py`, `benchmark.py`, `validation.py`, …), `research_agent.py` is a single module, and `auth`/`companies`/`admin`/`users` routers have no service module |
+| `backend/scripts/` | `convert_trusted_xlsx.py`, `load_trusted_yearly.py`, `validate_trusted_data.py`, `start_backend.sh` (Docker entry); also `pipeline_runner.py`, `retrain_forecasting.py`, `incremental_retrain.py`, `migration_state.py` |
 | `backend/alembic/` | Migrations; head includes `yearly_stocks` |
-| `backend/tests/` | 51 backend tests; sqlite via `conftest.py`, no Postgres needed |
-| `frontend/src/pages/` | One JSX file per route (Dashboard, ResearchAgent, Experiments, Benchmark, Forecasting, …) |
+| `backend/tests/` | 51 backend tests (7 files); sqlite via `conftest.py`, no Postgres needed |
+| `backend/airflow/` | Single dormant DAG (`dags/forecasting_retrain_dag.py`). `airflow` is not in `requirements.txt` or any deploy file — nothing runs it |
+| `frontend/src/pages/` | One JSX file per route, all `*Page.jsx` (`DashboardPage.jsx`, `ResearchAgentPage.jsx`, `ExperimentsPage.jsx`, `BenchmarkPage.jsx`, `ForecastingPage.jsx`, …) |
 | `frontend/src/api/` | `client.js`, `researchApi.js`, `cache.js` (sessionStorage SWR cache), `useCachedResource.js` |
 | `scripts/data_collection/` | Pipeline stages: `build_all.py`, `validate.py` (leakage guards), ingest/valuation/benchmark/integration modules |
-| `scripts/` (root) | `build_company_contexts.py` (RAG contexts), `fetch_yahoo_chart_prices.py` |
-| `experiments/` | `run_experiments.py` (walk-forward loop), `results/`, `reports/`, `leaderboard.csv` |
-| `tests/` (root) | 97 pipeline/research-agent tests |
-| `data/` | `raw/` (yearly XLSX), `trusted/` (generated CSVs), `trusted_raw/` (manual inputs), `trusted_clean/` (pipeline outputs + reports), `config/` (universe CSVs) |
+| `scripts/` (root) | `build_company_contexts.py` (RAG contexts), `fetch_yahoo_chart_prices.py`, `validate_trusted_data.py` |
+| `experiments/` | `run_experiments.py` (walk-forward loop), `results/`, `reports/summary.md`, `leaderboard.csv` |
+| `tests/` (root) | 97 pipeline/research-agent tests (11 files); 2 currently fail — see `CLAUDE.md` |
+| `data/` | `raw/` (yearly XLSX), `trusted/` (generated CSVs), `trusted_raw/` (manual inputs), `trusted_clean/` (pipeline outputs + reports), `config/` (universe CSVs); also `interim/`, `exports/` |
 | `research_agent_training/` | Instruction-dataset generation/validation/eval; no training performed |
 | `docs/` | `RENDER_DEPLOY.md`, `SUPABASE_AUTH.md`, `research_agent_guide.md` |
 
@@ -32,7 +33,7 @@ Three layers sharing one repo: (1) a Python data/experiment pipeline run from th
 - `data/trusted_clean/modeling_dataset_2020_2025.csv` — the modeling dataset (+ `_public_`/`_training_` splits).
 - `data/trusted_raw/shares_outstanding_events.csv` — manual shares input for valuation.
 - `TASK_STATE.md` — detailed status ledger; `CHANGELOG.md` — history.
-- `docker-compose.yml`, `render.yaml`, `vercel.json` — deployment definitions.
+- `docker-compose.yml`, `render.yaml`, root `vercel.json` — deployment definitions. Note there is a **second** `frontend/vercel.json` containing only SPA rewrites; the root one carries the build config.
 
 ## Entry Points
 
@@ -61,10 +62,10 @@ LLM (optional): OpenRouter / LM Studio / Ollama, explanation-only, deterministic
 ## Config / Build / Deploy
 
 - Env vars documented in `README.md` table (DATABASE_URL, SECRET_KEY, RESEARCH_LLM_*, TRUSTED_*, PUBLIC_DEMO_MODE, SUPABASE_*, VITE_*).
-- `docker-compose.yml`: services `db`, `backend`, `frontend`.
-- Render: Docker runtime, repo-root build context, `backend/Dockerfile` (do NOT set Root Directory to `backend`).
-- Vercel: `frontend/` root, `npm run build`, output `dist`.
-- Backend deps: `backend/requirements.txt` (Python 3.12); frontend: `frontend/package.json` (React 18, Vite 5, Playwright e2e).
+- `docker-compose.yml`: services `db` (postgres:16-alpine, :5432), `backend` (:8000), `frontend` (host :3000 → container :80 via nginx).
+- Render: Docker runtime, `dockerfilePath: ./backend/Dockerfile`, `dockerContext: .` (repo root) — do NOT set Render's Root Directory to `backend`. Services: `financeiq-backend` (web) + `financeiq-db`.
+- Vercel: build runs from the **repo root**, not `frontend/` — root `vercel.json` sets `installCommand`/`buildCommand` with `--prefix frontend` and `outputDirectory: frontend/dist`, plus SPA rewrites and security headers. `frontend/vercel.json` holds rewrites only.
+- Backend deps: `backend/requirements.txt` (FastAPI 0.111, SQLAlchemy 2.0, pydantic 2.7; Python 3.12 per `backend/Dockerfile`); frontend: `frontend/package.json` (React 18, Vite 5, Playwright e2e; scripts `dev`/`build`/`preview`/`e2e`).
 
 ## Common Edit Targets
 
@@ -86,6 +87,6 @@ LLM (optional): OpenRouter / LM Studio / Ollama, explanation-only, deterministic
 - Anything under `data/trusted/` and `data/trusted_clean/` (generated; regenerate via Makefile).
 - `data/trusted_raw/` manual inputs (human-curated corrections).
 - `backend/alembic/versions/` (append migrations; never edit shipped ones).
-- Weak-signal caveat copy in frontend pages.
-- `backend/airflow/` — purpose needs verification before modifying.
-- `unnecessary/` quarantine referenced in README — not present in this worktree; needs verification.
+- Weak-signal caveat copy in frontend pages (e.g. `DashboardPage.jsx:445` — "A weak signal, reported *honestly*.").
+- `backend/airflow/dags/forecasting_retrain_dag.py` — dormant (airflow is not a declared dependency); leave it alone rather than "fixing" or deleting it without a decision.
+- `unnecessary/` quarantine: **does not exist** in the repo and is untracked by git. `README.md:396` links to it anyway — a dead link. Do not recreate the directory to satisfy the link.

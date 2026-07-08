@@ -40,9 +40,15 @@ ls backend/app/routers backend/app/services frontend/src/pages scripts/data_coll
 grep -n "full-research\|data-validate\|research-agent-check" Makefile
 
 # Optional, if environment allows:
-PYTHONPATH=. python -m pytest tests/          # root suite
-cd backend && python -m pytest tests/         # backend suite
+PYTHONPATH=. python -m pytest tests/          # root suite -> 95 pass, 2 fail (stale call_local_llm)
+
+# Backend suite. Do NOT run as `cd backend && pytest tests/` if an untracked
+# backend/.env holds OPENROUTER_* keys: Settings forbids extra inputs and
+# collection aborts. Run from the repo root instead -> 51/51 pass.
+PYTHONPATH=backend python -m pytest backend/tests
 ```
+
+Both suites were run on 2026-07-08; results above are observed, not assumed.
 
 ## Final Response Format
 

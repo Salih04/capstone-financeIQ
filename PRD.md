@@ -13,7 +13,7 @@ No paid APIs, no scrapers, no synthetic data.
 
 ## Current Reality
 
-- **Capstone status: complete** (see `TASK_STATE.md`). Root 97 + backend 51 tests passing as of last ledger update (2026-06-11).
+- **Capstone status: complete** (see `TASK_STATE.md`). Test state re-verified 2026-07-08: **backend 51/51 pass**; **root 95/97 pass**, with 2 failures from a stale `call_local_llm` reference in `tests/test_research_agent.py` (the function is now `call_llm`). The ledger's "97 + 51 all passing" line reflects 2026-06-11 and is now out of date.
 - **The headline finding is negative and intentional:** walk-forward Spearman IC ≈ 0; the model shows no reliable predictive edge and does not consistently beat simple baselines. The UI displays this prominently ("A weak signal, reported honestly.").
 - Modeling dataset: 403 rows / 81 tickers / 321 target rows (`data/trusted_clean/modeling_dataset_2020_2025.csv`); public subset stays 40 tickers.
 - Vendor XLSX fundamentals are partly a **frozen 2025 snapshot** — rejected for modeling; real per-year income/profitability ingested via corrected yearly files; valuation reconstructed from Yahoo price × manual shares.
@@ -33,7 +33,7 @@ Can free, validated, leakage-safe fundamentals predict next-year BIST stock retu
 ## Core Workflows
 
 1. **Data pipeline** (repo root): `make full-research` — extract → benchmark → corrected yearly ingest → fetch Yahoo prices → free valuation → build T→T+1 dataset → integrate training-only tickers → validate → experiments. Outputs + audit reports in `data/trusted_clean/`.
-2. **Serving**: backend loads trusted yearly data into Postgres on startup; `/research/*` and `/forecasting/*` endpoints serve scores, diagnostics, data-quality evidence, and CSV-backed forecasting.
+2. **Serving**: backend loads trusted yearly data into Postgres on startup. `research.py` and `research_agent.py` both mount under the `/research` prefix (scores, diagnostics, data-quality evidence). The forecasting router declares **no prefix** — its routes sit at the API root (`/get-stocks`, `/predict`, `/predict/evaluate`, `/train-model`, `/get-parameters`, …), not under `/forecasting/*`.
 3. **Research agent**: `POST /research/ask` — grounded intents over validated evidence; hybrid score `0.65*ml + 0.20*confidence + 0.15*llm`, LLM optional and sandboxed.
 4. **Frontend**: routes `/dashboard`, `/research-agent`, `/companies`, `/experiments`, `/research`, `/data-quality`, `/benchmark`, `/forecasting` — each a research surface that keeps caveats and IC ≈ 0 visible; demo data as fallback only.
 5. **Training prep (no training performed)**: `research_agent_training/` generates/validates instruction JSONL from real reports.
@@ -63,9 +63,15 @@ Beyond-capstone options only (from `TASK_STATE.md`, all optional): expand the tr
 - Every score surfaced with its components, caveats, and data-quality evidence.
 - No fabricated value anywhere; negative result reported plainly.
 
+## Resolved (verified 2026-07-08)
+
+- **`unnecessary/` quarantine: does not exist.** Absent from the working tree, untracked by git (`git ls-files unnecessary` → empty), and not gitignored. The `README.md:396` link to `unnecessary/README.md` is therefore **dead**. The quarantine rule in `CLAUDE.md` ("do not reintroduce Finnhub, news API, synthetic seeders, KAP scraper") still stands on its own; only the directory link is stale. Fixing README is outside the four-file scope.
+- **`backend/airflow/`: one orphaned DAG.** Contains exactly `dags/forecasting_retrain_dag.py`, a tracked `BashOperator` DAG (`forecasting_retrain_daily`, `0 3 * * *`) shelling out to `backend/scripts/retrain_forecasting.py`. `airflow` appears in **no** dependency or deploy file (`backend/requirements.txt`, `docker-compose.yml`, `render.yaml`, `Makefile`). Nothing schedules or imports it — treat as dormant/aspirational, not live infrastructure.
+- **Test counts.** Re-run above: backend 51/51 green; root 97 collected, 95 green, 2 red.
+- **Dataset shape.** Independently recounted from `data/trusted_clean/modeling_dataset_2020_2025.csv`: 403 rows, 81 unique tickers, `has_target=True` on 321 rows. Matches the documented 403/81/321.
+
 ## Needs Verification
 
-- Whether Render/Vercel/Supabase deployments are currently live and at which URLs.
-- `unnecessary/` quarantine directory is referenced by `README.md` but absent from this worktree.
-- Test counts (97/51) reflect the 2026-06-11 ledger; re-run to confirm current state.
-- `backend/airflow/` exists but its role/liveness is undocumented.
+- Whether Render/Vercel/Supabase deployments are currently live and at which URLs. Deploy *definitions* are present and internally consistent (`render.yaml` → `financeiq-backend` + `financeiq-db`; root `vercel.json`), but liveness was not probed — confirming it requires an outbound request, not a repo read.
+- `backend/experiments/` is an empty directory holding no files and nothing tracked by git (git cannot track empty dirs, so it exists only locally); its intended role is unknown.
+- `backend/templates/quarterly_fundamentals_template.csv` exists, but quarterly exports are documented as frozen/excluded — whether this template is live input or a leftover is unclear.
