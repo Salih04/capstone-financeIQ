@@ -198,6 +198,10 @@ export default function LabelingLabPage() {
           {previews[d.id] && <PreviewChart preview={previews[d.id]} />}
         </Card>
       ))}
+
+      <footer style={{ marginTop: 28, borderTop: '1px solid var(--border)', paddingTop: 12, color: 'var(--text-3)', fontSize: 11 }}>
+        Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.
+      </footer>
     </div>
   )
 }
