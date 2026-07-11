@@ -54,6 +54,7 @@ export default function ForecastingDetailPage() {
         <p style={subtitleS}>
           Trend, parameter importance, and sector heatmap views for legacy forecasting experiments.
           Diagnostic output only; not production prediction or investment advice.
+          Based on ~40 public BIST companies, yearly data 2020–2025, nominal TRY returns during a high-inflation period. Historical patterns; no validated predictive skill (walk-forward IC ≈ 0).
         </p>
         <span style={badgeS}><BrainCircuit size={13} /> Experimental tool</span>
       </section>

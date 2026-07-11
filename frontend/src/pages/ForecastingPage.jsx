@@ -469,7 +469,7 @@ export default function ForecastingPage() {
 
       <footer className="ft-caveat">
         <span className="ft-caveat-pulse" aria-hidden="true" />
-        EXPERIMENTAL · Walk-forward IC ≈ 0 · Historical ranking patterns only · Research only · Not investment advice
+        EXPERIMENTAL · Walk-forward IC ≈ 0 · Historical ranking patterns only · Research only · Not investment advice · Based on ~40 public BIST companies, yearly data 2020–2025, nominal TRY returns during a high-inflation period. Historical patterns; no validated predictive skill (walk-forward IC ≈ 0).
       </footer>
     </div>
   )

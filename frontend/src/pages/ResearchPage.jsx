@@ -382,7 +382,7 @@ export default function ResearchPage() {
 
       <footer className="dx-caveat">
         <span className="dx-caveat-pulse" aria-hidden="true" />
-        Walk-forward IC ≈ 0 · Score is a ranking structure, not a prediction · Research only · Not investment advice
+        Walk-forward IC ≈ 0 · Score is a ranking structure, not a prediction · Research only · Not investment advice · Based on ~40 public BIST companies, yearly data 2020–2025, nominal TRY returns during a high-inflation period. Historical patterns; no validated predictive skill (walk-forward IC ≈ 0).
       </footer>
     </div>
   )
