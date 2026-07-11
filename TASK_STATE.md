@@ -54,7 +54,7 @@ claim.
 | Render Docker deploy | DONE | `render.yaml` (Docker, repo-root context), `$PORT`-aware Dockerfile CMD, docs aligned |
 | Private production lockdown | DONE | env-gated `require_access` (401 anon / 403 unapproved, fail-closed allowlist); docs/openapi gating; in-memory rate limit; frontend Google/signup hidden + approval gate + cache clear; security headers |
 | Supabase JWKS verification | DONE | asymmetric Signing Keys (RS256/ES256) via project JWKS from `SUPABASE_URL` (cached); HS256 legacy fallback; fixes 401 for approved users |
-| Tests | DONE | root 97 + backend 51 passing |
+| Verification baseline (2026-07-12) | DONE | root `PYTHONPATH=. python -m pytest tests/`: 97 passed; backend `PYTHONPATH=backend python -m pytest backend/tests`: 51 passed; `make data-validate`: VALID (403 rows, 40 features, 321 target rows); frontend `npm run build`: passed |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
 ---
