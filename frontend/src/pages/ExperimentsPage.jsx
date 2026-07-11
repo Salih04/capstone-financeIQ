@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useCachedResource, CACHE_TTL } from '../api/useCachedResource'
+import { apiErrorText } from '../api/errorText'
 import CacheTag from '../components/CacheTag'
 
 // ---------------------------------------------------------------------------
@@ -197,7 +198,11 @@ export default function ExperimentsPage() {
             <span>MEAN IC · BASELINE</span>
             <strong className="is-gold">{fmtIc(meanBase ?? EXPERIMENTS_MOCK.mean_ic_baseline)}</strong>
           </div>
-          {!fromApi && <div className="xp-mocknote">demo data — experiments API returned no folds</div>}
+          {!fromApi && (
+            <div className="xp-mocknote">
+              demo data — {apiErrorText(error) || 'experiments API returned no folds'}
+            </div>
+          )}
           <CacheTag fromCache={fromCache} refreshing={refreshing} savedAt={savedAt} onRefresh={refresh} />
         </div>
       </header>

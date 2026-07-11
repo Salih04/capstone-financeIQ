@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import api from '../api/client'
+import { apiErrorText } from '../api/errorText'
 import { getCached, setCached } from '../utils/sessionCache'
 
 // ---------------------------------------------------------------------------
@@ -112,6 +113,7 @@ export default function ResearchPage() {
   const [query, setQuery] = useState('')
   const [openCat, setOpenCat] = useState(null)
   const [mockMode, setMockMode] = useState(false)
+  const [mockReason, setMockReason] = useState(null)
 
   useEffect(() => {
     let mounted = true
@@ -125,8 +127,11 @@ export default function ResearchPage() {
           setYear(data.years[data.years.length - 1])
         } else if (!getCached(RESEARCH_YEARS_CACHE_KEY)?.length) setMockMode(true)
       })
-      .catch(() => {
-        if (mounted && !getCached(RESEARCH_YEARS_CACHE_KEY)?.length) setMockMode(true)
+      .catch((e) => {
+        if (mounted && !getCached(RESEARCH_YEARS_CACHE_KEY)?.length) {
+          setMockMode(true)
+          setMockReason(apiErrorText(e))
+        }
       })
 
     return () => {
@@ -158,8 +163,11 @@ export default function ResearchPage() {
         setCached(researchScoresCacheKey(year), rows)
         setSelected((s) => (rows.some((r) => r.ticker === s) ? s : rows[0].ticker))
       })
-      .catch(() => {
-        if (mounted && !getCached(researchScoresCacheKey(year))?.length) setMockMode(true)
+      .catch((e) => {
+        if (mounted && !getCached(researchScoresCacheKey(year))?.length) {
+          setMockMode(true)
+          setMockReason(apiErrorText(e))
+        }
       })
 
     return () => {
@@ -234,7 +242,7 @@ export default function ResearchPage() {
             </select>
           </label>
         )}
-        {mockMode && <div className="dx-mocknote">demo data — research API returned no usable rows</div>}
+        {mockMode && <div className="dx-mocknote">demo data — {mockReason || 'research API returned no usable rows'}</div>}
       </header>
 
       <div className="dx-main">

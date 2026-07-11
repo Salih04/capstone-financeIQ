@@ -187,6 +187,7 @@ export default function DataQualityPage() {
   const [rejectedLoading, setRejectedLoading] = useState(() => !hasCachedSpecimens)
   const [frozenEvidenceLoading, setFrozenEvidenceLoading] = useState(() => !cachedPage?.evi)
   const [hovered, setHovered] = useState(null)
+  const [apiError, setApiError] = useState(null)
   // cache metadata + manual refresh
   const [reloadKey, setReloadKey] = useState(0)
   const [refreshing, setRefreshing] = useState(false)
@@ -215,7 +216,12 @@ export default function DataQualityPage() {
         if (r.data) {
           nextDq = r.data
           persist()
-          if (mounted) setDq(r.data)
+          if (mounted) {
+            setDq(r.data)
+            setApiError(null)
+          }
+        } else if (r.error && mounted) {
+          setApiError(r.error)
         }
         return r.data
       },
@@ -301,7 +307,7 @@ export default function DataQualityPage() {
           <div><strong className="is-copper">{rejectedCountLabel}</strong><span>REJECTED</span></div>
           <div><strong className="is-gold">{leakCount}</strong><span>LEAKAGE-GUARDED</span></div>
           <div><strong className="is-copper">{frozenCountLabel}</strong><span>FROZEN-EXCLUDED</span></div>
-          {!fromApi && <div className="spx-mocknote">demo data — quality API returned no columns</div>}
+          {!fromApi && <div className="spx-mocknote">demo data — {apiError || 'quality API returned no columns'}</div>}
           <div className="spx-cachetag"><CacheTag fromCache={servedFromCache} refreshing={refreshing} savedAt={savedAt} onRefresh={doRefresh} /></div>
         </div>
       </header>
