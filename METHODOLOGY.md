@@ -94,6 +94,40 @@ Two clearly separated questions:
    training). It compares simple baselines and ML models on year-T features
    against year-(T+1) outcomes.
 
+## Serving-side experimental ranking heuristic ≠ walk-forward models
+
+The CSV-backed ranking shown by the forecasting service is a deterministic,
+explainable heuristic, not one of the linear or tree models evaluated by the
+`experiments/` walk-forward harness. Its source is
+`backend/app/services/forecasting_csv_service.py`; the relevant functions are
+`train_parameters()` and `run_forecast()`.
+
+`train_parameters()` uses the internal training split and finalized T→T+1
+targets by default (2020–2024). Within each training year, it marks companies
+at or above the 75th percentile of realized next-year return as historical
+top-quartile "winners." For each usable numeric feature, it calculates a
+non-negative discrimination score from the absolute standardized difference
+between the winner mean and the overall training mean, multiplied by the
+feature's non-null coverage among winners. It then normalizes each score by the
+largest feature score and selects the highest-weighted features (12 by default).
+
+`run_forecast()` applies those selected weights to the public-universe rows for
+one input year. It percentile-ranks each available feature across that year's
+public companies, multiplies each percentile by the calculated heuristic weight,
+and divides the summed contributions by the total selected weight to produce a
+bounded ranking score. Missing features are omitted from a company's
+contributions and reduce its reported confidence; they are never fabricated.
+The service also exposes the contributing features, missing features, and an
+experimental-ranking disclaimer. It does not emit buy/sell/hold signals or
+price targets.
+
+This mechanism describes which feature values **historically co-occurred with
+top-quartile returners in this small sample**; it does **not** establish that
+they predict future winners. Its weights are not validated predictive model
+parameters, and the walk-forward experiment result remains weak/unstable
+(Spearman IC near zero, with no reliable predictive edge). The ranking is
+therefore research support only, not investment advice.
+
 ## Honest findings (current data)
 
 - Walk-forward signal remains weak/unstable. The expanded pipeline improved the
