@@ -4,6 +4,8 @@
 
 **This validation objective is COMPLETE** (commit `47e1510a`, re-verified 2026-07-08 — see `OPERATING_LAYER_VALIDATION.md` for the full re-check, including test runs). Do not re-execute it. Current work for agents is sequenced in `FINANCEIQ_AGENT_TASK_QUEUE.md`; small/cheap models must also follow `FINANCEIQ_SMALL_MODEL_RULES.md`. Note: the "no documentation files beyond these four" restriction below applied to the original validation task only; the strategy-pass documents (`OPERATING_LAYER_VALIDATION.md`, `FINANCEIQ_*.md`, `.agent/memory/`) were explicitly authorized afterward.
 
+**Update 2026-07-12:** a candidate forward roadmap now exists — `FINANCEIQ_MOONSHOT_ROADMAP.md` (assessment, twelve evidence-grounded roadmap ideas, Stage 0–4 prioritization, do-not-claim register, interviewer narrative). Its execution tasks are appended to `FINANCEIQ_AGENT_TASK_QUEUE.md` as **Phase 2** (R2-* tasks). **Next agent: start with Phase-1 OPS-01** and follow the Phase-1 suggested order; the Stage-0 gate (OPS-01, DATA-04 + DATA-05, UI-01) must be complete before any Phase-2 task starts. Nothing in the roadmap is committed work, and none of it may weaken the IC ≈ 0 honesty boundary.
+
 ## Objective
 
 Validate the four-file operating layer for this repository. Confirm that `CLAUDE.md`, `PRD.md`, and `REPO_MAP.md` accurately describe the current repo. Fix only incorrect paths, wrong commands, misleading architecture descriptions, false product claims, or unclear task instructions. Do not implement product features.

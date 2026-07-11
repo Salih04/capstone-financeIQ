@@ -40,7 +40,7 @@ Can free, validated, leakage-safe fundamentals predict next-year BIST stock retu
 
 ## Intended Direction
 
-Beyond-capstone options only (from `TASK_STATE.md`, all optional): expand the training universe via the ready yfinance workflow, obtain genuine quarterly fundamentals, optionally fine-tune a local model per `research_agent_training/mlx_training_plan.md`. No committed roadmap.
+Beyond-capstone options only (from `TASK_STATE.md`, all optional): expand the training universe via the ready yfinance workflow, obtain genuine quarterly fundamentals, optionally fine-tune a local model per `research_agent_training/mlx_training_plan.md`. No committed roadmap; a **candidate** roadmap (assessment, staged ideas, execution queue) was documented 2026-07-12 in `FINANCEIQ_MOONSHOT_ROADMAP.md` + `FINANCEIQ_AGENT_TASK_QUEUE.md` Phase 2 — its theme is "instrument the negative result" (significance testing, reproducibility manifests, claim-gating, adversarial self-checks), never manufacturing predictive-edge claims.
 
 ## Non-Goals
 
