@@ -393,7 +393,8 @@ See [`SECURITY.md`](SECURITY.md).
 
 ## What was removed / quarantined
 
-Everything non-trusted is in [`unnecessary/`](unnecessary/README.md):
+The quarantined integrations were removed from the repository entirely; do not
+reintroduce them:
 
 - **Finnhub** removed entirely (API key assumed leaked).
 - **News API / news page** removed (not essential, was Finnhub-backed).
