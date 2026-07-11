@@ -65,6 +65,9 @@ target is the realized return in year T+1.
 | `target_year` | metadata | none |
 | `has_target` | metadata | none |
 | `is_inference_row` | metadata | none |
+| `is_public_universe` | metadata | none |
+| `is_training_universe` | metadata | none |
+| `universe_source` | metadata | none |
 
 ## Roles
 - **identifier / metadata**: not used as predictive features.

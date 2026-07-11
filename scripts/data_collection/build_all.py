@@ -85,8 +85,8 @@ def main(argv: list[str] | None = None) -> int:
     else:
         cfg.say("=== Building T->T+1 modeling dataset ===")
         df = P.build_modeling_dataset(cfg)
-        _data_dictionary(df)
 
+    _data_dictionary(df)
     report = V.validate(df, cfg)
 
     cfg.say("\n=== SUMMARY ===")
