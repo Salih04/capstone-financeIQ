@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Tag, Plus, X, Eye, EyeOff, CheckCircle, Trash2, Sparkles, Target } from 'lucide-react'
 import api from '../api/client'
 import { Card, GhostButton, Skeleton, EmptyState, SectionHeader } from '../components/ui'
+import DissentLedger from '../components/DissentLedger'
 
 const BENCHMARK_OPTIONS = [
   { value: 'sector_median', label: 'Sector Median' },
@@ -201,6 +202,8 @@ export default function LabelingLabPage() {
           {previews[d.id] && <PreviewChart preview={previews[d.id]} />}
         </Card>
       ))}
+
+      <DissentLedger />
 
       <footer style={{ marginTop: 28, borderTop: '1px solid var(--border)', paddingTop: 12, color: 'var(--text-3)', fontSize: 11 }}>
         Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.

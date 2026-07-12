@@ -1,7 +1,7 @@
 {
   "contract_name": "FinanceIQ Model Confidence Contract",
-  "version": "1.4.0",
-  "effective_date": "2026-07-12",
+  "version": "1.5.0",
+  "effective_date": "2026-07-13",
   "authority": "FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md",
   "versioning_procedure": {
     "minor_bump": "Any change to rules, scan coverage, required_disclaimer.pages, route aliases, exemptions, or evidence_state requires a minor version bump and an effective_date update.",
@@ -60,7 +60,8 @@
   "approved_wording": {
     "primary_disclaimer": "Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.",
     "inference_label": "unevaluated_forward_forecast",
-    "headline_conclusion": "No reliable predictive edge."
+    "headline_conclusion": "No reliable predictive edge.",
+    "dissent_ledger_boundary": "Records disagreement for research; never a score input."
   },
   "rules": [
     {
@@ -83,7 +84,8 @@
     "backend_response_files": [
       "backend/app/services/forecasting_csv_service.py",
       "backend/app/services/skeptic_service.py",
-      "backend/app/services/research/regime.py"
+      "backend/app/services/research/regime.py",
+      "backend/app/services/analyst_verdict_service.py"
     ],
     "allowlist": [
       {
@@ -142,13 +144,13 @@
       },
       {
         "path": "frontend/src/pages/LabelingLabPage.jsx",
-        "line": 206,
+        "line": 209,
         "text": "Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.",
         "reason": "Authoritative primary disclaimer forbids recommendation use."
       },
       {
         "path": "frontend/src/pages/ValidationLabPage.jsx",
-        "line": 341,
+        "line": 344,
         "text": "Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.",
         "reason": "Authoritative primary disclaimer forbids recommendation use."
       }

@@ -17,6 +17,7 @@ from app.routers import users
 from app.routers import fundamentals
 from app.routers import research
 from app.routers import research_agent
+from app.routers import analyst_verdicts
 from pathlib import Path
 
 # Wait for DB then create tables
@@ -89,6 +90,7 @@ app.include_router(users.router)
 app.include_router(fundamentals.router)
 app.include_router(research.router)
 app.include_router(research_agent.router)
+app.include_router(analyst_verdicts.router)
 
 
 @app.get("/health")

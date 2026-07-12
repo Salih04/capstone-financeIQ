@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { FlaskConical, Play, BarChart3, Clock, TrendingUp, TrendingDown, AlertCircle, ShieldCheck, Sparkles } from 'lucide-react'
 import api from '../api/client'
 import { Card, EmptyState } from '../components/ui'
+import DissentLedger from '../components/DissentLedger'
 
 const inputS = {
   background: 'var(--surface-1)',
@@ -336,6 +337,8 @@ export default function ValidationLabPage() {
           description="Select a model above and click Validate."
         />
       )}
+
+      <DissentLedger />
 
       <footer style={{ marginTop: 28, borderTop: '1px solid var(--border)', paddingTop: 12, color: 'var(--text-3)', fontSize: 11 }}>
         Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.

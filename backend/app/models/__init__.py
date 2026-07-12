@@ -9,6 +9,7 @@ from app.models.governance import ModelValidationRun, ModelFeatureImportance, La
 from app.models.ingestion import IngestionJob, DataQualityIssue
 from app.models.audit import AuditLog
 from app.models.trusted import YearlyStock
+from app.models.analyst_verdict import AnalystVerdict
 from app.models.forecasting import (
     WinnerCohortRow,
     SectorParameterRanking,
@@ -30,6 +31,7 @@ __all__ = [
     "IngestionJob", "DataQualityIssue",
     "AuditLog",
     "YearlyStock",
+    "AnalystVerdict",
     "WinnerCohortRow", "SectorParameterRanking", "ForecastRun", "ForecastPrediction",
     "ForecastEvaluationRun", "ForecastEvaluationFold",
     "QuarterlyFundamental",
