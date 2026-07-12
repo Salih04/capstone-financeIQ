@@ -5,7 +5,9 @@
 	collect-yfinance-bist100 clean-yfinance-bist100 update-training-universe-yfinance validate-universe data-audit \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
-	research-agent-autoresearch-iteration
+	research-agent-autoresearch-iteration demo-check
+
+FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 
 # Diagnose whether data/raw/quarterly_fintables/ files vary per period (they are frozen).
 inspect-quarterly:
@@ -48,6 +50,11 @@ research-agent-autoresearch-iteration:
 # Run the test suite.
 research-agent-check:
 	PYTHONPATH=. python -m pytest tests/
+
+# Read-only pre-demo check for a running backend. Override with:
+#   make demo-check FINANCEIQ_API_URL=http://127.0.0.1:8000
+demo-check:
+	python scripts/demo_smoke.py --base-url "$(FINANCEIQ_API_URL)"
 
 # Full pipeline + frozen evidence + universe split + contexts + dataset generation + tests.
 full-research-agent:
