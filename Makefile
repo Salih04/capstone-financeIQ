@@ -5,7 +5,7 @@
 	collect-yfinance-bist100 clean-yfinance-bist100 update-training-universe-yfinance validate-universe data-audit \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
-	research-agent-autoresearch-iteration demo-check research-verify-run research-significance claims-lint
+	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration claims-lint
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -194,6 +194,11 @@ research-verify-run:
 # Analyze persisted per-split predictions without retraining models.
 research-significance:
 	PYTHONPATH=. python experiments/significance.py
+
+# Audit the hybrid research score's confidence component against persisted rank errors.
+# Reads existing prediction dumps; never retrains or changes service/model computation.
+research-calibration:
+	PYTHONPATH=. python experiments/calibration_bench.py
 
 # Split modeling_dataset_2020_2025.csv into training and public subsets.
 # Requires data/config/universe_*.csv to exist (created in data/config/).

@@ -1,6 +1,6 @@
 # TASK_STATE.md — FinanceIQ
 
-Last updated: 2026-07-12 (rev 9)
+Last updated: 2026-07-12 (rev 10)
 
 ## Status legend
 - `DONE` — shipped, tested
@@ -64,6 +64,7 @@ claim.
 | R2-LINEAGE-01 feature passports (2026-07-12) | DONE (uncommitted) | generated `feature_passports.json` covers all 61 final-dataset columns; read-only `/research/feature-passports`; Score Explorer passport popover with modeling-vs-serving scope warning; root 111/111, backend 57/57, data VALID, frontend build and claims lint passed; commit deferred by request |
 | R2-SKEPTIC-01 skeptic challenge service (2026-07-12) | DONE (uncommitted) | cached artifact-grounded six-check `/research/skeptic/{ticker}` report; retrospective-cohort, coverage, instability, lineage, power, baseline, and family-wise limitations; MCC v1.2.0; root 111/111, backend 67/67, claims lint and live ASELS/ASTOR checks passed; commit deferred by request |
 | R2-AUTOPSY-01 Negative Alpha Autopsy (2026-07-12) | DONE (uncommitted) | `/autopsy` renders six artifact-backed exhibits with explicit source/limitation labels; `/research/significance/autopsy` reuses significance evidence and parses committed CSVs only; MCC v1.3.0; root 114/114, backend 69/69, frontend build and claims lint passed; live API passed, protected-page visual blocked by missing approved Supabase session; commit deferred by request |
+| R2-CAL-01 confidence calibration bench (2026-07-12) | DONE (uncommitted) | deterministic current-code replay over persisted 2023–2025 predictions; hybrid confidence is dataset-state scoped and constant at 0.25 across 240 ticker-year outcomes, so calibration/monotonicity are not estimable; coverage remains separate; root 125/125, backend 69/69, claims lint passed; no tuning or service/model change; `calibration_report.{json,md}` + `calibration_plot.csv`; commit deferred by request |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
 ---

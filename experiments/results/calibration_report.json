@@ -1,0 +1,247 @@
+{
+  "calibration": {
+    "confidence_unique_values": 1,
+    "confidence_values": [
+      0.25
+    ],
+    "informative_about_rank_error": false,
+    "monotonicity": {
+      "bootstrap_95pct": null,
+      "bootstrap_samples_requested": 2000,
+      "bootstrap_samples_usable": 0,
+      "higher_confidence_lower_error_spearman": null,
+      "reason": "Replayed hybrid confidence has fewer than two distinct values.",
+      "seed": 42,
+      "status": "not_estimable"
+    },
+    "realized_bins": 1,
+    "requested_bins": 10,
+    "status": "not_estimable",
+    "verdict": "Hybrid confidence is not informative about rank error at this scale: the replayed value is constant across all evaluated rows, so calibration and monotonicity are not estimable."
+  },
+  "claim_safety": {
+    "confidence_is_probability_of_return_profit_or_success": false,
+    "confidence_is_recommendation_strength": false,
+    "contract_conclusion": "no reliable predictive edge",
+    "contract_version": "1.3.0",
+    "core_ranking_or_model_computation_changed": false,
+    "statement": "Diagnostic only: confidence is not a probability of return, profit, or success; it is not recommendation strength and does not establish validated predictive reliability.",
+    "validated_predictive_reliability_established": false
+  },
+  "confidence_quantity": {
+    "confidence_level": "low",
+    "confidence_reasons": [
+      "small_sample (-0.25)",
+      "no_manual_valuation_profitability_features (-0.20)",
+      "weak_backtest_spearman_near_zero (-0.20)",
+      "frozen_columns_present (-0.10)"
+    ],
+    "confidence_score": 0.25,
+    "consumer_function": "backend/app/services/research_agent.py::generate_company_insight",
+    "hybrid_weight": 0.2,
+    "quantity": "research_agent_hybrid_confidence",
+    "scope": "dataset_artifact_state_not_per_ticker",
+    "service_function": "backend/app/services/research_agent.py::confidence_score"
+  },
+  "coverage_audit": {
+    "maximum": 1.0,
+    "median": 0.6625,
+    "minimum": 0.375,
+    "missing_input_ticker_years": 0,
+    "observed_ticker_years": 240,
+    "relationship_to_hybrid_confidence": "Measured separately; missing values are not imputed into either quantity."
+  },
+  "definitions": {
+    "calibration": "Whether higher replayed confidence accompanies lower realized rank error.",
+    "coverage": "Observed fraction of declared feature columns populated for the feature-year row; not confidence.",
+    "predicted_rank": "Descending y_pred rank within target year and model; average rank for ties.",
+    "rank_error": "Absolute difference between predicted_rank and realized_rank.",
+    "realized_outcome": "Persisted y_true nominal TRY T+1 return used only after scoring for evaluation.",
+    "realized_rank": "Descending y_true rank within target year and model.",
+    "score_magnitude": "Raw y_pred in each model's native scale; never compared or pooled across models.",
+    "uncertainty": "Observed rank-error distribution and seeded bootstrap association; not a return interval."
+  },
+  "excluded_confidence_quantity": {
+    "name": "forecasting_selected_feature_coverage_confidence",
+    "reason": "Separate per-row coverage diagnostic; it is not the hybrid score's 0.20 component.",
+    "service_function": "backend/app/services/forecasting_csv_service.py::run_forecast"
+  },
+  "inputs": [
+    {
+      "path": "experiments/results/predictions_test_2023.csv",
+      "sha256": "c954822ec52c4bdc7704cc0c7d9ac26c58817b2a75ec92c842915603eb5b72c8"
+    },
+    {
+      "path": "experiments/results/predictions_test_2024.csv",
+      "sha256": "cf88016a3f310811baaf3fed677230ffd98db4db0ea1417393c9afe87bb4c457"
+    },
+    {
+      "path": "experiments/results/predictions_test_2025.csv",
+      "sha256": "295dac3a1b056aa20b9320ff0844ec3cd6aca61fd602f195258a4bc7182cafb1"
+    },
+    {
+      "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+    },
+    {
+      "path": "data/trusted_clean/data_quality_report.json",
+      "sha256": "ec93ab788b453cf7d24850410f10435aab5fe9e17ca776409ec0149f2668f6f1"
+    },
+    {
+      "path": "model_confidence_contract.json",
+      "sha256": "07eb12d3dd65f9731dd41051a40d6bd0d055cdbf4975f4a05b73775a58bcb449"
+    }
+  ],
+  "limitations": [
+    "The replay describes the current checked-out confidence code applied to persisted historical outcomes; it is not historically persisted confidence.",
+    "The hybrid confidence component is dataset-state scoped and constant across tickers, so decile calibration cannot be estimated.",
+    "The 2,160 model rows repeat 240 ticker-year realized outcomes across nine models and are not 2,160 independent observations.",
+    "Only three test years and one macro regime are observed; no reliable predictive edge is established.",
+    "No confidence tuning or recalibration was performed on these rows."
+  ],
+  "model_summaries": [
+    {
+      "mean_absolute_rank_error": 24.883333,
+      "median_absolute_rank_error": 22.5,
+      "model": "baseline_equal_weight",
+      "model_rows": 240,
+      "score_magnitude_model_native_max": 0.809202,
+      "score_magnitude_model_native_min": 0.173638,
+      "target_years": [
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "mean_absolute_rank_error": 24.883333,
+      "median_absolute_rank_error": 22.5,
+      "model": "baseline_rank_score",
+      "model_rows": 240,
+      "score_magnitude_model_native_max": 0.809202,
+      "score_magnitude_model_native_min": 0.173638,
+      "target_years": [
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "mean_absolute_rank_error": 26.916667,
+      "median_absolute_rank_error": 24.0,
+      "model": "elasticnet",
+      "model_rows": 240,
+      "score_magnitude_model_native_max": 365.941437,
+      "score_magnitude_model_native_min": -0.747669,
+      "target_years": [
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "mean_absolute_rank_error": 28.183333,
+      "median_absolute_rank_error": 24.0,
+      "model": "gradient_boosting",
+      "model_rows": 240,
+      "score_magnitude_model_native_max": 681.890767,
+      "score_magnitude_model_native_min": 26.18108,
+      "target_years": [
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "mean_absolute_rank_error": 24.958333,
+      "median_absolute_rank_error": 22.0,
+      "model": "lasso",
+      "model_rows": 240,
+      "score_magnitude_model_native_max": 603.832209,
+      "score_magnitude_model_native_min": -171.873507,
+      "target_years": [
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "mean_absolute_rank_error": 25.7,
+      "median_absolute_rank_error": 22.0,
+      "model": "linear_regression",
+      "model_rows": 240,
+      "score_magnitude_model_native_max": 629.122919,
+      "score_magnitude_model_native_min": -186.855781,
+      "target_years": [
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "mean_absolute_rank_error": 29.041667,
+      "median_absolute_rank_error": 27.0,
+      "model": "random_forest",
+      "model_rows": 240,
+      "score_magnitude_model_native_max": 635.838457,
+      "score_magnitude_model_native_min": 37.119113,
+      "target_years": [
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "mean_absolute_rank_error": 25.1,
+      "median_absolute_rank_error": 22.0,
+      "model": "ridge",
+      "model_rows": 240,
+      "score_magnitude_model_native_max": 416.435753,
+      "score_magnitude_model_native_min": -101.715231,
+      "target_years": [
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "mean_absolute_rank_error": 25.05,
+      "median_absolute_rank_error": 22.0,
+      "model": "robust_rank_aggregation",
+      "model_rows": 240,
+      "score_magnitude_model_native_max": 0.930032,
+      "score_magnitude_model_native_min": 0.078924,
+      "target_years": [
+        2023,
+        2024,
+        2025
+      ]
+    }
+  ],
+  "replay_provenance": {
+    "code_version": {
+      "backend/app/services/forecasting_csv_service.py": "7438ab40a47b5a1122ec8079d977bde7b7482a31f90dee0de79fd0f5f0212cb1",
+      "backend/app/services/research_agent.py": "8115d469e7027d98e7404e63fddc9731a58ed2ebdb68922d714b8d5b1e0c0391"
+    },
+    "git_sha": "a95e1e1c92fe6ffbe3e1660f7caf66b2a110401c",
+    "git_worktree_dirty": true,
+    "random_seed": 42,
+    "replay_date": "2026-07-12"
+  },
+  "sample": {
+    "independent_ticker_year_outcomes": 240,
+    "models": 9,
+    "prediction_model_rows": 2160,
+    "rows_per_model_year": [
+      80
+    ],
+    "target_years": [
+      2023,
+      2024,
+      2025
+    ],
+    "universe": "81-ticker training universe; 80 evaluated rows per split; nominal TRY realized returns"
+  },
+  "schema_version": "1.0.0",
+  "task": "R2-CAL-01"
+}

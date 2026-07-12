@@ -55,6 +55,7 @@ Implements `FINANCEIQ_MOONSHOT_ROADMAP.md`. The Stage-0 gate is **satisfied**. P
 | R2-LINEAGE-01 feature passports | DONE (uncommitted) | 2026-07-12; generated `feature_passports.json` covers 61/61 columns, read-only API passthrough, Score Explorer passport popover; root 111/111, backend 57/57, data VALID, frontend build and claims lint passed; commit deferred by request |
 | R2-SKEPTIC-01 skeptic challenge service | DONE (uncommitted) | 2026-07-12; deterministic cached six-check `/research/skeptic/{ticker}` report, structured evidence citations and insufficient-data handling, MCC v1.2.0; root 111/111, backend 67/67, claims lint and live ASELS/ASTOR checks passed; commit deferred by request |
 | R2-AUTOPSY-01 Negative Alpha Autopsy | DONE (uncommitted) | 2026-07-12; six artifact-backed exhibits at `/autopsy`, typed `/research/significance/autopsy` passthrough, explicit source/limitation labels, MCC v1.3.0; root 114/114, backend 69/69, frontend build and claims lint passed; live API passed, page visual blocked by missing approved Supabase session; commit deferred by request |
+| R2-CAL-01 confidence calibration bench | DONE (uncommitted) | 2026-07-12; deterministic replay over persisted 2023–2025 prediction dumps, `calibration_report.{json,md}` + `calibration_plot.csv`; hybrid confidence is constant at 0.25, so decile calibration and monotonicity are not estimable; root 125/125, backend 69/69, claims lint passed; no tuning or service/model change; commit deferred by request |
 
 ## Universal rules for remaining Phase-2 tasks
 
@@ -189,6 +190,7 @@ Implements `FINANCEIQ_MOONSHOT_ROADMAP.md`. The Stage-0 gate is **satisfied**. P
 - **Rollback:** delete the new files; nothing else touched.
 - **Demo value:** high — an *audited* confidence number is rarer than a good one. **Research value:** very high. **CV value:** high.
 - **Model/effort:** **Opus, medium-high.** **Commit:** yes. **/clear after:** yes.
+- **Follow-up owner decision filed — NOT STARTED:** decide whether the current dataset-state component should be relabeled as a global caution diagnostic or replaced by a separately designed, walk-forward per-row quantity. Any redesign needs new holdout evaluation; do not tune on the 240 audited ticker-year outcomes or silently substitute forecasting coverage. This is an owner-decision queue item only, not authorization to change service or UI behavior.
 
 ### R2-REAL-01 — Real-terms & USD return targets (parallel evaluation)
 - **Priority:** P2. **Stage:** 2 (last Stage-2 item). **Owner role:** Data/Research. **Risk:** **high** (touches pipeline + creates quotable numbers).

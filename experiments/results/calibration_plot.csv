@@ -1,0 +1,2 @@
+calibration_status,confidence_bin,confidence_min,confidence_max,mean_confidence,n_model_rows,n_ticker_years,mean_rank_error,median_rank_error,mean_feature_coverage
+not_estimable,1,0.25,0.25,0.25,2160,240,26.07963,23.0,0.772708

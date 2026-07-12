@@ -165,6 +165,34 @@ parameters, and the walk-forward experiment result remains weak/unstable
 (Spearman IC near zero, with no reliable predictive edge). The ranking is
 therefore research support only, not investment advice.
 
+## Confidence calibration bench (R2-CAL-01)
+
+`make research-calibration` audits the user-facing hybrid research score's 0.20
+`confidence_score` component from `research_agent.confidence_score`; it does not
+substitute the forecasting service's separate per-row selected-feature coverage
+quantity. Audited as of the 2026-07-12 replay at git SHA
+`a95e1e1c92fe6ffbe3e1660f7caf66b2a110401c`, the current hybrid confidence was
+**0.25 (low)** for every row evaluated from the persisted 2023–2025 prediction
+dumps. Those dumps contain 2,160 model rows but only 240 distinct ticker-year
+outcomes because the same 80 outcomes per year are evaluated by nine models.
+
+Within each model and target year, the bench compares predicted rank with
+realized-return rank and keeps raw score magnitudes model-local because their
+scales differ. Ten confidence bins were requested, but only one was possible;
+therefore the higher-confidence/lower-rank-error relationship and its seeded
+bootstrap interval are **not estimable**. The plain finding is: **hybrid
+confidence is not informative about rank error at this scale because the
+replayed quantity has no cross-row variation.** Separately measured feature
+coverage did vary from 0.375 to 1.000 (median 0.6625), but it was not relabeled
+as hybrid confidence or used for post-hoc tuning. Missing coverage inputs remain
+null, and missing confidence inputs reduce the diagnostic rather than being
+filled. Confidence is not a probability of return, profit, or success, is not
+recommendation strength, and does not establish validated predictive
+reliability. Full provenance, model-native score ranges, rank errors, and the
+plot-ready single-bin artifact are in `experiments/results/calibration_report.*`
+and `calibration_plot.csv`. The no-reliable-predictive-edge conclusion remains
+unchanged.
+
 ## Honest findings (current data)
 
 - Walk-forward signal remains weak/unstable. The expanded pipeline improved the
