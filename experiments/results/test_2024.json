@@ -39,9 +39,9 @@
     "linear_regression": {
       "kind": "ml",
       "n": 80,
-      "mae": 74.58,
-      "rmse": 101.59,
-      "spearman": 0.083,
+      "mae": 74.45,
+      "rmse": 101.43,
+      "spearman": 0.081,
       "precision_at_5": 0.0,
       "top_bucket_avg_return": -0.95,
       "median_actual_return": 35.05,
@@ -83,9 +83,9 @@
     "random_forest": {
       "kind": "ml",
       "n": 80,
-      "mae": 186.86,
-      "rmse": 213.46,
-      "spearman": -0.171,
+      "mae": 186.92,
+      "rmse": 213.53,
+      "spearman": -0.173,
       "precision_at_5": 0.0,
       "top_bucket_avg_return": 7.67,
       "median_actual_return": 35.05,
@@ -94,11 +94,11 @@
     "gradient_boosting": {
       "kind": "ml",
       "n": 80,
-      "mae": 169.24,
-      "rmse": 196.83,
-      "spearman": -0.111,
+      "mae": 169.23,
+      "rmse": 196.7,
+      "spearman": -0.116,
       "precision_at_5": 0.0,
-      "top_bucket_avg_return": 4.97,
+      "top_bucket_avg_return": -3.79,
       "median_actual_return": 35.05,
       "directional_acc": 0.5
     }
