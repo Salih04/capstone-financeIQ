@@ -22,6 +22,42 @@ The pooled statistic is the equal-weighted mean of within-year Spearman ICs. Rea
 | ridge | ml | 0.093 | 0.1570 | 91.8% | [-0.039, 0.221] | 0.9419 | no |
 | robust_rank_aggregation | baseline | 0.128 | 0.0457 | 97.8% | [-0.001, 0.248] | n/a | not in ML family |
 
+## Statistical power and minimum detectable IC
+
+Observed IC, detectable IC, and statistical power answer different questions. Observed IC is the sample estimate from the persisted dumps. Detectable IC is the assumed true |IC| that reaches 80% long-run rejection probability here; it is not a hard significance cutoff. Statistical power is that long-run probability, not the probability that a reported model is true. Practical investment relevance is not evaluated by this calculation.
+
+The analytic calculation uses a two-sided Fisher-z approximation for Spearman IC at alpha=0.05 and target power 80%. It covers one prespecified IC test; it is not the Bonferroni-adjusted family-wise power of the six-model search.
+
+| Design | Scope | Rows/year | Test years | Total rows | Detectable \|IC\| (analytic) | Simulated power at analytic MDE | Agreement |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
+| current_one_split | actual prediction-dump design | 80 | 1 | 80 | 0.309 | 0.802 | within ±0.05 |
+| current_three_year_pooled | actual prediction-dump design | 80 | 3 | 240 | 0.182 | 0.810 | within ±0.05 |
+| public_40_one_split_sensitivity | planning sensitivity; not the current dump design | 40 | 1 | 40 | 0.431 | 0.787 | within ±0.05 |
+| public_40_three_year_sensitivity | planning sensitivity; not the current dump design | 40 | 3 | 120 | 0.260 | 0.793 | within ±0.05 |
+
+The seeded Gaussian-copula rank simulation checks several assumed true ICs for each design; full curves are in `significance_report.json`. Agreement means the simulated rejection rate at the analytic MDE is within 0.05 of 80%, not that the approximation or underlying design assumptions are proven correct.
+
+### Forty-ticker-per-year planning projection
+
+The pipeline is ready for more data; this is pipeline capability, not a promise that more data will produce predictive skill or practical returns.
+
+| Additional test years | Total test years | Tickers/year | Detectable \|IC\| (analytic) |
+| ---: | ---: | ---: | ---: |
+| 0 | 3 | 40 | 0.260 |
+| 1 | 4 | 40 | 0.226 |
+| 2 | 5 | 40 | 0.203 |
+| 3 | 6 | 40 | 0.186 |
+| 5 | 8 | 40 | 0.161 |
+| 7 | 10 | 40 | 0.145 |
+
+Power-analysis limits:
+
+- Only three test years are observed; treating within-year IC estimates as independent is an approximation.
+- The calculation assumes equal per-year sample sizes and a stable true IC across years, neither of which establishes regime generality.
+- The 40-ticker table is a planning sensitivity for the public-universe scale, not the current 80-row prediction-dump design.
+- The cohort is retrospective rather than verified point-in-time membership, and reproducibility remains numerical-environment-qualified.
+- Power bounds detection under assumptions; it neither estimates the true IC nor establishes practical investment relevance.
+
 Bonferroni correction covers the six ML models only; baselines are shown as context and are not part of that model-selection family. Their p-values are unadjusted and descriptive; they do not establish a reliable edge in only three test years from a retrospectively fixed cohort.
 
 ## Exploratory per-split results

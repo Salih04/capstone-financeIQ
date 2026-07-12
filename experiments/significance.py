@@ -9,7 +9,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
+from statistics import NormalDist
 
 import numpy as np
 import pandas as pd
@@ -28,6 +30,13 @@ ML_MODELS = (
 DEFAULT_SEED = 42
 DEFAULT_PERMUTATIONS = 10_000
 DEFAULT_BOOTSTRAPS = 10_000
+DEFAULT_POWER_SIMULATIONS = 5_000
+POWER_ALPHA = 0.05
+POWER_TARGET = 0.80
+POWER_AGREEMENT_TOLERANCE = 0.05
+PUBLIC_UNIVERSE_PLANNING_N = 40
+PROJECTION_EXTRA_YEARS = (0, 1, 2, 3, 5, 7)
+_STANDARD_NORMAL = NormalDist()
 
 
 def _sha256(path: Path) -> str:
@@ -63,6 +72,266 @@ def spearman_ic(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     pred_rank = _rank(np.asarray(y_pred, dtype=float))
     value = _rowwise_correlation(true_rank[None, :], pred_rank[None, :])[0]
     return float(value)
+
+
+def fisher_power(
+    true_ic: float,
+    *,
+    n_per_split: int,
+    split_count: int = 1,
+    alpha: float = POWER_ALPHA,
+) -> float:
+    """Approximate two-sided power for an equal-year Spearman IC design.
+
+    The approximation treats Fisher-transformed within-year Spearman
+    correlations as independent with variance ``1 / (n - 3)``. It is a design
+    calculation, not an estimate of the true IC and not a practical-return test.
+    """
+    if not -1.0 < true_ic < 1.0:
+        raise ValueError("true_ic must be strictly between -1 and 1")
+    if n_per_split < 4:
+        raise ValueError("n_per_split must be at least 4")
+    if split_count < 1:
+        raise ValueError("split_count must be positive")
+    if not 0.0 < alpha < 1.0:
+        raise ValueError("alpha must be strictly between 0 and 1")
+
+    information = split_count * (n_per_split - 3)
+    mean_shift = math.atanh(abs(true_ic)) * math.sqrt(information)
+    critical_value = _STANDARD_NORMAL.inv_cdf(1.0 - alpha / 2.0)
+    upper_tail = 1.0 - _STANDARD_NORMAL.cdf(critical_value - mean_shift)
+    lower_tail = _STANDARD_NORMAL.cdf(-critical_value - mean_shift)
+    return float(upper_tail + lower_tail)
+
+
+def minimum_detectable_ic(
+    *,
+    n_per_split: int,
+    split_count: int = 1,
+    alpha: float = POWER_ALPHA,
+    target_power: float = POWER_TARGET,
+) -> float:
+    """Return the minimum absolute IC reaching the requested analytic power."""
+    if not 0.0 < target_power < 1.0:
+        raise ValueError("target_power must be strictly between 0 and 1")
+    if target_power <= alpha:
+        return 0.0
+
+    lower = 0.0
+    upper = 1.0 - 1e-12
+    for _ in range(80):
+        midpoint = (lower + upper) / 2.0
+        if fisher_power(
+            midpoint,
+            n_per_split=n_per_split,
+            split_count=split_count,
+            alpha=alpha,
+        ) >= target_power:
+            upper = midpoint
+        else:
+            lower = midpoint
+    return float(upper)
+
+
+def _ordinal_row_ranks(values: np.ndarray) -> np.ndarray:
+    """Fast row ranks for continuous simulation draws, where ties occur with probability zero."""
+    order = np.argsort(values, axis=1)
+    ranks = np.empty_like(order, dtype=float)
+    rows = np.arange(len(values))[:, None]
+    ranks[rows, order] = np.arange(values.shape[1], dtype=float)
+    return ranks
+
+
+def simulate_fisher_power(
+    true_ic: float,
+    *,
+    n_per_split: int,
+    split_count: int = 1,
+    simulations: int = DEFAULT_POWER_SIMULATIONS,
+    seed: int = DEFAULT_SEED,
+    alpha: float = POWER_ALPHA,
+) -> float:
+    """Seeded Gaussian-copula cross-check of the Fisher-z power approximation."""
+    if not -1.0 < true_ic < 1.0:
+        raise ValueError("true_ic must be strictly between -1 and 1")
+    if n_per_split < 4:
+        raise ValueError("n_per_split must be at least 4")
+    if split_count < 1:
+        raise ValueError("split_count must be positive")
+    if simulations < 1:
+        raise ValueError("simulations must be positive")
+    if not 0.0 < alpha < 1.0:
+        raise ValueError("alpha must be strictly between 0 and 1")
+
+    # For a bivariate Gaussian copula, rho_s = 6/pi * asin(rho_p/2).
+    latent_correlation = 2.0 * math.sin(math.pi * true_ic / 6.0)
+    residual_scale = math.sqrt(1.0 - latent_correlation**2)
+    critical_value = _STANDARD_NORMAL.inv_cdf(1.0 - alpha / 2.0)
+    rng = np.random.default_rng(seed)
+    rejected = 0
+    completed = 0
+    chunk_size = min(1_000, simulations)
+    while completed < simulations:
+        batch_size = min(chunk_size, simulations - completed)
+        fisher_parts = []
+        for _ in range(split_count):
+            left = rng.normal(size=(batch_size, n_per_split))
+            noise = rng.normal(size=(batch_size, n_per_split))
+            right = latent_correlation * left + residual_scale * noise
+            correlations = _rowwise_correlation(
+                _ordinal_row_ranks(left), _ordinal_row_ranks(right)
+            )
+            fisher_parts.append(np.arctanh(np.clip(correlations, -0.999999, 0.999999)))
+        combined_z = np.mean(np.vstack(fisher_parts), axis=0) * math.sqrt(
+            split_count * (n_per_split - 3)
+        )
+        rejected += int(np.sum(np.abs(combined_z) > critical_value))
+        completed += batch_size
+    return float(rejected / simulations)
+
+
+def build_power_analysis(
+    evaluated_per_split: list[int],
+    *,
+    simulations: int = DEFAULT_POWER_SIMULATIONS,
+    seed: int = DEFAULT_SEED,
+) -> dict:
+    """Build actual-design and public-40 planning-sensitivity power results."""
+    if len(evaluated_per_split) != 1:
+        raise ValueError(
+            "power analysis requires one common evaluated-row count across split/model groups"
+        )
+    current_n = int(evaluated_per_split[0])
+    designs = [
+        ("current_one_split", current_n, 1, "actual prediction-dump design"),
+        ("current_three_year_pooled", current_n, 3, "actual prediction-dump design"),
+        (
+            "public_40_one_split_sensitivity",
+            PUBLIC_UNIVERSE_PLANNING_N,
+            1,
+            "planning sensitivity; not the current dump design",
+        ),
+        (
+            "public_40_three_year_sensitivity",
+            PUBLIC_UNIVERSE_PLANNING_N,
+            3,
+            "planning sensitivity; not the current dump design",
+        ),
+    ]
+    design_results = []
+    for design_index, (design_id, n_per_split, split_count, scope) in enumerate(designs):
+        detectable = minimum_detectable_ic(
+            n_per_split=n_per_split,
+            split_count=split_count,
+        )
+        simulated_at_mde = simulate_fisher_power(
+            detectable,
+            n_per_split=n_per_split,
+            split_count=split_count,
+            simulations=simulations,
+            seed=seed + design_index * 100,
+        )
+        curve = []
+        for point_index, multiplier in enumerate((0.0, 0.5, 1.0, 1.25)):
+            true_ic = min(0.95, detectable * multiplier)
+            simulated = simulate_fisher_power(
+                true_ic,
+                n_per_split=n_per_split,
+                split_count=split_count,
+                simulations=simulations,
+                seed=seed + design_index * 100 + point_index + 1,
+            )
+            curve.append(
+                {
+                    "assumed_true_ic": float(true_ic),
+                    "analytic_power": fisher_power(
+                        true_ic,
+                        n_per_split=n_per_split,
+                        split_count=split_count,
+                    ),
+                    "simulated_rejection_rate": simulated,
+                }
+            )
+        difference = abs(simulated_at_mde - POWER_TARGET)
+        design_results.append(
+            {
+                "design_id": design_id,
+                "scope": scope,
+                "n_per_split": n_per_split,
+                "split_count": split_count,
+                "total_evaluated_rows": n_per_split * split_count,
+                "analytic_minimum_detectable_abs_ic": detectable,
+                "simulated_power_at_analytic_mde": simulated_at_mde,
+                "absolute_power_difference": difference,
+                "agreement_within_tolerance": difference <= POWER_AGREEMENT_TOLERANCE,
+                "simulation_curve": curve,
+            }
+        )
+
+    projections = []
+    for extra_years in PROJECTION_EXTRA_YEARS:
+        total_years = 3 + extra_years
+        projections.append(
+            {
+                "additional_years": extra_years,
+                "total_test_years": total_years,
+                "n_per_year": PUBLIC_UNIVERSE_PLANNING_N,
+                "analytic_minimum_detectable_abs_ic": minimum_detectable_ic(
+                    n_per_split=PUBLIC_UNIVERSE_PLANNING_N,
+                    split_count=total_years,
+                ),
+            }
+        )
+
+    return {
+        "method": (
+            "two-sided Fisher z approximation for independent within-year Spearman ICs; "
+            "equal year weights and variance 1/(n-3)"
+        ),
+        "alpha_two_sided": POWER_ALPHA,
+        "target_power": POWER_TARGET,
+        "multiplicity_scope": (
+            "single prespecified IC test at alpha=0.05; this power calculation does not "
+            "represent Bonferroni-adjusted family-wise power across six ML models"
+        ),
+        "simulation": {
+            "method": (
+                "seeded Gaussian-copula draws calibrated to assumed Spearman IC, converted "
+                "to ranks, and rejected with the same Fisher-z approximation"
+            ),
+            "simulations_per_curve_point": simulations,
+            "seed": seed,
+            "agreement_tolerance_absolute_power": POWER_AGREEMENT_TOLERANCE,
+        },
+        "definitions": {
+            "observed_ic": "sample estimate computed from persisted prediction dumps",
+            "detectable_ic": (
+                "assumed true absolute IC yielding 80% long-run rejection probability under "
+                "the stated approximation; not a hard significance cutoff"
+            ),
+            "statistical_power": (
+                "long-run probability of rejecting a zero-IC null when the stated true IC "
+                "and design assumptions hold"
+            ),
+            "practical_relevance": (
+                "not evaluated by this calculation; detectability does not establish economic "
+                "value, robustness, implementability, or investment relevance"
+            ),
+        },
+        "designs": design_results,
+        "projection_framing": (
+            "The pipeline is ready for more data; this is pipeline capability, not a promise "
+            "that more data will produce predictive skill or practical returns."
+        ),
+        "projection_40_tickers_per_year": projections,
+        "limitations": [
+            "Only three test years are observed; treating within-year IC estimates as independent is an approximation.",
+            "The calculation assumes equal per-year sample sizes and a stable true IC across years, neither of which establishes regime generality.",
+            "The 40-ticker table is a planning sensitivity for the public-universe scale, not the current 80-row prediction-dump design.",
+            "The cohort is retrospective rather than verified point-in-time membership, and reproducibility remains numerical-environment-qualified.",
+            "Power bounds detection under assumptions; it neither estimates the true IC nor establishes practical investment relevance.",
+        ],
+    }
 
 
 def _permutation_distribution(
@@ -225,6 +494,7 @@ def build_report(
     permutations: int = DEFAULT_PERMUTATIONS,
     bootstraps: int = DEFAULT_BOOTSTRAPS,
     seed: int = DEFAULT_SEED,
+    power_simulations: int = DEFAULT_POWER_SIMULATIONS,
 ) -> dict:
     models = sorted(predictions["model"].unique())
     missing_ml = sorted(set(ML_MODELS) - set(models))
@@ -287,7 +557,7 @@ def build_report(
     )
     evaluated_label = ", ".join(str(value) for value in evaluated_per_split)
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "analysis": {
             "statistic": "equal-weighted mean of within-split Spearman ICs",
             "permutation": "two-sided; realized returns shuffled independently within each test year",
@@ -305,6 +575,11 @@ def build_report(
         },
         "source_artifacts": sources,
         "headline": headline,
+        "power_analysis": build_power_analysis(
+            evaluated_per_split,
+            simulations=power_simulations,
+            seed=seed,
+        ),
         "models": results,
         "limitations": [
             f"Only three test years with {evaluated_label} evaluated tickers per model and split; estimates remain noisy.",
@@ -362,6 +637,68 @@ def render_markdown(report: dict) -> str:
             f"{'yes' if significant else 'no' if significant is not None else 'not in ML family'} |"
         )
 
+    power = report["power_analysis"]
+    lines.extend(
+        [
+            "",
+            "## Statistical power and minimum detectable IC",
+            "",
+            "Observed IC, detectable IC, and statistical power answer different questions. "
+            "Observed IC is the sample estimate from the persisted dumps. Detectable IC is "
+            "the assumed true |IC| that reaches 80% long-run rejection probability here; it "
+            "is not a hard significance cutoff. Statistical power is that long-run probability, "
+            "not the probability that a reported model is true. Practical investment relevance "
+            "is not evaluated by this calculation.",
+            "",
+            f"The analytic calculation uses a two-sided Fisher-z approximation for Spearman "
+            f"IC at alpha={power['alpha_two_sided']:.2f} and target power "
+            f"{power['target_power']:.0%}. It covers one prespecified IC test; it is not the "
+            "Bonferroni-adjusted family-wise power of the six-model search.",
+            "",
+            "| Design | Scope | Rows/year | Test years | Total rows | Detectable \\|IC\\| (analytic) | Simulated power at analytic MDE | Agreement |",
+            "| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |",
+        ]
+    )
+    for design in power["designs"]:
+        lines.append(
+            f"| {design['design_id']} | {design['scope']} | {design['n_per_split']} | "
+            f"{design['split_count']} | {design['total_evaluated_rows']} | "
+            f"{_fmt(design['analytic_minimum_detectable_abs_ic'])} | "
+            f"{_fmt(design['simulated_power_at_analytic_mde'], 3)} | "
+            f"{'within ±0.05' if design['agreement_within_tolerance'] else 'outside ±0.05'} |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "The seeded Gaussian-copula rank simulation checks several assumed true ICs for "
+            "each design; full curves are in `significance_report.json`. Agreement means the "
+            "simulated rejection rate at the analytic MDE is within 0.05 of 80%, not that the "
+            "approximation or underlying design assumptions are proven correct.",
+            "",
+            "### Forty-ticker-per-year planning projection",
+            "",
+            power["projection_framing"],
+            "",
+            "| Additional test years | Total test years | Tickers/year | Detectable \\|IC\\| (analytic) |",
+            "| ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for projection in power["projection_40_tickers_per_year"]:
+        lines.append(
+            f"| {projection['additional_years']} | {projection['total_test_years']} | "
+            f"{projection['n_per_year']} | "
+            f"{_fmt(projection['analytic_minimum_detectable_abs_ic'])} |"
+        )
+    lines.extend(
+        [
+            "",
+            "Power-analysis limits:",
+            "",
+            *[f"- {limitation}" for limitation in power["limitations"]],
+        ]
+    )
+
     lines.extend(
         [
             "",
@@ -416,6 +753,7 @@ def run(
     permutations: int = DEFAULT_PERMUTATIONS,
     bootstraps: int = DEFAULT_BOOTSTRAPS,
     seed: int = DEFAULT_SEED,
+    power_simulations: int = DEFAULT_POWER_SIMULATIONS,
 ) -> tuple[Path, Path]:
     predictions, sources = load_prediction_dumps(results_dir)
     report = build_report(
@@ -424,6 +762,7 @@ def run(
         permutations=permutations,
         bootstraps=bootstraps,
         seed=seed,
+        power_simulations=power_simulations,
     )
     json_path = results_dir / "significance_report.json"
     markdown_path = results_dir / "significance_report.md"
@@ -441,12 +780,16 @@ def main() -> int:
     parser.add_argument("--permutations", type=int, default=DEFAULT_PERMUTATIONS)
     parser.add_argument("--bootstraps", type=int, default=DEFAULT_BOOTSTRAPS)
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    parser.add_argument(
+        "--power-simulations", type=int, default=DEFAULT_POWER_SIMULATIONS
+    )
     args = parser.parse_args()
     run(
         args.results_dir,
         permutations=args.permutations,
         bootstraps=args.bootstraps,
         seed=args.seed,
+        power_simulations=args.power_simulations,
     )
     return 0
 

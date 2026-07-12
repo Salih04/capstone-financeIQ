@@ -207,6 +207,32 @@ histograms, source checksums, and limitations are in
 `experiments/results/significance_report.json` and `.md`. This is research
 support only, not investment advice.
 
+### Power and detectability limits (R2-STAT-02)
+
+The same significance report now computes minimum detectable absolute Spearman
+IC using a two-sided Fisher-z approximation at α=0.05 and 80% power, with a
+seeded Gaussian-copula rank simulation as a cross-check. For the actual dump
+design, the analytic minimum detectable |IC| is **0.309 for one 80-row test
+year** and **0.182 for the equal-weighted three-year design**; simulated power
+at those thresholds is 0.802 and 0.810, respectively. A public-universe-scale
+planning sensitivity gives **0.431 for one 40-ticker year** and **0.260 for
+three 40-ticker years**. All simulated checks are within the report's ±0.05
+absolute-power tolerance.
+
+These quantities are deliberately separate. Observed IC is a sample estimate
+from the prediction dumps; detectable IC is an assumed true effect that would
+be rejected in 80% of repeated studies under the approximation; power is that
+long-run rejection probability. The detectable threshold is not a hard
+significance cutoff and does not estimate the true IC. The calculation is for
+one prespecified test and is not Bonferroni-adjusted family-wise power across
+the six ML models. It also says nothing about economic value, transaction
+costs, robustness, or practical investment relevance. With only three observed
+test years, retrospective-universe limitations, one macro regime, and
+environment-qualified numerical reproduction, the correct conclusion remains
+no reliable predictive edge. The 40-ticker projection in
+`experiments/results/significance_report.md` describes pipeline readiness for
+more data, not a promise that additional years will produce predictive skill.
+
 ## Reproducibility and run provenance
 
 Every `make research` run writes a registered manifest under

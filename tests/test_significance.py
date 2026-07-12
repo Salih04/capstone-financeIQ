@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from experiments import significance
 
@@ -58,3 +59,33 @@ def test_seeded_shuffled_data_has_non_extreme_p_value_and_is_deterministic() -> 
     p_value = first["pooled"]["permutation_p_value_two_sided"]
     assert 0.1 < p_value < 0.9
     assert first == second
+
+
+def test_minimum_detectable_ic_decreases_with_more_rows_and_years() -> None:
+    one_year_40 = significance.minimum_detectable_ic(n_per_split=40)
+    one_year_80 = significance.minimum_detectable_ic(n_per_split=80)
+    three_years_40 = significance.minimum_detectable_ic(
+        n_per_split=40, split_count=3
+    )
+
+    assert 0.0 < three_years_40 < one_year_40 < 1.0
+    assert one_year_80 < one_year_40
+    assert significance.fisher_power(
+        one_year_40, n_per_split=40
+    ) == pytest.approx(0.80, abs=1e-10)
+
+
+def test_seeded_power_simulation_and_claim_boundaries() -> None:
+    first = significance.build_power_analysis([80], simulations=2_000, seed=23)
+    second = significance.build_power_analysis([80], simulations=2_000, seed=23)
+
+    assert first == second
+    assert all(design["agreement_within_tolerance"] for design in first["designs"])
+    assert "not a promise" in first["projection_framing"].lower()
+    assert "not evaluated" in first["definitions"]["practical_relevance"].lower()
+    assert "not a hard significance cutoff" in first["definitions"]["detectable_ic"].lower()
+    projected = [
+        row["analytic_minimum_detectable_abs_ic"]
+        for row in first["projection_40_tickers_per_year"]
+    ]
+    assert projected == sorted(projected, reverse=True)
