@@ -184,7 +184,15 @@ def _read_one(path: Path, rep: ManualReport, strict: bool) -> pd.DataFrame | Non
         rep.issues.append(f"{path.name}: empty file")
         return None
 
-    df.columns = [_norm(c) for c in df.columns]
+    normalized_columns = [_norm(c) for c in df.columns]
+    duplicate_headers = sorted({c for c in normalized_columns if normalized_columns.count(c) > 1})
+    if duplicate_headers:
+        rep.issues.append(
+            f"{path.name}: malformed header; duplicate column name(s) after normalization: "
+            f"{duplicate_headers}"
+        )
+        return None
+    df.columns = normalized_columns
     is_combined = path.name.lower() == "all_financials.csv"
 
     # ticker
@@ -198,6 +206,26 @@ def _read_one(path: Path, rep: ManualReport, strict: bool) -> pd.DataFrame | Non
     # year
     if "year" not in df.columns:
         rep.issues.append(f"{path.name}: missing required 'year' column")
+        return None
+
+    mapped_headers: dict[str, list[str]] = {}
+    for col in df.columns:
+        canon = _ALIAS_TO_CANON.get(col)
+        if canon:
+            mapped_headers.setdefault(canon, []).append(col)
+    ambiguous_headers = {canon: cols for canon, cols in mapped_headers.items() if len(cols) > 1}
+    if ambiguous_headers:
+        details = ", ".join(f"{canon} <- {cols}" for canon, cols in sorted(ambiguous_headers.items()))
+        rep.issues.append(
+            f"{path.name}: malformed header; multiple columns map to the same financial field: {details}"
+        )
+        return None
+    if not mapped_headers:
+        rep.issues.append(
+            f"{path.name}: malformed header; no recognized financial columns. "
+            "Expected 'year' plus at least one supported financial field (for example "
+            "'revenue', 'net_income', 'total_assets', or 'roe')."
+        )
         return None
     yr = pd.to_numeric(df["year"], errors="coerce")
     if yr.isna().any() or not yr.dropna().between(1990, 2100).all():

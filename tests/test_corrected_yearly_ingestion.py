@@ -100,3 +100,24 @@ def test_modeling_features_grew_only_with_validated_fields():
     # raw / old-snapshot / leakage columns must never be features
     for c in RAW_OR_LEAKAGE_FORBIDDEN:
         assert c not in feats, f"forbidden raw/leakage column {c} must not be a feature"
+
+
+def _valid_source_frame(rows: int = ING.EXPECTED_TICKERS) -> pd.DataFrame:
+    data = {
+        "stock_code": [f"T{i:02d}" for i in range(rows)],
+        **{column: list(range(rows)) for column in ING.INCOME_FIELDS},
+        **{column: list(range(rows)) for column in ING.MARGIN_FIELDS},
+    }
+    return pd.DataFrame(data)
+
+
+def test_corrected_source_wrong_header_fails_with_required_columns():
+    df = _valid_source_frame().rename(columns={"stock_code": "stock_cod"})
+    with pytest.raises(ValueError, match=r"malformed header; missing required column.*stock_code"):
+        ING._validate_source_frame(df, "2023stocks.xlsx")
+
+
+def test_corrected_source_wrong_shape_fails_with_expected_counts():
+    df = _valid_source_frame(rows=ING.EXPECTED_TICKERS - 1)
+    with pytest.raises(ValueError, match=r"malformed shape; expected exactly 40 rows.*found 39 rows"):
+        ING._validate_source_frame(df, "2023stocks.xlsx")

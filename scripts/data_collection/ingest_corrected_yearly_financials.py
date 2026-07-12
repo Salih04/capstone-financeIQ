@@ -75,6 +75,40 @@ ALIGN_CHECK_FIELDS = ("total_assets", "current_assets", "non_current_assets",
 FROZEN_FRAC_REJECT = 0.5    # reject a candidate column if >=50% of tickers never vary
 MARGIN_ABS_LIMIT = 300.0    # |margin/roe/roa| beyond this looks like a magnitude, not a ratio
 MISALIGN_MIN_RATIO = 0.05   # money cell < 5% of a ticker's median money scale => suspected ratio leak
+REQUIRED_SOURCE_COLUMNS = {"stock_code", *INCOME_FIELDS, *MARGIN_FIELDS}
+
+
+def _validate_source_frame(df: pd.DataFrame, filename: str) -> pd.DataFrame:
+    """Reject malformed manual workbooks before any values enter the candidate."""
+    normalized = [str(c).strip().lower() for c in df.columns]
+    duplicate_headers = sorted({c for c in normalized if normalized.count(c) > 1})
+    if duplicate_headers:
+        raise ValueError(
+            f"{filename}: malformed header; duplicate column name(s): {duplicate_headers}"
+        )
+    df = df.copy()
+    df.columns = normalized
+
+    missing = sorted(REQUIRED_SOURCE_COLUMNS - set(df.columns))
+    if missing:
+        raise ValueError(
+            f"{filename}: malformed header; missing required column(s): {missing}. "
+            "Expected stock_code plus the corrected income/profitability fields."
+        )
+
+    raw_tickers = df["stock_code"]
+    blank = raw_tickers.isna() | raw_tickers.astype(str).str.strip().eq("")
+    tickers = raw_tickers.astype(str).str.upper().str.strip()
+    duplicate_count = int(tickers[~blank].duplicated().sum())
+    unique_count = int(tickers[~blank].nunique())
+    if len(df) != EXPECTED_TICKERS or unique_count != EXPECTED_TICKERS or blank.any() or duplicate_count:
+        raise ValueError(
+            f"{filename}: malformed shape; expected exactly {EXPECTED_TICKERS} rows with "
+            f"{EXPECTED_TICKERS} unique non-empty stock_code values, found {len(df)} rows, "
+            f"{unique_count} unique tickers, {int(blank.sum())} blank ticker(s), and "
+            f"{duplicate_count} duplicate ticker row(s)."
+        )
+    return df
 
 
 def _load_all() -> tuple[pd.DataFrame, dict]:
@@ -85,17 +119,12 @@ def _load_all() -> tuple[pd.DataFrame, dict]:
             issues.append(f"missing source file: {f.name}")
             continue
         df = pd.read_excel(f, sheet_name=SHEET)
-        df.columns = [str(c).strip().lower() for c in df.columns]
-        if "stock_code" not in df.columns:
-            issues.append(f"{f.name}: no stock_code column")
-            continue
+        df = _validate_source_frame(df, f.name)
         df["ticker"] = df["stock_code"].astype(str).str.upper().str.strip()
         df["year"] = y
         df["__source_file"] = f.name
         n = df["ticker"].nunique()
         coverage[y] = int(n)
-        if n != EXPECTED_TICKERS:
-            issues.append(f"{f.name}: {n} tickers (expected {EXPECTED_TICKERS})")
         frames.append(df)
     if not frames:
         raise SystemExit("no corrected yearly files found")

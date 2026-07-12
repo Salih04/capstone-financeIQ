@@ -86,6 +86,38 @@ def test_alias_mapping(tmp_path):
     assert "total_equity" in df.columns and "operating_income" in df.columns
 
 
+def test_unrecognized_financial_header_is_rejected_with_guidance(tmp_path):
+    d = _fin_dir(tmp_path)
+    (d / "ASELS.csv").write_text("year,reveneu\n2023,100\n")
+    df, rep = M.load_manual(d)
+    assert df is None
+    assert any(
+        "malformed header; no recognized financial columns" in issue
+        and "Expected 'year' plus at least one supported financial field" in issue
+        for issue in rep.issues
+    )
+
+
+def test_alias_collision_is_rejected_instead_of_silently_overwriting(tmp_path):
+    d = _fin_dir(tmp_path)
+    (d / "ASELS.csv").write_text("year,equity,total_equity\n2023,100,200\n")
+    df, rep = M.load_manual(d)
+    assert df is None
+    assert any(
+        "malformed header; multiple columns map to the same financial field" in issue
+        and "total_equity" in issue
+        for issue in rep.issues
+    )
+
+
+def test_malformed_csv_shape_reports_filename_and_parse_failure(tmp_path):
+    d = _fin_dir(tmp_path)
+    (d / "ASELS.csv").write_text('year,revenue\n2023,"100\n2024,200\n')
+    df, rep = M.load_manual(d)
+    assert df is None
+    assert any(issue.startswith("ASELS.csv: malformed CSV (") for issue in rep.issues)
+
+
 # ---- pipeline integration ----
 def test_merge_accepts_varying_rejects_frozen(monkeypatch, tmp_path):
     d = _fin_dir(tmp_path)
