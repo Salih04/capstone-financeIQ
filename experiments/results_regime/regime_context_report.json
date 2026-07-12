@@ -1,0 +1,339 @@
+{
+  "basis_evidence": {
+    "cpi_deflated_try": {
+      "reliable_predictive_edge_established": false,
+      "source": "experiments/results_real_terms/real_try/significance_report.md"
+    },
+    "nominal_try": {
+      "reliable_predictive_edge_established": false,
+      "source": "experiments/results/significance_report.md"
+    },
+    "usd_basis": {
+      "reliable_predictive_edge_established": false,
+      "source": "experiments/results_real_terms/usd/significance_report.md"
+    }
+  },
+  "conditional_diagnostics": {
+    "computed": false,
+    "observed_distinct_regimes": 1,
+    "reason": "All three test years map to the same task-defined observed period; a per-regime number would only relabel the aggregate.",
+    "required_distinct_regimes": 2,
+    "status": "not_computed_insufficient_regime_diversity"
+  },
+  "design": {
+    "analysis_type": "descriptive macro-context sensitivity lens",
+    "assignment_boundary": "inclusive",
+    "regime_definition_origin": "task-defined date boundary; not data-derived",
+    "regimes": [
+      {
+        "end_date": "2025-12-31",
+        "regime_id": "observed_2020_2025_macro_period",
+        "start_date": "2020-01-01"
+      }
+    ],
+    "test_year_assignments": {
+      "2023": "observed_2020_2025_macro_period",
+      "2024": "observed_2020_2025_macro_period",
+      "2025": "observed_2020_2025_macro_period"
+    },
+    "test_years": [
+      2023,
+      2024,
+      2025
+    ]
+  },
+  "findings": [
+    "Regime-conditional model diagnostics are untestable with the observed regime diversity and were not computed.",
+    "The macro series are displayed as effective-dated descriptive context only; no causal effect is inferred.",
+    "Nominal TRY, CPI-deflated TRY, and USD-basis evidence remain parallel negative-result analyses; none establishes a reliable predictive edge."
+  ],
+  "limitations": [
+    "Only three model test years (2023–2025) are observed, all inside one task-defined 2020–2025 macro period.",
+    "No per-regime statistic, causal effect, or regime-specific predictive edge is estimable from one observed period.",
+    "Multiplicity treatment and low-power limits from the nominal and alternative-basis significance reports remain applicable and unchanged.",
+    "The 81-ticker training cohort is retrospectively fixed rather than verified point-in-time BIST100 membership, so survivorship and universe-selection look-ahead risks remain unresolved.",
+    "Nominal TRY, national-CPI-deflated TRY, and USD-basis returns are separate descriptive bases; none represents investor-specific value or implementability.",
+    "Prediction-artifact byte reproducibility remains numerical-environment-qualified.",
+    "Missing macro observations remain null and are never interpolated or imputed.",
+    "Research support only; not investment advice."
+  ],
+  "macro_context": [
+    {
+      "bist100_return_pct": {
+        "effective_date": "2020-12-31",
+        "source": {
+          "name": "Validated yfinance BIST100 calendar-year return",
+          "source_file": "data/trusted_raw/bist100_benchmark_returns.csv"
+        },
+        "source_id": "yfinance_xu100_calendar_return",
+        "value": 27.38
+      },
+      "cpi_december_yoy_pct": {
+        "effective_date": "2020-12-31",
+        "source": {
+          "name": "TÜİK national December year-on-year CPI",
+          "source_file": "data/trusted_raw/macro/cpi_yearly_tr.md"
+        },
+        "source_id": "tuik_cpi_december_yoy",
+        "value": 14.6
+      },
+      "policy_rate_year_end_pct": {
+        "effective_date": "2020-12-25",
+        "source": {
+          "name": "TCMB one-week repo auction policy-rate history",
+          "source_url": "https://www.tcmb.gov.tr/wps/wcm/connect/en/tcmb%2Ben/main%2Bmenu/core%2Bfunctions/monetary%2Bpolicy/central%2Bbank%2Binterest%2Brates/1%2Bweek%2Brepo"
+        },
+        "source_id": "tcmb_one_week_repo",
+        "value": 17.0
+      },
+      "regime_id": "observed_2020_2025_macro_period",
+      "usdtry_year_end_try_per_usd": {
+        "effective_date": "2020-12-31",
+        "source": {
+          "name": "Yahoo chart API TRY=X year-end close",
+          "source_file": "data/trusted_raw/macro/usdtry_year_end.csv"
+        },
+        "source_id": "yahoo_try_x_year_end",
+        "value": 7.3737301826
+      },
+      "year": 2020
+    },
+    {
+      "bist100_return_pct": {
+        "effective_date": "2021-12-31",
+        "source": {
+          "name": "Validated yfinance BIST100 calendar-year return",
+          "source_file": "data/trusted_raw/bist100_benchmark_returns.csv"
+        },
+        "source_id": "yfinance_xu100_calendar_return",
+        "value": 24.23
+      },
+      "cpi_december_yoy_pct": {
+        "effective_date": "2021-12-31",
+        "source": {
+          "name": "TÜİK national December year-on-year CPI",
+          "source_file": "data/trusted_raw/macro/cpi_yearly_tr.md"
+        },
+        "source_id": "tuik_cpi_december_yoy",
+        "value": 36.08
+      },
+      "policy_rate_year_end_pct": {
+        "effective_date": "2021-12-17",
+        "source": {
+          "name": "TCMB one-week repo auction policy-rate history",
+          "source_url": "https://www.tcmb.gov.tr/wps/wcm/connect/en/tcmb%2Ben/main%2Bmenu/core%2Bfunctions/monetary%2Bpolicy/central%2Bbank%2Binterest%2Brates/1%2Bweek%2Brepo"
+        },
+        "source_id": "tcmb_one_week_repo",
+        "value": 14.0
+      },
+      "regime_id": "observed_2020_2025_macro_period",
+      "usdtry_year_end_try_per_usd": {
+        "effective_date": "2021-12-31",
+        "source": {
+          "name": "Yahoo chart API TRY=X year-end close",
+          "source_file": "data/trusted_raw/macro/usdtry_year_end.csv"
+        },
+        "source_id": "yahoo_try_x_year_end",
+        "value": 13.2904996872
+      },
+      "year": 2021
+    },
+    {
+      "bist100_return_pct": {
+        "effective_date": "2022-12-31",
+        "source": {
+          "name": "Validated yfinance BIST100 calendar-year return",
+          "source_file": "data/trusted_raw/bist100_benchmark_returns.csv"
+        },
+        "source_id": "yfinance_xu100_calendar_return",
+        "value": 185.94
+      },
+      "cpi_december_yoy_pct": {
+        "effective_date": "2022-12-31",
+        "source": {
+          "name": "TÜİK national December year-on-year CPI",
+          "source_file": "data/trusted_raw/macro/cpi_yearly_tr.md"
+        },
+        "source_id": "tuik_cpi_december_yoy",
+        "value": 64.27
+      },
+      "policy_rate_year_end_pct": {
+        "effective_date": "2022-11-25",
+        "source": {
+          "name": "TCMB one-week repo auction policy-rate history",
+          "source_url": "https://www.tcmb.gov.tr/wps/wcm/connect/en/tcmb%2Ben/main%2Bmenu/core%2Bfunctions/monetary%2Bpolicy/central%2Bbank%2Binterest%2Brates/1%2Bweek%2Brepo"
+        },
+        "source_id": "tcmb_one_week_repo",
+        "value": 9.0
+      },
+      "regime_id": "observed_2020_2025_macro_period",
+      "usdtry_year_end_try_per_usd": {
+        "effective_date": "2022-12-30",
+        "source": {
+          "name": "Yahoo chart API TRY=X year-end close",
+          "source_file": "data/trusted_raw/macro/usdtry_year_end.csv"
+        },
+        "source_id": "yahoo_try_x_year_end",
+        "value": 18.7029895782
+      },
+      "year": 2022
+    },
+    {
+      "bist100_return_pct": {
+        "effective_date": "2023-12-31",
+        "source": {
+          "name": "Validated yfinance BIST100 calendar-year return",
+          "source_file": "data/trusted_raw/bist100_benchmark_returns.csv"
+        },
+        "source_id": "yfinance_xu100_calendar_return",
+        "value": 31.96
+      },
+      "cpi_december_yoy_pct": {
+        "effective_date": "2023-12-31",
+        "source": {
+          "name": "TÜİK national December year-on-year CPI",
+          "source_file": "data/trusted_raw/macro/cpi_yearly_tr.md"
+        },
+        "source_id": "tuik_cpi_december_yoy",
+        "value": 64.77
+      },
+      "policy_rate_year_end_pct": {
+        "effective_date": "2023-12-22",
+        "source": {
+          "name": "TCMB one-week repo auction policy-rate history",
+          "source_url": "https://www.tcmb.gov.tr/wps/wcm/connect/en/tcmb%2Ben/main%2Bmenu/core%2Bfunctions/monetary%2Bpolicy/central%2Bbank%2Binterest%2Brates/1%2Bweek%2Brepo"
+        },
+        "source_id": "tcmb_one_week_repo",
+        "value": 42.5
+      },
+      "regime_id": "observed_2020_2025_macro_period",
+      "usdtry_year_end_try_per_usd": {
+        "effective_date": "2023-12-29",
+        "source": {
+          "name": "Yahoo chart API TRY=X year-end close",
+          "source_file": "data/trusted_raw/macro/usdtry_year_end.csv"
+        },
+        "source_id": "yahoo_try_x_year_end",
+        "value": 29.5198001862
+      },
+      "year": 2023
+    },
+    {
+      "bist100_return_pct": {
+        "effective_date": "2024-12-31",
+        "source": {
+          "name": "Validated yfinance BIST100 calendar-year return",
+          "source_file": "data/trusted_raw/bist100_benchmark_returns.csv"
+        },
+        "source_id": "yfinance_xu100_calendar_return",
+        "value": 28.94
+      },
+      "cpi_december_yoy_pct": {
+        "effective_date": "2024-12-31",
+        "source": {
+          "name": "TÜİK national December year-on-year CPI",
+          "source_file": "data/trusted_raw/macro/cpi_yearly_tr.md"
+        },
+        "source_id": "tuik_cpi_december_yoy",
+        "value": 44.38
+      },
+      "policy_rate_year_end_pct": {
+        "effective_date": "2024-12-27",
+        "source": {
+          "name": "TCMB one-week repo auction policy-rate history",
+          "source_url": "https://www.tcmb.gov.tr/wps/wcm/connect/en/tcmb%2Ben/main%2Bmenu/core%2Bfunctions/monetary%2Bpolicy/central%2Bbank%2Binterest%2Brates/1%2Bweek%2Brepo"
+        },
+        "source_id": "tcmb_one_week_repo",
+        "value": 47.5
+      },
+      "regime_id": "observed_2020_2025_macro_period",
+      "usdtry_year_end_try_per_usd": {
+        "effective_date": "2024-12-31",
+        "source": {
+          "name": "Yahoo chart API TRY=X year-end close",
+          "source_file": "data/trusted_raw/macro/usdtry_year_end.csv"
+        },
+        "source_id": "yahoo_try_x_year_end",
+        "value": 35.3052482605
+      },
+      "year": 2024
+    },
+    {
+      "bist100_return_pct": {
+        "effective_date": "2025-12-31",
+        "source": {
+          "name": "Validated yfinance BIST100 calendar-year return",
+          "source_file": "data/trusted_raw/bist100_benchmark_returns.csv"
+        },
+        "source_id": "yfinance_xu100_calendar_return",
+        "value": 12.64
+      },
+      "cpi_december_yoy_pct": {
+        "effective_date": "2025-12-31",
+        "source": {
+          "name": "TÜİK national December year-on-year CPI",
+          "source_file": "data/trusted_raw/macro/cpi_yearly_tr.md"
+        },
+        "source_id": "tuik_cpi_december_yoy",
+        "value": 30.89
+      },
+      "policy_rate_year_end_pct": {
+        "effective_date": "2025-12-12",
+        "source": {
+          "name": "TCMB one-week repo auction policy-rate history",
+          "source_url": "https://www.tcmb.gov.tr/wps/wcm/connect/en/tcmb%2Ben/main%2Bmenu/core%2Bfunctions/monetary%2Bpolicy/central%2Bbank%2Binterest%2Brates/1%2Bweek%2Brepo"
+        },
+        "source_id": "tcmb_one_week_repo",
+        "value": 38.0
+      },
+      "regime_id": "observed_2020_2025_macro_period",
+      "usdtry_year_end_try_per_usd": {
+        "effective_date": "2025-12-31",
+        "source": {
+          "name": "Yahoo chart API TRY=X year-end close",
+          "source_file": "data/trusted_raw/macro/usdtry_year_end.csv"
+        },
+        "source_id": "yahoo_try_x_year_end",
+        "value": 42.9519805908
+      },
+      "year": 2025
+    }
+  ],
+  "schema_version": "1.0.0",
+  "source_artifacts": [
+    {
+      "path": "data/trusted_raw/macro/macro_context_yearly.csv",
+      "sha256": "8e76746d2808c8b2bd410d9c48b8f454dbe1d66df319c8ef87ec6e28f440bcb8"
+    },
+    {
+      "path": "data/trusted_raw/macro/macro_context_yearly.md",
+      "sha256": "45e036f04064f981f5b13133a6323e2c42d1a6877f02adb8cb807337aec0ae78"
+    },
+    {
+      "path": "data/trusted_raw/macro/cpi_yearly_tr.csv",
+      "sha256": "f797a53b6336ceace4298981e2cd28ac17b1985c82c7d4d6ab839703c5f36a32"
+    },
+    {
+      "path": "data/trusted_raw/macro/usdtry_year_end.csv",
+      "sha256": "a15f3e0b5c39e1fc03efab7115e0418b37f1078a637e4fc8aa6896a4ff33da96"
+    },
+    {
+      "path": "data/trusted_raw/bist100_benchmark_returns.csv",
+      "sha256": "ccfa2bbc5a654245b39ff97dc535f59c31c08c9b9216f93dfb84c2df2a323a6b"
+    },
+    {
+      "path": "experiments/results/significance_report.md",
+      "sha256": "76f3ff7010821167cc71b4d812090c617299c4fbbf117ff949cd0c80750b356a"
+    },
+    {
+      "path": "experiments/results_real_terms/real_try/significance_report.md",
+      "sha256": "3ea962bae9d2556556435aa02c28ed5072ff748698bde38a08de43d3c263145e"
+    },
+    {
+      "path": "experiments/results_real_terms/usd/significance_report.md",
+      "sha256": "a60bc5003bdd784a5932d3a2a68502b401b096e70dc381b6218287baee967505"
+    }
+  ],
+  "statement": "2020–2025 spans a single extraordinary Turkish macro regime (high inflation, deep TRY depreciation). Model behavior across regimes is therefore untested — this lens shows regime context and will only compute regime-conditional diagnostics when regime diversity exists.",
+  "task": "R2-REGIME-01"
+}

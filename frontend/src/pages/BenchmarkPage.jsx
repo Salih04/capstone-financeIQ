@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useCachedResource, CACHE_TTL } from '../api/useCachedResource'
 import CacheTag from '../components/CacheTag'
+import RegimeStrip from '../components/RegimeStrip'
 
 // ---------------------------------------------------------------------------
 // Benchmark — THE TIDE CHART.
@@ -186,6 +187,8 @@ export default function BenchmarkPage() {
           </p>
         </aside>
       </div>
+
+      <RegimeStrip years={rows.map((row) => row.year)} />
 
       <footer className="td-caveat">
         <span className="td-caveat-pulse" aria-hidden="true" />

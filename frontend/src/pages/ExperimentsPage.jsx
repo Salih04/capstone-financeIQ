@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useCachedResource, CACHE_TTL } from '../api/useCachedResource'
 import { apiErrorText } from '../api/errorText'
 import CacheTag from '../components/CacheTag'
+import RegimeStrip from '../components/RegimeStrip'
 
 // ---------------------------------------------------------------------------
 // Experiments — THE SEISMOGRAPH.
@@ -358,6 +359,8 @@ export default function ExperimentsPage() {
           )}
         </aside>
       </div>
+
+      <RegimeStrip years={years} />
 
       <section className="xp-verdict">
         <div className="xp-verdict-label">EXPERIMENT VERDICT</div>

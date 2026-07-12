@@ -227,6 +227,29 @@ coverage, prediction dumps, corrected tests, and limitations are in
 `experiments/results_real_terms/`. The nominal artifacts and the conclusion —
 no reliable predictive edge — remain unchanged.
 
+## Regime Lens (R2-REGIME-01)
+
+`make research-regime` validates effective-dated annual CPI, year-end TCMB
+one-week repo policy rates, USDTRY closes, and BIST100 nominal returns without
+changing any chart series, return target, ranking, or model artifact. **2020–2025
+spans a single extraordinary Turkish macro regime (high inflation, deep TRY
+depreciation). Model behavior across regimes is therefore untested — this lens
+shows regime context and will only compute regime-conditional diagnostics when
+regime diversity exists.** The observed 2023–2025 test years all map to that
+single task-defined, inclusive 2020–2025 period, so the workflow emits
+`not_computed_insufficient_regime_diversity` and computes no per-regime model
+statistics.
+
+The macro series are descriptive sensitivity context, not evidence that macro
+moves caused model behavior. Nominal TRY, CPI-deflated TRY, and USD-basis
+analyses remain parallel; none establishes a reliable predictive edge. The
+existing multiplicity and low-power treatment, retrospective-universe and
+survivorship risks, basis limitations, and numerical-environment qualification
+remain unchanged. Full sources, effective dates, null handling, and claim-safe
+limitations are in `data/trusted_raw/macro/macro_context_yearly.md` and
+`experiments/results_regime/regime_context_report.*`. Research support only;
+not investment advice.
+
 ## Honest findings (current data)
 
 - Walk-forward signal remains weak/unstable. The expanded pipeline improved the

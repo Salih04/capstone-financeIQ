@@ -18,6 +18,7 @@ from app.services.research import (
     feature_passports,
     feature_registry,
     profit,
+    regime,
     scoring,
     significance,
     validation,
@@ -106,6 +107,15 @@ def autopsy_report(_: User | None = Depends(require_access)):
     try:
         return significance.autopsy_payload()
     except significance.SignificanceReportMissing as exc:
+        raise HTTPException(503, str(exc))
+
+
+@router.get("/regime-context")
+def regime_context(_: User | None = Depends(require_access)):
+    """Serve effective-dated macro context; never compute per-regime statistics."""
+    try:
+        return regime.payload()
+    except regime.RegimeContextReportMissing as exc:
         raise HTTPException(503, str(exc))
 
 
