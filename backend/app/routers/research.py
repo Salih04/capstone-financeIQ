@@ -14,6 +14,7 @@ from app.services.research import (
     benchmark,
     company,
     data,
+    feature_passports,
     feature_registry,
     profit,
     scoring,
@@ -78,6 +79,15 @@ def benchmark_status(_: User | None = Depends(require_access)):
 @router.get("/feature-registry")
 def registry(_: User | None = Depends(require_access)):
     return {"features": feature_registry.registry_as_dicts()}
+
+
+@router.get("/feature-passports")
+def passports(_: User | None = Depends(require_access)):
+    """Serve generated lineage records; never infer missing provenance at request time."""
+    try:
+        return feature_passports.payload()
+    except feature_passports.FeaturePassportsMissing as exc:
+        raise HTTPException(503, str(exc))
 
 
 @router.get("/significance")

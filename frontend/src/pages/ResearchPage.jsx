@@ -63,6 +63,28 @@ const researchScoresCacheKey = (year) => `page:research:scores:${year}`
 const researchDetailCacheKey = (year, ticker) => `page:research:detail:${year}:${ticker}`
 const clampPct = (v) => Math.max(0, Math.min(100, Number(v) || 0))
 const fmt1 = (v) => (v == null || Number.isNaN(Number(v)) ? '—' : Number(v).toFixed(1))
+const PASSPORT_ALIASES = {
+  roe_pct: 'roe',
+  roa_pct: 'roa',
+  gross_margin_pct: 'gross_margin',
+  ebitda_margin_pct: 'ebitda_margin',
+  net_margin_pct: 'net_margin',
+  pe: 'pe_ratio',
+  p_e_ratio: 'pe_ratio',
+  pb: 'pb_ratio',
+  p_b_ratio: 'pb_ratio',
+  net_debt_ebitda: 'net_debt_to_ebitda',
+  revenue_growth: 'revenue_growth_pct',
+}
+
+function passportName(featureName) {
+  const normalized = String(featureName || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_|_$/g, '')
+  return PASSPORT_ALIASES[normalized] || normalized
+}
 
 // Normalize real detail OR mock into one dissection structure.
 function buildDissection(detail, mockMode) {
@@ -84,7 +106,12 @@ function buildDissection(detail, mockMode) {
       name: c.category,
       weight: 1 / n,
       score: Number(c.category_score) || 0,
-      features: null, // feature-level detail not exposed by this endpoint
+      features: Array.isArray(c.features) ? c.features.map((f) => ({
+        name: f.feature,
+        value: f.raw,
+        percentile: f.percentile,
+        coverage: null,
+      })) : null,
     })),
     weightsExplicit: false,
   }
@@ -112,6 +139,9 @@ export default function ResearchPage() {
   const [detail, setDetail] = useState(() => cachedPage?.detail ?? cachedDetail ?? null)
   const [query, setQuery] = useState('')
   const [openCat, setOpenCat] = useState(null)
+  const [passports, setPassports] = useState([])
+  const [passportError, setPassportError] = useState(null)
+  const [openPassportName, setOpenPassportName] = useState(null)
   const [mockMode, setMockMode] = useState(false)
   const [mockReason, setMockReason] = useState(null)
 
@@ -134,6 +164,24 @@ export default function ResearchPage() {
         }
       })
 
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    let mounted = true
+    api.get('/research/feature-passports')
+      .then(({ data }) => {
+        if (!mounted) return
+        setPassports(Array.isArray(data?.passports) ? data.passports : [])
+        setPassportError(null)
+      })
+      .catch((e) => {
+        if (!mounted) return
+        setPassports([])
+        setPassportError(apiErrorText(e))
+      })
     return () => {
       mounted = false
     }
@@ -218,6 +266,10 @@ export default function ResearchPage() {
     : companies.filter((c) => !query || c.ticker.toUpperCase().includes(query.trim().toUpperCase()))
 
   const openCategory = dissection?.categories?.find((c) => c.name === openCat) || null
+  const passportsByName = useMemo(
+    () => new Map(passports.map((passport) => [passport.name, passport])),
+    [passports],
+  )
 
   return (
     <div className="dx">
@@ -266,7 +318,7 @@ export default function ResearchPage() {
                   type="button"
                   className={`dx-rail-item ${on ? 'is-on' : ''}`}
                   aria-pressed={on}
-                  onClick={() => { setSelected(c.ticker); setOpenCat(null) }}
+                  onClick={() => { setSelected(c.ticker); setOpenCat(null); setOpenPassportName(null) }}
                 >
                   <span>{c.ticker}</span>
                   <strong>{fmt1(c.fundamental_score)}</strong>
@@ -295,7 +347,7 @@ export default function ResearchPage() {
                       className={`dx-seg ${on ? 'is-open' : ''}`}
                       style={{ flexGrow: Math.max(cat.weight, 0.05) * 100, '--seg-c': CAT_COLORS[i % CAT_COLORS.length] }}
                       aria-expanded={on}
-                      onClick={() => setOpenCat(on ? null : cat.name)}
+                      onClick={() => { setOpenCat(on ? null : cat.name); setOpenPassportName(null) }}
                     >
                       <span className="dx-seg-fill" style={{ height: `${clampPct(cat.score)}%` }} />
                       <span className="dx-seg-name">{cat.name.toUpperCase()}</span>
@@ -318,17 +370,72 @@ export default function ResearchPage() {
                     <span>{openCategory.name.toUpperCase()} · UNFOLDED</span>
                     <span>category score {fmt1(openCategory.score)}</span>
                   </div>
-                  {openCategory.features ? openCategory.features.map((f) => (
-                    <div key={f.name} className={`dx-feature ${f.coverage < 0.7 ? 'is-grainy' : ''}`}>
-                      <span className="dx-feature-name">{f.name}</span>
-                      <span className="dx-feature-val">{Number(f.value).toFixed(3)}</span>
-                      <span className="dx-feature-track">
-                        <span className="dx-feature-fill" style={{ width: `${clampPct(f.percentile)}%` }} />
-                      </span>
-                      <span className="dx-feature-pct">p{f.percentile}</span>
-                      <span className="dx-feature-cov">{Math.round(f.coverage * 100)}% cov</span>
-                    </div>
-                  )) : (
+                  {passportError && (
+                    <p className="dx-passport-error">Lineage record unavailable — {passportError}</p>
+                  )}
+                  {openCategory.features ? openCategory.features.map((f) => {
+                    const passport = passportsByName.get(passportName(f.name))
+                    const passportOpen = passport?.name === openPassportName
+                    return (
+                      <div key={f.name} className="dx-feature-wrap">
+                        <div className={`dx-feature ${f.coverage != null && f.coverage < 0.7 ? 'is-grainy' : ''}`}>
+                          <button
+                            type="button"
+                            className="dx-feature-name"
+                            disabled={!passport}
+                            aria-expanded={passport ? passportOpen : undefined}
+                            title={passport ? 'Open final-dataset lineage passport' : 'No final-dataset passport for this serving-only feature'}
+                            onClick={() => setOpenPassportName(passportOpen ? null : passport.name)}
+                          >
+                            {f.name}
+                            <small>{passport ? 'passport ↗' : 'no passport'}</small>
+                          </button>
+                          <span className="dx-feature-val">{f.value == null ? '—' : Number(f.value).toFixed(3)}</span>
+                          <span className="dx-feature-track">
+                            <span className="dx-feature-fill" style={{ width: `${clampPct(f.percentile)}%` }} />
+                          </span>
+                          <span className="dx-feature-pct">p{f.percentile ?? '—'}</span>
+                          <span className="dx-feature-cov">{f.coverage == null ? '— cov' : `${Math.round(f.coverage * 100)}% cov`}</span>
+                        </div>
+                        {passportOpen && (
+                          <div className="dx-passport" role="region" aria-label={`${passport.name} provenance record`}>
+                            <div className="dx-passport-head">
+                              <span>MODELING DATASET PASSPORT</span>
+                              <strong>{passport.name}</strong>
+                            </div>
+                            <div className="dx-passport-tags">
+                              <span>SOURCE · {passport.source_class}</span>
+                              <span>ROLE · {passport.registry_role}</span>
+                              <span>STATUS · {passport.acceptance_status}</span>
+                              <span>LEAKAGE · {passport.leakage_risk}</span>
+                            </div>
+                            <div className="dx-passport-grid">
+                              <div>
+                                <b>TRANSFORM CHAIN</b>
+                                <ol>{passport.transform_chain.map((step) => <li key={step}>{step}</li>)}</ol>
+                              </div>
+                              <div>
+                                <b>CAVEATS</b>
+                                {passport.caveats.length
+                                  ? <ul>{passport.caveats.map((caveat) => <li key={caveat}>{caveat}</li>)}</ul>
+                                  : <p>None recorded.</p>}
+                              </div>
+                            </div>
+                            <div className="dx-passport-evidence">
+                              EVIDENCE · {passport.evidence_files.map((path) => <code key={path}>{path}</code>)}
+                            </div>
+                            <p className="dx-passport-scope">
+                              This passport documents modeling_dataset_2020_2025.csv. Score Explorer raw values
+                              currently come from the separate trusted-yearly scoring path.
+                            </p>
+                            <p className="dx-passport-footer">
+                              <strong>Provenance record — documents source and validation path, not a guarantee of source accuracy.</strong>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  }) : (
                     <p className="dx-unfold-note">
                       Feature-level constituents are not exposed by this endpoint — the category score
                       above is the finest validated granularity for live data.
@@ -467,17 +574,46 @@ const CSS = `
 .dx-unfold { margin-top: 18px; border-top: 1px dashed rgba(200,211,202,0.2); padding-top: 14px; animation: dxIn 0.35s ease; }
 .dx-unfold-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.2em; color: var(--dx-faint); margin-bottom: 12px; }
+.dx-feature-wrap { border-bottom: 1px solid rgba(200,211,202,0.07); }
 .dx-feature { display: grid; grid-template-columns: 130px 64px 1fr 38px 64px; gap: 10px; align-items: center;
-  font-family: var(--font-mono); padding: 6px 0; border-bottom: 1px solid rgba(200,211,202,0.07); }
+  font-family: var(--font-mono); padding: 6px 0; }
 .dx-feature.is-grainy { opacity: 0.65; }
 .dx-feature.is-grainy .dx-feature-track { border: 1px dashed rgba(200,211,202,0.3); }
-.dx-feature-name { font-size: 11px; color: var(--dx-paper); }
+.dx-feature-name { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; border: 0; padding: 0;
+  background: transparent; font-family: var(--font-mono); font-size: 11px; color: var(--dx-paper); cursor: pointer; text-align: left; }
+.dx-feature-name small { font-size: 7.5px; letter-spacing: 0.12em; color: var(--dx-emerald); text-transform: uppercase; }
+.dx-feature-name:disabled { cursor: default; color: var(--dx-dim); }
+.dx-feature-name:disabled small { color: var(--dx-faint); }
+.dx-feature-name:focus-visible { outline: 1px solid var(--dx-emerald); outline-offset: 3px; }
 .dx-feature-val { font-size: 10.5px; color: var(--dx-dim); text-align: right; }
 .dx-feature-track { position: relative; height: 6px; background: rgba(200,211,202,0.08); border-radius: 1px; overflow: hidden; }
 .dx-feature-fill { display: block; height: 100%; background: var(--dx-emerald); transition: width 0.5s ease; }
 .dx-feature-pct { font-size: 10px; color: var(--dx-gold); text-align: right; }
 .dx-feature-cov { font-size: 9px; color: var(--dx-faint); text-align: right; letter-spacing: 0.04em; }
 .dx-unfold-note { margin: 0; font-size: 12px; line-height: 1.55; color: var(--dx-dim); }
+.dx-passport-error { margin: 0 0 10px; font-family: var(--font-mono); font-size: 9px; color: var(--dx-copper); }
+.dx-passport { margin: 8px 0 14px; padding: 14px; border: 1px solid rgba(77,165,131,0.45); border-left: 3px solid var(--dx-emerald);
+  background: rgba(8,11,10,0.78); animation: dxIn 0.25s ease; }
+.dx-passport-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.18em; color: var(--dx-faint); }
+.dx-passport-head strong { color: var(--dx-paper); font-size: 11px; }
+.dx-passport-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.dx-passport-tags span { padding: 4px 6px; border: 1px solid rgba(200,211,202,0.15); font-family: var(--font-mono);
+  font-size: 8px; letter-spacing: 0.08em; color: var(--dx-dim); }
+.dx-passport-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.dx-passport-grid b { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.18em; color: var(--dx-gold); }
+.dx-passport-grid ol, .dx-passport-grid ul { margin: 7px 0 0; padding-left: 18px; color: var(--dx-dim); font-size: 10.5px; line-height: 1.5; }
+.dx-passport-grid p { margin: 7px 0 0; color: var(--dx-dim); font-size: 10.5px; }
+.dx-passport-evidence { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 12px; font-family: var(--font-mono);
+  font-size: 8px; letter-spacing: 0.1em; color: var(--dx-faint); }
+.dx-passport-evidence code { padding: 3px 5px; background: rgba(200,211,202,0.06); color: var(--dx-dim); font-size: 8px; letter-spacing: 0; }
+.dx-passport-scope { margin: 11px 0 0; color: var(--dx-dim); font-size: 10px; line-height: 1.5; }
+.dx-passport-footer { margin: 9px 0 0; color: var(--dx-paper); font-size: 10px; line-height: 1.5; }
+@media (max-width: 700px) {
+  .dx-feature { grid-template-columns: 105px 54px 1fr 34px; }
+  .dx-feature-cov { display: none; }
+  .dx-passport-grid { grid-template-columns: 1fr; }
+}
 .dx-empty { font-family: var(--font-mono); font-size: 12px; color: var(--dx-faint); padding: 20px 0; }
 
 /* readout */

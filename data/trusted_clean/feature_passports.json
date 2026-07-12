@@ -1,0 +1,1260 @@
+{
+  "dataset": "modeling_dataset_2020_2025.csv",
+  "disclaimer": "Research/educational lineage record. Not investment advice or a guarantee of source accuracy.",
+  "passports": [
+    {
+      "acceptance_status": "identifier_only",
+      "caveats": [
+        "Ticker identity is normalized text; it is not point-in-time membership evidence."
+      ],
+      "evidence_files": [
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "none",
+      "name": "ticker",
+      "registry_role": "identifier",
+      "source_class": "metadata",
+      "transform_chain": [
+        "normalize ticker text to uppercase",
+        "use ticker with year as row key"
+      ]
+    },
+    {
+      "acceptance_status": "identifier_only",
+      "caveats": [
+        "No verified company-name source is attached; the ticker is used as the label."
+      ],
+      "evidence_files": [
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "none",
+      "name": "company_name",
+      "registry_role": "identifier",
+      "source_class": "metadata",
+      "transform_chain": [
+        "copy ticker into company_name as a display label"
+      ]
+    },
+    {
+      "acceptance_status": "identifier_only",
+      "caveats": [],
+      "evidence_files": [
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "none",
+      "name": "year",
+      "registry_role": "identifier",
+      "source_class": "metadata",
+      "transform_chain": [
+        "parse source fiscal year as integer",
+        "retain years 2020 through 2025"
+      ]
+    },
+    {
+      "acceptance_status": "metadata_only",
+      "caveats": [
+        "Sector is unpopulated in the trusted modeling path and must not be inferred."
+      ],
+      "evidence_files": [
+        "METHODOLOGY.md",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "none",
+      "name": "sector",
+      "registry_role": "metadata",
+      "source_class": "metadata",
+      "transform_chain": [
+        "leave null because no validated sector-label source exists"
+      ]
+    },
+    {
+      "acceptance_status": "metadata_only",
+      "caveats": [
+        "Index text does not establish historical constituent membership."
+      ],
+      "evidence_files": [
+        "docs/universe_audit.md",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "none",
+      "name": "indices",
+      "registry_role": "metadata",
+      "source_class": "metadata",
+      "transform_chain": [
+        "retain public-cohort index text from the reference input",
+        "leave training-only pilot rows null"
+      ]
+    },
+    {
+      "acceptance_status": "metadata_only",
+      "caveats": [
+        "This flag is not verified point-in-time BIST100 membership."
+      ],
+      "evidence_files": [
+        "docs/universe_audit.md",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "none",
+      "name": "is_bist100",
+      "registry_role": "metadata",
+      "source_class": "metadata",
+      "transform_chain": [
+        "derive public rows from whether indices contains XU100",
+        "set training-only pilot rows false"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Benchmark coverage gaps remain null."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/bist100_benchmark_report.json",
+        "scripts/data_collection/collect_bist100_benchmark.py",
+        "scripts/data_collection/price_features.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "benchmark_same_year_return_pct",
+      "registry_role": "feature_allowed",
+      "source_class": "yahoo_fetch",
+      "transform_chain": [
+        "load validated BIST100 yearly return",
+        "join benchmark year to feature year T"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "current_assets",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "current_ratio",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by universe_source, so no single upstream source class is asserted.",
+        "Training-only yfinance values are unofficial and require KAP cross-check."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "ebitda",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: prefer validated corrected-yearly CSV values",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "The current training-only pilot rows contain no values for this column."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "ebitda_growth_pct",
+      "registry_role": "feature_allowed",
+      "source_class": "vendor_xlsx",
+      "transform_chain": [
+        "load year-varying public-cohort field from the validated legacy yearly export",
+        "leave unavailable training-only values null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by universe_source, so no single upstream source class is asserted.",
+        "Training-only yfinance values are unofficial and require KAP cross-check."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "ebitda_margin",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: prefer validated corrected-yearly CSV values",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Legacy snapshot values for this field were rejected as frozen; the accepted values are rebuilt from validated dependencies.",
+        "Manual shares and external Yahoo prices are inputs; missing inputs remain null."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/free_valuation_history_report.json",
+        "data/trusted_clean/frozen_column_evidence.json",
+        "data/trusted_clean/shares_outstanding_expansion_report.json",
+        "scripts/data_collection/build_free_valuation_history.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "enterprise_value",
+      "registry_role": "feature_allowed",
+      "source_class": "derived",
+      "transform_chain": [
+        "enterprise_value = market_cap + net_debt",
+        "apply input and plausibility guards",
+        "accept only year-varying output; otherwise leave null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "equity",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Legacy snapshot values for this field were rejected as frozen; the accepted values are rebuilt from validated dependencies.",
+        "Manual shares and external Yahoo prices are inputs; missing inputs remain null."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/free_valuation_history_report.json",
+        "data/trusted_clean/frozen_column_evidence.json",
+        "data/trusted_clean/shares_outstanding_expansion_report.json",
+        "scripts/data_collection/build_free_valuation_history.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "ev_ebitda",
+      "registry_role": "feature_allowed",
+      "source_class": "derived",
+      "transform_chain": [
+        "ev_ebitda = enterprise_value / ebitda where ebitda is positive",
+        "apply input and plausibility guards",
+        "accept only year-varying output; otherwise leave null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "financial_debt_ratio",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by universe_source, so no single upstream source class is asserted.",
+        "Training-only yfinance values are unofficial and require KAP cross-check."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "gross_margin",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: prefer validated corrected-yearly CSV values",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by universe_source, so no single upstream source class is asserted.",
+        "Training-only yfinance values are unofficial and require KAP cross-check."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "gross_profit",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: prefer validated corrected-yearly CSV values",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "The current training-only pilot rows contain no values for this column."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "gross_profit_growth_pct",
+      "registry_role": "feature_allowed",
+      "source_class": "vendor_xlsx",
+      "transform_chain": [
+        "load year-varying public-cohort field from the validated legacy yearly export",
+        "leave unavailable training-only values null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "leverage_ratio",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "long_term_liabilities",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Legacy snapshot values for this field were rejected as frozen; the accepted values are rebuilt from validated dependencies.",
+        "Manual shares and external Yahoo prices are inputs; missing inputs remain null."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/free_valuation_history_report.json",
+        "data/trusted_clean/frozen_column_evidence.json",
+        "data/trusted_clean/shares_outstanding_expansion_report.json",
+        "scripts/data_collection/build_free_valuation_history.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "market_cap",
+      "registry_role": "feature_allowed",
+      "source_class": "derived",
+      "transform_chain": [
+        "market_cap = Yahoo year-end price × manual shares outstanding",
+        "apply input and plausibility guards",
+        "accept only year-varying output; otherwise leave null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "net_debt",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "net_debt_to_ebitda",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by universe_source, so no single upstream source class is asserted.",
+        "Training-only yfinance values are unofficial and require KAP cross-check."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "net_income",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: prefer validated corrected-yearly CSV values",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "The current training-only pilot rows contain no values for this column."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "net_income_growth_pct",
+      "registry_role": "feature_allowed",
+      "source_class": "vendor_xlsx",
+      "transform_chain": [
+        "load year-varying public-cohort field from the validated legacy yearly export",
+        "leave unavailable training-only values null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by universe_source, so no single upstream source class is asserted.",
+        "Training-only yfinance values are unofficial and require KAP cross-check."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "net_margin",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: prefer validated corrected-yearly CSV values",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "non_current_assets",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by universe_source, so no single upstream source class is asserted.",
+        "Training-only yfinance values are unofficial and require KAP cross-check."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "operating_income",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: prefer validated corrected-yearly CSV values",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "The current training-only pilot rows contain no values for this column."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "operating_income_growth_pct",
+      "registry_role": "feature_allowed",
+      "source_class": "vendor_xlsx",
+      "transform_chain": [
+        "load year-varying public-cohort field from the validated legacy yearly export",
+        "leave unavailable training-only values null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Legacy snapshot values for this field were rejected as frozen; the accepted values are rebuilt from validated dependencies.",
+        "Manual shares and external Yahoo prices are inputs; missing inputs remain null."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/free_valuation_history_report.json",
+        "data/trusted_clean/frozen_column_evidence.json",
+        "data/trusted_clean/shares_outstanding_expansion_report.json",
+        "scripts/data_collection/build_free_valuation_history.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "pb_ratio",
+      "registry_role": "feature_allowed",
+      "source_class": "derived",
+      "transform_chain": [
+        "pb_ratio = market_cap / equity where equity is positive and validated",
+        "apply input and plausibility guards",
+        "accept only year-varying output; otherwise leave null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Legacy snapshot values for this field were rejected as frozen; the accepted values are rebuilt from validated dependencies.",
+        "Manual shares and external Yahoo prices are inputs; missing inputs remain null."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/free_valuation_history_report.json",
+        "data/trusted_clean/frozen_column_evidence.json",
+        "data/trusted_clean/shares_outstanding_expansion_report.json",
+        "scripts/data_collection/build_free_valuation_history.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "pe_ratio",
+      "registry_role": "feature_allowed",
+      "source_class": "derived",
+      "transform_chain": [
+        "pe_ratio = market_cap / net_income where net_income is positive",
+        "apply input and plausibility guards",
+        "accept only year-varying output; otherwise leave null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Yahoo price coverage is incomplete; missing ticker-years remain null."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/pilot_integration_report.json",
+        "docs/universe_audit.md",
+        "scripts/data_collection/price_features.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "price_adjclose_t",
+      "registry_role": "feature_allowed",
+      "source_class": "yahoo_fetch",
+      "transform_chain": [
+        "load cached Yahoo adjusted close",
+        "select the final valid price at or before year end T"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Yahoo or benchmark coverage gaps propagate as null; no price values are filled."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/bist100_benchmark_report.json",
+        "docs/universe_audit.md",
+        "scripts/data_collection/price_features.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "price_data_available",
+      "registry_role": "feature_allowed",
+      "source_class": "derived",
+      "transform_chain": [
+        "set 1 only when a valid Yahoo year-end price row exists",
+        "use only observations known by end of year T"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Yahoo or benchmark coverage gaps propagate as null; no price values are filled."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/bist100_benchmark_report.json",
+        "docs/universe_audit.md",
+        "scripts/data_collection/price_features.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "price_drawdown_from_3y_high_pct",
+      "registry_role": "feature_allowed",
+      "source_class": "derived",
+      "transform_chain": [
+        "compare T adjusted close with the maximum adjusted close from T-2 through T",
+        "use only observations known by end of year T"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Yahoo or benchmark coverage gaps propagate as null; no price values are filled."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/bist100_benchmark_report.json",
+        "docs/universe_audit.md",
+        "scripts/data_collection/price_features.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "price_history_years_available",
+      "registry_role": "feature_allowed",
+      "source_class": "derived",
+      "transform_chain": [
+        "count valid Yahoo year-end observations available through T",
+        "use only observations known by end of year T"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Yahoo or benchmark coverage gaps propagate as null; no price values are filled."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/bist100_benchmark_report.json",
+        "docs/universe_audit.md",
+        "scripts/data_collection/price_features.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "price_momentum_1y_pct",
+      "registry_role": "feature_allowed",
+      "source_class": "derived",
+      "transform_chain": [
+        "compute percentage change from T-1 to T adjusted close",
+        "use only observations known by end of year T"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Yahoo or benchmark coverage gaps propagate as null; no price values are filled."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/bist100_benchmark_report.json",
+        "docs/universe_audit.md",
+        "scripts/data_collection/price_features.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "price_momentum_2y_pct",
+      "registry_role": "feature_allowed",
+      "source_class": "derived",
+      "transform_chain": [
+        "compute percentage change from T-2 to T adjusted close",
+        "use only observations known by end of year T"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Yahoo or benchmark coverage gaps propagate as null; no price values are filled."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/bist100_benchmark_report.json",
+        "docs/universe_audit.md",
+        "scripts/data_collection/price_features.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "price_vs_bist100_1y_pct",
+      "registry_role": "feature_allowed",
+      "source_class": "derived",
+      "transform_chain": [
+        "subtract same-year BIST100 return from one-year price momentum",
+        "use only observations known by end of year T"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by universe_source, so no single upstream source class is asserted.",
+        "Training-only yfinance values are unofficial and require KAP cross-check."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "revenue",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: prefer validated corrected-yearly CSV values",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "The current training-only pilot rows contain no values for this column."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "revenue_growth_pct",
+      "registry_role": "feature_allowed",
+      "source_class": "vendor_xlsx",
+      "transform_chain": [
+        "load year-varying public-cohort field from the validated legacy yearly export",
+        "leave unavailable training-only values null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by universe_source, so no single upstream source class is asserted.",
+        "Training-only yfinance values are unofficial and require KAP cross-check."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "roa",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: prefer validated corrected-yearly CSV values",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by universe_source, so no single upstream source class is asserted.",
+        "Training-only yfinance values are unofficial and require KAP cross-check."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "roe",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: prefer validated corrected-yearly CSV values",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "short_term_liabilities",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "total_assets",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "accepted_feature",
+      "caveats": [
+        "Column-level provenance is mixed by row and cannot be reduced to one verified source class.",
+        "Rejected or unavailable cells remain null; no values are inferred."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/corrected_yearly_ingestion_report.json",
+        "data/trusted_clean/data_quality_report.json",
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/manual_ingest.py"
+      ],
+      "leakage_risk": "provisional_reference_fundamental",
+      "name": "working_capital",
+      "registry_role": "feature_allowed",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: load accepted year-varying vendor values",
+        "override reviewed 2024 public cells from corrected_balance_sheet_2024.csv",
+        "training-only rows: retain available unofficial yfinance values",
+        "preserve missing values as null"
+      ]
+    },
+    {
+      "acceptance_status": "target_only",
+      "caveats": [
+        "Rows without a validated T+1 outcome remain inference-only."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/data_quality_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "is_target",
+      "name": "next_year_return_pct",
+      "registry_role": "target",
+      "source_class": "derived",
+      "transform_chain": [
+        "shift each ticker's realized return from year T+1 back onto feature year T"
+      ]
+    },
+    {
+      "acceptance_status": "target_only",
+      "caveats": [
+        "Pilot ranks are computed within the pilot cohort rather than jointly with the public cohort."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "is_target",
+      "name": "next_year_rank_by_return",
+      "registry_role": "target",
+      "source_class": "derived",
+      "transform_chain": [
+        "rank next_year_return_pct descending within target year"
+      ]
+    },
+    {
+      "acceptance_status": "target_only",
+      "caveats": [
+        "Pilot ranks are computed within the pilot cohort rather than jointly with the public cohort."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "is_target",
+      "name": "next_year_return_percentile",
+      "registry_role": "target",
+      "source_class": "derived",
+      "transform_chain": [
+        "percentile-rank next_year_return_pct within target year"
+      ]
+    },
+    {
+      "acceptance_status": "target_only",
+      "caveats": [
+        "Pilot ranks are computed within the pilot cohort rather than jointly with the public cohort."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "is_target",
+      "name": "next_year_top_10pct_returner",
+      "registry_role": "target",
+      "source_class": "derived",
+      "transform_chain": [
+        "flag target-year return percentile at or above 90"
+      ]
+    },
+    {
+      "acceptance_status": "target_only",
+      "caveats": [
+        "Pilot ranks are computed within the pilot cohort rather than jointly with the public cohort."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/pilot_integration_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "is_target",
+      "name": "next_year_top_20pct_returner",
+      "registry_role": "target",
+      "source_class": "derived",
+      "transform_chain": [
+        "flag target-year return percentile at or above 80"
+      ]
+    },
+    {
+      "acceptance_status": "target_only",
+      "caveats": [
+        "Benchmark targets are unavailable for training-only pilot rows and remain null."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/bist100_benchmark_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "is_target",
+      "name": "next_year_bist100_return_pct",
+      "registry_role": "benchmark",
+      "source_class": "derived",
+      "transform_chain": [
+        "join validated BIST100 return on target_year = T+1"
+      ]
+    },
+    {
+      "acceptance_status": "target_only",
+      "caveats": [
+        "Null company or benchmark targets propagate as null."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/bist100_benchmark_report.json",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "is_target",
+      "name": "next_year_excess_return_vs_bist100",
+      "registry_role": "benchmark",
+      "source_class": "derived",
+      "transform_chain": [
+        "next_year_return_pct - next_year_bist100_return_pct"
+      ]
+    },
+    {
+      "acceptance_status": "target_only",
+      "caveats": [
+        "Null excess-return targets remain null."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/bist100_benchmark_report.json",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "is_target",
+      "name": "next_year_outperform_bist100",
+      "registry_role": "benchmark",
+      "source_class": "derived",
+      "transform_chain": [
+        "flag next_year_excess_return_vs_bist100 greater than zero"
+      ]
+    },
+    {
+      "acceptance_status": "analysis_only",
+      "caveats": [
+        "Column-level provenance is mixed by universe_source.",
+        "This same-year outcome is analysis-only and never a feature."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/data_quality_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "is_same_year_outcome",
+      "name": "same_year_return_pct",
+      "registry_role": "same_year_analysis_only",
+      "source_class": "unknown",
+      "transform_chain": [
+        "public rows: retain realized annual return from the legacy yearly export",
+        "training-only rows: derive return from adjacent Yahoo year-end adjusted closes"
+      ]
+    },
+    {
+      "acceptance_status": "metadata_only",
+      "caveats": [],
+      "evidence_files": [
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "none",
+      "name": "target_year",
+      "registry_role": "metadata",
+      "source_class": "derived",
+      "transform_chain": [
+        "target_year = year + 1"
+      ]
+    },
+    {
+      "acceptance_status": "metadata_only",
+      "caveats": [
+        "Missing future outcomes remain null and are not imputed."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/data_quality_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "none",
+      "name": "has_target",
+      "registry_role": "metadata",
+      "source_class": "derived",
+      "transform_chain": [
+        "has_target = next_year_return_pct is non-null"
+      ]
+    },
+    {
+      "acceptance_status": "metadata_only",
+      "caveats": [
+        "Missing future outcomes remain null and are not imputed."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/data_quality_report.json",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/pipeline.py"
+      ],
+      "leakage_risk": "none",
+      "name": "is_inference_row",
+      "registry_role": "metadata",
+      "source_class": "derived",
+      "transform_chain": [
+        "is_inference_row = not has_target"
+      ]
+    },
+    {
+      "acceptance_status": "metadata_only",
+      "caveats": [
+        "Configured cohort membership is retrospective, not verified point-in-time index membership."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/pilot_integration_report.json",
+        "docs/universe_audit.md",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/split_universe_datasets.py"
+      ],
+      "leakage_risk": "none",
+      "name": "is_public_universe",
+      "registry_role": "metadata",
+      "source_class": "metadata",
+      "transform_chain": [
+        "mark membership in the configured public cohort",
+        "persist during universe split/integration"
+      ]
+    },
+    {
+      "acceptance_status": "metadata_only",
+      "caveats": [
+        "Configured cohort membership is retrospective, not verified point-in-time index membership."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/pilot_integration_report.json",
+        "docs/universe_audit.md",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/split_universe_datasets.py"
+      ],
+      "leakage_risk": "none",
+      "name": "is_training_universe",
+      "registry_role": "metadata",
+      "source_class": "metadata",
+      "transform_chain": [
+        "mark membership in the configured training cohort",
+        "persist during universe split/integration"
+      ]
+    },
+    {
+      "acceptance_status": "metadata_only",
+      "caveats": [
+        "Configured cohort membership is retrospective, not verified point-in-time index membership."
+      ],
+      "evidence_files": [
+        "data/trusted_clean/pilot_integration_report.json",
+        "docs/universe_audit.md",
+        "scripts/data_collection/integrate_pilot_tickers.py",
+        "scripts/data_collection/split_universe_datasets.py"
+      ],
+      "leakage_risk": "none",
+      "name": "universe_source",
+      "registry_role": "metadata",
+      "source_class": "metadata",
+      "transform_chain": [
+        "record public_40 or yfinance_pilot row origin",
+        "persist during universe split/integration"
+      ]
+    }
+  ],
+  "schema_version": "1.0.0",
+  "source_class_definitions": {
+    "corrected_yearly_csv": "Validated corrected-yearly/manual CSV path.",
+    "derived": "Deterministic transformation of cited inputs.",
+    "manual_shares": "Human-supplied shares-outstanding input; never inferred.",
+    "metadata": "Identifier, cohort, or row-state metadata.",
+    "unknown": "A single verified column-level source cannot be asserted.",
+    "vendor_xlsx": "Verified column path from the legacy yearly vendor export.",
+    "yahoo_fetch": "External Yahoo/yfinance price or benchmark observation."
+  }
+}
