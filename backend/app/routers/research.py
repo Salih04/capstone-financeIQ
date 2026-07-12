@@ -7,10 +7,11 @@ quarterly/winner tables, no external APIs. Selected period is always a YEAR.
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 
 from app.core.dependencies import require_access
 from app.models.user import User
-from app.services import skeptic_service
+from app.services import courtroom_service, skeptic_service
 from app.services.research import (
     benchmark,
     company,
@@ -25,6 +26,11 @@ from app.services.research import (
 )
 
 router = APIRouter(prefix="/research", tags=["research"])
+
+
+class CourtroomBody(BaseModel):
+    ticker: str
+    year: int | None = None
 
 
 def _guard_year(year: int) -> None:
@@ -124,5 +130,14 @@ def skeptic_report(ticker: str, _: User | None = Depends(require_access)):
     """Challenge a ticker with cached, committed evidence; never alter its score."""
     try:
         return skeptic_service.skeptic_report(ticker)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
+
+
+@router.post("/courtroom")
+def courtroom_report(body: CourtroomBody, _: User | None = Depends(require_access)):
+    """Return deterministic evidence lenses with no adjudication field."""
+    try:
+        return courtroom_service.courtroom_report(body.ticker, body.year)
     except ValueError as exc:
         raise HTTPException(422, str(exc))

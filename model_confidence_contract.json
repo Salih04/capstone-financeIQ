@@ -1,6 +1,6 @@
 {
   "contract_name": "FinanceIQ Model Confidence Contract",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "effective_date": "2026-07-13",
   "authority": "FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md",
   "versioning_procedure": {
@@ -84,6 +84,7 @@
     "backend_response_files": [
       "backend/app/services/forecasting_csv_service.py",
       "backend/app/services/skeptic_service.py",
+      "backend/app/services/courtroom_service.py",
       "backend/app/services/research/regime.py",
       "backend/app/services/analyst_verdict_service.py"
     ],
@@ -172,6 +173,7 @@
       "frontend/src/pages/CompanyPage.jsx",
       "frontend/src/pages/CompanyResearchDetailPage.jsx",
       "frontend/src/pages/ComparePage.jsx",
+      "frontend/src/pages/CourtroomPage.jsx",
       "frontend/src/pages/DashboardPage.jsx",
       "frontend/src/pages/DataHealthPage.jsx",
       "frontend/src/pages/DataQualityPage.jsx",

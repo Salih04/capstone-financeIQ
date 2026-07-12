@@ -17,7 +17,7 @@ def test_forecasting_service_satisfies_model_confidence_contract(monkeypatch):
     approved = contract["approved_wording"]
     inference_contract = contract["inference_contract"]
 
-    assert contract["version"] == "1.5.0"
+    assert contract["version"] == "1.6.0"
     assert contract["evidence_state"]["reliable_predictive_edge_observed"] is False
     assert svc.DISCLAIMER == approved["primary_disclaimer"]
 

@@ -1,6 +1,6 @@
 # TASK_STATE.md — FinanceIQ
 
-Last updated: 2026-07-12 (rev 10)
+Last updated: 2026-07-13 (rev 11)
 
 ## Status legend
 - `DONE` — shipped, tested
@@ -68,6 +68,7 @@ claim.
 | R2-REAL-01 real-terms + USD return targets (2026-07-12) | DONE (uncommitted) | TÜİK December CPI + cached Yahoo `TRY=X` year-end quotes derive separate CPI-deflated TRY and USD-basis targets for all 321 nominal outcomes with null propagation/no imputation; isolated significance reports show random-forest pooled IC −0.156 (Bonferroni p=0.0984) real TRY and −0.150 (Bonferroni p=0.1278) USD, neither family-wise significant; two-run checksums identical; canonical datasets and nominal experiment artifacts unchanged; root 136/136, data VALID, claims lint passed; no commit by request |
 | R2-REGIME-01 Regime Lens (2026-07-12) | DONE (uncommitted) | effective-dated CPI, year-end TCMB policy rate, USDTRY, and BIST100 context with source-or-null validation; deterministic `regime_context_report.{json,md}` and `/research/regime-context` feed the shared Benchmark/Experiments strip without altering chart payloads; all three test years occupy one task-defined period, so regime-conditional diagnostics are untestable and not computed; root 146/146, backend 71/71, data VALID, frontend build and claims lint passed; canonical nominal/real-terms artifacts unchanged; no commit by request |
 | R2-LOOP-01 analyst-in-the-loop dissent ledger (2026-07-13) | DONE (uncommitted) | append-only `analyst_verdicts` migration; authenticated verdict writes plus deterministic read-only aggregate counts on the existing Labeling/Validation Labs; mandatory no-score-input/no-crowd-signal boundary; scoring output pin-tested identical with and without verdict rows; MCC v1.5.0; isolated Postgres migration applied through `20260713_0007`; root 149/149, backend 76/76, frontend build and claims lint passed; protected research/data artifact checksums unchanged; no commit by request |
+| R2-COURT-01 Research Courtroom (2026-07-13) | DONE (uncommitted) | deterministic Bull/Bear/Skeptic/Risk evidence lenses over company contexts, feature passports, Skeptic output, quality evidence, and the corrected significance report; four citation-complete items per lens, Risk always last, no adjudication field, and missing/malformed inputs return `insufficient_data`; `POST /research/courtroom` + `/courtroom`; MCC v1.6.0; root 152/152, backend 83/83, frontend build, claims lint, and live LLM-off API passed; page visual blocked by the real Supabase auth gate without an approved session; protected research/data checksums unchanged; no commit by request |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
 ---
