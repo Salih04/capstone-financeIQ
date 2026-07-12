@@ -1,0 +1,7 @@
+year,target_date,price_date,try_per_usd,currency,source,yahoo_symbol,status,error
+2020,2020-12-31,2020-12-31,7.3737301826,TRY,yahoo_chart_api,TRY=X,success,
+2021,2021-12-31,2021-12-31,13.2904996872,TRY,yahoo_chart_api,TRY=X,success,
+2022,2022-12-31,2022-12-30,18.7029895782,TRY,yahoo_chart_api,TRY=X,success,
+2023,2023-12-31,2023-12-29,29.5198001862,TRY,yahoo_chart_api,TRY=X,success,
+2024,2024-12-31,2024-12-31,35.3052482605,TRY,yahoo_chart_api,TRY=X,success,
+2025,2025-12-31,2025-12-31,42.9519805908,TRY,yahoo_chart_api,TRY=X,success,
