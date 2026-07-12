@@ -246,7 +246,16 @@ An OPTIONAL experimental mode (`target_mode=include_partial_2025`) can include
 
 - Small dataset, even after expansion. All out-of-sample numbers are noisy;
   overfitting is easy.
-- No survivorship/look-ahead audit of how the 40-company universe was selected.
+- The universe audit verifies the configured 40-company public cohort and
+  81-ticker training split, but not historical BIST100 membership. Git first
+  records the 40-name cohort in June 2026, after the 2020–2025 study window; the
+  repository contains no point-in-time constituent, delisting, suspension, or
+  membership-effective-date history and does not state the original selection
+  rule. Actual Yahoo coverage is 226/240 public ticker-years (35/40 tickers
+  complete). Results therefore describe a retrospectively fixed repository
+  cohort and retain unresolved survivorship and universe-selection look-ahead
+  risk; missing history was not inferred or filled. See
+  `docs/universe_audit.md` for the file- and commit-cited evidence.
 - BIST100 benchmark/excess-return fields exist where source coverage is valid;
   they are not available for every expanded training row.
 - Supervised ML is **not** presented as a reliable trained predictor.
