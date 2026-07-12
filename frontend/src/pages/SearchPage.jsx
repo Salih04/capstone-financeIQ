@@ -359,6 +359,8 @@ export default function SearchPage() {
         <span className="cmap-caveat-pulse" aria-hidden="true" />
         Hybrid score = 0.65 · ML + 0.20 · Confidence + 0.15 · LLM evidence
         <span className="cmap-caveat-sep">·</span>
+        Sector labels are illustrative fallback metadata; sector comparisons with fewer than 10 companies are anecdotal
+        <span className="cmap-caveat-sep">·</span>
         Walk-forward IC ≈ 0 · Research only · Not investment advice
       </footer>
     </div>

@@ -97,6 +97,9 @@ export default function ForecastingDetailPage() {
 
       <Card style={{ padding: '1rem', marginTop: 16 }}>
         <div style={{ fontSize: 12, color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 10 }}>Sector Heatmap ({year || 'n/a'})</div>
+        <p style={{ color: 'var(--warning)', fontSize: 12, margin: '0 0 12px', lineHeight: 1.5 }}>
+          Sector comparisons with fewer than 10 companies are anecdotal.
+        </p>
         {Object.keys(heatBySector).length === 0 ? (
           <EmptyState title="No heatmap data" description="Run forecast and ensure year data exists." />
         ) : (

@@ -151,6 +151,9 @@ export default function LabelingLabPage() {
               </select>
             </div>
           </div>
+          <p style={{ color: 'var(--warning)', fontSize: 12, margin: '12px 0 0', lineHeight: 1.5 }}>
+            Sector comparisons with fewer than 10 companies are anecdotal.
+          </p>
           <button onClick={handleCreate} style={{ marginTop: 14, background: 'var(--primary)', border: 'none', borderRadius: 'var(--radius-md)', color: '#fff', padding: '9px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
             Create
           </button>

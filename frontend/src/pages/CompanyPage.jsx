@@ -718,9 +718,12 @@ export default function CompanyPage() {
       {/* Sector Z-Score tab */}
       {activeTab === 'sector' && (
         sectorForPeriod.length === 0 ? (
-          <EmptyState icon={ArrowUpRight} title="No sector data" sub="Sector benchmarks require at least 2 companies in the same sector." />
+          <EmptyState icon={ArrowUpRight} title="No sector data" sub="Sector benchmarks require at least 2 companies in the same sector. Sector comparisons with fewer than 10 companies are anecdotal." />
         ) : (
           <Card>
+            <p style={{ color: 'var(--warning)', fontSize: 12, margin: '0 0 14px', lineHeight: 1.5 }}>
+              Sector comparisons with fewer than 10 companies are anecdotal.
+            </p>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>

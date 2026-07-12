@@ -191,6 +191,9 @@ function AdaptiveWeightsCard({ adaptiveInfo }) {
             <div style={{ background: 'rgba(168,103,75,0.08)', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: 'var(--text-2)' }}>
               <strong style={{ color: '#A8674B' }}>Sector Adjustment:</strong>{' '}
               {sector_adjustment.explanation}
+              <div style={{ marginTop: 5, color: 'var(--text-3)' }}>
+                Sector comparisons with fewer than 10 companies are anecdotal.
+              </div>
             </div>
           )}
           <p style={{ fontSize: 11.5, color: 'var(--text-3)', margin: '10px 0 0', lineHeight: 1.5 }}>

@@ -403,6 +403,10 @@ export default function ComparePage() {
               <div>ElasticNet + RandomForest</div>
             </div>
 
+            <div style={{ marginBottom: 12, fontSize: 11, color: 'var(--text-3)', lineHeight: 1.45 }}>
+              Sector comparisons with fewer than 10 companies are anecdotal.
+            </div>
+
             <label style={{ display: 'block', fontSize: 12, color: 'var(--text-2)', marginBottom: 6 }}>Period</label>
             <select
               value={period} onChange={e => setPeriod(e.target.value)}

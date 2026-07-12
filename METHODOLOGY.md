@@ -35,7 +35,8 @@ Verified by `scripts/validate_trusted_data.py` (`column_variability`):
   free-reconstructed valuation fields where inputs pass shape/coverage checks.
 - **Accepted year-T market features:** Yahoo year-end price, year-T return,
   volatility, drawdown, benchmark-relative return, dividend/split indicators,
-  sector metadata, and data-coverage indicators.
+  and data-coverage indicators. The `sector` identity column exists but is
+  currently unpopulated; it is not an accepted modeling feature.
 - **Rejected or guarded fields:** frozen snapshot columns, current-only multiples,
   same-row realized returns, future-derived targets, and any post-target fields.
 
@@ -47,6 +48,42 @@ Consequences, stated honestly:
   the public UI universe remains the selected 40 BIST companies.
 - The product does **not** claim robust predictive alpha. It tests whether
   leakage-safe year-T information has measurable T+1 rank signal.
+
+### Sector-label provenance and sample sizes (DATA-06 audit, 2026-07-12)
+
+The trusted modeling path has no validated sector-label source. In
+`scripts/data_collection/pipeline.py`, `build_universe()` deliberately sets
+`sector` to null because the legacy reference data does not contain reliable
+per-year sectors. The generated `data/trusted_raw/company_universe.csv` therefore
+has an empty `sector` column. None of the universe files in `data/config/*.csv`
+defines a sector label: they contain ticker membership and notes only.
+
+Current committed-output counts, measured by distinct ticker, are:
+
+| Dataset | Labeled sectors | Unassigned | Total tickers | Rows with blank sector |
+|---|---:|---:|---:|---:|
+| Public (`modeling_dataset_public_2020_2025.csv`) | 0 | 40 | 40 | 240 / 240 |
+| Training (`modeling_dataset_training_2020_2025.csv`) | 0 | 81 | 81 | 403 / 403 |
+
+There are consequently no evidence-backed per-sector stock counts to report;
+the only current bucket is **Unassigned** (40 public, 81 training). Assigning
+companies to sectors would require a separately sourced, reviewed taxonomy and
+owner sign-off. Missing labels must remain null rather than being inferred.
+
+The DB-backed sector analytics are a separate legacy path. The trusted yearly
+loader also leaves `Company.sector` and `Company.sector_code` null.
+`backend/app/services/sector_service.py` performs no label mapping or
+normalization: it groups exact, non-null `Company.sector_code` strings and will
+compute z-scores with as few as two populated peers (`MIN_PEERS = 2`). Thus its
+labels are consistent only if the active database was populated consistently by
+an external/manual workflow; they do not come from the trusted modeling dataset.
+The legacy quarterly-forecasting upload likewise accepts its `sector` text from
+the uploaded CSV and is not sector provenance for the trusted dataset.
+
+Any sector comparison with fewer than 10 companies is **anecdotal**. Sector
+z-scores, percentiles, heatmaps, medians, and adaptive adjustments must not be
+read as statistically reliable or as evidence of predictive skill. They remain
+research support only, not investment advice.
 
 ## Two separate scores
 
