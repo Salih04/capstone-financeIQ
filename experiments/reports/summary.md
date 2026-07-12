@@ -3,12 +3,9 @@
 Walk-forward, leakage-controlled. Small data (40 stocks/year) — treat
 all out-of-sample numbers as noisy and overfitting-prone.
 
-> ⚠️ DATA CAVEAT: the trusted XLSX files share ONE static fundamental
-> snapshot (only realized returns vary by year). So the predictor features
-> are identical every year and this harness is DEGENERATE on the current
-> data — it tests a fixed fundamental ranking against each year's returns,
-> not real time-series forecasting. The pipeline is ready for genuinely
-> time-varying fundamentals if/when they are provided.
+> ⚠️ DATA CAVEAT: corrected features vary by year: 39 of 40 predictor features show verified
+> within-ticker cross-year variance; 33 frozen reference columns are excluded. The dataset remains
+> small and sparse, so this does not establish reliable predictive signal.
 
 ## test_2023
 

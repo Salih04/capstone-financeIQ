@@ -323,6 +323,56 @@ def _markdown_table(df: pd.DataFrame) -> str:
     return "\n".join(lines)
 
 
+def _data_caveat(feature_data: pd.DataFrame, feat_cols: list[str], frozen_excluded: int) -> list[str]:
+    """Build the report caveat from observed within-ticker cross-year variance."""
+    varying_features = []
+    for c in feat_cols:
+        cross_year_variance = feature_data.groupby("ticker")[c].var(ddof=0).dropna()
+        if (cross_year_variance > 0).any():
+            varying_features.append(c)
+
+    if varying_features:
+        return [
+            "> ⚠️ DATA CAVEAT: corrected features vary by year: "
+            f"{len(varying_features)} of {len(feat_cols)} predictor features show verified",
+            "> within-ticker cross-year variance; "
+            f"{frozen_excluded} frozen reference columns are excluded. The dataset remains",
+            "> small and sparse, so this does not establish reliable predictive signal."
+        ]
+
+    return [
+        "> ⚠️ DATA CAVEAT: verified current predictor features have no within-ticker",
+        "> cross-year variance. This harness is DEGENERATE on the current data — it",
+        "> tests a fixed feature ranking against each year's returns, not real time-series",
+        "> forecasting. The pipeline requires genuinely time-varying features."
+    ]
+
+
+def _write_summary_report(lb: pd.DataFrame, panel: pd.DataFrame, feat_cols: list[str]) -> None:
+    """Write the honest summary without changing experiment results."""
+    frozen_excluded = 0
+    quality_report = ROOT / "data" / "trusted_clean" / "data_quality_report.json"
+    if quality_report.is_file():
+        quality = json.loads(quality_report.read_text())
+        frozen_excluded = len(quality.get("frozen_columns_excluded_from_features", []))
+    variation_frame = panel
+    if _modeling_csv().is_file():
+        variation_frame = pd.read_csv(_modeling_csv(), usecols=["ticker", *feat_cols])
+    lines = ["# Experiment summary (next-year return prediction)\n",
+             "Walk-forward, leakage-controlled. Small data (40 stocks/year) — treat",
+             "all out-of-sample numbers as noisy and overfitting-prone.\n",
+             *_data_caveat(variation_frame, feat_cols, frozen_excluded),
+             ""]
+    for split in SPLITS:
+        sub = lb[lb["split"] == split["name"]].copy()
+        if "spearman" in sub:
+            sub = sub.sort_values("spearman", ascending=False, na_position="last")
+        lines.append(f"## {split['name']}\n")
+        lines.append(_markdown_table(sub))
+        lines.append("")
+    (REPORTS / "summary.md").write_text("\n".join(lines))
+
+
 def run() -> None:
     RESULTS.mkdir(parents=True, exist_ok=True)
     REPORTS.mkdir(parents=True, exist_ok=True)
@@ -418,24 +468,7 @@ def run() -> None:
             sm.append(f"- ML beats baseline: {bool(len(ml) and len(base) and ml.max() > base.mean())}\n")
     (RESULTS / "experiment_summary.md").write_text("\n".join(sm))
 
-    # Honest summary report.
-    lines = ["# Experiment summary (next-year return prediction)\n",
-             "Walk-forward, leakage-controlled. Small data (40 stocks/year) — treat",
-             "all out-of-sample numbers as noisy and overfitting-prone.\n",
-             "> ⚠️ DATA CAVEAT: the trusted XLSX files share ONE static fundamental",
-             "> snapshot (only realized returns vary by year). So the predictor features",
-             "> are identical every year and this harness is DEGENERATE on the current",
-             "> data — it tests a fixed fundamental ranking against each year's returns,",
-             "> not real time-series forecasting. The pipeline is ready for genuinely",
-             "> time-varying fundamentals if/when they are provided.\n"]
-    for split in SPLITS:
-        sub = lb[lb["split"] == split["name"]].copy()
-        if "spearman" in sub:
-            sub = sub.sort_values("spearman", ascending=False, na_position="last")
-        lines.append(f"## {split['name']}\n")
-        lines.append(_markdown_table(sub))
-        lines.append("")
-    (REPORTS / "summary.md").write_text("\n".join(lines))
+    _write_summary_report(lb, panel, feat_cols)
     print("Wrote leaderboard + results + reports.")
     print(lb.to_string(index=False))
 
