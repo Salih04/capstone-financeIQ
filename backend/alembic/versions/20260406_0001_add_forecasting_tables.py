@@ -1,7 +1,7 @@
 """add forecasting tables
 
 Revision ID: 20260406_0001
-Revises:
+Revises: 20260405_0000
 Create Date: 2026-04-06
 """
 
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 revision = "20260406_0001"
-down_revision = None
+down_revision = "20260405_0000"
 branch_labels = None
 depends_on = None
 

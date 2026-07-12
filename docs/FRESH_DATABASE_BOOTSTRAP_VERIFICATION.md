@@ -1,8 +1,8 @@
 # Fresh-database bootstrap verification
 
-**Status:** BLOCKED — verified on 2026-07-12 against an isolated local Postgres
-16 scratch database. No production, shared, or existing project database was
-used.
+**Status:** PASS — repaired and re-verified on 2026-07-12 against an isolated
+local Postgres 16 scratch database. No production, shared, or existing project
+database was used.
 
 ## Scope
 
@@ -32,7 +32,7 @@ printf 'services:\n  db:\n    ports: !reset []\n' | \
 
 docker compose -p financeiq-be02 build backend
 
-# Required fresh-database sequence (failed at the migration step; see below).
+# Required fresh-database sequence.
 docker compose -p financeiq-be02 run --rm --no-deps backend \
   sh -lc 'alembic upgrade head && python -m scripts.load_trusted_yearly'
 
@@ -50,35 +50,69 @@ docker compose -p financeiq-be02 exec -T db psql -U postgres -d capstone_db -c \
 docker compose -p financeiq-be02 down -v
 ```
 
+## Repair
+
+The original Alembic graph had no base-application-schema revision. Its first
+revision, `20260406_0001_add_forecasting_tables`, referenced `users`, while
+later revisions also assumed `users`, `computed_metrics`, and
+`sector_normalized_features` already existed. Those tables had historically
+come from SQLAlchemy `create_all`, not migration history.
+
+Revision `20260405_0000_add_base_application_schema` now records the
+pre-forecast application schema explicitly, and `20260406_0001` points to that
+baseline. Inserting a baseline is necessary because an additive revision after
+`20260406_0001` could never run before the failing foreign key. The forecast,
+onboarding, quarterly-fundamentals, performance-index, and trusted-yearly
+revisions remain separate and retain their original order.
+
 ## Observed result
 
-Both the direct sequence and `backend/scripts/start_backend.sh` exited `1` at
-the first Alembic migration, `20260406_0001_add_forecasting_tables`.
+The direct migration/load sequence exited `0`. Alembic applied the linear chain
+from `20260405_0000` through head `20260406_0006`. The trusted loader then
+validated the existing combined CSV and loaded 240 rows: 40 stocks for each year
+from 2020 through 2025. It derived 40 company rows from those trusted tickers;
+no sector values or other missing values were invented.
 
 ```text
-psycopg2.errors.UndefinedTable: relation "users" does not exist
-...
-CREATE TABLE forecast_runs (...,
-    FOREIGN KEY(created_by_user_id) REFERENCES users (id))
+Loaded: 240 created, 0 updated, 40 companies synced.
+Summary:
+  yearly_stocks rows : 240
+  years              : [2020, 2021, 2022, 2023, 2024, 2025]
+  companies          : 40
+    2020: 40 stocks
+    2021: 40 stocks
+    2022: 40 stocks
+    2023: 40 stocks
+    2024: 40 stocks
+    2025: 40 stocks
 ```
 
-The migration chain's initial revision creates `forecast_runs` with a foreign
-key to `users`, but no preceding migration creates the `users` table. PostgreSQL
-rolls the failed DDL back: after the run, `alembic_version`, `yearly_stocks`, and
-`users` were all absent.
+Running `backend/scripts/start_backend.sh` against the same scratch database
+also succeeded. Its idempotent loader result was `0 created, 240 updated`,
+Uvicorn reported `Application startup complete`, and an in-container request to
+`http://127.0.0.1:8000/health` returned HTTP 200:
+
+```json
+{"status":"ok","version":"3.0.0"}
+```
 
 | Check | Observed value |
 |---|---:|
-| Migration head applied | No — stops at `20260406_0001` |
-| `yearly_stocks` table exists | No |
-| `yearly_stocks` rows | Not reached (table absent) |
-| `python -m scripts.load_trusted_yearly` | Not run (guarded by failed `&&` migration command) |
-| Docker backend boot | No — startup script exits during Alembic |
+| Migration head applied | Yes — `20260406_0006` |
+| `users` table exists | Yes |
+| `yearly_stocks` table exists | Yes |
+| `yearly_stocks` rows | 240 |
+| `python -m scripts.load_trusted_yearly` | Exit 0 |
+| Docker backend boot | Yes |
+| `GET /health` | HTTP 200 |
 
-## Required follow-up
+## Additional verification note
 
-Fresh-database bootstrap cannot be marked working until the Alembic history can
-create the base application schema before migrations that reference `users`.
-This BE-02 task intentionally does not add or alter migrations. After that
-separate migration repair, rerun this exact scratch procedure and record the
-actual `yearly_stocks` row count plus a successful backend `/health` response.
+`alembic check` found no missing tables or columns after bootstrap. It reports
+three existing indexes from revision `20260406_0005` as candidates for removal
+because those indexes are not declared in current SQLAlchemy model metadata:
+`ix_computed_metrics_company_period`,
+`ix_quarterly_fundamentals_stock_period`, and
+`ix_sector_normalized_company_period`. That pre-existing model/migration index
+drift does not block bootstrap and was not changed in this narrowly scoped
+repair.
