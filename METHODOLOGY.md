@@ -175,6 +175,38 @@ therefore research support only, not investment advice.
 - The best ML run can look better in isolated folds, but stability is limited.
   The correct conclusion is uncertainty, not a predictive edge.
 
+## Headline IC significance treatment (R2-STAT-01)
+
+`make research` now persists deterministic evaluated-row artifacts at
+`experiments/results/predictions_test_2023.csv` through
+`predictions_test_2025.csv` (ticker, target year, model, realized return, and
+prediction). `make research-significance` consumes those dumps without
+retraining. For each model it computes an equal-weighted mean of the three
+within-year Spearman ICs, shuffles realized returns independently within each
+test year 10,000 times for a two-sided permutation p-value, and resamples
+tickers with replacement within year 10,000 times for a 95% bootstrap interval.
+The six ML-model p-values are Bonferroni-corrected as one selection family.
+
+The smallest pooled raw ML p-value is for random forest: pooled IC **−0.153**,
+raw permutation **p=0.0183**, Bonferroni-adjusted **p=0.1098**, and model-specific
+bootstrap 95% CI **[−0.273, −0.028]**. The unadjusted interval and raw p-value do
+not override the family-wise test: no ML model is statistically distinguishable
+from the within-year null after correction, so the results do not support a
+reliable predictive edge. The equal-weight baseline has pooled IC **0.150**,
+unadjusted **p=0.0168**, and bootstrap 95% CI **[0.024, 0.267]**; it is reported
+as descriptive baseline context outside the six-model ML correction family, not
+as a validated edge.
+
+The current harness uses the internal training universe and has **n=80**
+evaluated rows per model in each split, rather than the public-40 shorthand in
+earlier audit prose. There are still only three test years. Results describe a
+retrospectively fixed repository cohort, not verified point-in-time BIST100
+membership, and exact prediction-artifact reproduction remains qualified by the
+recorded numerical environment. Full values, exploratory per-split rows, null
+histograms, source checksums, and limitations are in
+`experiments/results/significance_report.json` and `.md`. This is research
+support only, not investment advice.
+
 ## Reproducibility and run provenance
 
 Every `make research` run writes a registered manifest under

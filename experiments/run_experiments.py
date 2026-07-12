@@ -140,6 +140,7 @@ def _generated_artifacts() -> list[Path]:
         RESULTS / "leaderboard.csv",
         RESULTS / "leaderboard_by_target.csv",
         RESULTS / "research_agent_model_outputs.csv",
+        *(RESULTS / f"predictions_{split['name']}.csv" for split in SPLITS),
         *(RESULTS / f"{split['name']}.json" for split in SPLITS),
     ]
     return [path for path in candidates if path.is_file()]
@@ -615,16 +616,34 @@ def run(output_root: Path | None = None) -> Path:
 
         split_result = {"split": split["name"], "train_n": int(len(ytr)),
                         "test_n": int(np.sum(~np.isnan(yte))), "models": {}}
+        prediction_rows = []
         for name, (kind, fn) in MODELS.items():
             try:
                 yp = np.asarray(fn(Xtr, ytr, Xte), dtype=float)
                 met = _metrics(yte, yp)
+                evaluated = ~np.isnan(yte) & ~np.isnan(yp)
+                prediction_rows.extend(
+                    {
+                        "ticker": ticker,
+                        "year": split["test_feature_year"] + 1,
+                        "model": name,
+                        "y_true": float(actual),
+                        "y_pred": float(prediction),
+                    }
+                    for ticker, actual, prediction in zip(
+                        te.loc[evaluated, "ticker"], yte[evaluated], yp[evaluated]
+                    )
+                )
             except Exception as exc:  # honest failure report, not silent
                 met = {"error": str(exc)}
             split_result["models"][name] = {"kind": kind, **met}
             leaderboard_rows.append({"split": split["name"], "model": name, "kind": kind,
                                      **{k: v for k, v in met.items() if k != "n"}})
         (RESULTS / f"{split['name']}.json").write_text(json.dumps(split_result, indent=2))
+        pd.DataFrame(
+            prediction_rows,
+            columns=["ticker", "year", "model", "y_true", "y_pred"],
+        ).to_csv(RESULTS / f"predictions_{split['name']}.csv", index=False, float_format="%.17g")
 
     lb = pd.DataFrame(leaderboard_rows)
     lb.to_csv(LEADERBOARD, index=False)
