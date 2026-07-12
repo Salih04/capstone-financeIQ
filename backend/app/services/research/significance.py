@@ -16,6 +16,7 @@ from app.core.paths import resolve_repo_root
 
 
 REPORT_PATH = resolve_repo_root() / "experiments" / "results" / "significance_report.json"
+FRICTION_REPORT_PATH = resolve_repo_root() / "experiments" / "results" / "friction_report.json"
 AUTOPSY_ARTIFACTS = {
     "feature_stability_by_split": resolve_repo_root()
     / "experiments"
@@ -115,6 +116,12 @@ def payload() -> dict:
 
 def autopsy_payload() -> dict:
     """Return the existing significance evidence plus parsed autopsy exhibits."""
+    friction = None
+    if FRICTION_REPORT_PATH.is_file():
+        friction = _load_cached(str(FRICTION_REPORT_PATH), FRICTION_REPORT_PATH.stat().st_mtime)
+        required = {"task", "chart_stamp", "design", "plot_rows", "claim_safety", "limitations"}
+        if not required.issubset(friction) or friction.get("task") != "R2-FRICTION-01":
+            raise SignificanceReportMissing("Friction report has an unsupported schema.")
     return {
         "schema_version": 1,
         "significance": payload(),
@@ -122,4 +129,5 @@ def autopsy_payload() -> dict:
             name: _artifact_payload(path)
             for name, path in AUTOPSY_ARTIFACTS.items()
         },
+        "friction": friction,
     }

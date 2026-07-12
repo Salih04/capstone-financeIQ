@@ -1,6 +1,6 @@
 # TASK_STATE.md — FinanceIQ
 
-Last updated: 2026-07-13 (rev 11)
+Last updated: 2026-07-13 (rev 12)
 
 ## Status legend
 - `DONE` — shipped, tested
@@ -69,6 +69,7 @@ claim.
 | R2-REGIME-01 Regime Lens (2026-07-12) | DONE (uncommitted) | effective-dated CPI, year-end TCMB policy rate, USDTRY, and BIST100 context with source-or-null validation; deterministic `regime_context_report.{json,md}` and `/research/regime-context` feed the shared Benchmark/Experiments strip without altering chart payloads; all three test years occupy one task-defined period, so regime-conditional diagnostics are untestable and not computed; root 146/146, backend 71/71, data VALID, frontend build and claims lint passed; canonical nominal/real-terms artifacts unchanged; no commit by request |
 | R2-LOOP-01 analyst-in-the-loop dissent ledger (2026-07-13) | DONE (uncommitted) | append-only `analyst_verdicts` migration; authenticated verdict writes plus deterministic read-only aggregate counts on the existing Labeling/Validation Labs; mandatory no-score-input/no-crowd-signal boundary; scoring output pin-tested identical with and without verdict rows; MCC v1.5.0; isolated Postgres migration applied through `20260713_0007`; root 149/149, backend 76/76, frontend build and claims lint passed; protected research/data artifact checksums unchanged; no commit by request |
 | R2-COURT-01 Research Courtroom (2026-07-13) | DONE (uncommitted) | deterministic Bull/Bear/Skeptic/Risk evidence lenses over company contexts, feature passports, Skeptic output, quality evidence, and the corrected significance report; four citation-complete items per lens, Risk always last, no adjudication field, and missing/malformed inputs return `insufficient_data`; `POST /research/courtroom` + `/courtroom`; MCC v1.6.0; root 152/152, backend 83/83, frontend build, claims lint, and live LLM-off API passed; page visual blocked by the real Supabase auth gate without an approved session; protected research/data checksums unchanged; no commit by request |
+| R2-FRICTION-01 friction simulator (2026-07-13) | DONE (uncommitted) | deterministic within-model/year rank-only top-10 nominal TRY baskets, half-L1 turnover, zero/illustrative/deliberately adverse assumed-cost controls, `friction_report.{json,md}` + `friction_plot.csv`, and an in-drawing stamped Autopsy panel; no raw score pooling, execution inference, or core model/ranking change; two-run checksums identical; MCC v1.7.0; root 168/168, backend 85/85, frontend build and claims lint passed; protected experiment/trusted-data artifacts unchanged; no commit by request |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
 ---

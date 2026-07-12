@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useCachedResource, CACHE_TTL } from '../api/useCachedResource'
 import { apiErrorText } from '../api/errorText'
 import CacheTag from '../components/CacheTag'
@@ -11,7 +11,10 @@ const SOURCE = {
   significance: 'experiments/results/significance_report.json',
   power: 'experiments/results/significance_report.json · METHODOLOGY.md',
   regime: 'METHODOLOGY.md · experiments/results/significance_report.json',
+  friction: 'experiments/results/friction_report.json · friction_plot.csv',
 }
+
+const FRICTION_STAMP = 'Hypothetical illustration — not a backtest of a viable strategy; underlying signal IC ≈ 0 and no model survives significance correction.'
 
 const MODEL_LABELS = {
   baseline_equal_weight: 'Equal-weight baseline',
@@ -240,10 +243,109 @@ function RegimeStatement() {
   )
 }
 
+function FrictionChart({ friction, reason }) {
+  const models = friction?.design?.models || []
+  const scenarios = friction?.cost_scenarios || []
+  const [selectedModel, setSelectedModel] = useState('random_forest')
+  const [selectedScenario, setSelectedScenario] = useState('illustrative_100bps_assumption')
+  if (!friction?.plot_rows?.length || !models.length || !scenarios.length) return <EmptyPlot reason={reason} />
+
+  const model = models.includes(selectedModel) ? selectedModel : models[0]
+  const scenario = scenarios.find((item) => item.scenario_id === selectedScenario) || scenarios[0]
+  const rows = friction.plot_rows
+    .filter((row) => row.model === model && row.scenario_id === scenario.scenario_id)
+    .sort((a, b) => Number(a.year) - Number(b.year))
+  if (!rows.length) return <EmptyPlot reason="The friction artifact has no rows for this model and scenario." />
+
+  const finiteValues = rows.flatMap((row) => [row.gross_basket_mean_return_pct, row.net_basket_mean_return_pct])
+    .map(Number)
+    .filter(Number.isFinite)
+  const maxAbs = Math.max(...finiteValues.map(Math.abs), 1)
+  const zeroY = 176
+  const barScale = 106 / maxAbs
+  const geometry = (value) => {
+    if (value == null) return null
+    const numeric = Number(value)
+    if (!Number.isFinite(numeric)) return null
+    const height = Math.max(Math.abs(numeric) * barScale, 1)
+    return { height, y: numeric >= 0 ? zeroY - height : zeroY }
+  }
+  const valueLabelY = (value, bar) => Number(value) >= 0
+    ? Math.max(bar.y - 7, 62)
+    : Math.min(bar.y + bar.height + 13, 248)
+  const stamp = friction.chart_stamp === FRICTION_STAMP ? friction.chart_stamp : FRICTION_STAMP
+
+  return (
+    <div className="ap-friction-viz">
+      <div className="ap-friction-controls">
+        <label>
+          MODEL
+          <select value={model} onChange={(event) => setSelectedModel(event.target.value)}>
+            {models.map((item) => <option value={item} key={item}>{item.replace(/_/g, ' ')}</option>)}
+          </select>
+        </label>
+        <div className="ap-cost-controls" aria-label="Assumed cost scenarios">
+          {scenarios.map((item) => (
+            <button
+              className={item.scenario_id === scenario.scenario_id ? 'is-active' : ''}
+              type="button"
+              onClick={() => setSelectedScenario(item.scenario_id)}
+              key={item.scenario_id}
+            >
+              {Number(item.cost_bps).toLocaleString()} bps
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <svg className="ap-friction-svg" viewBox="0 0 920 300" role="img" aria-label={`Gross and assumed-cost net nominal TRY basket mean returns for ${model}`}>
+        <rect className="ap-friction-bg" x="0" y="0" width="920" height="300" />
+        <foreignObject x="18" y="12" width="884" height="42">
+          <div className="ap-friction-stamp">{stamp}</div>
+        </foreignObject>
+        <line className="ap-friction-zero" x1="54" x2="884" y1={zeroY} y2={zeroY} />
+        <text className="ap-friction-axis-label" x="12" y={zeroY + 3}>0%</text>
+        {rows.map((row, index) => {
+          const gross = geometry(row.gross_basket_mean_return_pct)
+          const net = geometry(row.net_basket_mean_return_pct)
+          const groupX = 170 + index * 260
+          return (
+            <g key={`${row.year}-${row.scenario_id}`}>
+              {gross && <rect className="ap-friction-bar is-gross" x={groupX - 48} y={gross.y} width="54" height={gross.height} />}
+              {net && <rect className="ap-friction-bar is-net" x={groupX + 18} y={net.y} width="54" height={net.height} />}
+              <text className="ap-friction-value" x={groupX - 21} y={gross ? valueLabelY(row.gross_basket_mean_return_pct, gross) : 70} textAnchor="middle">
+                {percent(row.gross_basket_mean_return_pct)}
+              </text>
+              <text className="ap-friction-value" x={groupX + 45} y={net ? valueLabelY(row.net_basket_mean_return_pct, net) : zeroY - 8} textAnchor="middle">
+                {net ? percent(row.net_basket_mean_return_pct) : 'N/A'}
+              </text>
+              <text className="ap-friction-year" x={groupX + 12} y="260" textAnchor="middle">{row.year}</text>
+              <text className="ap-friction-turnover" x={groupX + 12} y="278" textAnchor="middle">
+                turnover {row.turnover_from_prior_year == null ? 'N/A' : fixed(row.turnover_from_prior_year, 2)}
+              </text>
+            </g>
+          )
+        })}
+        <g className="ap-friction-legend">
+          <rect className="ap-friction-bar is-gross" x="690" y="72" width="14" height="8" />
+          <text x="710" y="80">GROSS</text>
+          <rect className="ap-friction-bar is-net" x="780" y="72" width="14" height="8" />
+          <text x="800" y="80">NET</text>
+        </g>
+      </svg>
+      <div className="ap-friction-meta">
+        <span>{scenario.role} · {Number(scenario.cost_bps).toLocaleString()} bps</span>
+        <span>top-{friction.design.top_k} · equal weight · within-model ranks only</span>
+      </div>
+    </div>
+  )
+}
+
 export default function AutopsyPage() {
   const { data: report, error, fromCache, refreshing, savedAt, refresh } =
     useCachedResource('/research/significance/autopsy', { ttlMs: CACHE_TTL.LONG })
   const hasEvidence = Boolean(report?.evidence && report?.significance)
+  const hasFriction = Boolean(report?.friction?.plot_rows?.length)
   const reason = apiErrorText(error) || 'autopsy artifact API returned no evidence'
 
   return (
@@ -263,7 +365,7 @@ export default function AutopsyPage() {
         </div>
         <div className={`ap-mode ${hasEvidence ? 'is-live' : 'is-fallback'}`}>
           <span>{hasEvidence ? 'LIVE ARTIFACT MODE' : 'DEMO FALLBACK · NO VALUES'}</span>
-          <strong>{hasEvidence ? '4 CSV exhibits + significance report loaded' : reason}</strong>
+          <strong>{hasEvidence ? `4 CSV exhibits + significance report${hasFriction ? ' + friction sensitivity' : ''} loaded` : reason}</strong>
           <CacheTag fromCache={fromCache} refreshing={refreshing} savedAt={savedAt} onRefresh={refresh} />
         </div>
       </header>
@@ -342,6 +444,24 @@ export default function AutopsyPage() {
           <RegimeStatement />
         </Exhibit>
       </main>
+
+      <section className="ap-friction" aria-labelledby="ap-friction-title">
+        <header className="ap-friction-head">
+          <div>
+            <div className="ap-label">FRICTION SENSITIVITY · INVERTED BACKTESTER</div>
+            <h2 id="ap-friction-title">Gross luck under assumed turnover costs.</h2>
+          </div>
+          <strong>81-ticker training universe, nominal TRY.</strong>
+        </header>
+        <p className="ap-friction-copy">
+          Equal-weight top-10 baskets use descending ranks inside each model and year; raw score magnitudes never cross model boundaries. Cost values are assumptions, not measured BIST costs. No bid–ask spread, market impact, liquidity, capacity, or tradeability is inferred.
+        </p>
+        <FrictionChart friction={report?.friction} reason={reason} />
+        <p className="ap-finding">
+          <strong>BOUNDARY · </strong>Gross and net bars are descriptive historical sensitivity outputs, not realizable returns or investment value. Nominal TRY is shown here; CPI-deflated TRY and USD-basis evidence remain separate. Multiplicity, power, survivorship, retrospective-cohort, single-regime, and environment limitations remain unchanged.
+        </p>
+        <SourceLine limitation="assumed bps only; no execution, spread, impact, liquidity, or tradeability inputs">{SOURCE.friction}</SourceLine>
+      </section>
 
       <footer className="ap-limitations">
         <strong>LIMITATIONS HELD IN VIEW</strong>
@@ -426,6 +546,29 @@ const CSS = `
 .ap-regime strong { color: var(--ap-copper); font-size: 11px; letter-spacing: .2em; }
 .ap-regime p { margin: 0; color: var(--ap-dim); font-size: 10px; }
 .ap-regime small { color: var(--ap-faint); font-size: 8.5px; }
+.ap-friction { margin-top: 20px; max-width: 1220px; border: 1px solid rgba(200,163,90,.3); border-top: 2px solid var(--ap-gold); background: rgba(10,15,13,.78); padding: 20px; }
+.ap-friction-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.ap-friction-head h2 { margin: 5px 0 0; font-size: 21px; font-weight: 600; }
+.ap-friction-head > strong { color: var(--ap-gold); font: 9px var(--font-mono); letter-spacing: .08em; }
+.ap-friction-copy { max-width: 100ch; color: var(--ap-dim); font-size: 12px; line-height: 1.65; }
+.ap-friction-viz { margin: 16px 0; }
+.ap-friction-controls { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.ap-friction-controls label { display: grid; gap: 5px; color: var(--ap-faint); font: 8px var(--font-mono); letter-spacing: .12em; }
+.ap-friction-controls select { min-width: 210px; border: 1px solid rgba(200,211,202,.2); background: #0b100e; color: var(--ap-paper); padding: 8px 10px; font: 10px var(--font-mono); }
+.ap-cost-controls { display: flex; gap: 6px; flex-wrap: wrap; }
+.ap-cost-controls button { border: 1px solid rgba(200,211,202,.18); background: rgba(232,236,230,.03); color: var(--ap-dim); padding: 7px 10px; font: 8.5px var(--font-mono); cursor: pointer; }
+.ap-cost-controls button.is-active { border-color: var(--ap-gold); color: var(--ap-gold); background: rgba(200,163,90,.08); }
+.ap-friction-svg { display: block; width: 100%; min-height: 260px; border: 1px solid rgba(200,211,202,.12); }
+.ap-friction-bg { fill: #080c0a; }
+.ap-friction-zero { stroke: rgba(232,236,230,.3); stroke-width: 1; stroke-dasharray: 3 4; }
+.ap-friction-axis-label, .ap-friction-value, .ap-friction-year, .ap-friction-turnover, .ap-friction-legend { fill: var(--ap-dim); font: 9px var(--font-mono); }
+.ap-friction-value { fill: var(--ap-paper); }
+.ap-friction-year { fill: var(--ap-gold); font-size: 11px; }
+.ap-friction-turnover { fill: var(--ap-faint); font-size: 8px; }
+.ap-friction-bar.is-gross { fill: var(--ap-emerald); }
+.ap-friction-bar.is-net { fill: var(--ap-copper); }
+.ap-friction-stamp { border: 1px solid rgba(200,163,90,.42); background: rgba(14,11,10,.96); color: var(--ap-gold); padding: 6px 9px; font: 9px/1.35 var(--font-mono); letter-spacing: .025em; }
+.ap-friction-meta { display: flex; justify-content: space-between; gap: 8px 18px; flex-wrap: wrap; margin-top: 8px; color: var(--ap-faint); font: 8.5px var(--font-mono); }
 .ap-limitations { margin-top: 20px; max-width: 1220px; border: 1px solid rgba(168,103,75,.35); background: rgba(14,11,10,.76); padding: 13px 16px; display: grid; gap: 7px; }
 .ap-limitations strong { color: var(--ap-copper); font: 9px var(--font-mono); letter-spacing: .22em; }
 .ap-limitations span { color: var(--ap-dim); font: 9px/1.6 var(--font-mono); }
@@ -436,6 +579,9 @@ const CSS = `
   .ap-p-row, .ap-power-row { grid-template-columns: 1fr; }
   .ap-p-row strong, .ap-power-row strong { text-align: left; }
   .ap-power-row small { grid-column: auto; }
+  .ap-friction { padding: 14px; }
+  .ap-friction-svg { min-width: 760px; }
+  .ap-friction-viz { overflow-x: auto; }
 }
 @media (prefers-reduced-motion: reduce) { .ap, .ap * { animation: none !important; transition: none !important; } }
 `

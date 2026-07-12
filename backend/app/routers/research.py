@@ -109,7 +109,7 @@ def significance_report(_: User | None = Depends(require_access)):
 
 @router.get("/significance/autopsy")
 def autopsy_report(_: User | None = Depends(require_access)):
-    """Extend significance evidence with parsed, committed autopsy CSVs."""
+    """Extend significance evidence with parsed, committed autopsy artifacts."""
     try:
         return significance.autopsy_payload()
     except significance.SignificanceReportMissing as exc:

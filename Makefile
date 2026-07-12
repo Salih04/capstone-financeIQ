@@ -6,7 +6,7 @@
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration \
-	fetch-usdtry alternative-targets research-real-terms research-regime claims-lint
+	fetch-usdtry alternative-targets research-real-terms research-regime research-friction claims-lint
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -219,6 +219,11 @@ research-real-terms: alternative-targets
 # the workflow emits an explicit untestable state and no per-regime statistics.
 research-regime:
 	PYTHONPATH=. python experiments/regime_lens.py
+
+# Build rank-only top-k basket turnover/cost sensitivities from persisted dumps.
+# Cost scenarios are assumptions, not measured BIST trading frictions.
+research-friction:
+	PYTHONPATH=. python experiments/friction_sim.py
 
 # Split modeling_dataset_2020_2025.csv into training and public subsets.
 # Requires data/config/universe_*.csv to exist (created in data/config/).

@@ -1,6 +1,6 @@
 {
   "contract_name": "FinanceIQ Model Confidence Contract",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "effective_date": "2026-07-13",
   "authority": "FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md",
   "versioning_procedure": {
@@ -24,6 +24,10 @@
     {
       "path": "experiments/results_regime/regime_context_report.md",
       "finding": "Regime-conditional diagnostics are untestable with one observed macro period and were not computed."
+    },
+    {
+      "path": "experiments/results/friction_report.md",
+      "finding": "Rank-basket turnover and cost outputs are descriptive assumption sensitivities, not implementable returns or investment value."
     }
   ],
   "evidence_state": {
@@ -32,6 +36,7 @@
     "investment_value_evaluated": false,
     "power_thresholds_are_observed_edge": false,
     "regime_robustness_testable": false,
+    "friction_sensitivity_establishes_implementable_returns": false,
     "conclusion": "no reliable predictive edge"
   },
   "approved_claim_classes": {
@@ -85,6 +90,7 @@
       "backend/app/services/forecasting_csv_service.py",
       "backend/app/services/skeptic_service.py",
       "backend/app/services/courtroom_service.py",
+      "backend/app/services/research/significance.py",
       "backend/app/services/research/regime.py",
       "backend/app/services/analyst_verdict_service.py"
     ],
