@@ -1,6 +1,6 @@
 {
   "contract_name": "FinanceIQ Model Confidence Contract",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "effective_date": "2026-07-12",
   "authority": "FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md",
   "versioning_procedure": {
@@ -76,7 +76,8 @@
   "scan": {
     "frontend_glob": "frontend/src/**/*.jsx",
     "backend_response_files": [
-      "backend/app/services/forecasting_csv_service.py"
+      "backend/app/services/forecasting_csv_service.py",
+      "backend/app/services/skeptic_service.py"
     ],
     "allowlist": [
       {

@@ -62,6 +62,7 @@ claim.
 | R2-CONTRACT-01 Model Confidence Contract v1 + claims lint (2026-07-12) | DONE | `28ba92b2`; `model_confidence_contract.json`, `scripts/lint_claims.py`, `make claims-lint`, and backend contract test |
 | R2-CONTRACT-02 MCC coverage drift + versioning (2026-07-12) | DONE (uncommitted) | v1.1.0; route-registration guard, recursive JSX scan, explicit auth exemptions, versioning procedure; root 109/109, backend 56/56, claims lint passed; commit deferred by request |
 | R2-LINEAGE-01 feature passports (2026-07-12) | DONE (uncommitted) | generated `feature_passports.json` covers all 61 final-dataset columns; read-only `/research/feature-passports`; Score Explorer passport popover with modeling-vs-serving scope warning; root 111/111, backend 57/57, data VALID, frontend build and claims lint passed; commit deferred by request |
+| R2-SKEPTIC-01 skeptic challenge service (2026-07-12) | DONE (uncommitted) | cached artifact-grounded six-check `/research/skeptic/{ticker}` report; retrospective-cohort, coverage, instability, lineage, power, baseline, and family-wise limitations; MCC v1.2.0; root 111/111, backend 67/67, claims lint and live ASELS/ASTOR checks passed; commit deferred by request |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
 ---

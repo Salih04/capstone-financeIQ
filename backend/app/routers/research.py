@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.core.dependencies import require_access
 from app.models.user import User
+from app.services import skeptic_service
 from app.services.research import (
     benchmark,
     company,
@@ -97,3 +98,12 @@ def significance_report(_: User | None = Depends(require_access)):
         return significance.payload()
     except significance.SignificanceReportMissing as exc:
         raise HTTPException(503, str(exc))
+
+
+@router.get("/skeptic/{ticker}")
+def skeptic_report(ticker: str, _: User | None = Depends(require_access)):
+    """Challenge a ticker with cached, committed evidence; never alter its score."""
+    try:
+        return skeptic_service.skeptic_report(ticker)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
