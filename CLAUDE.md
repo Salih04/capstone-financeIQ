@@ -75,9 +75,9 @@ docker compose up --build                     # db + backend + frontend (:3000/:
 
 Python 3.12 (backend Docker image); frontend is Node/Vite (React 18, Vite 5).
 
-### Known test-suite state (verified 2026-07-08)
+### Known test-suite state (verified 2026-07-12)
 
-- **Backend: 51/51 pass.** Gotcha: `backend/app/config.py` sets `env_file = ".env"` and its `Settings` model rejects unknown keys. A local, untracked `backend/.env` carrying `OPENROUTER_API_KEY` / `OPENROUTER_HTTP_REFERER` / `OPENROUTER_APP_TITLE` makes `cd backend && pytest tests/` abort at collection with `extra_forbidden`. Running from the repo root (`PYTHONPATH=backend python -m pytest backend/tests`) sidesteps the `.env` and passes 51/51.
+- **Backend: 54/54 pass.** `backend/app/config.py` reads `backend/.env` when tests run from that directory and now ignores unknown provider/tooling keys (including `OPENROUTER_API_KEY`, `OPENROUTER_HTTP_REFERER`, and `OPENROUTER_APP_TITLE`). Both `cd backend && python -m pytest tests/` and `PYTHONPATH=backend python -m pytest backend/tests` are supported.
 - **Root: 95/97 pass.** The two failures are real code/test drift, not environment: `tests/test_research_agent.py::test_llm_provider_none_fails_safe` and `::test_llm_bad_url_fails_safe` call `research_agent.call_local_llm`, which no longer exists — the function is now `call_llm`. `research_agent_training/evaluate_local_llm.py:129` has the same stale reference. Fixing these is a source change, out of scope for documentation tasks.
 
 ## Forbidden Changes

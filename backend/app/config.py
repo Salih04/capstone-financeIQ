@@ -72,6 +72,10 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        # Local tooling may add provider-specific variables that this app does
+        # not consume. Ignore those unknown entries while retaining validation
+        # for every declared setting.
+        extra = "ignore"
 
 
 settings = Settings()
