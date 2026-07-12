@@ -92,6 +92,23 @@ Outputs in `data/trusted_clean/` (`modeling_dataset_2020_2025.csv`,
 `corrected_yearly_ingestion_report.*`, `data_dictionary.md`). See
 **[DATA_PIPELINE.md](DATA_PIPELINE.md)** and **[DATA_REQUIREMENTS.md](DATA_REQUIREMENTS.md)**.
 
+### Reproducibility quickstart
+
+From the repository root, create a registered run, reproduce its manifest in an
+isolated temporary directory, then check the versioned claim guardrails:
+
+```bash
+make research
+make research-verify-run
+make claims-lint
+```
+
+To verify an older registered run, set
+`RESEARCH_MANIFEST=experiments/results/runs/<run>/manifest.json` on the second
+command. See [METHODOLOGY.md — Reproducibility and run provenance](METHODOLOGY.md#reproducibility-and-run-provenance)
+for the manifest contents, checksum rules, and environment-sensitive comparison
+policy.
+
 Real per-year income/profitability is now ingested (corrected yearly files) and
 valuation is reconstructed for free from Yahoo year-end price × manual shares
 outstanding. Supply shares via the capital-event file
