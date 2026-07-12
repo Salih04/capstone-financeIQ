@@ -22,8 +22,15 @@ Outputs: experiments/results/*.json, experiments/leaderboard.csv,
 
 from __future__ import annotations
 
+import argparse
+import hashlib
+import importlib.metadata
 import json
+import platform
+import subprocess
 import sys
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -37,9 +44,11 @@ from app.services.research import data, feature_registry as reg, scoring  # noqa
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor  # noqa: E402
 from sklearn.linear_model import ElasticNet, Lasso, LinearRegression, Ridge  # noqa: E402
 
-RESULTS = ROOT / "experiments" / "results"
-REPORTS = ROOT / "experiments" / "reports"
-LEADERBOARD = ROOT / "experiments" / "leaderboard.csv"
+DEFAULT_OUTPUT_ROOT = ROOT / "experiments"
+OUTPUT_ROOT = DEFAULT_OUTPUT_ROOT
+RESULTS = OUTPUT_ROOT / "results"
+REPORTS = OUTPUT_ROOT / "reports"
+LEADERBOARD = OUTPUT_ROOT / "leaderboard.csv"
 
 PRED_FEATURES = [f for f in reg.features_for_next_year_prediction()]
 
@@ -47,6 +56,177 @@ PRED_FEATURES = [f for f in reg.features_for_next_year_prediction()]
 CLEAN_MODELING = ROOT / "data" / "trusted_clean" / "modeling_dataset_2020_2025.csv"
 TRAINING_MODELING = ROOT / "data" / "trusted_clean" / "modeling_dataset_training_2020_2025.csv"
 PUBLIC_MODELING = ROOT / "data" / "trusted_clean" / "modeling_dataset_public_2020_2025.csv"
+
+MODEL_CONFIGS = {
+    "baseline_equal_weight": {"kind": "baseline", "parameters": {}, "seed": None},
+    "baseline_rank_score": {"kind": "baseline", "parameters": {}, "seed": None},
+    "robust_rank_aggregation": {"kind": "baseline", "parameters": {}, "seed": None},
+    "linear_regression": {"kind": "ml", "parameters": {}, "seed": None},
+    "ridge": {"kind": "ml", "parameters": {"alpha": 1.0}, "seed": None},
+    "lasso": {"kind": "ml", "parameters": {"alpha": 0.1, "max_iter": 5000}, "seed": None},
+    "elasticnet": {"kind": "ml", "parameters": {"alpha": 0.1, "max_iter": 5000}, "seed": None},
+    "random_forest": {
+        "kind": "ml",
+        "parameters": {"n_estimators": 200, "max_depth": 4},
+        "seed": 42,
+    },
+    "gradient_boosting": {
+        "kind": "ml",
+        "parameters": {"max_depth": 2, "n_estimators": 120},
+        "seed": 42,
+    },
+}
+
+
+def _configure_output_root(output_root: Path | None) -> None:
+    """Point generated artifacts at the default tree or an isolated rerun tree."""
+    global OUTPUT_ROOT, RESULTS, REPORTS, LEADERBOARD
+    OUTPUT_ROOT = (output_root or DEFAULT_OUTPUT_ROOT).resolve()
+    RESULTS = OUTPUT_ROOT / "results"
+    REPORTS = OUTPUT_ROOT / "reports"
+    LEADERBOARD = OUTPUT_ROOT / "leaderboard.csv"
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _file_record(path: Path, *, base: Path = ROOT, role: str | None = None) -> dict:
+    record = {
+        "path": path.resolve().relative_to(base.resolve()).as_posix(),
+        "sha256": _sha256(path),
+        "size_bytes": path.stat().st_size,
+    }
+    if role is not None:
+        record["role"] = role
+    return record
+
+
+def _git_metadata() -> dict:
+    def _git(*args: str) -> str:
+        result = subprocess.run(
+            ["git", *args], cwd=ROOT, check=True, capture_output=True, text=True
+        )
+        return result.stdout.strip()
+
+    try:
+        sha = _git("rev-parse", "HEAD")
+        dirty = bool(_git("status", "--porcelain", "--untracked-files=normal"))
+    except (OSError, subprocess.CalledProcessError):
+        return {"sha": None, "short_sha": "nogit", "dirty": None}
+    return {"sha": sha, "short_sha": sha[:8], "dirty": dirty}
+
+
+def _package_versions() -> dict[str, str]:
+    return {
+        package: importlib.metadata.version(package)
+        for package in ("numpy", "pandas", "scikit-learn")
+    }
+
+
+def _generated_artifacts() -> list[Path]:
+    candidates = [
+        LEADERBOARD,
+        REPORTS / "summary.md",
+        RESULTS / "coverage_impact.csv",
+        RESULTS / "experiment_summary.md",
+        RESULTS / "feature_coverage.csv",
+        RESULTS / "feature_stability_by_split.csv",
+        RESULTS / "feature_stability_summary.csv",
+        RESULTS / "leaderboard.csv",
+        RESULTS / "leaderboard_by_target.csv",
+        RESULTS / "research_agent_model_outputs.csv",
+        *(RESULTS / f"{split['name']}.json" for split in SPLITS),
+    ]
+    return [path for path in candidates if path.is_file()]
+
+
+def _write_manifest(
+    outputs: list[Path],
+    feat_cols: list[str],
+    leaderboard: pd.DataFrame,
+    started_at: datetime,
+    elapsed_seconds: float,
+) -> Path:
+    """Register exact run inputs and outputs without certifying methodology."""
+    git = _git_metadata()
+    completed_at = datetime.now(timezone.utc)
+    timestamp = completed_at.strftime("%Y%m%dT%H%M%S.%fZ")
+    run_id = f"{timestamp}_{git['short_sha']}"
+    manifest_path = RESULTS / "runs" / run_id / "manifest.json"
+
+    input_candidates = [
+        (CLEAN_MODELING, "canonical modeling dataset required by the project contract"),
+        (_modeling_csv(), "actual experiment dataset"),
+        (PUBLIC_MODELING, "public-universe model-output input"),
+        (ROOT / "data" / "trusted_clean" / "data_quality_report.json", "data-quality report input"),
+    ]
+    seen_inputs: set[Path] = set()
+    inputs = []
+    for path, role in input_candidates:
+        resolved = path.resolve()
+        if path.is_file() and resolved not in seen_inputs:
+            inputs.append(_file_record(path, role=role))
+            seen_inputs.add(resolved)
+
+    config_files = [
+        ROOT / "experiments" / "run_experiments.py",
+        ROOT / "backend" / "app" / "services" / "research" / "feature_registry.py",
+        ROOT / "Makefile",
+    ]
+    artifact_records = [
+        _file_record(path, base=OUTPUT_ROOT) for path in sorted(outputs)
+    ]
+    relative_manifest = manifest_path.relative_to(ROOT) if manifest_path.is_relative_to(ROOT) else manifest_path
+    semantic_leaderboard = json.loads(leaderboard.to_json(orient="split"))
+    manifest = {
+        "schema_version": 1,
+        "statement": "Records inputs and artifacts; does not certify methodology or predictive validity.",
+        "run": {
+            "id": run_id,
+            "started_at_utc": started_at.isoformat(),
+            "completed_at_utc": completed_at.isoformat(),
+            "wall_clock_seconds": round(elapsed_seconds, 6),
+            "command": "PYTHONPATH=. python experiments/run_experiments.py",
+            "reproduce_command": f"python scripts/verify_run.py {relative_manifest}",
+        },
+        "git": git,
+        "python": {
+            "version": platform.python_version(),
+            "full_version": sys.version,
+            "implementation": platform.python_implementation(),
+            "executable": sys.executable,
+        },
+        "platform": {
+            "system": platform.system(),
+            "release": platform.release(),
+            "machine": platform.machine(),
+            "description": platform.platform(),
+        },
+        "packages": _package_versions(),
+        "inputs": inputs,
+        "features": feat_cols,
+        "configuration": {
+            "targets": TARGETS,
+            "splits": SPLITS,
+            "models": MODEL_CONFIGS,
+            "seeds": {
+                name: config["seed"]
+                for name, config in MODEL_CONFIGS.items()
+                if config["seed"] is not None
+            },
+            "files": [_file_record(path) for path in config_files],
+        },
+        "artifacts": artifact_records,
+        "semantic_outputs": {"leaderboard": semantic_leaderboard},
+    }
+    manifest_path.parent.mkdir(parents=True, exist_ok=False)
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    return manifest_path
 
 
 def _modeling_csv() -> Path:
@@ -378,7 +558,10 @@ def _write_summary_report(lb: pd.DataFrame, panel: pd.DataFrame, feat_cols: list
     (REPORTS / "summary.md").write_text("\n".join(lines))
 
 
-def run() -> None:
+def run(output_root: Path | None = None) -> Path:
+    _configure_output_root(output_root)
+    started_at = datetime.now(timezone.utc)
+    started_clock = time.perf_counter()
     RESULTS.mkdir(parents=True, exist_ok=True)
     REPORTS.mkdir(parents=True, exist_ok=True)
     panel = build_panel()
@@ -475,9 +658,21 @@ def run() -> None:
     (RESULTS / "experiment_summary.md").write_text("\n".join(sm))
 
     _write_summary_report(lb, panel, feat_cols)
+    manifest_path = _write_manifest(
+        _generated_artifacts(), feat_cols, lb, started_at, time.perf_counter() - started_clock
+    )
     print("Wrote leaderboard + results + reports.")
+    print(f"Registered run manifest: {manifest_path}")
     print(lb.to_string(index=False))
+    return manifest_path
 
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--out",
+        type=Path,
+        help="isolated output root containing leaderboard.csv, results/, and reports/",
+    )
+    args = parser.parse_args()
+    run(args.out)

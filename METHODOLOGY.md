@@ -175,6 +175,29 @@ therefore research support only, not investment advice.
 - The best ML run can look better in isolated folds, but stability is limited.
   The correct conclusion is uncertainty, not a predictive edge.
 
+## Reproducibility and run provenance
+
+Every `make research` run writes a registered manifest under
+`experiments/results/runs/<UTC timestamp>_<git short SHA>/manifest.json`. The
+manifest records the git SHA and dirty-tree flag; Python, platform, and numerical
+package versions; all fixed seeds; feature columns; model and walk-forward split
+configuration; SHA-256 checksums for the canonical, training, and public datasets
+and other run inputs; configuration-file checksums; wall-clock duration; and a
+SHA-256 checksum for every generated experiment artifact.
+
+Run `make research-verify-run` to reproduce the latest manifest in an isolated
+temporary directory, or pass a specific path as
+`make research-verify-run RESEARCH_MANIFEST=<manifest>`. Verification requires
+input and configuration checksums to match, compares the headline leaderboard at
+`atol=1e-12` with zero relative tolerance, and requires all artifact bytes to be
+identical when Python, platform, and package versions match. When the numerical
+environment differs, byte drift is reported explicitly and only semantic
+leaderboard reproduction within that strict tolerance can pass.
+
+Registration documents provenance; it does not certify methodology or establish
+predictive validity. The weak/unstable, no-reliable-edge conclusion and the
+research-support-only boundary remain unchanged.
+
 ## Leakage controls
 
 Enforced in `app/services/research/feature_registry.py`:

@@ -5,9 +5,10 @@
 	collect-yfinance-bist100 clean-yfinance-bist100 update-training-universe-yfinance validate-universe data-audit \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
-	research-agent-autoresearch-iteration demo-check
+	research-agent-autoresearch-iteration demo-check research-verify-run
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
+RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
 
 # Diagnose whether data/raw/quarterly_fintables/ files vary per period (they are frozen).
 inspect-quarterly:
@@ -180,6 +181,11 @@ data-benchmark:
 # Run the walk-forward experiment loop.
 research:
 	PYTHONPATH=. python experiments/run_experiments.py
+
+# Reproduce the latest registered experiment run, or pass RESEARCH_MANIFEST=path.
+research-verify-run:
+	@test -n "$(RESEARCH_MANIFEST)" || { echo "No experiment manifest found. Run 'make research' first."; exit 1; }
+	PYTHONPATH=. python scripts/verify_run.py "$(RESEARCH_MANIFEST)"
 
 # Split modeling_dataset_2020_2025.csv into training and public subsets.
 # Requires data/config/universe_*.csv to exist (created in data/config/).
