@@ -151,6 +151,10 @@ function SignalMeter({ icValue }) {
         <span>+0.5</span>
       </div>
       <div className="fiq-meter-verdict">Walk-forward IC ≈ 0: weak predictive signal</div>
+      <div className="fiq-meter-dispersion">
+        −0.17 to +0.22 across test_2023/24/25 · individually indistinguishable from zero at n≈40
+        · source: experiments/leaderboard.csv
+      </div>
     </div>
   )
 }
@@ -287,7 +291,7 @@ function DetailPanel({ ticker }) {
         {t.coverage < 0.55
           ? 'Thin coverage: this readout stays grainy by design. Treat the ranking signal as low-trust.'
           : t.band === 'top'
-            ? 'Crisp coverage, but ranking strength does not imply predictive edge — walk-forward IC remains ≈ 0.'
+            ? 'Crisp coverage, but ranking strength does not imply predictive edge — committed test-fold IC spans −0.17 to +0.22, individually indistinguishable from zero at n≈40.'
             : 'Low diagnostic score under solid coverage. Historical evaluation only.'}
       </p>
     </aside>
@@ -482,7 +486,7 @@ export default function DashboardPage() {
         <span className="fiq-caveat-pulse" aria-hidden="true" />
         Research only · Not investment advice
         <span className="fiq-caveat-sep">·</span>
-        Walk-forward IC ≈ 0: weak predictive signal
+        Walk-forward IC ≈ 0 · range −0.17 to +0.22 · each indistinguishable from zero at n≈40
       </footer>
     </div>
   )
@@ -583,6 +587,7 @@ const CSS = `
 .fiq-meter-tick { position: absolute; top: 7px; bottom: 7px; width: 1px; background: rgba(159,174,159,0.5); }
 .fiq-meter-scale { display: flex; justify-content: space-between; margin-top: 5px; font-family: ui-monospace, Menlo, monospace; font-size: 9.5px; color: var(--fiq-faint); }
 .fiq-meter-verdict { margin-top: 10px; font-size: 11.5px; letter-spacing: 0.04em; color: var(--fiq-paper); border-top: 1px dashed rgba(200,211,202,0.18); padding-top: 9px; }
+.fiq-meter-dispersion { margin-top: 6px; font-family: ui-monospace, Menlo, monospace; font-size: 9.5px; line-height: 1.45; color: var(--fiq-dim); }
 
 /* ---- dataset strip ---- */
 .fiq-strip {

@@ -198,6 +198,10 @@ export default function ExperimentsPage() {
             <span>MEAN IC · BASELINE</span>
             <strong className="is-gold">{fmtIc(meanBase ?? EXPERIMENTS_MOCK.mean_ic_baseline)}</strong>
           </div>
+          <div className="xp-dispersion">
+            <strong>−0.17 to +0.22</strong> across test_2023/24/25 · individually indistinguishable
+            from zero at n≈40 · source: experiments/leaderboard.csv
+          </div>
           {!fromApi && (
             <div className="xp-mocknote">
               demo data — {apiErrorText(error) || 'experiments API returned no folds'}
@@ -242,8 +246,9 @@ export default function ExperimentsPage() {
                 <strong>{active.point.overlap ? `${active.point.overlap.hit}/${active.point.overlap.of}` : 'N/A'}</strong>
               </div>
               <p className="xp-readout-note">
-                |IC| under 0.1 on ~40 stocks is statistically indistinguishable from zero.
-                Single-fold spikes are noise, not skill.
+                The committed leaderboard spans −0.17 to +0.22 across test_2023/24/25;
+                each fold is individually indistinguishable from zero at n≈40. Single-fold
+                spikes are noise, not skill.
               </p>
             </>
           )}
@@ -261,7 +266,8 @@ export default function ExperimentsPage() {
 
       <footer className="xp-caveat">
         <span className="xp-caveat-pulse" aria-hidden="true" />
-        Walk-forward IC ≈ 0 · No reliable predictive edge · Research only · Not investment advice
+        Walk-forward IC ≈ 0 · range −0.17 to +0.22 · each indistinguishable from zero at n≈40 ·
+        Research only · Not investment advice
       </footer>
     </div>
   )
@@ -304,6 +310,9 @@ const CSS = `
 .xp-mean strong { font-size: 17px; }
 .xp-mean .is-gold { color: var(--xp-gold); }
 .xp-mean .is-copper { color: var(--xp-copper); }
+.xp-dispersion { max-width: 34ch; border-top: 1px dashed rgba(200,211,202,0.16); padding-top: 8px;
+  font-family: var(--font-mono); font-size: 9.5px; line-height: 1.5; color: var(--xp-dim); }
+.xp-dispersion strong { color: var(--xp-paper); font-weight: 600; }
 .xp-mocknote { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.06em; color: var(--xp-copper); border-top: 1px dashed rgba(168,103,75,0.4); padding-top: 8px; }
 
 .xp-main { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
