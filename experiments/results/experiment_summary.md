@@ -1,7 +1,10 @@
 # Experiment summary (benchmark-aware, walk-forward)
 
 Small data (~40 stocks/year), leakage-controlled. Treat all numbers as noisy.
-Features are largely a static snapshot; baselines usually match/beat ML.
+> ⚠️ DATA CAVEAT: corrected features vary by year: 39 of 40 predictor features show verified
+> within-ticker cross-year variance; 33 frozen reference columns are excluded. The dataset remains
+> small and sparse, so this does not establish reliable predictive signal.
+Baselines usually match/beat ML.
 
 Additional reports: `feature_coverage.csv`, `feature_stability_summary.csv`, `coverage_impact.csv`.
 

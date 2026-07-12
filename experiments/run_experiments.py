@@ -348,8 +348,8 @@ def _data_caveat(feature_data: pd.DataFrame, feat_cols: list[str], frozen_exclud
     ]
 
 
-def _write_summary_report(lb: pd.DataFrame, panel: pd.DataFrame, feat_cols: list[str]) -> None:
-    """Write the honest summary without changing experiment results."""
+def _feature_variance_caveat(panel: pd.DataFrame, feat_cols: list[str]) -> list[str]:
+    """Build the variance caveat from the current raw modeling data."""
     frozen_excluded = 0
     quality_report = ROOT / "data" / "trusted_clean" / "data_quality_report.json"
     if quality_report.is_file():
@@ -358,10 +358,15 @@ def _write_summary_report(lb: pd.DataFrame, panel: pd.DataFrame, feat_cols: list
     variation_frame = panel
     if _modeling_csv().is_file():
         variation_frame = pd.read_csv(_modeling_csv(), usecols=["ticker", *feat_cols])
+    return _data_caveat(variation_frame, feat_cols, frozen_excluded)
+
+
+def _write_summary_report(lb: pd.DataFrame, panel: pd.DataFrame, feat_cols: list[str]) -> None:
+    """Write the honest summary without changing experiment results."""
     lines = ["# Experiment summary (next-year return prediction)\n",
              "Walk-forward, leakage-controlled. Small data (40 stocks/year) — treat",
              "all out-of-sample numbers as noisy and overfitting-prone.\n",
-             *_data_caveat(variation_frame, feat_cols, frozen_excluded),
+             *_feature_variance_caveat(panel, feat_cols),
              ""]
     for split in SPLITS:
         sub = lb[lb["split"] == split["name"]].copy()
@@ -454,7 +459,8 @@ def run() -> None:
     # honest per-target summary
     sm = ["# Experiment summary (benchmark-aware, walk-forward)\n",
           "Small data (~40 stocks/year), leakage-controlled. Treat all numbers as noisy.",
-          "Features are largely a static snapshot; baselines usually match/beat ML.\n",
+          *_feature_variance_caveat(panel, feat_cols),
+          "Baselines usually match/beat ML.\n",
           "Additional reports: `feature_coverage.csv`, `feature_stability_summary.csv`, `coverage_impact.csv`.\n",
           f"Targets evaluated: {sorted(bt['target'].unique()) if len(bt) else ['next_year_return_pct']}\n"]
     if len(bt):
