@@ -94,7 +94,7 @@
       },
       {
         "path": "frontend/src/pages/ExperimentsPage.jsx",
-        "line": 187,
+        "line": 291,
         "text": "Each band is one model under walk-forward evaluation: train on years 1…N, predict year N+1,",
         "reason": "Method description, not a claim of demonstrated predictive skill."
       },

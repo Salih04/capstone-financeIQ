@@ -17,6 +17,7 @@ from app.services.research import (
     feature_registry,
     profit,
     scoring,
+    significance,
     validation,
 )
 
@@ -77,3 +78,12 @@ def benchmark_status(_: User | None = Depends(require_access)):
 @router.get("/feature-registry")
 def registry(_: User | None = Depends(require_access)):
     return {"features": feature_registry.registry_as_dicts()}
+
+
+@router.get("/significance")
+def significance_report(_: User | None = Depends(require_access)):
+    """Serve committed significance/power evidence; never recompute it at request time."""
+    try:
+        return significance.payload()
+    except significance.SignificanceReportMissing as exc:
+        raise HTTPException(503, str(exc))

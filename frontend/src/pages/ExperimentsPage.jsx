@@ -34,6 +34,7 @@ const MODEL_LABELS = {
   lasso: 'Lasso',
   elasticnet: 'ElasticNet',
   random_forest: 'Random Forest',
+  gradient_boosting: 'Gradient boosting',
 }
 const modelLabel = (m) => MODEL_LABELS[m] || String(m || '').replace(/_/g, ' ')
 const yearOf = (s) => {
@@ -92,6 +93,107 @@ function buildTraces(exp) {
 }
 
 const fmtIc = (v) => (v == null ? 'N/A' : `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(3)}`)
+const fmtP = (v) => (v == null ? 'N/A' : Number(v).toFixed(4))
+
+function InstrumentedNullPanel({ report, error }) {
+  if (!report?.models?.length) {
+    return (
+      <section className="xp-null xp-null-fallback" aria-live="polite">
+        <div className="xp-null-kicker">INSTRUMENTED NULL · REPORT UNAVAILABLE</div>
+        <p>
+          Demo fallback only. The committed significance report is unavailable, so this panel does not display
+          p-values, confidence intervals, null distributions, or detectable-IC thresholds.
+        </p>
+        <div className="xp-mocknote">demo fallback — {apiErrorText(error) || 'significance API returned no report'}</div>
+      </section>
+    )
+  }
+
+  const models = report.models
+  const domain = Math.max(0.35, ...models.flatMap((model) => [
+    Math.abs(model.pooled.observed_ic),
+    ...model.pooled.bootstrap_ci_95.map(Math.abs),
+  ])) * 1.08
+  const ciWidth = 640
+  const ciHeight = models.length * 42 + 24
+  const ciX = (value) => ((Number(value) + domain) / (2 * domain)) * ciWidth
+  const headlineModel = models.find((model) => model.model === report.headline?.model) || models[0]
+  const histogram = headlineModel.pooled.null_histogram
+  const histogramMax = Math.max(...histogram.counts, 1)
+  const histogramWidth = 640
+  const histogramHeight = 132
+  const histogramMin = histogram.bin_edges[0]
+  const histogramRange = histogram.bin_edges[histogram.bin_edges.length - 1] - histogramMin
+  const observedX = ((headlineModel.pooled.observed_ic - histogramMin) / histogramRange) * histogramWidth
+  const designs = report.power_analysis?.designs || []
+  const pooledDesign = designs.find((design) => design.design_id === 'current_three_year_pooled')
+  const splitDesign = designs.find((design) => design.design_id === 'current_one_split')
+
+  return (
+    <section className="xp-null" aria-labelledby="instrumented-null-title">
+      <div className="xp-null-kicker">INSTRUMENTED NULL · COMMITTED SIGNIFICANCE REPORT</div>
+      <h2 id="instrumented-null-title">No ML model is statistically distinguishable from the within-year null after family-wise correction.</h2>
+      <p className="xp-null-intro">
+        Pooled results from the 81-ticker training universe (n=80 per split; three test years). Each raw permutation
+        p-value is paired with its Bonferroni-adjusted value; neither is presented as investment value.
+      </p>
+
+      <div className="xp-null-grid">
+        <div className="xp-null-card">
+          <div className="xp-null-card-title">POOLED IC · 95% BOOTSTRAP INTERVAL</div>
+          <svg className="xp-ci-chart" viewBox={`0 0 ${ciWidth} ${ciHeight}`} role="img" aria-label="Pooled IC dots within bootstrap confidence intervals for each ML model">
+            <line x1={ciX(0)} y1="0" x2={ciX(0)} y2={ciHeight} className="xp-ci-zero" />
+            {models.map((model, index) => {
+              const y = 22 + index * 42
+              const [low, high] = model.pooled.bootstrap_ci_95
+              return (
+                <g key={model.model}>
+                  <text x="0" y={y - 12} className="xp-ci-label">{modelLabel(model.model).toUpperCase()}</text>
+                  <line x1={ciX(low)} y1={y} x2={ciX(high)} y2={y} className="xp-ci-range" />
+                  <circle cx={ciX(model.pooled.observed_ic)} cy={y} r="5" className="xp-ci-dot" />
+                  <text x={ciWidth} y={y + 4} textAnchor="end" className="xp-ci-value">{fmtIc(model.pooled.observed_ic)}</text>
+                </g>
+              )
+            })}
+          </svg>
+          <div className="xp-null-axis"><span>{fmtIc(-domain)}</span><span>IC 0</span><span>{fmtIc(domain)}</span></div>
+        </div>
+
+        <div className="xp-null-card xp-null-histogram-card">
+          <div className="xp-null-card-title">NULL DISTRIBUTION · {modelLabel(headlineModel.model).toUpperCase()}</div>
+          <svg className="xp-histogram" viewBox={`0 0 ${histogramWidth} ${histogramHeight}`} role="img" aria-label={`Permutation null distribution for ${modelLabel(headlineModel.model)} with observed pooled IC marked`}>
+            {histogram.counts.map((count, index) => {
+              const x = (index / histogram.counts.length) * histogramWidth
+              const width = histogramWidth / histogram.counts.length
+              const height = (count / histogramMax) * (histogramHeight - 20)
+              return <rect key={histogram.bin_edges[index]} x={x} y={histogramHeight - height} width={Math.max(width - 1, 1)} height={height} className="xp-histogram-bar" />
+            })}
+            <line x1={observedX} y1="4" x2={observedX} y2={histogramHeight} className="xp-histogram-observed" />
+          </svg>
+          <div className="xp-histogram-legend"><span>observed pooled IC {fmtIc(headlineModel.pooled.observed_ic)}</span><span>permuted within-year null</span></div>
+        </div>
+      </div>
+
+      <div className="xp-pair-table" aria-label="Paired raw and adjusted p-values">
+        {models.map((model) => (
+          <div className="xp-pair-row" key={model.model}>
+            <span className="xp-pair-model">{modelLabel(model.model)}</span>
+            <span>IC <strong>{fmtIc(model.pooled.observed_ic)}</strong></span>
+            <span>RAW P <strong>{fmtP(model.pooled.permutation_p_value_two_sided)}</strong></span>
+            <span>ADJ. P (BONFERRONI) <strong>{fmtP(model.pooled.bonferroni_adjusted_p_value)}</strong></span>
+          </div>
+        ))}
+      </div>
+
+      {pooledDesign && splitDesign && (
+        <p className="xp-power-footer">
+          This design could only detect |IC| ≥ {Number(pooledDesign.analytic_minimum_detectable_abs_ic).toFixed(3)} (three-year, 80-row design; {Number(splitDesign.analytic_minimum_detectable_abs_ic).toFixed(3)} for a single year) at 80% power — a design limit, not an estimate of the true IC.
+        </p>
+      )}
+      <div className="xp-null-limitations">{report.limitations?.join(' · ')}</div>
+    </section>
+  )
+}
 
 // ── one seismograph band ────────────────────────────────────────────────────
 function TraceBand({ trace, years, hovered, onHover }) {
@@ -153,6 +255,8 @@ function TraceBand({ trace, years, hovered, onHover }) {
 export default function ExperimentsPage() {
   const { data: exp, error, fromCache, refreshing, savedAt, refresh } =
     useCachedResource('/research/experiments', { ttlMs: CACHE_TTL.LONG })
+  const { data: significance, error: significanceError } =
+    useCachedResource('/research/significance', { ttlMs: CACHE_TTL.LONG })
   const [hovered, setHovered] = useState(null)
 
   const failed = !!error && !exp
@@ -264,6 +368,8 @@ export default function ExperimentsPage() {
         <p className="xp-verdict-api">{String(verdict)}</p>
       </section>
 
+      <InstrumentedNullPanel report={significance} error={significanceError} />
+
       <footer className="xp-caveat">
         <span className="xp-caveat-pulse" aria-hidden="true" />
         Walk-forward IC ≈ 0 · range −0.17 to +0.22 · each indistinguishable from zero at n≈40 ·
@@ -355,6 +461,33 @@ const CSS = `
 .xp-verdict-label { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.28em; color: var(--xp-gold); margin-bottom: 9px; }
 .xp-verdict p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.6; color: var(--xp-paper); }
 .xp-verdict-api { font-family: var(--font-mono); font-size: 11px !important; color: var(--xp-dim) !important; }
+
+.xp-null { margin-top: 24px; max-width: 1100px; border: 1px solid rgba(77,165,131,0.34); border-left: 3px solid var(--xp-emerald); background: rgba(11,16,15,0.72); border-radius: 3px; padding: 19px 20px; }
+.xp-null-kicker, .xp-null-card-title { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.22em; color: var(--xp-emerald); }
+.xp-null h2 { max-width: 760px; margin: 9px 0; font-size: clamp(17px, 2vw, 23px); line-height: 1.25; font-weight: 600; color: var(--xp-paper); }
+.xp-null-intro { max-width: 820px; margin: 0; color: var(--xp-dim); font-size: 12px; line-height: 1.6; }
+.xp-null-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 16px; margin-top: 18px; }
+.xp-null-card { border: 1px solid rgba(200,211,202,0.14); background: rgba(8,11,10,0.45); padding: 12px; overflow: hidden; }
+.xp-ci-chart, .xp-histogram { display: block; width: 100%; margin-top: 10px; overflow: visible; }
+.xp-ci-zero { stroke: rgba(232,236,230,0.28); stroke-dasharray: 3 5; }
+.xp-ci-range { stroke: var(--xp-dim); stroke-width: 3; stroke-linecap: round; }
+.xp-ci-dot { fill: var(--xp-emerald); stroke: var(--xp-paper); stroke-width: 1.5; }
+.xp-ci-label, .xp-ci-value { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.07em; fill: var(--xp-dim); }
+.xp-ci-value { fill: var(--xp-paper); }
+.xp-null-axis, .xp-histogram-legend { display: flex; justify-content: space-between; gap: 10px; margin-top: 4px; font-family: var(--font-mono); font-size: 9px; color: var(--xp-faint); }
+.xp-histogram { height: 158px; background: repeating-linear-gradient(0deg, rgba(232,236,230,0.025) 0 1px, transparent 1px 5px); }
+.xp-histogram-bar { fill: rgba(77,165,131,0.5); }
+.xp-histogram-observed { stroke: var(--xp-copper); stroke-width: 3; }
+.xp-histogram-legend span:first-child { color: var(--xp-copper); }
+.xp-pair-table { margin-top: 16px; border-top: 1px solid rgba(200,211,202,0.14); }
+.xp-pair-row { display: grid; grid-template-columns: minmax(130px, 1.1fr) repeat(3, minmax(100px, 1fr)); gap: 10px; align-items: center; border-bottom: 1px solid rgba(200,211,202,0.1); padding: 9px 4px; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.04em; color: var(--xp-faint); }
+.xp-pair-row strong { color: var(--xp-paper); font-size: 10px; }
+.xp-pair-model { color: var(--xp-dim); font-size: 10px; letter-spacing: 0.08em; }
+.xp-power-footer { margin: 16px 0 0; border-left: 2px solid var(--xp-gold); padding: 8px 0 8px 11px; font-size: 12px; line-height: 1.55; color: var(--xp-paper); }
+.xp-null-limitations { margin-top: 12px; font-family: var(--font-mono); font-size: 9px; line-height: 1.65; color: var(--xp-faint); }
+.xp-null-fallback { border-left-color: var(--xp-copper); }
+.xp-null-fallback .xp-null-kicker { color: var(--xp-copper); }
+@media (max-width: 820px) { .xp-null-grid { grid-template-columns: 1fr; } .xp-pair-row { grid-template-columns: 1fr 1fr; } .xp-pair-model { grid-column: 1 / -1; } }
 
 .xp-caveat { position: sticky; bottom: 14px; z-index: 4; margin-top: 28px;
   display: flex; align-items: center; gap: 10px; width: fit-content; max-width: 100%;

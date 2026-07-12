@@ -27,6 +27,7 @@ export const researchApi = {
   diagnostics: () => safeGet('/research/model-diagnostics'),
   dataQuality: () => safeGet('/research/data-quality'),
   experiments: () => safeGet('/research/experiments'),
+  significance: () => safeGet('/research/significance'),
   benchmark: () => safeGet('/research/benchmark'),
   companies: () => safeGet('/research/companies'),
   frozenEvidence: () => safeGet('/research/frozen-evidence'),
