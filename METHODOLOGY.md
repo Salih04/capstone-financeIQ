@@ -281,6 +281,16 @@ Registration documents provenance; it does not certify methodology or establish
 predictive validity. The weak/unstable, no-reliable-edge conclusion and the
 research-support-only boundary remain unchanged.
 
+### Run-directory governance
+
+A manifest is of record only when its `leaderboard.csv` SHA-256 matches the
+committed `experiments/leaderboard.csv`. Run-directory age or name does not
+override that checksum rule; if multiple manifests match, each remains a
+co-record. Superseded run directories may be deleted only in the same commit
+that replaces the committed leaderboard, so the replacement manifest and
+leaderboard remain reviewable together. Manifests are generated provenance
+records and must never be hand-edited.
+
 ## Leakage controls
 
 Enforced in `app/services/research/feature_registry.py`:

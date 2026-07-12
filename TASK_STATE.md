@@ -1,6 +1,6 @@
 # TASK_STATE.md — FinanceIQ
 
-Last updated: 2026-06-11 (rev 6)
+Last updated: 2026-07-12 (rev 7)
 
 ## Status legend
 - `DONE` — shipped, tested
@@ -54,7 +54,12 @@ claim.
 | Render Docker deploy | DONE | `render.yaml` (Docker, repo-root context), `$PORT`-aware Dockerfile CMD, docs aligned |
 | Private production lockdown | DONE | env-gated `require_access` (401 anon / 403 unapproved, fail-closed allowlist); docs/openapi gating; in-memory rate limit; frontend Google/signup hidden + approval gate + cache clear; security headers |
 | Supabase JWKS verification | DONE | asymmetric Signing Keys (RS256/ES256) via project JWKS from `SUPABASE_URL` (cached); HS256 legacy fallback; fixes 401 for approved users |
-| Verification baseline (2026-07-12) | DONE | root `PYTHONPATH=. python -m pytest tests/`: 97 passed; backend `PYTHONPATH=backend python -m pytest backend/tests`: 51 passed; `make data-validate`: VALID (403 rows, 40 features, 321 target rows); VER-02 frontend `npm install`: passed/up to date (audit: 10 vulnerabilities); `npm run build`: passed; `npm run e2e`: not run — no backend available (`curl http://127.0.0.1:8000/health`: connection refused) |
+| Verification baseline (2026-07-12) | DONE | latest R2-GOV-01 refresh: root `PYTHONPATH=. python -m pytest tests/`: 106 passed; backend `PYTHONPATH=backend python -m pytest backend/tests`: 55 passed; `make data-validate`: VALID (403 rows, 40 features, 321 target rows); VER-02 frontend `npm install`: passed/up to date (audit: 10 vulnerabilities); `npm run build`: passed; `npm run e2e`: not run — no backend available (`curl http://127.0.0.1:8000/health`: connection refused) |
+| R2-REPRO-01 run manifests + one-command reproduction (2026-07-12) | DONE | `74f35efe`; registered manifests, `scripts/verify_run.py`, `make research-verify-run`, and methodology provenance guidance |
+| R2-UNIV-01 universe & survivorship audit (2026-07-12) | DONE | `26448525`; `docs/universe_audit.md` and retrospective-cohort limitations |
+| R2-STAT-01 permutation + bootstrap significance (2026-07-12) | DONE | `c0c5c1d9`; prediction dumps, `experiments/significance.py`, and significance reports |
+| R2-STAT-02 power / minimum detectable IC (2026-07-12) | DONE | `a875bf67`; analytic and simulated power analysis in the significance report and methodology |
+| R2-CONTRACT-01 Model Confidence Contract v1 + claims lint (2026-07-12) | DONE | `28ba92b2`; `model_confidence_contract.json`, `scripts/lint_claims.py`, `make claims-lint`, and backend contract test |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
 ---
