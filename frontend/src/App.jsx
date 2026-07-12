@@ -16,6 +16,7 @@ import ResearchPage from './pages/ResearchPage'
 import ResearchAgentPage from './pages/ResearchAgentPage'
 import DataQualityPage from './pages/DataQualityPage'
 import ExperimentsPage from './pages/ExperimentsPage'
+import AutopsyPage from './pages/AutopsyPage'
 import BenchmarkPage from './pages/BenchmarkPage'
 import CompaniesResearchPage from './pages/CompaniesResearchPage'
 import CompanyResearchDetailPage from './pages/CompanyResearchDetailPage'
@@ -54,6 +55,7 @@ export default function App() {
       <Route path="/research-agent" element={<Protected><ResearchAgentPage /></Protected>} />
       <Route path="/data-quality" element={<Protected><DataQualityPage /></Protected>} />
       <Route path="/experiments" element={<Protected><ExperimentsPage /></Protected>} />
+      <Route path="/autopsy" element={<Protected><AutopsyPage /></Protected>} />
       <Route path="/benchmark" element={<Protected><BenchmarkPage /></Protected>} />
       <Route path="/research/companies" element={<Protected><CompaniesResearchPage /></Protected>} />
       <Route path="/research/companies/:ticker" element={<Protected><CompanyResearchDetailPage /></Protected>} />

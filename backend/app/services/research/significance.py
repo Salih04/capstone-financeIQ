@@ -7,6 +7,7 @@ bootstrap intervals, and null histogram for each ML model.
 
 from __future__ import annotations
 
+import csv
 import json
 from functools import lru_cache
 from pathlib import Path
@@ -15,6 +16,21 @@ from app.core.paths import resolve_repo_root
 
 
 REPORT_PATH = resolve_repo_root() / "experiments" / "results" / "significance_report.json"
+AUTOPSY_ARTIFACTS = {
+    "feature_stability_by_split": resolve_repo_root()
+    / "experiments"
+    / "results"
+    / "feature_stability_by_split.csv",
+    "feature_stability_summary": resolve_repo_root()
+    / "experiments"
+    / "results"
+    / "feature_stability_summary.csv",
+    "coverage_impact": resolve_repo_root()
+    / "experiments"
+    / "results"
+    / "coverage_impact.csv",
+    "leaderboard": resolve_repo_root() / "experiments" / "leaderboard.csv",
+}
 
 
 class SignificanceReportMissing(RuntimeError):
@@ -33,6 +49,37 @@ def _load_report() -> dict:
             f"Significance report not found at {REPORT_PATH}. Run `make research-significance`."
         )
     return _load_cached(str(REPORT_PATH), REPORT_PATH.stat().st_mtime)
+
+
+def _typed_csv_value(value: str):
+    if value == "":
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        try:
+            return float(value)
+        except ValueError:
+            return value
+
+
+@lru_cache(maxsize=8)
+def _load_csv_cached(path: str, mtime: float) -> tuple[dict, ...]:
+    with Path(path).open(encoding="utf-8", newline="") as handle:
+        return tuple(
+            {key: _typed_csv_value(value) for key, value in row.items()}
+            for row in csv.DictReader(handle)
+        )
+
+
+def _artifact_payload(path: Path) -> dict:
+    if not path.is_file():
+        raise SignificanceReportMissing(f"Autopsy evidence not found at {path}.")
+    rows = _load_csv_cached(str(path), path.stat().st_mtime)
+    return {
+        "source_file": str(path.relative_to(resolve_repo_root())),
+        "rows": list(rows),
+    }
 
 
 def payload() -> dict:
@@ -63,4 +110,16 @@ def payload() -> dict:
         "models": models,
         "power_analysis": report["power_analysis"],
         "limitations": report["limitations"],
+    }
+
+
+def autopsy_payload() -> dict:
+    """Return the existing significance evidence plus parsed autopsy exhibits."""
+    return {
+        "schema_version": 1,
+        "significance": payload(),
+        "evidence": {
+            name: _artifact_payload(path)
+            for name, path in AUTOPSY_ARTIFACTS.items()
+        },
     }

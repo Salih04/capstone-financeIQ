@@ -1,6 +1,6 @@
 {
   "contract_name": "FinanceIQ Model Confidence Contract",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "effective_date": "2026-07-12",
   "authority": "FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md",
   "versioning_procedure": {
@@ -159,6 +159,7 @@
     "pages": [
       "frontend/src/pages/AIResearchAssistantPage.jsx",
       "frontend/src/pages/AdminPage.jsx",
+      "frontend/src/pages/AutopsyPage.jsx",
       "frontend/src/pages/BenchmarkPage.jsx",
       "frontend/src/pages/CompanyPage.jsx",
       "frontend/src/pages/CompanyResearchDetailPage.jsx",

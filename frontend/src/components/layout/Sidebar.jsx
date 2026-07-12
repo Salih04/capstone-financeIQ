@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import {
   LayoutDashboard, Building2,
-  ShieldCheck, Activity, Tag, FlaskConical, ChevronLeft, Database, LineChart,
+  ShieldCheck, Activity, Tag, FlaskConical, ChevronLeft, Database, LineChart, Microscope,
   ChevronRight, LogOut, Bot, Sparkles, BrainCircuit, TrendingUp,
 } from 'lucide-react'
 
@@ -15,6 +15,7 @@ const NAV_SECTIONS = [
       { path: '/research-agent', icon: Bot, label: 'AI Research Assistant' },
       { path: '/research/companies', icon: Building2, label: 'Companies' },
       { path: '/experiments', icon: FlaskConical, label: 'Experiments' },
+      { path: '/autopsy', icon: Microscope, label: 'Negative Alpha Autopsy' },
       { path: '/research', icon: Sparkles, label: 'Score Explorer' },
       { path: '/data-quality', icon: Database, label: 'Data Quality' },
       { path: '/benchmark', icon: LineChart, label: 'Benchmark' },

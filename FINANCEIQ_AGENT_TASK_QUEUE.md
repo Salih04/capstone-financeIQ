@@ -54,6 +54,7 @@ Implements `FINANCEIQ_MOONSHOT_ROADMAP.md`. The Stage-0 gate is **satisfied**. P
 | R2-CONTRACT-02 MCC coverage drift guard + versioning procedure | DONE (uncommitted) | 2026-07-12; `model_confidence_contract.json` v1.1.0, recursive JSX scan, explicit auth exemptions, root route-coverage guard, and MCC versioning procedure; commit deferred by request |
 | R2-LINEAGE-01 feature passports | DONE (uncommitted) | 2026-07-12; generated `feature_passports.json` covers 61/61 columns, read-only API passthrough, Score Explorer passport popover; root 111/111, backend 57/57, data VALID, frontend build and claims lint passed; commit deferred by request |
 | R2-SKEPTIC-01 skeptic challenge service | DONE (uncommitted) | 2026-07-12; deterministic cached six-check `/research/skeptic/{ticker}` report, structured evidence citations and insufficient-data handling, MCC v1.2.0; root 111/111, backend 67/67, claims lint and live ASELS/ASTOR checks passed; commit deferred by request |
+| R2-AUTOPSY-01 Negative Alpha Autopsy | DONE (uncommitted) | 2026-07-12; six artifact-backed exhibits at `/autopsy`, typed `/research/significance/autopsy` passthrough, explicit source/limitation labels, MCC v1.3.0; root 114/114, backend 69/69, frontend build and claims lint passed; live API passed, page visual blocked by missing approved Supabase session; commit deferred by request |
 
 ## Universal rules for remaining Phase-2 tasks
 

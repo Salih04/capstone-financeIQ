@@ -100,6 +100,15 @@ def significance_report(_: User | None = Depends(require_access)):
         raise HTTPException(503, str(exc))
 
 
+@router.get("/significance/autopsy")
+def autopsy_report(_: User | None = Depends(require_access)):
+    """Extend significance evidence with parsed, committed autopsy CSVs."""
+    try:
+        return significance.autopsy_payload()
+    except significance.SignificanceReportMissing as exc:
+        raise HTTPException(503, str(exc))
+
+
 @router.get("/skeptic/{ticker}")
 def skeptic_report(ticker: str, _: User | None = Depends(require_access)):
     """Challenge a ticker with cached, committed evidence; never alter its score."""

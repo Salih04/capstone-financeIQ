@@ -28,6 +28,7 @@ export const researchApi = {
   dataQuality: () => safeGet('/research/data-quality'),
   experiments: () => safeGet('/research/experiments'),
   significance: () => safeGet('/research/significance'),
+  autopsy: () => safeGet('/research/significance/autopsy'),
   benchmark: () => safeGet('/research/benchmark'),
   companies: () => safeGet('/research/companies'),
   frozenEvidence: () => safeGet('/research/frozen-evidence'),
