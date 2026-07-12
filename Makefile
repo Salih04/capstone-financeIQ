@@ -5,7 +5,7 @@
 	collect-yfinance-bist100 clean-yfinance-bist100 update-training-universe-yfinance validate-universe data-audit \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
-	research-agent-autoresearch-iteration demo-check research-verify-run research-significance
+	research-agent-autoresearch-iteration demo-check research-verify-run research-significance claims-lint
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -51,6 +51,10 @@ research-agent-autoresearch-iteration:
 # Run the test suite.
 research-agent-check:
 	PYTHONPATH=. python -m pytest tests/
+
+# Enforce the versioned Model Confidence Contract on user-facing and response copy.
+claims-lint:
+	python scripts/lint_claims.py
 
 # Read-only pre-demo check for a running backend. Override with:
 #   make demo-check FINANCEIQ_API_URL=http://127.0.0.1:8000

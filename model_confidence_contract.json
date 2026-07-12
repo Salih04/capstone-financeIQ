@@ -1,0 +1,191 @@
+{
+  "contract_name": "FinanceIQ Model Confidence Contract",
+  "version": "1.0.0",
+  "effective_date": "2026-07-12",
+  "authority": "FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md",
+  "evidence_basis": [
+    {
+      "path": "experiments/results/significance_report.md",
+      "finding": "No ML model is statistically distinguishable from the within-year null after family-wise correction."
+    },
+    {
+      "path": "experiments/leaderboard.csv",
+      "finding": "Walk-forward rank signal is weak and unstable across the three test years."
+    },
+    {
+      "path": "FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md",
+      "finding": "Research-support-only claim wording is authoritative."
+    }
+  ],
+  "evidence_state": {
+    "ml_family_wise_significant": false,
+    "reliable_predictive_edge_observed": false,
+    "investment_value_evaluated": false,
+    "power_thresholds_are_observed_edge": false,
+    "conclusion": "no reliable predictive edge"
+  },
+  "approved_claim_classes": {
+    "diagnostics": [
+      "diagnostic score",
+      "historical ranking pattern",
+      "same-year descriptive relationship"
+    ],
+    "research_support": [
+      "research support only",
+      "academic decision-support prototype",
+      "not investment advice"
+    ],
+    "statistical_uncertainty": [
+      "no validated predictive skill",
+      "not statistically distinguishable from the within-year null after family-wise correction",
+      "detectable IC is a design threshold, not an observed effect"
+    ],
+    "limitations": [
+      "three observed test years",
+      "retrospectively fixed cohort",
+      "nominal TRY returns in one macro regime",
+      "power analysis does not establish practical investment relevance"
+    ]
+  },
+  "approved_wording": {
+    "primary_disclaimer": "Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.",
+    "inference_label": "unevaluated_forward_forecast",
+    "headline_conclusion": "No reliable predictive edge."
+  },
+  "rules": [
+    {
+      "id": "MCC-CLAIM-001",
+      "description": "User-facing and response copy must not claim prediction, recommendations, outperformance, or trading value while the evidence state remains negative.",
+      "severity": "error",
+      "patterns": [
+        "\\bpredicts?\\b",
+        "\\bwill\\s+outperform\\b",
+        "\\bexpected\\s+returns?\\b",
+        "\\b(?:buy|sell|hold)\\b",
+        "\\bmarket[-\\s]beating\\b",
+        "\\bprofitable\\s+trad(?:e|es|ing)\\b",
+        "\\breliable\\s+return\\s+prediction\\b"
+      ]
+    }
+  ],
+  "scan": {
+    "frontend_glob": "frontend/src/pages/*.jsx",
+    "backend_response_files": [
+      "backend/app/services/forecasting_csv_service.py"
+    ],
+    "allowlist": [
+      {
+        "path": "backend/app/services/forecasting_csv_service.py",
+        "line": 19,
+        "text": "- No buy/sell/hold signals or price targets.",
+        "reason": "Explicit negation in a response-module guardrail."
+      },
+      {
+        "path": "backend/app/services/forecasting_csv_service.py",
+        "line": 41,
+        "text": "DISCLAIMER = \"Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.\"",
+        "reason": "Authoritative primary disclaimer forbids recommendation use."
+      },
+      {
+        "path": "frontend/src/pages/AdminPage.jsx",
+        "line": 342,
+        "text": "Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.",
+        "reason": "Authoritative primary disclaimer forbids recommendation use."
+      },
+      {
+        "path": "frontend/src/pages/ExperimentsPage.jsx",
+        "line": 187,
+        "text": "Each band is one model under walk-forward evaluation: train on years 1…N, predict year N+1,",
+        "reason": "Method description, not a claim of demonstrated predictive skill."
+      },
+      {
+        "path": "frontend/src/pages/ForecastingPage.jsx",
+        "line": 246,
+        "text": "<div className=\"ff-stage is-predict\">",
+        "reason": "CSS class token, not user-facing claim copy."
+      },
+      {
+        "path": "frontend/src/pages/ForecastingPage.jsx",
+        "line": 608,
+        "text": ".ff-stage.is-predict { border-left: 3px solid #4da583;",
+        "reason": "CSS selector, not user-facing claim copy."
+      },
+      {
+        "path": "frontend/src/pages/ForecastingPage.jsx",
+        "line": 612,
+        "text": ".ff-stage.is-predict .ff-stage-years { color: #4da583; }",
+        "reason": "CSS selector, not user-facing claim copy."
+      },
+      {
+        "path": "frontend/src/pages/ForecastingDetailPage.jsx",
+        "line": 27,
+        "text": "api.get('/predict/trends', { params: { stock_code: stockCode, sector } }).then(({ data }) => setTrend(data)).catch(() => setTrend({ series: [] }))",
+        "reason": "Legacy API route name, not user-facing claim copy."
+      },
+      {
+        "path": "frontend/src/pages/ForecastingDetailPage.jsx",
+        "line": 32,
+        "text": "api.get('/predict/heatmap', { params: { year } }).then(({ data }) => setHeatmap(data)).catch(() => setHeatmap({ heatmap: [] }))",
+        "reason": "Legacy API route name, not user-facing claim copy."
+      },
+      {
+        "path": "frontend/src/pages/LabelingLabPage.jsx",
+        "line": 206,
+        "text": "Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.",
+        "reason": "Authoritative primary disclaimer forbids recommendation use."
+      },
+      {
+        "path": "frontend/src/pages/ValidationLabPage.jsx",
+        "line": 341,
+        "text": "Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.",
+        "reason": "Authoritative primary disclaimer forbids recommendation use."
+      }
+    ]
+  },
+  "required_disclaimer": {
+    "required_fragments": [
+      "investment advice"
+    ],
+    "required_any_fragments": [
+      "research",
+      "diagnostic"
+    ],
+    "pages": [
+      "frontend/src/pages/AIResearchAssistantPage.jsx",
+      "frontend/src/pages/AdminPage.jsx",
+      "frontend/src/pages/BenchmarkPage.jsx",
+      "frontend/src/pages/CompanyPage.jsx",
+      "frontend/src/pages/CompanyResearchDetailPage.jsx",
+      "frontend/src/pages/ComparePage.jsx",
+      "frontend/src/pages/DashboardPage.jsx",
+      "frontend/src/pages/DataHealthPage.jsx",
+      "frontend/src/pages/DataQualityPage.jsx",
+      "frontend/src/pages/ExperimentsPage.jsx",
+      "frontend/src/pages/ForecastingDetailPage.jsx",
+      "frontend/src/pages/ForecastingPage.jsx",
+      "frontend/src/pages/LabelingLabPage.jsx",
+      "frontend/src/pages/ResearchPage.jsx",
+      "frontend/src/pages/ScoreResultPage.jsx",
+      "frontend/src/pages/SearchPage.jsx",
+      "frontend/src/pages/ValidationLabPage.jsx"
+    ],
+    "route_aliases": {
+      "frontend/src/pages/CompaniesResearchPage.jsx": "frontend/src/pages/SearchPage.jsx",
+      "frontend/src/pages/ResearchAgentPage.jsx": "frontend/src/pages/AIResearchAssistantPage.jsx"
+    }
+  },
+  "inference_contract": {
+    "service_file": "backend/app/services/forecasting_csv_service.py",
+    "response_status_field": "prediction_status",
+    "required_status": "unevaluated_forward_forecast",
+    "row_requirements": {
+      "is_inference": true,
+      "realized_return_available": false
+    }
+  },
+  "limitations": [
+    "This linter is a vocabulary and required-label tripwire, not proof that every claim is honest.",
+    "Allowlisted lines require review when their path, line number, or exact text changes.",
+    "Statistical or economic claim validity still requires human review against the cited evidence."
+  ]
+}

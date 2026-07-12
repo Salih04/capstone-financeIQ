@@ -233,6 +233,31 @@ no reliable predictive edge. The 40-ticker projection in
 `experiments/results/significance_report.md` describes pipeline readiness for
 more data, not a promise that additional years will produce predictive skill.
 
+## Model Confidence Contract and claims lint (R2-CONTRACT-01)
+
+`model_confidence_contract.json` is the machine-readable v1 claim boundary for
+user-facing pages and forecasting response copy. It cites the committed
+leaderboard and significance report as its evidence basis, records that no ML
+model survives family-wise correction, and separates approved diagnostic,
+research-support, statistical-uncertainty, and limitation wording from forbidden
+investment or predictive claims. Power-analysis thresholds remain study-design
+quantities; the contract does not treat them as observed edge, economic value,
+or evidence that more data will produce predictive skill.
+
+Run `make claims-lint` (or `python scripts/lint_claims.py`) after changing page
+copy or forecasting response constants. The stdlib-only check requires the
+research-support / not-investment-advice disclaimer on every routed data-page
+implementation, pins the `unevaluated_forward_forecast` inference label, and
+rejects unreviewed prediction, outperformance, expected-return, buy/sell/hold,
+market-beating, or profitable-trading language with `file:line` diagnostics.
+Legitimate negated, methodological, route-name, and CSS-token uses are explicit
+exact-line allowlist entries in the contract, so changes require review.
+
+This mechanism is a tripwire, not proof of honest meaning. Passing it does not
+validate methodology, predictive skill, practical investment relevance, or the
+semantics of wording outside its configured surfaces; claims still require human
+review against `FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md` and the cited evidence.
+
 ## Reproducibility and run provenance
 
 Every `make research` run writes a registered manifest under

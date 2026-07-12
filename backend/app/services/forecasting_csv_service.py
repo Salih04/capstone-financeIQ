@@ -38,7 +38,7 @@ _TRAINING_CSV = _REPO_ROOT / "data" / "trusted_clean" / "modeling_dataset_traini
 _PUBLIC_CSV = _REPO_ROOT / "data" / "trusted_clean" / "modeling_dataset_public_2020_2025.csv"
 _BASE_CSV = _REPO_ROOT / "data" / "trusted_clean" / "modeling_dataset_2020_2025.csv"
 
-DISCLAIMER = "Experimental ranking signal — NOT investment advice. Do not use for buy/sell/hold decisions."
+DISCLAIMER = "Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions."
 
 # Columns that are NOT predictive features
 _NON_FEATURES = {
