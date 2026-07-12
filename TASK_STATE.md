@@ -60,6 +60,7 @@ claim.
 | R2-STAT-01 permutation + bootstrap significance (2026-07-12) | DONE | `c0c5c1d9`; prediction dumps, `experiments/significance.py`, and significance reports |
 | R2-STAT-02 power / minimum detectable IC (2026-07-12) | DONE | `a875bf67`; analytic and simulated power analysis in the significance report and methodology |
 | R2-CONTRACT-01 Model Confidence Contract v1 + claims lint (2026-07-12) | DONE | `28ba92b2`; `model_confidence_contract.json`, `scripts/lint_claims.py`, `make claims-lint`, and backend contract test |
+| R2-CONTRACT-02 MCC coverage drift + versioning (2026-07-12) | DONE (uncommitted) | v1.1.0; route-registration guard, recursive JSX scan, explicit auth exemptions, versioning procedure; root 109/109, backend 56/56, claims lint passed; commit deferred by request |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
 ---

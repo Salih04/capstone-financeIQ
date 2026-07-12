@@ -1,8 +1,13 @@
 {
   "contract_name": "FinanceIQ Model Confidence Contract",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "effective_date": "2026-07-12",
   "authority": "FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md",
+  "versioning_procedure": {
+    "minor_bump": "Any change to rules, scan coverage, required_disclaimer.pages, route aliases, exemptions, or evidence_state requires a minor version bump and an effective_date update.",
+    "patch_bump": "Allowlist-only line-number or exact-text refreshes require a patch version bump.",
+    "review": "Every version change requires human review against the authority and cited evidence before release."
+  },
   "evidence_basis": [
     {
       "path": "experiments/results/significance_report.md",
@@ -69,7 +74,7 @@
     }
   ],
   "scan": {
-    "frontend_glob": "frontend/src/pages/*.jsx",
+    "frontend_glob": "frontend/src/**/*.jsx",
     "backend_response_files": [
       "backend/app/services/forecasting_csv_service.py"
     ],
@@ -172,7 +177,17 @@
     "route_aliases": {
       "frontend/src/pages/CompaniesResearchPage.jsx": "frontend/src/pages/SearchPage.jsx",
       "frontend/src/pages/ResearchAgentPage.jsx": "frontend/src/pages/AIResearchAssistantPage.jsx"
-    }
+    },
+    "exempt_pages": [
+      {
+        "path": "frontend/src/pages/LoginPage.jsx",
+        "reason": "Authentication entry point with no research, model, or data surface."
+      },
+      {
+        "path": "frontend/src/pages/AuthCallbackPage.jsx",
+        "reason": "Authentication callback with no research, model, or data surface."
+      }
+    ]
   },
   "inference_contract": {
     "service_file": "backend/app/services/forecasting_csv_service.py",

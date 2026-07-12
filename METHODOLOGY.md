@@ -253,6 +253,14 @@ market-beating, or profitable-trading language with `file:line` diagnostics.
 Legitimate negated, methodological, route-name, and CSS-token uses are explicit
 exact-line allowlist entries in the contract, so changes require review.
 
+### Contract versioning procedure (R2-CONTRACT-02)
+
+Changes to MCC rules, scan coverage, data-page registration (including aliases
+and exemptions), or evidence state require a minor-version bump and updated
+effective date. Allowlist-only line-number or exact-text refreshes require a
+patch bump. Every version change requires human review against the authority
+and cited evidence before release.
+
 This mechanism is a tripwire, not proof of honest meaning. Passing it does not
 validate methodology, predictive skill, practical investment relevance, or the
 semantics of wording outside its configured surfaces; claims still require human

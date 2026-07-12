@@ -29,6 +29,7 @@ def _load_contract(root: Path) -> dict[str, Any]:
     required = {
         "contract_name",
         "version",
+        "versioning_procedure",
         "evidence_basis",
         "evidence_state",
         "approved_wording",
@@ -70,7 +71,10 @@ def lint_repository(root: Path) -> list[str]:
         allowlist[key] = entry
 
     matched_allowlist: set[tuple[str, int, str]] = set()
-    scan_paths = [Path(p) for p in glob.glob(str(root / contract["scan"]["frontend_glob"]))]
+    scan_paths = [
+        Path(p)
+        for p in glob.glob(str(root / contract["scan"]["frontend_glob"]), recursive=True)
+    ]
     scan_paths.extend(root / path for path in contract["scan"]["backend_response_files"])
 
     compiled_rules: list[tuple[str, re.Pattern[str]]] = []
@@ -167,7 +171,7 @@ def main(argv: list[str] | None = None) -> int:
             print(error)
         print(f"Claims lint FAILED: {len(errors)} violation(s).")
         return 1
-    print("Claims lint PASSED: Model Confidence Contract v1 satisfied.")
+    print(f"Claims lint PASSED: Model Confidence Contract v{_load_contract(root)['version']} satisfied.")
     return 0
 
 

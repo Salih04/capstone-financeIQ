@@ -51,6 +51,7 @@ Implements `FINANCEIQ_MOONSHOT_ROADMAP.md`. The Stage-0 gate is **satisfied**. P
 | R2-STAT-02 power / minimum detectable IC | DONE | `a875bf67`; analytic+simulated power in the significance report: detectable \|IC\| ≈ **0.309** (one 80-row year), **0.182** (three-year design), 0.431/0.260 at public-40 scale; METHODOLOGY §"Power and detectability limits", claims guide §11 |
 | R2-CONTRACT-01 Model Confidence Contract v1 + claims lint | DONE | `28ba92b2`; `model_confidence_contract.json` (v1.0.0), `scripts/lint_claims.py`, `make claims-lint`, backend contract test |
 | R2-GOV-01 truth sync + experiment-artifact governance | DONE (uncommitted) | 2026-07-12; observed root 106/106, backend 55/55, data VALID; truth-sync and run-directory governance docs updated |
+| R2-CONTRACT-02 MCC coverage drift guard + versioning procedure | DONE (uncommitted) | 2026-07-12; `model_confidence_contract.json` v1.1.0, recursive JSX scan, explicit auth exemptions, root route-coverage guard, and MCC versioning procedure; commit deferred by request |
 
 ## Universal rules for remaining Phase-2 tasks
 
