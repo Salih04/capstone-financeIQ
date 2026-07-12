@@ -1,0 +1,1655 @@
+{
+  "analysis": {
+    "bootstrap": "tickers resampled with replacement independently within each test year",
+    "bootstraps": 10000,
+    "evaluated_tickers_per_model_split": [
+      80
+    ],
+    "multiplicity": {
+      "family": [
+        "linear_regression",
+        "ridge",
+        "lasso",
+        "elasticnet",
+        "random_forest",
+        "gradient_boosting"
+      ],
+      "family_size": 6,
+      "family_wise_alpha": 0.05,
+      "method": "Bonferroni"
+    },
+    "permutation": "two-sided; realized returns shuffled independently within each test year",
+    "permutations": 10000,
+    "seed": 42,
+    "statistic": "equal-weighted mean of within-split Spearman ICs"
+  },
+  "claim_safety": {
+    "descriptive_research_evidence_only": true,
+    "investment_value_established": false,
+    "multiplicity_gate": "Bonferroni across the same six-model ML family",
+    "reliable_predictive_edge_established": false
+  },
+  "headline": {
+    "bonferroni_adjusted_p_value": 0.0983901609839016,
+    "bootstrap_ci_95": [
+      -0.27563639418074026,
+      -0.028099509225500856
+    ],
+    "conclusion": "No ML model is statistically distinguishable from the within-year null after Bonferroni correction; the data do not support a reliable predictive edge.",
+    "model": "random_forest",
+    "observed_ic": -0.15562044542255335,
+    "observed_null_percentile": 0.81,
+    "permutation_p_value_two_sided": 0.0163983601639836,
+    "selection": "smallest pooled raw permutation p-value among the six ML models",
+    "significant_fwer_0_05": false
+  },
+  "limitations": [
+    "Only three test years with 80 evaluated tickers per model and split; estimates remain noisy.",
+    "The cohort is a retrospectively fixed repository universe, not verified point-in-time BIST100 membership.",
+    "Prediction artifact byte reproducibility is environment-qualified; manifests separate same-environment byte identity from cross-environment semantic checks.",
+    "CPI-deflated TRY returns use national December year-on-year CPI as a descriptive basis; they do not represent investor-specific inflation or investment value.",
+    "Research support only; not investment advice."
+  ],
+  "models": [
+    {
+      "exploratory_by_split": [
+        {
+          "bootstrap_ci_95": [
+            -0.11796577491046324,
+            0.289847967243345
+          ],
+          "n": 80,
+          "observed_ic": 0.094868609229282,
+          "observed_null_percentile": 80.83,
+          "permutation_p_value_two_sided": 0.39716028397160286,
+          "split": "test_2023",
+          "year": 2023
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.011096322529199303,
+            0.41101539512079943
+          ],
+          "n": 80,
+          "observed_ic": 0.21179090482887952,
+          "observed_null_percentile": 97.29,
+          "permutation_p_value_two_sided": 0.0598940105989401,
+          "split": "test_2024",
+          "year": 2024
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.09384667117152151,
+            0.3634577326195378
+          ],
+          "n": 80,
+          "observed_ic": 0.1423581809657759,
+          "observed_null_percentile": 89.98,
+          "permutation_p_value_two_sided": 0.20627937206279373,
+          "split": "test_2025",
+          "year": 2025
+        }
+      ],
+      "kind": "baseline",
+      "model": "baseline_equal_weight",
+      "pooled": {
+        "bonferroni_adjusted_p_value": null,
+        "bootstrap_ci_95": [
+          0.0239420942834559,
+          0.2667130763807406
+        ],
+        "n": 240,
+        "null_distribution_quantiles": {
+          "0.01": -0.1484426092196801,
+          "0.05": -0.10818231644684738,
+          "0.5": -0.0008199881744901579,
+          "0.95": 0.1054654689137485,
+          "0.99": 0.1453061747208365
+        },
+        "null_histogram": {
+          "bin_edges": [
+            -1.0,
+            -0.95,
+            -0.9,
+            -0.85,
+            -0.8,
+            -0.75,
+            -0.7,
+            -0.65,
+            -0.6,
+            -0.55,
+            -0.5,
+            -0.45,
+            -0.4,
+            -0.35,
+            -0.3,
+            -0.25,
+            -0.2,
+            -0.15,
+            -0.1,
+            -0.05,
+            0.0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            7,
+            80,
+            564,
+            1584,
+            2809,
+            2826,
+            1539,
+            512,
+            68,
+            9,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "observed_ic": 0.14967256500797912,
+        "observed_null_percentile": 99.2,
+        "permutation_p_value_two_sided": 0.016798320167983202,
+        "significant_fwer_0_05": null,
+        "split_count": 3
+      }
+    },
+    {
+      "exploratory_by_split": [
+        {
+          "bootstrap_ci_95": [
+            -0.11796577491046324,
+            0.289847967243345
+          ],
+          "n": 80,
+          "observed_ic": 0.094868609229282,
+          "observed_null_percentile": 80.83,
+          "permutation_p_value_two_sided": 0.39716028397160286,
+          "split": "test_2023",
+          "year": 2023
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.011096322529199303,
+            0.41101539512079943
+          ],
+          "n": 80,
+          "observed_ic": 0.21179090482887952,
+          "observed_null_percentile": 97.29,
+          "permutation_p_value_two_sided": 0.0598940105989401,
+          "split": "test_2024",
+          "year": 2024
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.09384667117152151,
+            0.3634577326195378
+          ],
+          "n": 80,
+          "observed_ic": 0.1423581809657759,
+          "observed_null_percentile": 89.98,
+          "permutation_p_value_two_sided": 0.20627937206279373,
+          "split": "test_2025",
+          "year": 2025
+        }
+      ],
+      "kind": "baseline",
+      "model": "baseline_rank_score",
+      "pooled": {
+        "bonferroni_adjusted_p_value": null,
+        "bootstrap_ci_95": [
+          0.0239420942834559,
+          0.2667130763807406
+        ],
+        "n": 240,
+        "null_distribution_quantiles": {
+          "0.01": -0.1484426092196801,
+          "0.05": -0.10818231644684738,
+          "0.5": -0.0008199881744901579,
+          "0.95": 0.1054654689137485,
+          "0.99": 0.1453061747208365
+        },
+        "null_histogram": {
+          "bin_edges": [
+            -1.0,
+            -0.95,
+            -0.9,
+            -0.85,
+            -0.8,
+            -0.75,
+            -0.7,
+            -0.65,
+            -0.6,
+            -0.55,
+            -0.5,
+            -0.45,
+            -0.4,
+            -0.35,
+            -0.3,
+            -0.25,
+            -0.2,
+            -0.15,
+            -0.1,
+            -0.05,
+            0.0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            7,
+            80,
+            564,
+            1584,
+            2809,
+            2826,
+            1539,
+            512,
+            68,
+            9,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "observed_ic": 0.14967256500797912,
+        "observed_null_percentile": 99.2,
+        "permutation_p_value_two_sided": 0.016798320167983202,
+        "significant_fwer_0_05": null,
+        "split_count": 3
+      }
+    },
+    {
+      "exploratory_by_split": [
+        {
+          "bootstrap_ci_95": [
+            -0.31352679413296347,
+            0.14294922808138788
+          ],
+          "n": 80,
+          "observed_ic": -0.09153988609843,
+          "observed_null_percentile": 21.605,
+          "permutation_p_value_two_sided": 0.42715728427157285,
+          "split": "test_2023",
+          "year": 2023
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.17941993033713277,
+            0.27283480079556155
+          ],
+          "n": 80,
+          "observed_ic": 0.04285044538209095,
+          "observed_null_percentile": 64.575,
+          "permutation_p_value_two_sided": 0.7026297370262974,
+          "split": "test_2024",
+          "year": 2024
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.23983226798651366,
+            0.22962812672271507
+          ],
+          "n": 80,
+          "observed_ic": -0.007759024847632442,
+          "observed_null_percentile": 47.85,
+          "permutation_p_value_two_sided": 0.9471052894710529,
+          "split": "test_2025",
+          "year": 2025
+        }
+      ],
+      "kind": "ml",
+      "model": "elasticnet",
+      "pooled": {
+        "bonferroni_adjusted_p_value": 1.0,
+        "bootstrap_ci_95": [
+          -0.14758419204448292,
+          0.11219701380903604
+        ],
+        "n": 240,
+        "null_distribution_quantiles": {
+          "0.01": -0.14976823764924396,
+          "0.05": -0.10853408463527714,
+          "0.5": 0.00021885305662675225,
+          "0.95": 0.10795514659527482,
+          "0.99": 0.1535840358891145
+        },
+        "null_histogram": {
+          "bin_edges": [
+            -1.0,
+            -0.95,
+            -0.9,
+            -0.85,
+            -0.8,
+            -0.75,
+            -0.7,
+            -0.65,
+            -0.6,
+            -0.55,
+            -0.5,
+            -0.45,
+            -0.4,
+            -0.35,
+            -0.3,
+            -0.25,
+            -0.2,
+            -0.15,
+            -0.1,
+            -0.05,
+            0.0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            12,
+            87,
+            542,
+            1559,
+            2789,
+            2824,
+            1541,
+            531,
+            103,
+            10,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "observed_ic": -0.018816155187990496,
+        "observed_null_percentile": 38.39,
+        "permutation_p_value_two_sided": 0.7666233376662334,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      }
+    },
+    {
+      "exploratory_by_split": [
+        {
+          "bootstrap_ci_95": [
+            -0.35696667833509255,
+            0.09188973050836217
+          ],
+          "n": 80,
+          "observed_ic": -0.14319873411286685,
+          "observed_null_percentile": 10.09,
+          "permutation_p_value_two_sided": 0.20127987201279873,
+          "split": "test_2023",
+          "year": 2023
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.3419335531200557,
+            0.11724867695161133
+          ],
+          "n": 80,
+          "observed_ic": -0.11889427387847082,
+          "observed_null_percentile": 14.75,
+          "permutation_p_value_two_sided": 0.2990700929907009,
+          "split": "test_2024",
+          "year": 2024
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.29911153687521264,
+            0.15700091898581142
+          ],
+          "n": 80,
+          "observed_ic": -0.07358180965775903,
+          "observed_null_percentile": 25.765,
+          "permutation_p_value_two_sided": 0.5196480351964804,
+          "split": "test_2025",
+          "year": 2025
+        }
+      ],
+      "kind": "ml",
+      "model": "gradient_boosting",
+      "pooled": {
+        "bonferroni_adjusted_p_value": 0.49195080491950804,
+        "bootstrap_ci_95": [
+          -0.24004935488830725,
+          0.02345376319145056
+        ],
+        "n": 240,
+        "null_distribution_quantiles": {
+          "0.01": -0.1531055684049892,
+          "0.05": -0.10534205216428898,
+          "0.5": -0.00048178237589948747,
+          "0.95": 0.10613011050408479,
+          "0.99": 0.154969665939116
+        },
+        "null_histogram": {
+          "bin_edges": [
+            -1.0,
+            -0.95,
+            -0.9,
+            -0.85,
+            -0.8,
+            -0.75,
+            -0.7,
+            -0.65,
+            -0.6,
+            -0.55,
+            -0.5,
+            -0.45,
+            -0.4,
+            -0.35,
+            -0.3,
+            -0.25,
+            -0.2,
+            -0.15,
+            -0.1,
+            -0.05,
+            0.0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            10,
+            101,
+            493,
+            1584,
+            2845,
+            2723,
+            1630,
+            490,
+            107,
+            14,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "observed_ic": -0.11189160588303222,
+        "observed_null_percentile": 4.12,
+        "permutation_p_value_two_sided": 0.08199180081991801,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      }
+    },
+    {
+      "exploratory_by_split": [
+        {
+          "bootstrap_ci_95": [
+            -0.20116006532739372,
+            0.266490492346018
+          ],
+          "n": 80,
+          "observed_ic": 0.03389671582543657,
+          "observed_null_percentile": 62.515,
+          "permutation_p_value_two_sided": 0.7675232476752325,
+          "split": "test_2023",
+          "year": 2023
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.05629394706505696,
+            0.38333823070922896
+          ],
+          "n": 80,
+          "observed_ic": 0.17025316455696202,
+          "observed_null_percentile": 93.95,
+          "permutation_p_value_two_sided": 0.1202879712028797,
+          "split": "test_2024",
+          "year": 2024
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.11628276513069649,
+            0.3376894199770029
+          ],
+          "n": 80,
+          "observed_ic": 0.11612751992498828,
+          "observed_null_percentile": 84.73,
+          "permutation_p_value_two_sided": 0.30356964303569645,
+          "split": "test_2025",
+          "year": 2025
+        }
+      ],
+      "kind": "ml",
+      "model": "lasso",
+      "pooled": {
+        "bonferroni_adjusted_p_value": 0.6155384461553844,
+        "bootstrap_ci_95": [
+          -0.0261539271974795,
+          0.23573395071340045
+        ],
+        "n": 240,
+        "null_distribution_quantiles": {
+          "0.01": -0.15258809078319946,
+          "0.05": -0.1053371927190859,
+          "0.5": -0.0012654387707014222,
+          "0.95": 0.1089341174258509,
+          "0.99": 0.15244148202150096
+        },
+        "null_histogram": {
+          "bin_edges": [
+            -1.0,
+            -0.95,
+            -0.9,
+            -0.85,
+            -0.8,
+            -0.75,
+            -0.7,
+            -0.65,
+            -0.6,
+            -0.55,
+            -0.5,
+            -0.45,
+            -0.4,
+            -0.35,
+            -0.3,
+            -0.25,
+            -0.2,
+            -0.15,
+            -0.1,
+            -0.05,
+            0.0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            16,
+            97,
+            502,
+            1597,
+            2863,
+            2703,
+            1565,
+            542,
+            104,
+            10,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "observed_ic": 0.10675913343579563,
+        "observed_null_percentile": 94.61,
+        "permutation_p_value_two_sided": 0.10258974102589741,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      }
+    },
+    {
+      "exploratory_by_split": [
+        {
+          "bootstrap_ci_95": [
+            -0.2756900901441484,
+            0.18572055330810394
+          ],
+          "n": 80,
+          "observed_ic": -0.0516186502403951,
+          "observed_null_percentile": 32.92,
+          "permutation_p_value_two_sided": 0.6585341465853415,
+          "split": "test_2023",
+          "year": 2023
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.16694686512575382,
+            0.29315546899517414
+          ],
+          "n": 80,
+          "observed_ic": 0.06228316924519456,
+          "observed_null_percentile": 70.62,
+          "permutation_p_value_two_sided": 0.5802419758024198,
+          "split": "test_2024",
+          "year": 2024
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.12921614658468933,
+            0.3305196478971106
+          ],
+          "n": 80,
+          "observed_ic": 0.10459446788560713,
+          "observed_null_percentile": 81.9,
+          "permutation_p_value_two_sided": 0.35196480351964804,
+          "split": "test_2025",
+          "year": 2025
+        }
+      ],
+      "kind": "ml",
+      "model": "linear_regression",
+      "pooled": {
+        "bonferroni_adjusted_p_value": 1.0,
+        "bootstrap_ci_95": [
+          -0.09606275806441132,
+          0.1718516053616777
+        ],
+        "n": 240,
+        "null_distribution_quantiles": {
+          "0.01": -0.1475656044547016,
+          "0.05": -0.10756292132531968,
+          "0.5": -0.00024687276100345803,
+          "0.95": 0.10954400108664729,
+          "0.99": 0.1543879385441811
+        },
+        "null_histogram": {
+          "bin_edges": [
+            -1.0,
+            -0.95,
+            -0.9,
+            -0.85,
+            -0.8,
+            -0.75,
+            -0.7,
+            -0.65,
+            -0.6,
+            -0.55,
+            -0.5,
+            -0.45,
+            -0.4,
+            -0.35,
+            -0.3,
+            -0.25,
+            -0.2,
+            -0.15,
+            -0.1,
+            -0.05,
+            0.0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            6,
+            84,
+            537,
+            1562,
+            2823,
+            2787,
+            1555,
+            527,
+            107,
+            11,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "observed_ic": 0.038419662296802194,
+        "observed_null_percentile": 72.37,
+        "permutation_p_value_two_sided": 0.5489451054894511,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      }
+    },
+    {
+      "exploratory_by_split": [
+        {
+          "bootstrap_ci_95": [
+            -0.3967686548405182,
+            0.03196405892898483
+          ],
+          "n": 80,
+          "observed_ic": -0.1931597084381724,
+          "observed_null_percentile": 4.33,
+          "permutation_p_value_two_sided": 0.08699130086991301,
+          "split": "test_2023",
+          "year": 2023
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.3634239733958598,
+            0.04878199031626668
+          ],
+          "n": 80,
+          "observed_ic": -0.1622597280825129,
+          "observed_null_percentile": 7.52,
+          "permutation_p_value_two_sided": 0.15378462153784622,
+          "split": "test_2024",
+          "year": 2024
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.3296912797920828,
+            0.1188823083097663
+          ],
+          "n": 80,
+          "observed_ic": -0.11144189974697472,
+          "observed_null_percentile": 15.6,
+          "permutation_p_value_two_sided": 0.32526747325267474,
+          "split": "test_2025",
+          "year": 2025
+        }
+      ],
+      "kind": "ml",
+      "model": "random_forest",
+      "pooled": {
+        "bonferroni_adjusted_p_value": 0.0983901609839016,
+        "bootstrap_ci_95": [
+          -0.27563639418074026,
+          -0.028099509225500856
+        ],
+        "n": 240,
+        "null_distribution_quantiles": {
+          "0.01": -0.14970506027452687,
+          "0.05": -0.10818327535562881,
+          "0.5": 0.0007145389351592795,
+          "0.95": 0.10811668050445468,
+          "0.99": 0.1508626265770447
+        },
+        "null_histogram": {
+          "bin_edges": [
+            -1.0,
+            -0.95,
+            -0.9,
+            -0.85,
+            -0.8,
+            -0.75,
+            -0.7,
+            -0.65,
+            -0.6,
+            -0.55,
+            -0.5,
+            -0.45,
+            -0.4,
+            -0.35,
+            -0.3,
+            -0.25,
+            -0.2,
+            -0.15,
+            -0.1,
+            -0.05,
+            0.0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            7,
+            92,
+            547,
+            1541,
+            2776,
+            2788,
+            1606,
+            537,
+            96,
+            10,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "observed_ic": -0.15562044542255335,
+        "observed_null_percentile": 0.81,
+        "permutation_p_value_two_sided": 0.0163983601639836,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      }
+    },
+    {
+      "exploratory_by_split": [
+        {
+          "bootstrap_ci_95": [
+            -0.22992618088238348,
+            0.23059701857005746
+          ],
+          "n": 80,
+          "observed_ic": -0.0004922759559710705,
+          "observed_null_percentile": 50.65,
+          "permutation_p_value_two_sided": 0.9962003799620038,
+          "split": "test_2023",
+          "year": 2023
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.024865251344147084,
+            0.4200598730696537
+          ],
+          "n": 80,
+          "observed_ic": 0.20307079231129865,
+          "observed_null_percentile": 96.9,
+          "permutation_p_value_two_sided": 0.06429357064293571,
+          "split": "test_2024",
+          "year": 2024
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.142635801965774,
+            0.306517939865022
+          ],
+          "n": 80,
+          "observed_ic": 0.08384903891233005,
+          "observed_null_percentile": 77.115,
+          "permutation_p_value_two_sided": 0.45465453454654536,
+          "split": "test_2025",
+          "year": 2025
+        }
+      ],
+      "kind": "ml",
+      "model": "ridge",
+      "pooled": {
+        "bonferroni_adjusted_p_value": 0.8531146885311469,
+        "bootstrap_ci_95": [
+          -0.03672279530991246,
+          0.2239227499517155
+        ],
+        "n": 240,
+        "null_distribution_quantiles": {
+          "0.01": -0.15478895825284555,
+          "0.05": -0.10675504784347803,
+          "0.5": -0.0005515704177753722,
+          "0.95": 0.10780335416605759,
+          "0.99": 0.15245142434093342
+        },
+        "null_histogram": {
+          "bin_edges": [
+            -1.0,
+            -0.95,
+            -0.9,
+            -0.85,
+            -0.8,
+            -0.75,
+            -0.7,
+            -0.65,
+            -0.6,
+            -0.55,
+            -0.5,
+            -0.45,
+            -0.4,
+            -0.35,
+            -0.3,
+            -0.25,
+            -0.2,
+            -0.15,
+            -0.1,
+            -0.05,
+            0.0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            11,
+            111,
+            500,
+            1612,
+            2798,
+            2739,
+            1595,
+            522,
+            102,
+            10,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "observed_ic": 0.09547585175588587,
+        "observed_null_percentile": 92.73,
+        "permutation_p_value_two_sided": 0.1421857814218578,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      }
+    },
+    {
+      "exploratory_by_split": [
+        {
+          "bootstrap_ci_95": [
+            -0.13331635951773868,
+            0.29240881860612844
+          ],
+          "n": 80,
+          "observed_ic": 0.0879058453233871,
+          "observed_null_percentile": 78.16,
+          "permutation_p_value_two_sided": 0.43885611438856115,
+          "split": "test_2023",
+          "year": 2023
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.019752745983541778,
+            0.390873271107133
+          ],
+          "n": 80,
+          "observed_ic": 0.1954290527074114,
+          "observed_null_percentile": 96.16,
+          "permutation_p_value_two_sided": 0.08089191080891911,
+          "split": "test_2024",
+          "year": 2024
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.13337744536568608,
+            0.32776040054749817
+          ],
+          "n": 80,
+          "observed_ic": 0.09993494748152439,
+          "observed_null_percentile": 81.185,
+          "permutation_p_value_two_sided": 0.38036196380361964,
+          "split": "test_2025",
+          "year": 2025
+        }
+      ],
+      "kind": "baseline",
+      "model": "robust_rank_aggregation",
+      "pooled": {
+        "bonferroni_adjusted_p_value": null,
+        "bootstrap_ci_95": [
+          -0.0010000394053779453,
+          0.24827309177531776
+        ],
+        "n": 240,
+        "null_distribution_quantiles": {
+          "0.01": -0.14454462141158814,
+          "0.05": -0.10765673211803872,
+          "0.5": -0.0013628585403023343,
+          "0.95": 0.10453847365606943,
+          "0.99": 0.14578500144305603
+        },
+        "null_histogram": {
+          "bin_edges": [
+            -1.0,
+            -0.95,
+            -0.9,
+            -0.85,
+            -0.8,
+            -0.75,
+            -0.7,
+            -0.65,
+            -0.6,
+            -0.55,
+            -0.5,
+            -0.45,
+            -0.4,
+            -0.35,
+            -0.3,
+            -0.25,
+            -0.2,
+            -0.15,
+            -0.1,
+            -0.05,
+            0.0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            9,
+            71,
+            552,
+            1619,
+            2831,
+            2775,
+            1560,
+            499,
+            73,
+            9,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "observed_ic": 0.12775661517077427,
+        "observed_null_percentile": 97.76,
+        "permutation_p_value_two_sided": 0.0456954304569543,
+        "significant_fwer_0_05": null,
+        "split_count": 3
+      }
+    }
+  ],
+  "power_analysis": {
+    "alpha_two_sided": 0.05,
+    "definitions": {
+      "detectable_ic": "assumed true absolute IC yielding 80% long-run rejection probability under the stated approximation; not a hard significance cutoff",
+      "observed_ic": "sample estimate computed from persisted prediction dumps",
+      "practical_relevance": "not evaluated by this calculation; detectability does not establish economic value, robustness, implementability, or investment relevance",
+      "statistical_power": "long-run probability of rejecting a zero-IC null when the stated true IC and design assumptions hold"
+    },
+    "designs": [
+      {
+        "absolute_power_difference": 0.0017999999999999128,
+        "agreement_within_tolerance": true,
+        "analytic_minimum_detectable_abs_ic": 0.3088465894975577,
+        "design_id": "current_one_split",
+        "n_per_split": 80,
+        "scope": "actual prediction-dump design",
+        "simulated_power_at_analytic_mde": 0.8018,
+        "simulation_curve": [
+          {
+            "analytic_power": 0.050000000000000044,
+            "assumed_true_ic": 0.0,
+            "simulated_rejection_rate": 0.0492
+          },
+          {
+            "analytic_power": 0.27670429442082134,
+            "assumed_true_ic": 0.15442329474877886,
+            "simulated_rejection_rate": 0.2774
+          },
+          {
+            "analytic_power": 0.8,
+            "assumed_true_ic": 0.3088465894975577,
+            "simulated_rejection_rate": 0.7944
+          },
+          {
+            "analytic_power": 0.9466111028439432,
+            "assumed_true_ic": 0.3860582368719472,
+            "simulated_rejection_rate": 0.943
+          }
+        ],
+        "split_count": 1,
+        "total_evaluated_rows": 80
+      },
+      {
+        "absolute_power_difference": 0.009599999999999942,
+        "agreement_within_tolerance": true,
+        "analytic_minimum_detectable_abs_ic": 0.18227082541387504,
+        "design_id": "current_three_year_pooled",
+        "n_per_split": 80,
+        "scope": "actual prediction-dump design",
+        "simulated_power_at_analytic_mde": 0.8096,
+        "simulation_curve": [
+          {
+            "analytic_power": 0.050000000000000044,
+            "assumed_true_ic": 0.0,
+            "simulated_rejection_rate": 0.0508
+          },
+          {
+            "analytic_power": 0.2844150380779723,
+            "assumed_true_ic": 0.09113541270693752,
+            "simulated_rejection_rate": 0.2812
+          },
+          {
+            "analytic_power": 0.8,
+            "assumed_true_ic": 0.18227082541387504,
+            "simulated_rejection_rate": 0.7996
+          },
+          {
+            "analytic_power": 0.9411780202786315,
+            "assumed_true_ic": 0.2278385317673438,
+            "simulated_rejection_rate": 0.94
+          }
+        ],
+        "split_count": 3,
+        "total_evaluated_rows": 240
+      },
+      {
+        "absolute_power_difference": 0.012800000000000034,
+        "agreement_within_tolerance": true,
+        "analytic_minimum_detectable_abs_ic": 0.4305545355469506,
+        "design_id": "public_40_one_split_sensitivity",
+        "n_per_split": 40,
+        "scope": "planning sensitivity; not the current dump design",
+        "simulated_power_at_analytic_mde": 0.7872,
+        "simulation_curve": [
+          {
+            "analytic_power": 0.050000000000000044,
+            "assumed_true_ic": 0.0,
+            "simulated_rejection_rate": 0.0476
+          },
+          {
+            "analytic_power": 0.2649548620094478,
+            "assumed_true_ic": 0.2152772677734753,
+            "simulated_rejection_rate": 0.2538
+          },
+          {
+            "analytic_power": 0.8,
+            "assumed_true_ic": 0.4305545355469506,
+            "simulated_rejection_rate": 0.7984
+          },
+          {
+            "analytic_power": 0.9553854140325572,
+            "assumed_true_ic": 0.5381931694336882,
+            "simulated_rejection_rate": 0.9528
+          }
+        ],
+        "split_count": 1,
+        "total_evaluated_rows": 40
+      },
+      {
+        "absolute_power_difference": 0.007000000000000006,
+        "agreement_within_tolerance": true,
+        "analytic_minimum_detectable_abs_ic": 0.2598190759194811,
+        "design_id": "public_40_three_year_sensitivity",
+        "n_per_split": 40,
+        "scope": "planning sensitivity; not the current dump design",
+        "simulated_power_at_analytic_mde": 0.793,
+        "simulation_curve": [
+          {
+            "analytic_power": 0.050000000000000044,
+            "assumed_true_ic": 0.0,
+            "simulated_rejection_rate": 0.0416
+          },
+          {
+            "analytic_power": 0.28020147066638307,
+            "assumed_true_ic": 0.12990953795974056,
+            "simulated_rejection_rate": 0.2772
+          },
+          {
+            "analytic_power": 0.8000000000000003,
+            "assumed_true_ic": 0.2598190759194811,
+            "simulated_rejection_rate": 0.8042
+          },
+          {
+            "analytic_power": 0.9441146809252015,
+            "assumed_true_ic": 0.3247738448993514,
+            "simulated_rejection_rate": 0.948
+          }
+        ],
+        "split_count": 3,
+        "total_evaluated_rows": 120
+      }
+    ],
+    "limitations": [
+      "Only three test years are observed; treating within-year IC estimates as independent is an approximation.",
+      "The calculation assumes equal per-year sample sizes and a stable true IC across years, neither of which establishes regime generality.",
+      "The 40-ticker table is a planning sensitivity for the public-universe scale, not the current 80-row prediction-dump design.",
+      "The cohort is retrospective rather than verified point-in-time membership, and reproducibility remains numerical-environment-qualified.",
+      "Power bounds detection under assumptions; it neither estimates the true IC nor establishes practical investment relevance."
+    ],
+    "method": "two-sided Fisher z approximation for independent within-year Spearman ICs; equal year weights and variance 1/(n-3)",
+    "multiplicity_scope": "single prespecified IC test at alpha=0.05; this power calculation does not represent Bonferroni-adjusted family-wise power across six ML models",
+    "projection_40_tickers_per_year": [
+      {
+        "additional_years": 0,
+        "analytic_minimum_detectable_abs_ic": 0.2598190759194811,
+        "n_per_year": 40,
+        "total_test_years": 3
+      },
+      {
+        "additional_years": 1,
+        "analytic_minimum_detectable_abs_ic": 0.22630219427371773,
+        "n_per_year": 40,
+        "total_test_years": 4
+      },
+      {
+        "additional_years": 2,
+        "analytic_minimum_detectable_abs_ic": 0.2031120520968228,
+        "n_per_year": 40,
+        "total_test_years": 5
+      },
+      {
+        "additional_years": 3,
+        "analytic_minimum_detectable_abs_ic": 0.185844807899661,
+        "n_per_year": 40,
+        "total_test_years": 6
+      },
+      {
+        "additional_years": 5,
+        "analytic_minimum_detectable_abs_ic": 0.1614144384274509,
+        "n_per_year": 40,
+        "total_test_years": 8
+      },
+      {
+        "additional_years": 7,
+        "analytic_minimum_detectable_abs_ic": 0.14462608745653588,
+        "n_per_year": 40,
+        "total_test_years": 10
+      }
+    ],
+    "projection_framing": "The pipeline is ready for more data; this is pipeline capability, not a promise that more data will produce predictive skill or practical returns.",
+    "simulation": {
+      "agreement_tolerance_absolute_power": 0.05,
+      "method": "seeded Gaussian-copula draws calibrated to assumed Spearman IC, converted to ranks, and rejected with the same Fisher-z approximation",
+      "seed": 42,
+      "simulations_per_curve_point": 5000
+    },
+    "target_power": 0.8
+  },
+  "schema_version": 2,
+  "source_artifacts": [
+    {
+      "models": [
+        "baseline_equal_weight",
+        "baseline_rank_score",
+        "elasticnet",
+        "gradient_boosting",
+        "lasso",
+        "linear_regression",
+        "random_forest",
+        "ridge",
+        "robust_rank_aggregation"
+      ],
+      "path": "experiments/results_real_terms/real_try/predictions_test_2023.csv",
+      "rows": 720,
+      "sha256": "8ca50ab304b52e20978326e197aef50c0375accd516f0948dde1684a546a8f38",
+      "year": 2023
+    },
+    {
+      "models": [
+        "baseline_equal_weight",
+        "baseline_rank_score",
+        "elasticnet",
+        "gradient_boosting",
+        "lasso",
+        "linear_regression",
+        "random_forest",
+        "ridge",
+        "robust_rank_aggregation"
+      ],
+      "path": "experiments/results_real_terms/real_try/predictions_test_2024.csv",
+      "rows": 720,
+      "sha256": "54255f6e81a68dc1ff143e80b821c170b39fe4d923e55697655b872be7c28a9b",
+      "year": 2024
+    },
+    {
+      "models": [
+        "baseline_equal_weight",
+        "baseline_rank_score",
+        "elasticnet",
+        "gradient_boosting",
+        "lasso",
+        "linear_regression",
+        "random_forest",
+        "ridge",
+        "robust_rank_aggregation"
+      ],
+      "path": "experiments/results_real_terms/real_try/predictions_test_2025.csv",
+      "rows": 720,
+      "sha256": "a4985189f7935ce6a8de46cf1cc4cf55b67520fddefead0b1a662e2d355ee087",
+      "year": 2025
+    }
+  ],
+  "target_basis": {
+    "alternative_targets_sha256": "ba56ccca44433c5012b885dad9412c70aa96f5442b73d9873d45b062bf2ff2f4",
+    "id": "real_try",
+    "label": "CPI-deflated real TRY return",
+    "target_column": "next_year_real_return_pct"
+  },
+  "task": "R2-REAL-01"
+}

@@ -293,12 +293,46 @@ def _feature_cols(m: pd.DataFrame) -> list[str]:
     return [c for c in m.columns if c not in non and not c.startswith("next_year_")]
 
 
-def build_panel_for_target(target_col: str):
-    """(panel, feat_cols) with the given next_year_* column as target. None if absent."""
+def build_panel_for_target(target_col: str, target_path: Path | None = None):
+    """Return ``(panel, feature_columns)`` for a next-year target.
+
+    ``target_path`` is an optional, target-only table keyed exactly like the
+    training modeling dataset.  It lets parallel evaluations reuse the same
+    features, splits, models, and metrics without copying alternative outcomes
+    into the canonical modeling CSV.  Missing target values remain missing.
+    """
     modeling_path = _modeling_csv()
     if not modeling_path.is_file():
         return None, []
     m = pd.read_csv(modeling_path)
+    if target_path is not None:
+        target_path = Path(target_path)
+        targets = pd.read_csv(target_path)
+        required = {"ticker", "year", target_col}
+        missing = sorted(required - set(targets.columns))
+        if missing:
+            raise ValueError(
+                f"{target_path} is missing required alternative-target columns: {missing}"
+            )
+        if targets.duplicated(["ticker", "year"]).any():
+            raise ValueError(f"{target_path} contains duplicate ticker/year keys")
+        base_keys = m[["ticker", "year"]].copy()
+        target_keys = targets[["ticker", "year"]].copy()
+        alignment = base_keys.merge(
+            target_keys, on=["ticker", "year"], how="outer", indicator=True
+        )
+        if not alignment["_merge"].eq("both").all():
+            counts = alignment["_merge"].value_counts().to_dict()
+            raise ValueError(
+                f"{target_path} keys do not align exactly with {modeling_path}: {counts}"
+            )
+        m = m.drop(columns=[target_col], errors="ignore").merge(
+            targets[["ticker", "year", target_col]],
+            on=["ticker", "year"],
+            how="left",
+            validate="one_to_one",
+            sort=False,
+        )
     if target_col not in m.columns or m[target_col].notna().sum() == 0:
         return None, []
     feat_cols = _feature_cols(m)

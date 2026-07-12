@@ -5,7 +5,8 @@
 	collect-yfinance-bist100 clean-yfinance-bist100 update-training-universe-yfinance validate-universe data-audit \
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
-	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration claims-lint
+	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration \
+	fetch-usdtry alternative-targets research-real-terms claims-lint
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -199,6 +200,20 @@ research-significance:
 # Reads existing prediction dumps; never retrains or changes service/model computation.
 research-calibration:
 	PYTHONPATH=. python experiments/calibration_bench.py
+
+# Fetch/cache year-end TRY-per-USD quotes for the parallel return-basis audit.
+fetch-usdtry:
+	PYTHONPATH=. python scripts/fetch_usdtry_year_end.py --start-year 2020 --end-year 2025
+
+# Derive CPI-deflated TRY and USD-basis targets into a separate target-only CSV.
+# The canonical modeling datasets are read-only inputs to this target.
+alternative-targets: fetch-usdtry
+	PYTHONPATH=. python -m scripts.data_collection.derive_alternative_targets
+
+# Run the existing walk-forward models and significance gates on each alternative basis.
+# Outputs are isolated under experiments/results_real_terms/.
+research-real-terms: alternative-targets
+	PYTHONPATH=. python experiments/run_alternative_targets.py
 
 # Split modeling_dataset_2020_2025.csv into training and public subsets.
 # Requires data/config/universe_*.csv to exist (created in data/config/).

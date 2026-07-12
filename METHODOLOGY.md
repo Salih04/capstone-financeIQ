@@ -193,6 +193,40 @@ plot-ready single-bin artifact are in `experiments/results/calibration_report.*`
 and `calibration_plot.csv`. The no-reliable-predictive-edge conclusion remains
 unchanged.
 
+## Alternative return-basis evaluation (R2-REAL-01)
+
+`make alternative-targets` preserves the canonical nominal TRY targets and
+derives two parallel target columns in the separately generated
+`data/trusted_clean/modeling_targets_alternative.csv`. Real TRY return is
+`(1 + nominal) / (1 + CPI) - 1`, using TÜİK's December year-on-year national CPI
+for target year T+1. USD-basis return is
+`(1 + nominal) * USDTRY_T / USDTRY_T+1 - 1`, using Yahoo `TRY=X` year-end closes
+quoted as TRY per USD. The manual CPI input has a source and retrieval-date
+sidecar; Yahoo responses are cached. A missing nominal target, CPI year, or FX
+year remains null and is never interpolated or imputed. All 321 existing nominal
+target rows have both alternative targets in this run.
+
+`make research-real-terms` reuses the nominal harness's features, walk-forward
+splits, nine models, and seeded significance machinery, but writes only to
+`experiments/results_real_terms/`. On the CPI-deflated real TRY basis, the
+smallest pooled raw p-value in the six-model ML family is random forest at
+pooled IC **−0.156**, raw permutation **p=0.0164**, and Bonferroni-adjusted
+**p=0.0984**. On the USD basis, the corresponding selected model is random
+forest at pooled IC **−0.150**, raw permutation **p=0.0213**, and
+Bonferroni-adjusted **p=0.1278**. Neither basis survives the existing
+family-wise gate. These are descriptive historical research results from three
+80-row test years in the retrospective training cohort; they do not establish
+signal, investment value, implementability, or a reliable predictive edge.
+
+As an inflation-basis illustration only, the repository's 2022 BIST100 return
+of **185.94% nominal TRY** becomes **74.07% CPI-deflated TRY** under the same
+64.27% December year-on-year CPI transformation. This comparison is not a
+strategy-performance or investment-value statement. Full derivation provenance,
+coverage, prediction dumps, corrected tests, and limitations are in
+`data/trusted_clean/alternative_targets_report.*` and
+`experiments/results_real_terms/`. The nominal artifacts and the conclusion —
+no reliable predictive edge — remain unchanged.
+
 ## Honest findings (current data)
 
 - Walk-forward signal remains weak/unstable. The expanded pipeline improved the

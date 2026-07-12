@@ -1,0 +1,61 @@
+{
+  "alternative_targets_sha256": "ba56ccca44433c5012b885dad9412c70aa96f5442b73d9873d45b062bf2ff2f4",
+  "bases": [
+    {
+      "basis_id": "real_try",
+      "evaluated_rows_per_model_split": [
+        80
+      ],
+      "headline": {
+        "bonferroni_adjusted_p_value": 0.0983901609839016,
+        "bootstrap_ci_95": [
+          -0.27563639418074026,
+          -0.028099509225500856
+        ],
+        "conclusion": "No ML model is statistically distinguishable from the within-year null after Bonferroni correction; the data do not support a reliable predictive edge.",
+        "model": "random_forest",
+        "observed_ic": -0.15562044542255335,
+        "observed_null_percentile": 0.81,
+        "permutation_p_value_two_sided": 0.0163983601639836,
+        "selection": "smallest pooled raw permutation p-value among the six ML models",
+        "significant_fwer_0_05": false
+      },
+      "label": "CPI-deflated real TRY return",
+      "report_json": "experiments/results_real_terms/real_try/significance_report.json",
+      "report_md": "experiments/results_real_terms/real_try/significance_report.md",
+      "target_column": "next_year_real_return_pct"
+    },
+    {
+      "basis_id": "usd",
+      "evaluated_rows_per_model_split": [
+        80
+      ],
+      "headline": {
+        "bonferroni_adjusted_p_value": 0.1277872212778722,
+        "bootstrap_ci_95": [
+          -0.27251644337395564,
+          -0.022598816766877753
+        ],
+        "conclusion": "No ML model is statistically distinguishable from the within-year null after Bonferroni correction; the data do not support a reliable predictive edge.",
+        "model": "random_forest",
+        "observed_ic": -0.1504698753771919,
+        "observed_null_percentile": 1.0,
+        "permutation_p_value_two_sided": 0.0212978702129787,
+        "selection": "smallest pooled raw permutation p-value among the six ML models",
+        "significant_fwer_0_05": false
+      },
+      "label": "USD-basis return",
+      "report_json": "experiments/results_real_terms/usd/significance_report.json",
+      "report_md": "experiments/results_real_terms/usd/significance_report.md",
+      "target_column": "next_year_usd_return_pct"
+    }
+  ],
+  "claim_safety": {
+    "conclusion": "No reliable predictive edge is established on either alternative basis.",
+    "descriptive_research_evidence_only": true,
+    "investment_value_established": false
+  },
+  "nominal_artifacts_replaced": false,
+  "schema_version": "1.0.0",
+  "task": "R2-REAL-01"
+}
