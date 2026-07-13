@@ -1,0 +1,577 @@
+{
+  "schema_version": "1.0.0",
+  "task": "R3-REL-01",
+  "purpose": "Ownership and regeneration provenance for the generated artifacts under the governed roots. Each entry records which existing Makefile command regenerates a file (or class of files) and whether the file may be hand-edited. This registry records ownership and regeneration provenance only; it does not certify statistical validity, methodology, or predictive value, and asserts no investment merit. The no-reliable-predictive-edge conclusion and the research-support-only boundary are unchanged.",
+  "curation": "Hand-curated and reviewed input, like model_confidence_contract.json. NOT a generated file. Every generator_command below cites an existing Makefile target confirmed against the writer in scripts/ or experiments/ (writers were read, not inferred from filenames). Regenerate artifacts only through their owning command; never hand-edit a generated file.",
+  "governed_roots": [
+    "experiments/results",
+    "experiments/results_real_terms",
+    "experiments/results_regime",
+    "data/trusted_clean"
+  ],
+  "coverage_rule": "Every file under a governed root, excluding experiments/results/runs/**, must be matched by exactly one entry below. An unmatched file (orphan) or a file matched by more than one entry (duplicate ownership) is a governance failure enforced by tests/test_artifact_registry.py.",
+  "coverage_exclusions": [
+    {
+      "glob": "experiments/results/runs/**",
+      "reason": "Per-run manifest directories accumulate one directory per 'make research' run. They are governed as a class by the run_manifest entry below and by METHODOLOGY 'Run-directory governance', not enumerated per file."
+    }
+  ],
+  "artifact_class_definitions": {
+    "generated": "Deterministic output of a Makefile-invoked generator. Regenerate via generator_command; never hand-edit.",
+    "run_manifest": "Per-run provenance manifest written by 'make research'. Generated provenance; immutable once written (see METHODOLOGY run-directory governance).",
+    "human_document": "Hand-authored / human-reviewed document. Owned by a human editor, not a generator; hand_edit_forbidden is false.",
+    "source_input": "Manually curated raw input. Lives under data/trusted_raw/, outside these governed roots; listed here only for vocabulary completeness.",
+    "runtime_output": "Output produced by the running application at request time. Outside these governed roots; listed here only for vocabulary completeness.",
+    "proposed_future": "Artifact named by a future task but not yet created. Intentionally has NO registry entry until the file exists, because every entry must match at least one real file."
+  },
+  "checksum_verification": {
+    "rule": "Reports that embed a top-level source_artifacts list of {path, sha256} objects are re-verified: each referenced path is re-hashed and compared to the recorded sha256. A mismatch is stale evidence — regenerate the report via its generator_command or investigate the upstream change. The verification set is auto-discovered across the governed roots by the test, so newly added reports are covered automatically.",
+    "known_reports_on_creation": [
+      "experiments/results/significance_report.json",
+      "experiments/results/friction_report.json",
+      "experiments/results_real_terms/real_try/significance_report.json",
+      "experiments/results_real_terms/usd/significance_report.json",
+      "experiments/results_regime/regime_context_report.json"
+    ]
+  },
+  "reproducibility_note": "Regeneration reproduces content in an environment-qualified sense only: byte identity requires matching Python, platform, and numerical-package versions (see METHODOLOGY 'Reproducibility and run provenance'). This registry does not claim universal byte reproducibility.",
+  "entries": [
+    {
+      "path_or_glob": "experiments/results/coverage_impact.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/coverage_impact.csv)."
+    },
+    {
+      "path_or_glob": "experiments/results/experiment_summary.md",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/experiment_summary.md)."
+    },
+    {
+      "path_or_glob": "experiments/results/feature_coverage.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/feature_coverage.csv)."
+    },
+    {
+      "path_or_glob": "experiments/results/feature_stability_by_split.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/feature_stability_by_split.csv)."
+    },
+    {
+      "path_or_glob": "experiments/results/feature_stability_summary.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/feature_stability_summary.csv)."
+    },
+    {
+      "path_or_glob": "experiments/results/leaderboard.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/leaderboard.csv), a per-run copy of the canonical top-level experiments/leaderboard.csv. The top-level file is governed by METHODOLOGY run-directory governance and sits outside these enumerated roots."
+    },
+    {
+      "path_or_glob": "experiments/results/leaderboard_by_target.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/leaderboard_by_target.csv)."
+    },
+    {
+      "path_or_glob": "experiments/results/research_agent_model_outputs.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/research_agent_model_outputs.csv). Carries ml_score/ml_rank only."
+    },
+    {
+      "path_or_glob": "experiments/results/predictions_test_2023.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/predictions_test_2023.csv). Per-model per-ticker dump, 81-ticker training universe (n=80 rows/split)."
+    },
+    {
+      "path_or_glob": "experiments/results/predictions_test_2024.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/predictions_test_2024.csv)."
+    },
+    {
+      "path_or_glob": "experiments/results/predictions_test_2025.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/predictions_test_2025.csv)."
+    },
+    {
+      "path_or_glob": "experiments/results/test_2023.json",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/<split>.json)."
+    },
+    {
+      "path_or_glob": "experiments/results/test_2024.json",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/<split>.json)."
+    },
+    {
+      "path_or_glob": "experiments/results/test_2025.json",
+      "artifact_class": "generated",
+      "generator_command": "make research",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/run_experiments.py (RESULTS/<split>.json)."
+    },
+    {
+      "path_or_glob": "experiments/results/runs/**",
+      "artifact_class": "run_manifest",
+      "generator_command": "make research",
+      "inputs": ["experiments/run_experiments.py runtime environment"],
+      "hand_edit_forbidden": true,
+      "notes": "Single glob for all per-run manifest directories (excluded from per-file coverage enumeration). Written by experiments/run_experiments.py; governed by METHODOLOGY run-directory governance (a manifest is of record only when its leaderboard.csv SHA matches the committed experiments/leaderboard.csv). Never hand-edit a manifest."
+    },
+    {
+      "path_or_glob": "experiments/results/significance_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make research-significance",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/significance.py. Embeds source_artifacts checksums (re-verified by the staleness test)."
+    },
+    {
+      "path_or_glob": "experiments/results/significance_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make research-significance",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/significance.py (render_markdown)."
+    },
+    {
+      "path_or_glob": "experiments/results/calibration_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make research-calibration",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/calibration_bench.py (JSON_OUTPUT)."
+    },
+    {
+      "path_or_glob": "experiments/results/calibration_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make research-calibration",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/calibration_bench.py (MARKDOWN_OUTPUT)."
+    },
+    {
+      "path_or_glob": "experiments/results/calibration_plot.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-calibration",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/calibration_bench.py (PLOT_OUTPUT)."
+    },
+    {
+      "path_or_glob": "experiments/results/friction_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make research-friction",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv",
+        "experiments/results/significance_report.json"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/friction_sim.py (JSON_OUTPUT). Embeds source_artifacts checksums (re-verified by the staleness test)."
+    },
+    {
+      "path_or_glob": "experiments/results/friction_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make research-friction",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/friction_sim.py (MARKDOWN_OUTPUT)."
+    },
+    {
+      "path_or_glob": "experiments/results/friction_plot.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-friction",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/friction_sim.py (PLOT_OUTPUT)."
+    },
+    {
+      "path_or_glob": "experiments/results_real_terms/**",
+      "artifact_class": "generated",
+      "generator_command": "make research-real-terms",
+      "inputs": [
+        "data/trusted_clean/modeling_targets_alternative.csv",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Single glob for the isolated real-terms results directory (comparison_report.{json,md} plus real_try/** and usd/** leaderboards, prediction dumps, and significance reports). Written by experiments/run_alternative_targets.py; scoped to one generator-owned directory, so the glob is exact, not broad. Sub-report significance JSONs embed source_artifacts checksums (re-verified by the staleness test)."
+    },
+    {
+      "path_or_glob": "experiments/results_regime/**",
+      "artifact_class": "generated",
+      "generator_command": "make research-regime",
+      "inputs": [
+        "data/trusted_raw/macro/macro_context_yearly.csv",
+        "experiments/results/significance_report.md",
+        "experiments/results_real_terms/real_try/significance_report.md",
+        "experiments/results_real_terms/usd/significance_report.md"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Single glob for the isolated regime results directory (regime_context_report.{json,md}). Written by experiments/regime_lens.py; scoped to one generator-owned directory. Embeds source_artifacts checksums (re-verified by the staleness test)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/modeling_dataset_2020_2025.csv",
+      "artifact_class": "generated",
+      "generator_command": "make data",
+      "inputs": ["data/trusted_raw/**", "data/config/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Canonical modeling dataset written by scripts/data_collection/pipeline.py (MODELING_CSV) during 'make data'."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/company_year_fundamentals.csv",
+      "artifact_class": "generated",
+      "generator_command": "make data",
+      "inputs": ["data/trusted_raw/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/pipeline.py (FUNDAMENTALS_CSV) during 'make data'."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/company_year_returns.csv",
+      "artifact_class": "generated",
+      "generator_command": "make data",
+      "inputs": ["data/trusted_raw/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/pipeline.py (RETURNS_CSV) during 'make data'."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/bist100_benchmark_returns.template.csv",
+      "artifact_class": "generated",
+      "generator_command": "make data",
+      "inputs": ["scripts/data_collection/pipeline.py"],
+      "hand_edit_forbidden": true,
+      "notes": "Emitted-if-missing by scripts/data_collection/pipeline.py (BENCHMARK_TEMPLATE) during 'make data'. Distinct from data/trusted_raw/bist100_benchmark_returns.template.csv, which 'make benchmark' emits and which lies outside these governed roots."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/data_dictionary.md",
+      "artifact_class": "generated",
+      "generator_command": "make data",
+      "inputs": ["data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/build_all.py (_data_dictionary) during 'make data'; also regenerated by 'make data-validate'."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/feature_passports.json",
+      "artifact_class": "generated",
+      "generator_command": "make data",
+      "inputs": ["data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/build_all.py (_feature_passports) during 'make data'; also regenerated by 'make data-validate'. Per-column lineage record (R2-LINEAGE-01)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/data_quality_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make data",
+      "inputs": ["data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/validate.py (QUALITY_JSON) during 'make data' / 'make data-validate'."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/data_quality_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make data",
+      "inputs": ["data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/validate.py (QUALITY_MD) during 'make data' / 'make data-validate'."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/feature_engineering_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make data",
+      "inputs": ["data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/validate.py (FEATURE_JSON) during 'make data' / 'make data-validate'."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/feature_engineering_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make data",
+      "inputs": ["data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/validate.py (FEATURE_MD) during 'make data' / 'make data-validate'."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/modeling_dataset_public_2020_2025.csv",
+      "artifact_class": "generated",
+      "generator_command": "make split-datasets",
+      "inputs": ["data/trusted_clean/modeling_dataset_2020_2025.csv", "data/config/universe_public_40.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/split_universe_datasets.py (PUBLIC_OUT)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "artifact_class": "generated",
+      "generator_command": "make split-datasets",
+      "inputs": ["data/trusted_clean/modeling_dataset_2020_2025.csv", "data/config/universe_training_bist100.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/split_universe_datasets.py (TRAINING_OUT)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/universe_split_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make split-datasets",
+      "inputs": ["data/trusted_clean/modeling_dataset_2020_2025.csv", "data/config/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/split_universe_datasets.py (REPORT_OUT)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/frozen_column_evidence.json",
+      "artifact_class": "generated",
+      "generator_command": "make frozen-evidence",
+      "inputs": ["data/raw/quarterly_fintables/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/generate_frozen_column_evidence.py."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/frozen_column_evidence.md",
+      "artifact_class": "generated",
+      "generator_command": "make frozen-evidence",
+      "inputs": ["data/raw/quarterly_fintables/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/generate_frozen_column_evidence.py."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/corrected_yearly_ingestion_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make ingest-corrected-yearly",
+      "inputs": ["data/trusted_raw/financials/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/ingest_corrected_yearly_financials.py (REPORT_JSON). Also runs first inside 'make data'."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/corrected_yearly_ingestion_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make ingest-corrected-yearly",
+      "inputs": ["data/trusted_raw/financials/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/ingest_corrected_yearly_financials.py (REPORT_MD)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/free_valuation_history_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make valuation",
+      "inputs": ["data/trusted_raw/prices/**", "data/trusted_raw/shares_outstanding_events.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/build_free_valuation_history.py (REPORT_JSON)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/free_valuation_history_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make valuation",
+      "inputs": ["data/trusted_raw/prices/**", "data/trusted_raw/shares_outstanding_events.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/build_free_valuation_history.py (REPORT_MD)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/shares_outstanding_expansion_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make shares",
+      "inputs": ["data/trusted_raw/shares_outstanding_events.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/expand_shares_outstanding_events.py (REPORT_JSON)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/shares_outstanding_expansion_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make shares",
+      "inputs": ["data/trusted_raw/shares_outstanding_events.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/expand_shares_outstanding_events.py (REPORT_MD)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/bist100_benchmark_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make benchmark",
+      "inputs": ["data/trusted_raw/bist100_benchmark_returns.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/collect_bist100_benchmark.py (REPORT_JSON)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/bist100_benchmark_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make benchmark",
+      "inputs": ["data/trusted_raw/bist100_benchmark_returns.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/collect_bist100_benchmark.py (REPORT_MD)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/pilot_integration_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make integrate-pilot-tickers",
+      "inputs": ["data/trusted_raw/financials/bist100_yfinance_candidate_clean.csv", "data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/integrate_pilot_tickers.py (REPORT_OUT). JSON only; no markdown counterpart."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/pipeline_audit_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make data-audit",
+      "inputs": ["data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/audit_pipeline.py (OUT_JSON)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/pipeline_audit_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make data-audit",
+      "inputs": ["data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/audit_pipeline.py (OUT_MD)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/quarterly_snapshot_inspection.json",
+      "artifact_class": "generated",
+      "generator_command": "make inspect-quarterly",
+      "inputs": ["data/raw/quarterly_fintables/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/inspect_quarterly_snapshots.py (OUT_JSON)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/quarterly_snapshot_inspection.md",
+      "artifact_class": "generated",
+      "generator_command": "make inspect-quarterly",
+      "inputs": ["data/raw/quarterly_fintables/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/inspect_quarterly_snapshots.py (OUT_MD)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/yearly_snapshot_migration_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make extract-yearly-financials",
+      "inputs": ["data/raw/yearly_stocks/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/extract_yearly_snapshots_to_manual_financials.py (MIGRATION_JSON)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/yearly_snapshot_migration_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make extract-yearly-financials",
+      "inputs": ["data/raw/yearly_stocks/**"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/extract_yearly_snapshots_to_manual_financials.py (MIGRATION_MD)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/bist100_yfinance_pilot_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make clean-yfinance-bist100",
+      "inputs": ["data/trusted_raw/financials/bist100_yfinance_candidate.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/clean_yfinance_candidate.py (REPORT_MD)."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/bist100_yfinance_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make collect-bist100-financials",
+      "inputs": ["data/config/bist100_candidates.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/collect_bist100_financials_yfinance.py (REPORT_JSON). Optional external-network expansion step; not part of the default pipeline."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/alternative_targets_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make alternative-targets",
+      "inputs": ["data/trusted_raw/macro/cpi_yearly_tr.csv", "data/trusted_raw/macro/usdtry_year_end.csv", "data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/derive_alternative_targets.py."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/alternative_targets_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make alternative-targets",
+      "inputs": ["data/trusted_raw/macro/cpi_yearly_tr.csv", "data/trusted_raw/macro/usdtry_year_end.csv", "data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/derive_alternative_targets.py."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/modeling_targets_alternative.csv",
+      "artifact_class": "generated",
+      "generator_command": "make alternative-targets",
+      "inputs": ["data/trusted_raw/macro/cpi_yearly_tr.csv", "data/trusted_raw/macro/usdtry_year_end.csv", "data/trusted_clean/modeling_dataset_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/data_collection/derive_alternative_targets.py. Separate target-only CSV; the canonical modeling dataset stays byte-identical."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/company_contexts/*.json",
+      "artifact_class": "generated",
+      "generator_command": "make build-company-contexts",
+      "inputs": ["data/trusted_clean/modeling_dataset_public_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Single non-recursive glob for the per-company RAG context files (240 files). Written by scripts/build_company_contexts.py; scoped to one generator-owned directory and one extension, so the glob is exact, not broad."
+    },
+    {
+      "path_or_glob": "data/trusted_clean/bist100_expansion_report.md",
+      "artifact_class": "human_document",
+      "generator_command": null,
+      "inputs": [],
+      "hand_edit_forbidden": false,
+      "notes": "OWNER DECISION SURFACED: hand-authored, dated investigation report (2026-06-10, 'Superseded' status), committed manually. No generator script writes it (verified: no writer in scripts/ or experiments/; git history is manual edits). Classified human_document rather than assigned a guessed generator. It resides inside a generated-output tree; the owner may relocate it (for example under docs/) to keep the governed roots exclusively generated."
+    }
+  ]
+}

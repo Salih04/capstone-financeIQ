@@ -384,6 +384,16 @@ that replaces the committed leaderboard, so the replacement manifest and
 leaderboard remain reviewable together. Manifests are generated provenance
 records and must never be hand-edited.
 
+### Artifact registry
+
+`artifact_registry.json` (curated, reviewed input — not generated) maps every
+file under `experiments/results*/` and `data/trusted_clean/` to the single
+Makefile command that regenerates it, its artifact class, and whether
+hand-editing is forbidden. `tests/test_artifact_registry.py` fails on any
+orphaned or multiply-owned artifact, unsupported regeneration command, or stale
+`source_artifacts` checksum. The registry records ownership only; it certifies
+neither methodology nor predictive value.
+
 ## Leakage controls
 
 Enforced in `app/services/research/feature_registry.py`:
