@@ -70,7 +70,7 @@ Investors (individual, corporate) and admins. Role stored on `User.role` (invest
 | `data/trusted_clean/modeling_dataset_training_2020_2025.csv` | Training-only split — 403 rows / 81 tickers / 321 target rows (experiments + walk-forward CV) |
 | `data/trusted_raw/financials/` | Corrected yearly XLSX exports + yfinance candidate CSV + manual KAP template |
 | `data/trusted_raw/prices/yahoo_year_end_prices.csv` | Yahoo Chart year-end prices (OHLCV only — no financial statements) |
-| `data/trusted_clean/bist100_benchmark_returns.csv` | BIST100 annual returns → excess-return / outperform targets |
+| `data/trusted_raw/bist100_benchmark_returns.csv` | BIST100 annual returns → excess-return / outperform targets |
 | `data/config/universe_public_40.csv` | 40-ticker public inference universe |
 | `data/config/universe_training_bist100.csv` | Expanded training universe config (81 tickers; public_40 plus training-only yfinance-compatible names) |
 | `data/trusted_clean/pipeline_audit_report.*` | CSV inventory, source class, row/ticker/year coverage, missingness, duplicate-key checks |

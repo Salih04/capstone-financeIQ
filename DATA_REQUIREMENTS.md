@@ -48,13 +48,14 @@ Margins/ratios/growth are **derived** by `normalize_financials`, so you only nee
 the raw statement lines + year-end valuation. Valuation must match the year end —
 never copy current multiples into past years; leave null instead.
 
-### BIST100 benchmark — `data/trusted_raw/bist100_benchmark_returns.csv` (preferred) or `data/trusted_clean/bist100_benchmark_returns.csv`
+### BIST100 benchmark — `data/trusted_raw/bist100_benchmark_returns.csv`
 
 ```
 year,bist100_return_pct
 ```
 Real BIST100 yearly total returns, one row per year. Templates are emitted in
-both locations (`*.template.csv`). When present, the pipeline adds
+the trusted-raw and trusted-clean locations (`*.template.csv`), but the completed
+input belongs under `data/trusted_raw/`. When present, the pipeline adds
 `next_year_bist100_return_pct`, `next_year_excess_return_vs_bist100`,
 `next_year_outperform_bist100`. Never fabricated.
 

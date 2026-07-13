@@ -13,14 +13,14 @@ Three layers sharing one repo: (1) a Python data/experiment pipeline run from th
 | `backend/app/services/` | Business logic. Roughly — not strictly — 1:1 with routers: `research/` is a subpackage (`scoring.py`, `company.py`, `benchmark.py`, `validation.py`, …), `research_agent.py` is a single module, and `auth`/`companies`/`admin`/`users` routers have no service module |
 | `backend/scripts/` | `convert_trusted_xlsx.py`, `load_trusted_yearly.py`, `validate_trusted_data.py`, `start_backend.sh` (Docker entry); also `pipeline_runner.py`, `retrain_forecasting.py`, `incremental_retrain.py`, `migration_state.py` |
 | `backend/alembic/` | Migrations; head includes `yearly_stocks` |
-| `backend/tests/` | 51 backend tests (7 files); sqlite via `conftest.py`, no Postgres needed |
+| `backend/tests/` | Backend suite; sqlite via `conftest.py`, no Postgres needed. Current observed count: `docs/VERIFICATION_BASELINE.md` |
 | `backend/airflow/` | Single dormant DAG (`dags/forecasting_retrain_dag.py`). `airflow` is not in `requirements.txt` or any deploy file — nothing runs it |
 | `frontend/src/pages/` | One JSX file per route, all `*Page.jsx` (`DashboardPage.jsx`, `ResearchAgentPage.jsx`, `ExperimentsPage.jsx`, `BenchmarkPage.jsx`, `ForecastingPage.jsx`, …) |
 | `frontend/src/api/` | `client.js`, `researchApi.js`, `cache.js` (sessionStorage SWR cache), `useCachedResource.js` |
 | `scripts/data_collection/` | Pipeline stages: `build_all.py`, `validate.py` (leakage guards), ingest/valuation/benchmark/integration modules |
 | `scripts/` (root) | `build_company_contexts.py` (RAG contexts), `fetch_yahoo_chart_prices.py`, `validate_trusted_data.py` |
 | `experiments/` | `run_experiments.py` (walk-forward loop), `results/`, `reports/summary.md`, `leaderboard.csv` |
-| `tests/` (root) | 97 pipeline/research-agent tests (11 files); 2 currently fail — see `CLAUDE.md` |
+| `tests/` (root) | Pipeline/research-agent suite. Current observed count and status: `docs/VERIFICATION_BASELINE.md` |
 | `data/` | `raw/` (yearly XLSX), `trusted/` (generated CSVs), `trusted_raw/` (manual inputs), `trusted_clean/` (pipeline outputs + reports), `config/` (universe CSVs); also `interim/`, `exports/` |
 | `research_agent_training/` | Instruction-dataset generation/validation/eval; no training performed |
 | `docs/` | `RENDER_DEPLOY.md`, `SUPABASE_AUTH.md`, `research_agent_guide.md` |
