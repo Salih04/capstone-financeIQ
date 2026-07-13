@@ -6,6 +6,7 @@
   "governed_roots": [
     "experiments/results",
     "experiments/results_disagreement",
+    "experiments/results_influence",
     "experiments/results_real_terms",
     "experiments/results_regime",
     "data/trusted_clean"
@@ -289,6 +290,42 @@
       ],
       "hand_edit_forbidden": true,
       "notes": "Written by experiments/disagreement_atlas.py (MATRIX_OUTPUT). Exact per-file registration avoids a broad glob."
+    },
+    {
+      "path_or_glob": "experiments/results_influence/influence_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make research-influence",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/influence_map.py (JSON_OUTPUT). Embeds source_artifacts checksums for the persisted prediction dumps. Leave-one-out pooled-IC sensitivity diagnostic; reuses experiments/significance.py spearman_ic."
+    },
+    {
+      "path_or_glob": "experiments/results_influence/influence_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make research-influence",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/influence_map.py (MARKDOWN_OUTPUT)."
+    },
+    {
+      "path_or_glob": "experiments/results_influence/influence_by_observation.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-influence",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/influence_map.py (OBSERVATION_OUTPUT). Exact per-file registration avoids a broad glob."
     },
     {
       "path_or_glob": "experiments/results_real_terms/**",

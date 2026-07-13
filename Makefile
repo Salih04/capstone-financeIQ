@@ -6,7 +6,7 @@
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration \
-	fetch-usdtry alternative-targets research-real-terms research-regime research-friction research-disagreement claims-lint docs-lint
+	fetch-usdtry alternative-targets research-real-terms research-regime research-friction research-disagreement research-influence claims-lint docs-lint
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -233,6 +233,11 @@ research-friction:
 # It does not retrain models or compare raw prediction magnitudes across models.
 research-disagreement:
 	PYTHONPATH=. python experiments/disagreement_atlas.py
+
+# Build the isolated leave-one-out IC influence diagnostics from persisted dumps.
+# It reuses the significance pooled-IC definition and never retrains or reranks.
+research-influence:
+	PYTHONPATH=. python experiments/influence_map.py
 
 # Split modeling_dataset_2020_2025.csv into training and public subsets.
 # Requires data/config/universe_*.csv to exist (created in data/config/).
