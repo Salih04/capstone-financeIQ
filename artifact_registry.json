@@ -6,6 +6,7 @@
   "governed_roots": [
     "experiments/results",
     "experiments/results_disagreement",
+    "experiments/results_excess",
     "experiments/results_influence",
     "experiments/results_rank_stability",
     "experiments/results_real_terms",
@@ -377,6 +378,16 @@
       ],
       "hand_edit_forbidden": true,
       "notes": "Single glob for the isolated real-terms results directory (comparison_report.{json,md} plus real_try/** and usd/** leaderboards, prediction dumps, and significance reports). Written by experiments/run_alternative_targets.py; scoped to one generator-owned directory, so the glob is exact, not broad. Sub-report significance JSONs embed source_artifacts checksums (re-verified by the staleness test)."
+    },
+    {
+      "path_or_glob": "experiments/results_excess/**",
+      "artifact_class": "generated",
+      "generator_command": "make research-excess",
+      "inputs": [
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Single glob for the isolated excess-return-basis results directory (leaderboard.csv, predictions_test_*.csv, significance_report.{json,md}). Written by experiments/run_excess_basis.py (R3-TGT-01); scoped to one generator-owned directory, so the glob is exact, not broad. The significance JSON embeds source_artifacts checksums (re-verified by the staleness test)."
     },
     {
       "path_or_glob": "experiments/results_regime/**",

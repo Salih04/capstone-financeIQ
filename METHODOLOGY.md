@@ -227,6 +227,27 @@ coverage, prediction dumps, corrected tests, and limitations are in
 `experiments/results_real_terms/`. The nominal artifacts and the conclusion —
 no reliable predictive edge — remain unchanged.
 
+## Excess-return-basis evaluation (R3-TGT-01)
+
+`make research-excess` applies the same treatment to the excess-return target
+`next_year_excess_return_vs_bist100` (nominal TRY return minus the BIST100
+nominal TRY index return, in percentage points), which already exists in the
+canonical modeling dataset and previously had only leaderboard-level coverage.
+The runner reuses the nominal harness's features, walk-forward splits, nine
+models, and seeded significance machinery unchanged, and writes only to
+`experiments/results_excess/`. BIST100 benchmark-relative coverage shrinks the
+evaluated panel from 80 to **40 rows in each of the three test years**; rows
+without a valid excess target remain null and are never filled, and the
+per-year evaluated n is reported explicitly in the generated report. The
+smallest pooled raw p-value in the six-model ML family is gradient boosting at
+pooled IC **−0.211**, raw permutation **p=0.0217**, and Bonferroni-adjusted
+**p=0.1302**; the basis does not survive the existing family-wise gate, and no
+uncorrected or per-split value may be promoted as a benchmark-relative finding.
+This is a descriptive historical research result from three 40-row test years
+in the retrospective training cohort; it does not establish signal, investment
+value, implementability, or a reliable predictive edge. The nominal artifacts
+and the conclusion — no reliable predictive edge — remain unchanged.
+
 ## Regime Lens (R2-REGIME-01)
 
 `make research-regime` validates effective-dated annual CPI, year-end TCMB
