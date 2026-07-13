@@ -276,3 +276,36 @@ Extends `FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md` §6–§7 (which stay authoritative
 - Update the assessment (§1) only from repo evidence; cite files. If a Phase-2 task lands, move its idea's status inline (e.g. "shipped in commit X — see …").
 - Never let this file make a performance claim; it inherits the claims guide's boundary.
 - If future committed evidence ever *does* show significant signal, the change flows: experiments → NRIS report → audit update → claims-guide update → only then this file and any UI copy (with MCC version bump).
+
+---
+
+## 9. Phase 3 / Phase 4 strategic direction (added 2026-07-13)
+
+### 9.1 Status of the twelve roadmap ideas: all shipped
+
+Every §3 idea landed in Phase 2 and is committed (verified 2026-07-13 at `fbab761f`; both suites re-run green — root 168/168, backend 85/85). NRIS (`2985a86b` UI panel), Real-Terms (`7124bdd8`), MCC (`28ba92b2` → v1.7.0), Skeptic (`53a92a41`), Autopsy (`a95e1e1c`), Regime Lens (`d83741c2`), Courtroom (`ef6a8030`), Registry/Thesis-Mode manifests (`74f35efe`), Lineage Passports (`6af2c5be`), Friction (`b9fe263e`), Analyst Ledger (`57ea8c05`), Calibration Bench (`646fdae7`). This section is the strategic frame for what comes next; execution lives in `FINANCEIQ_AGENT_TASK_QUEUE.md` Phase 3, and the full candidate/adversarial-review record lives in `FINANCEIQ_PHASE3_4_FRONTIER_PLAN.md`. Do not duplicate task specs here.
+
+### 9.2 The Phase-3 theme in one sentence
+
+Phase 2 turned the negative result into an instrument; **Phase 3 turns the instrument on itself** — evaluating the one scoring path users actually see (serving-heuristic significance parity), feeding the significance rig known noise to prove it rejects it (placebo laboratory), pre-registering the only true out-of-sample test this project will ever get (the frozen 2026 forward ranking), measuring how fragile the rankings and the cohort are (stability, influence, disagreement), and wiring the already-built evidence (Skeptic, calibration, real-terms) into the product instead of leaving it in committed files.
+
+### 9.3 The Phase-4 theme in one sentence
+
+**Package the honesty for outsiders**: examiner/thesis/public-release systems (question bank grounded in an auto-aggregated limitations register, reproducible appendix bundles, a release checklist), frontier robustness experiments (cellwise contamination, effective dimensionality, per-cell provenance), and advanced product surfaces (evidence registry page, counterfactual explorer) — all built over committed artifacts, never over live recomputation.
+
+### 9.4 New do-not-claim rows (binding, additive to §6)
+
+| Never claim | Even after building | Say instead |
+|---|---|---|
+| "The serving heuristic works / has measurable edge" (or "is contrarian signal" if its IC is negative) | R3-SERV-01 | "The user-facing heuristic was evaluated under the same walk-forward significance treatment; result reported with its null placement, establishing no investment value either way" |
+| "Our methodology was validated by placebo testing" as a market claim | R3-NULL-01 | "The evaluation machinery was negative-control tested; placebo rejection rates matched chance expectation" |
+| "Pre-registered study proves/will prove predictive skill" | R3-PREREG-01 | "A near-powerless single-year test was pre-registered for discipline; no single outcome can establish an edge" |
+| "Stable / robust ranking" from stability frequencies | R3-STAT-01 | "Resampling variability of a null-consistent ranking, reported as fragility evidence" |
+| "Models agree, so the signal is real" | R3-STAT-02 | "Cross-model agreement measures instability, not validity" |
+| Any composed memo sentence reading as a recommendation | R3-MEMO-01 | Memos are citation-complete compositions of committed artifacts with a structurally absent recommendation slot |
+
+### 9.5 Standing risks this direction must not create
+
+- **Diagnostic inflation:** each new sensitivity artifact is one more quotable number family. The mitigation is structural (every artifact embeds `limitations` + a claim-safety sentence; the artifact registry and MCC evidence guard make drift fail tests) — not vigilance.
+- **Product surfaces outrunning evidence:** Phase-4C UI work is gated on committed artifacts and endpoints; no client-side statistics anywhere, ever.
+- **Truth drift recurrence:** the §1.4-class failure (docs lagging the repo) recurred within one phase; Phase 3A exists because culture did not scale — tripwires (verification baseline, docs link lint, registry test, MCC evidence guard) now own the problem.
