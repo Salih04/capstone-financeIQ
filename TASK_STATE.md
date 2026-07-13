@@ -1,6 +1,6 @@
 # TASK_STATE.md — FinanceIQ
 
-Last updated: 2026-07-13 (rev 13)
+Last updated: 2026-07-13 (rev 14)
 
 ## Status legend
 - `DONE` — shipped, tested
@@ -72,7 +72,32 @@ claim.
 | R2-FRICTION-01 friction simulator (2026-07-13) | DONE (uncommitted) | deterministic within-model/year rank-only top-10 nominal TRY baskets, half-L1 turnover, zero/illustrative/deliberately adverse assumed-cost controls, `friction_report.{json,md}` + `friction_plot.csv`, and an in-drawing stamped Autopsy panel; no raw score pooling, execution inference, or core model/ranking change; two-run checksums identical; MCC v1.7.0; root 168/168, backend 85/85, frontend build and claims lint passed; protected experiment/trusted-data artifacts unchanged; no commit by request |
 | R2-DEMO-01 glass-box demo runbook + reproducibility quickstart (2026-07-13) | DONE (uncommitted) | shipped-route inventory and timed runbook for runtime proof, frozen-evidence specimen archive, seismograph/Instrumented Null, Negative Alpha Autopsy, deterministic Skeptic/Courtroom, explicit fallback branches, and a rehearsed MCC-CLAIM-001 failure/revert finale; README adds the three-command manifest quickstart; smoke and live read-only ASELS APIs passed after rebuilding stale local containers; root 168/168, backend 85/85, frontend build and claims lint passed; visual protected-route verification blocked at `/login` because the frontend container lacks `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`; `make research-verify-run` blocked honestly on changed `experiments/run_experiments.py` and `Makefile` checksums; protected experiment/trusted-data artifacts unchanged; no commit by request |
 | Phase 3/4 frontier planning pass (2026-07-13) | DONE | docs-only at `fbab761f`; suites re-verified (root 168/168, backend 85/85, observed); new `FINANCEIQ_PHASE3_4_FRONTIER_PLAN.md` (post-Phase-2 audit, 43-candidate register, adversarial dispositions, dependency graph, waves, verification matrix, model allocation); `FINANCEIQ_AGENT_TASK_QUEUE.md` gains the Phase-3 section (Phase-2 closure note, 20 execution packets, later backlog, dependency order); roadmap §9 strategic direction + new do-not-claim rows; TASK.md now routes the next agent to R3-GOV-01; no source, data, config, or generated artifact touched; commit left to owner |
+| R3-GOV-01 post-Phase-2 truth sync (2026-07-13) | DONE (awaiting owner commit) | `docs/VERIFICATION_BASELINE.md` is the current counts ledger: root 168/168, backend 85/85, data VALID (403 rows, 40 features, 321 target rows), claims lint passed; stale operating-doc counts now cite the baseline; Phase-2 commit reconciliation appended below; docs-only, no behavior or generated-artifact change |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
+
+---
+
+## Phase-2 post-commit reconciliation (appended by R3-GOV-01)
+
+The Phase-2 status rows above preserve what was true when each task finished. The owner's later commits supersede the historical `DONE (uncommitted)` / `commit deferred` wording:
+
+| Task | Committed SHA |
+|---|---|
+| R2-GOV-01 | `d743e7d2` |
+| R2-STAT-UI-01 | `2985a86b` |
+| R2-CONTRACT-02 | `253eedc5` |
+| R2-LINEAGE-01 | `6af2c5be` |
+| R2-SKEPTIC-01 | `53a92a41` |
+| R2-AUTOPSY-01 | `a95e1e1c` |
+| R2-CAL-01 | `646fdae7` |
+| R2-REAL-01 | `7124bdd8` |
+| R2-REGIME-01 | `d83741c2` |
+| R2-LOOP-01 | `57ea8c05` |
+| R2-COURT-01 | `ef6a8030` |
+| R2-FRICTION-01 | `b9fe263e` |
+| R2-DEMO-01 | `97e4fc33` |
+
+Post-Phase-2 reproducibility state was then recorded by `fbab761f`.
 
 ---
 

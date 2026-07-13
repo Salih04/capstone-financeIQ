@@ -6,9 +6,8 @@ wording drifts from the measured artifacts, change the supported report-writing
 path and regenerate it in the task that owns that work; do not patch the output
 directly.
 
-Evidence: inspected `experiments/run_experiments.py` (`run()`, summary-writing
-block ending with `(RESULTS / "experiment_summary.md").write_text(...)`) on
-2026-07-12. The current generated file still contains the stale “largely a
-static snapshot” sentence, while the separate `experiments/reports/summary.md`
-uses `_data_caveat()`; this confirms that the two outputs have separate
-generation paths.
+Evidence update (2026-07-13): the lesson still applies, but the cited stale
+sentence no longer exists after the owning experiment path regenerated the
+report. `rg "static snapshot|DEGENERATE" experiments/results/experiment_summary.md
+experiments/reports/summary.md` returns no matches. The generator remains the
+only authorized place to change generated summary wording.

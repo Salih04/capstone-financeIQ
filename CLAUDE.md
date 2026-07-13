@@ -1,4 +1,4 @@
-# CLAUDE.md
+# Repository Agent Instructions
 
 ## Role
 
@@ -6,7 +6,7 @@ You are a maintenance/extension agent for **FinanceIQ**: a completed capstone �
 
 ## Read Order
 
-1. `CLAUDE.md` (this file)
+1. `AGENTS.md` / `CLAUDE.md` (byte-identical copies of this instruction file)
 2. `PRD.md` — what the project is and is not
 3. `REPO_MAP.md` — where things live
 4. `TASK.md` — current task only
@@ -48,10 +48,10 @@ You are a maintenance/extension agent for **FinanceIQ**: a completed capstone �
 ## Build / Test / Verification Commands
 
 ```bash
-# Root pipeline tests (97 collected; 95 pass, 2 fail as of 2026-07-08 — see below)
+# Root pipeline tests (current observed count: docs/VERIFICATION_BASELINE.md)
 PYTHONPATH=. python -m pytest tests/          # == make research-agent-check
 
-# Backend tests (51 tests; sqlite, no Postgres needed)
+# Backend tests (current observed count: docs/VERIFICATION_BASELINE.md; sqlite, no Postgres needed)
 cd backend && python -m pytest tests/         # see .env gotcha below
 
 # Data pipeline
@@ -75,10 +75,11 @@ docker compose up --build                     # db + backend + frontend (:3000/:
 
 Python 3.12 (backend Docker image); frontend is Node/Vite (React 18, Vite 5).
 
-### Known test-suite state (verified 2026-07-12)
+### Current verification baseline
 
-- **Backend: 55/55 pass.** `backend/app/config.py` reads `backend/.env` when tests run from that directory. The earlier collection failure caused by unknown provider/tooling keys (including `OPENROUTER_API_KEY`, `OPENROUTER_HTTP_REFERER`, and `OPENROUTER_APP_TITLE`) was resolved by OPS-05: settings now ignore unknown keys. Both `cd backend && python -m pytest tests/` and `PYTHONPATH=backend python -m pytest backend/tests` are supported.
-- **Root: 106/106 pass.** The stale `call_local_llm` test and evaluation references were resolved by OPS-01; no known root-suite failures remain in this verification run.
+- The dated, command-level source of truth for root/backend suite counts and data validation is `docs/VERIFICATION_BASELINE.md`. Do not copy those counts into new operating docs; cite the baseline instead.
+- OPS-05 resolved the earlier backend collection failure from unknown provider/tooling keys in `backend/.env`; settings now ignore unknown keys. Both `cd backend && python -m pytest tests/` and `PYTHONPATH=backend python -m pytest backend/tests` are supported.
+- OPS-01 resolved the stale `call_local_llm` test and evaluation references; the current baseline records no known root-suite failures.
 
 ## Forbidden Changes
 

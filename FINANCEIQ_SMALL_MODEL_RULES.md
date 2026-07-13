@@ -25,7 +25,8 @@ Binding rules for small/cheap coding models working in this repository. These ar
 
 - Anything in `scripts/data_collection/` (leakage/frozen guards live here — project credibility depends on them).
 - `experiments/run_experiments.py` (metrics/report generation).
-- `backend/app/services/forecasting_csv_service.py`, `scoring_service.py`, `adaptive_weights_service.py`, `research_agent.py` score math (the `0.65/0.20/0.15` hybrid weights and penalty terms).
+- `backend/app/services/forecasting_csv_service.py`, `scoring_service.py`, `adaptive_weights_service.py`, and `research_agent.py` score math (the `0.65/0.20/0.15` hybrid weights and penalty terms).
+- Phase-2 claim/evidence services: `backend/app/services/skeptic_service.py`, `courtroom_service.py`, `analyst_verdict_service.py`, and `backend/app/services/research/significance.py`.
 - Alembic migrations (`backend/alembic/versions/` — append-only, and not by you).
 - Regenerating datasets (`make data`, `make full-research`, `make research`) — these rewrite committed outputs.
 - Auth/JWT verification code (`test_supabase_jwks.py` territory).
@@ -40,10 +41,10 @@ Any diff touching: leakage guards (`scripts/data_collection/validate.py`, `manua
 
 ## 7. Common failure modes in this repo (observed, not hypothetical)
 
-- **`cd backend && pytest tests/` aborts at collection** when an untracked `backend/.env` holds `OPENROUTER_*` keys (`Settings` forbids extras). Run `PYTHONPATH=backend python -m pytest backend/tests` from the repo root instead.
+- **Historical `.env` collection failure:** OPS-05 changed Settings to ignore unknown keys, so provider/tooling keys in an untracked `backend/.env` no longer abort collection. Prefer the root command `PYTHONPATH=backend python -m pytest backend/tests` because it is the recorded verification path.
 - **Assuming router prefixes**: forecasting and scoring routers have **no prefix** — routes sit at API root (`/get-stocks`, `/predict`, …), while `research.py` *and* `research_agent.py` both mount under `/research`. Always check `backend/app/routers/<x>.py` before naming an endpoint.
 - **Assuming router→service symmetry**: `auth`/`companies`/`admin`/`users` routers have no service module; `research.py` is backed by the `services/research/` subpackage.
-- **Trusting generated reports' prose**: `experiments/reports/summary.md` contains a hardcoded stale caveat. Metrics tables are committed evidence; embedded prose may lag.
+- **Trusting generated reports' prose**: generated summary wording has drifted before and was later repaired through its owning generator. Metrics tables are committed evidence; embedded prose may lag, so never hand-edit generated reports.
 - **"Fixing" the dead `unnecessary/README.md` link by creating the directory** — the directory was deliberately removed; fix the link, never recreate the target.
 - **Editing files under `data/trusted/` or `data/trusted_clean/` by hand** — they are generated; hand edits are forbidden and will be overwritten.
 
@@ -53,7 +54,7 @@ Read the whole target page first. Match the dark "Research Terminal" visual lang
 
 ## 9. Backend changes, safely
 
-Only with an assigned task naming the router/service. Read router + matching service + matching test file fully. Never change response shapes without a test proving the old contract (the contract tests in `backend/tests/test_forecasting_api_contract.py` exist for exactly this). Verify: `PYTHONPATH=backend python -m pytest backend/tests` → expect 51 pass (or more if you added tests); any failure you didn't introduce must be reported, not "fixed".
+Only with an assigned task naming the router/service. Read router + matching service + matching test file fully. Never change response shapes without a test proving the old contract (the contract tests in `backend/tests/test_forecasting_api_contract.py` exist for exactly this). Verify with `PYTHONPATH=backend python -m pytest backend/tests`; compare against `docs/VERIFICATION_BASELINE.md` (or expect more if your task adds tests). Any failure you didn't introduce must be reported, not "fixed".
 
 ## 10. Data pipeline changes, safely
 
@@ -65,7 +66,7 @@ You don't make these either. The hybrid score weights, forecasting heuristic, an
 
 ## 12. Required verification behavior
 
-Run the verification commands your task lists — actually run them, do not simulate output. Expected baselines: backend 51/51; root 97 collected (95 pass + 2 known `call_local_llm` failures until OPS-01 lands, then 97/97); `make data-validate` → "valid for T→T+1 modeling: True". If a command cannot run (missing Postgres, missing node_modules), say so explicitly — never report a pass you didn't observe.
+Run the verification commands your task lists — actually run them, do not simulate output. The current root/backend counts and `make data-validate` result live in `docs/VERIFICATION_BASELINE.md`; compare against that dated source instead of copying counts into task reports. If a command cannot run (missing Postgres, missing node_modules), say so explicitly — never report a pass you didn't observe.
 
 ## 13. Final response checklist (all required)
 

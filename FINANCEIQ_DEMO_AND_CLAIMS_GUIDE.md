@@ -1,6 +1,6 @@
 # FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md
 
-Demo-safe narrative and claim boundaries. Every number here comes from committed repo evidence (`data/trusted_clean/data_quality_report.md`, `experiments/leaderboard.csv`, test runs on 2026-07-08). Nothing in this guide is investment advice, and the product must never be presented as such.
+Demo-safe narrative and claim boundaries. Every number here comes from committed repo evidence (`data/trusted_clean/data_quality_report.md`, `experiments/leaderboard.csv`, and the dated `docs/VERIFICATION_BASELINE.md`). Nothing in this guide is investment advice, and the product must never be presented as such.
 
 ## 1. One-sentence product explanation
 
@@ -8,7 +8,7 @@ FinanceIQ is an academic decision-support research terminal that analyzes histor
 
 ## 2. What the project actually demonstrates
 
-- Engineering: a full-stack system (FastAPI + Postgres backend, React research terminal, reproducible Makefile pipeline, 148 automated tests across two suites).
+- Engineering: a full-stack system (FastAPI + Postgres backend, React research terminal, reproducible Makefile pipeline, and two green automated suites; cite `docs/VERIFICATION_BASELINE.md` for the current counts).
 - Data forensics: automated detection that the vendor's "historical" fundamentals were a frozen 2025 snapshot (per-ticker evidence in `frozen_column_evidence.md`), followed by rebuilding trustworthy yearly data from corrected files, free Yahoo prices, and manual share counts.
 - Methodological honesty: walk-forward, leakage-controlled evaluation whose result (Spearman IC ≈ 0, per-split range −0.17 to +0.22 across 2023–2025; baselines match or beat ML) is displayed in the product instead of hidden.
 - Explainability: every ranking decomposes into named feature weights, confidence components, and data-quality caveats.
@@ -69,10 +69,10 @@ Keep the existing "research support, not investment advice" framing (already pre
 
 ## 15. Final presentation checklist
 
-- [ ] `make data-validate` passes (403 rows / 40 features / 321 targets).
-- [ ] Backend suite 51/51; root suite green (97/97 once OPS-01 lands; until then, be ready to explain the 2 known stale-test failures).
+- [ ] `make data-validate` matches the current result in `docs/VERIFICATION_BASELINE.md`.
+- [ ] Root and backend suites match the current green results in `docs/VERIFICATION_BASELINE.md`.
 - [ ] Backend running with real CSV data — confirm a page shows live data, not demo fallback.
-- [ ] Frontend production build verified (currently **not** verified — task VER-02).
+- [ ] Frontend production build re-run before presenting (the production build was verified green during Phase 2).
 - [ ] Frozen-snapshot evidence page ready to show (best "wow" moment: the pipeline catching bad vendor data).
 - [ ] IC ≈ 0 chart ready, with the §11 uncertainty explanation rehearsed.
 - [ ] §14 answer rehearsed; §5 forbidden claims reviewed by everyone presenting.

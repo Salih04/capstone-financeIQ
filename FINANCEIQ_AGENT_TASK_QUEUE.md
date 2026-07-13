@@ -2,7 +2,7 @@
 
 Sequenced task queue for future coding agents. Grounded in the 2026-07-08 audit (`FINANCEIQ_MODEL_VALIDITY_AUDIT.md`, `OPERATING_LAYER_VALIDATION.md`) and re-planned 2026-07-12 from direct repo inspection after the Stage-0/Stage-1/Stage-2 completions below. Every agent: read `CLAUDE.md` → `PRD.md` → `REPO_MAP.md` → `FINANCEIQ_SMALL_MODEL_RULES.md` first, then only the task's listed files.
 
-**Universal verification (updated 2026-07-12):** after backend edits run `PYTHONPATH=backend python -m pytest backend/tests` (expect **55 pass**, or more if your task adds tests); after pipeline/test edits run `PYTHONPATH=. python -m pytest tests/` (expect **106 pass**, or more); after data edits also run `make data-validate` (expect VALID — 403 rows, 40 features, 321 target rows); after any user-facing copy or response-constant change run `make claims-lint` (expect exit 0). Rollback for all tasks: `git checkout -- <files>` before commit, `git revert` after — no task below has irreversible side effects unless its rollback note says otherwise.
+**Universal verification:** current observed suite counts and data-validation output live in `docs/VERIFICATION_BASELINE.md`; re-run the applicable command and compare with that dated baseline rather than copying counts into new task text. After backend edits run `PYTHONPATH=backend python -m pytest backend/tests`; after pipeline/test edits run `PYTHONPATH=. python -m pytest tests/`; after data edits also run `make data-validate`; after any user-facing copy or response-constant change run `make claims-lint`. Rollback for all tasks: `git checkout -- <files>` before commit, `git revert` after — no task below has irreversible side effects unless its rollback note says otherwise.
 
 **Model recommendation key** (used in every spec): **Sol** = small/fast model — docs, copy, ledger edits, verification runs. **Terra** = mid model — standard additive backend/frontend features with existing patterns to copy. **Opus** = strong model — guard-adjacent code, statistics, migrations, new services. **Fable** = frontier model — tasks where pipeline changes and claim surfaces intersect, or where a wrong judgment call creates investment-advice risk. Effort levels: low / medium / high.
 
@@ -62,6 +62,28 @@ Implements `FINANCEIQ_MOONSHOT_ROADMAP.md`. The Stage-0 gate is **satisfied**. P
 | R2-COURT-01 Research Courtroom | DONE (uncommitted) | 2026-07-13; deterministic citation-complete Bull/Bear/Skeptic/Risk evidence lenses at `POST /research/courtroom` and `/courtroom`; four items per lens, Risk last, structured `insufficient_data`, and no adjudication field; MCC v1.6.0; root 152/152, backend 83/83, frontend build, claims lint, and live LLM-off API passed; protected-page visual blocked by missing approved Supabase session; protected research/data checksums unchanged; no commit by request |
 | R2-FRICTION-01 Friction simulator | DONE (uncommitted) | 2026-07-13; deterministic within-model/year rank-only top-10 nominal TRY baskets with half-L1 turnover and explicit zero/illustrative/deliberately adverse assumed-cost controls; `friction_report.{json,md}` + `friction_plot.csv` and in-drawing stamped Autopsy panel; MCC v1.7.0; two-run checksums identical; root 168/168, backend 85/85, frontend build and claims lint passed; protected experiment/trusted-data checksums unchanged; no commit by request |
 | R2-DEMO-01 glass-box demo runbook + reproducibility quickstart | DONE (uncommitted) | 2026-07-13; `docs/DEMO_RUNBOOK.md` scripts the shipped runtime, specimen, seismograph/Instrumented Null, Autopsy, Skeptic, Courtroom, fallback, and claim-tripwire flow; README adds the three-command manifest quickstart; finale failed once under MCC-CLAIM-001 and passed after revert; smoke/API checks passed after rebuilding stale local containers; root 168/168, backend 85/85, frontend build and claims lint passed; protected frontend visuals blocked by missing `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY`; protected experiment/trusted-data artifacts unchanged; no commit by request |
+
+### Phase-2 post-commit reconciliation (appended by R3-GOV-01)
+
+The rows above preserve their at-completion state. The owner's later commits supersede every `DONE (uncommitted)` / `commit deferred` note as follows; no historical row was rewritten.
+
+| Task | Committed SHA |
+|---|---|
+| R2-GOV-01 | `d743e7d2` |
+| R2-STAT-UI-01 | `2985a86b` |
+| R2-CONTRACT-02 | `253eedc5` |
+| R2-LINEAGE-01 | `6af2c5be` |
+| R2-SKEPTIC-01 | `53a92a41` |
+| R2-AUTOPSY-01 | `a95e1e1c` |
+| R2-CAL-01 | `646fdae7` |
+| R2-REAL-01 | `7124bdd8` |
+| R2-REGIME-01 | `d83741c2` |
+| R2-LOOP-01 | `57ea8c05` |
+| R2-COURT-01 | `ef6a8030` |
+| R2-FRICTION-01 | `b9fe263e` |
+| R2-DEMO-01 | `97e4fc33` |
+
+Post-Phase-2 reproducibility state was then recorded by `fbab761f`.
 
 ## Universal rules for remaining Phase-2 tasks
 
@@ -310,6 +332,12 @@ Hard dependencies: AUTOPSY needs STAT-UI (endpoint reuse) and CONTRACT-02 (regis
 
 Planning provenance: candidate analysis, adversarial-review dispositions, dependency graph, waves, verification matrix, model allocation, and prioritized selections live in `FINANCEIQ_PHASE3_4_FRONTIER_PLAN.md`. Strategic framing lives in `FINANCEIQ_MOONSHOT_ROADMAP.md` §9. This queue holds the execution packets and is the single execution source of truth.
 
+## Phase 3 completion ledger
+
+| Task | Status | Evidence |
+|---|---|---|
+| R3-GOV-01 post-Phase-2 truth sync | DONE (awaiting owner commit) | 2026-07-13; `docs/VERIFICATION_BASELINE.md`; root/backend suites green, data VALID, claims lint passed; operating docs cite the baseline; Phase-2 commit reconciliation appended; no code, data, metric, generated artifact, MCC, or application behavior changed |
+
 ## Universal rules for Phase-3 tasks (in addition to the Phase-2 universal rules above, which all still apply)
 
 - **Never overwrite a canonical artifact.** Every new evaluation writes to a **new, separately named** `experiments/results_<name>/` directory. `experiments/leaderboard.csv`, `experiments/results/significance_report.*`, `experiments/results/predictions_test_*.csv`, `experiments/results/{calibration,friction}_report.*`, `experiments/results_real_terms/`, `experiments/results_regime/`, and everything in `data/trusted_clean/` change only via their owning Makefile targets, and only in a task that explicitly owns regeneration (no Phase-3 task below does).
@@ -326,7 +354,7 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 
 ### R3-GOV-01 — Post-Phase-2 truth sync + verification baseline
 - **Priority:** P1. **Wave:** 3A (first). **Owner role:** Docs/Verification. **Risk:** low. **Model/effort:** **Sol, low.** Independent review: none (self-verifying).
-- **Verified current state (2026-07-13):** all Phase-2 work committed at `fbab761f`; suites observed root 168/168, backend 85/85; yet `CLAUDE.md`/`AGENTS.md` "Known test-suite state" say 106/55 and 95-97/51 respectively; `PRD.md` Current Reality says 51/51 + 95/97 + "21 pages" (there are 23 page files / 24 routes in `frontend/src/App.jsx`); `FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md` §2 says "148 automated tests", §15 says 51/51 + 97/97; `FINANCEIQ_SMALL_MODEL_RULES.md` §9/§12 say 51/97; `TASK_STATE.md` + this queue's Phase-2 ledger carry stale "(uncommitted)" notes; `.agent/memory/01-generated-experiment-summary.md` cites a stale sentence that no longer exists in the regenerated `experiments/results/experiment_summary.md` (grep 0 hits).
+- **Verified pre-execution state (2026-07-13):** all Phase-2 work committed at `fbab761f`; suites observed root 168/168, backend 85/85; yet `CLAUDE.md`/`AGENTS.md` "Known test-suite state" said 106/55 and 95-97/51 respectively; `PRD.md` Current Reality said 51/51 + 95/97 and carried a stale page inventory. The R3-GOV-01 recount found 23 page files and 27 `<Route>` declarations in `frontend/src/App.jsx` (22 page-rendering, 5 redirects). `FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md` §2 said "148 automated tests", §15 said 51/51 + 97/97; `FINANCEIQ_SMALL_MODEL_RULES.md` §9/§12 said 51/97; `TASK_STATE.md` + this queue's Phase-2 ledger carried stale "(uncommitted)" notes; `.agent/memory/01-generated-experiment-summary.md` cited a stale sentence that no longer exists in the regenerated `experiments/results/experiment_summary.md` (grep 0 hits).
 - **Read first:** this packet; `git log --oneline -20`; the exact sections named above (grep, do not read files whole).
 - **Files to modify:** `CLAUDE.md`, `AGENTS.md` (keep byte-identical to each other), `PRD.md`, `FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md`, `FINANCEIQ_SMALL_MODEL_RULES.md`, `TASK_STATE.md`, this file (ledger SHAs), `.agent/memory/01-…` (evidence note only — the lesson itself stands). New (proposed): `docs/VERIFICATION_BASELINE.md` — a short dated ledger of observed suite counts/data-validate output; after creating it, the docs above should state counts once and cite this file for "current baseline" instead of embedding numbers in multiple places where feasible without restructuring.
 - **Do NOT touch:** any source code, generated artifacts, METHODOLOGY numbers, the MCC, or the Phase-2 ledger's existing text (append SHA corrections; never rewrite/delete rows).
