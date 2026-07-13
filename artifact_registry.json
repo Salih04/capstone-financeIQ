@@ -5,6 +5,7 @@
   "curation": "Hand-curated and reviewed input, like model_confidence_contract.json. NOT a generated file. Every generator_command below cites an existing Makefile target confirmed against the writer in scripts/ or experiments/ (writers were read, not inferred from filenames). Regenerate artifacts only through their owning command; never hand-edit a generated file.",
   "governed_roots": [
     "experiments/results",
+    "experiments/results_disagreement",
     "experiments/results_real_terms",
     "experiments/results_regime",
     "data/trusted_clean"
@@ -252,6 +253,42 @@
       ],
       "hand_edit_forbidden": true,
       "notes": "Written by experiments/friction_sim.py (PLOT_OUTPUT)."
+    },
+    {
+      "path_or_glob": "experiments/results_disagreement/disagreement_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make research-disagreement",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/disagreement_atlas.py (JSON_OUTPUT). Embeds source_artifacts checksums for the persisted prediction dumps."
+    },
+    {
+      "path_or_glob": "experiments/results_disagreement/disagreement_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make research-disagreement",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/disagreement_atlas.py (MARKDOWN_OUTPUT)."
+    },
+    {
+      "path_or_glob": "experiments/results_disagreement/disagreement_matrix.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-disagreement",
+      "inputs": [
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/disagreement_atlas.py (MATRIX_OUTPUT). Exact per-file registration avoids a broad glob."
     },
     {
       "path_or_glob": "experiments/results_real_terms/**",

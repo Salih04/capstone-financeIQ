@@ -337,6 +337,7 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 | Task | Status | Evidence |
 |---|---|---|
 | R3-GOV-01 post-Phase-2 truth sync | DONE (awaiting owner commit) | 2026-07-13; `docs/VERIFICATION_BASELINE.md`; root/backend suites green, data VALID, claims lint passed; operating docs cite the baseline; Phase-2 commit reconciliation appended; no code, data, metric, generated artifact, MCC, or application behavior changed |
+| R3-STAT-02 model disagreement atlas | DONE (awaiting owner commit) | 2026-07-13; isolated seedless rank-only 9×9 per-year Spearman matrices and per-ticker-year nine-model rank spread/IQR in `experiments/results_disagreement/`; source dump checksums embedded and verified; missing ranks yield explicit insufficient-data nulls; no raw cross-model score comparison, retraining, ranking/service change, or predictive-validity claim; registry ownership is `make research-disagreement` |
 
 ## Universal rules for Phase-3 tasks (in addition to the Phase-2 universal rules above, which all still apply)
 

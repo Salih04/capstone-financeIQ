@@ -1,0 +1,4303 @@
+{
+  "analysis_status": "complete",
+  "artifacts": {
+    "json_report": "experiments/results_disagreement/disagreement_report.json",
+    "markdown_report": "experiments/results_disagreement/disagreement_report.md",
+    "matrix_csv": "experiments/results_disagreement/disagreement_matrix.csv"
+  },
+  "claim_safety": {
+    "describes_model_instability_only": true,
+    "existing_real_terms_regime_or_friction_interpretation_changed": false,
+    "existing_significance_or_power_results_changed": false,
+    "investment_value_established": false,
+    "predictive_validity_established": false,
+    "recommendations_emitted": false,
+    "reliable_predictive_edge_established": false
+  },
+  "claim_safety_sentence": "**Model disagreement measures instability of a signal already indistinguishable from the null; high agreement between models is not evidence of predictive validity.**",
+  "design": {
+    "analysis_type": "cross-model within-year prediction-rank disagreement",
+    "core_model_or_ranking_changed": false,
+    "missing_prediction_handling": "No values are filled. Pairwise cells with fewer than three shared ranks are null; ticker-year spread/IQR are null unless every model has a rank.",
+    "model_count": 9,
+    "models": [
+      "baseline_equal_weight",
+      "baseline_rank_score",
+      "elasticnet",
+      "gradient_boosting",
+      "lasso",
+      "linear_regression",
+      "random_forest",
+      "ridge",
+      "robust_rank_aggregation"
+    ],
+    "pairwise_statistic": "Pearson correlation of the two models' within-model ranks (Spearman rank correlation)",
+    "rank_definition": "average-tie ascending rank of y_pred within one target year and one model",
+    "raw_prediction_magnitudes_compared_across_models": false,
+    "significance_test_added": false,
+    "target_years": [
+      2023,
+      2024,
+      2025
+    ],
+    "ticker_statistic": "max minus min and linear-interpolation IQR across all model ranks for a ticker-year",
+    "universe": "81-ticker retrospective training universe; 80 evaluated rows per model-year in the current dumps"
+  },
+  "findings": [
+    "The matrix and spread rows are descriptive rank-agreement diagnostics only; they do not test predictive performance.",
+    "Raw prediction magnitudes are never compared across models because their scales differ by model.",
+    "Any absent or insufficient rank evidence is retained as an explicit null/status rather than filled or inferred."
+  ],
+  "generated_by": {
+    "deterministic_ordering": "year, model, ticker; CSV rows use year, row_model, column_model",
+    "generator_command": "make research-disagreement",
+    "module": "experiments/disagreement_atlas.py",
+    "sampling": "none; seedless arithmetic",
+    "serialization": "sorted-key JSON, newline-terminated UTF-8 JSON/Markdown/CSV"
+  },
+  "limitations": [
+    "This is the retrospective 81-ticker training universe with 80 evaluated rows per model-year, not verified point-in-time BIST100 membership; survivorship and universe-selection risks remain.",
+    "Only three target years are represented, all within one unusual macro regime; this atlas does not establish regime robustness.",
+    "Rank agreement or disagreement describes model instability, not opportunity, economic value, trading profitability, or predictive validity.",
+    "The analysis adds no significance test and does not change the existing multiplicity correction, low-power limits, or null-consistent conclusion.",
+    "Raw y_pred scales differ by model and are deliberately never compared across models; ties receive average ranks.",
+    "Missing or non-finite predictions are never imputed. Insufficient pairwise or ticker-year evidence is reported as null with an explicit status.",
+    "This report uses nominal-TRY persisted dumps only and does not replace or merge the parallel real-TRY or USD-basis evidence.",
+    "Reproduction is numerical-environment-qualified; deterministic byte identity is demonstrated only in the current environment.",
+    "Research support only; not investment advice."
+  ],
+  "pairwise_rank_correlation_matrix": [
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": -0.4779418659,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": -0.4555065878,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": -0.2085794655,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": -0.2752930145,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": -0.4953732734,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": -0.3206985466,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 0.9305505953,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": -0.4779418659,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": -0.4555065878,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": -0.2085794655,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": -0.2752930145,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": -0.4953732734,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": -0.3206985466,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 0.9305505953,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.4779418659,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.4779418659,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 1.0,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.6367973189,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.7479371777,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.5282700422,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.7693317472,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.949859353,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.5103931164,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.4555065878,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.4555065878,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.6367973189,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 1.0,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.5309320649,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.4358150879,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.8209117928,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.5863144083,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.5131023362,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.2085794655,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.2085794655,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.7479371777,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.5309320649,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 1.0,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.8151898734,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.6076336594,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.8613689639,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.2539835236,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.2752930145,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.2752930145,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.5282700422,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.4358150879,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.8151898734,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 1.0,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.4670093003,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.5927566807,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.2582703642,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.4953732734,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.4953732734,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.7693317472,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.8209117928,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.6076336594,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.4670093003,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 1.0,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.7037312689,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.5428184731,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.3206985466,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.3206985466,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.949859353,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.5863144083,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.8613689639,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.5927566807,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.7037312689,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 1.0,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.3732142198,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 0.9305505953,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 0.9305505953,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": -0.5103931164,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": -0.5131023362,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": -0.2539835236,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": -0.2582703642,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": -0.5428184731,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": -0.3732142198,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 1.0,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2023
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": -0.3353961556,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.0641940002,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.2451242382,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.2467885607,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": -0.2191527142,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.1356305673,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 0.9487042988,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": -0.3353961556,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.0641940002,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.2451242382,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.2467885607,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": -0.2191527142,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.1356305673,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 0.9487042988,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.3353961556,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.3353961556,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 1.0,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.3975644489,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.4641819034,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.4062353493,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.3973651979,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.685302391,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.3563444203,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 0.0641940002,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 0.0641940002,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.3975644489,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 1.0,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.6032501363,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.5612081646,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.663193427,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.5866771371,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.0181127568,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 0.2451242382,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 0.2451242382,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.4641819034,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.6032501363,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 1.0,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.9706516643,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.2906604,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.9232770745,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 0.2041043676,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 0.2467885607,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 0.2467885607,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.4062353493,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.5612081646,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.9706516643,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 1.0,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.2635388159,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.8595405532,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 0.2178676374,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.2191527142,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.2191527142,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.3973651979,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.663193427,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.2906604,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.2635388159,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 1.0,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.3156605465,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.2889834661,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 0.1356305673,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 0.1356305673,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.685302391,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.5866771371,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.9232770745,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.8595405532,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.3156605465,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 1.0,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 0.0953229531,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 0.9487042988,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 0.9487042988,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": -0.3563444203,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": -0.0181127568,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.2041043676,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.2178676374,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": -0.2889834661,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.0953229531,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 1.0,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2024
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": -0.2808954524,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": -0.2161509611,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.0127285513,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": -0.0582981716,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": -0.3821869561,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.0267229255,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 0.9730353818,
+      "row_model": "baseline_equal_weight",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 1.0,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": -0.2808954524,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": -0.2161509611,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.0127285513,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": -0.0582981716,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": -0.3821869561,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.0267229255,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 0.9730353818,
+      "row_model": "baseline_rank_score",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.2808954524,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.2808954524,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 1.0,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.4214486639,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.5789498359,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.2647210502,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.3154964574,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.7355133615,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.2573037728,
+      "row_model": "elasticnet",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.2161509611,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.2161509611,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.4214486639,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 1.0,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.1528598218,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.0902484763,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.8131552576,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.2379043601,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.225656534,
+      "row_model": "gradient_boosting",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 0.0127285513,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 0.0127285513,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.5789498359,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.1528598218,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 1.0,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.8622128458,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.0106423502,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.9420534459,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 0.0508465637,
+      "row_model": "lasso",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.0582981716,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.0582981716,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.2647210502,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.0902484763,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.8622128458,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 1.0,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.0189640117,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.6976558837,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.0177810597,
+      "row_model": "linear_regression",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": -0.3821869561,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": -0.3821869561,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.3154964574,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.8131552576,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.0106423502,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.0189640117,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 1.0,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.0976330147,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": -0.3655277505,
+      "row_model": "random_forest",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 0.0267229255,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 0.0267229255,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": 0.7355133615,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": 0.2379043601,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.9420534459,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": 0.6976558837,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": 0.0976330147,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 1.0,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 0.0705850638,
+      "row_model": "ridge",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_equal_weight",
+      "rank_spearman": 0.9730353818,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "baseline_rank_score",
+      "rank_spearman": 0.9730353818,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "elasticnet",
+      "rank_spearman": -0.2573037728,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "gradient_boosting",
+      "rank_spearman": -0.225656534,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "lasso",
+      "rank_spearman": 0.0508465637,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "linear_regression",
+      "rank_spearman": -0.0177810597,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "random_forest",
+      "rank_spearman": -0.3655277505,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "ridge",
+      "rank_spearman": 0.0705850638,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    },
+    {
+      "column_model": "robust_rank_aggregation",
+      "rank_spearman": 1.0,
+      "row_model": "robust_rank_aggregation",
+      "shared_ranked_ticker_count": 80,
+      "status": "complete",
+      "year": 2025
+    }
+  ],
+  "per_year_summary": [
+    {
+      "pairwise_insufficient_data_cells": 0,
+      "pairwise_off_diagonal_rank_spearman": {
+        "count": 72,
+        "maximum": 1.0,
+        "median": 0.1136178112,
+        "minimum": -0.5428184731
+      },
+      "ticker_insufficient_data_rows": 0,
+      "ticker_rank_iqr": {
+        "count": 80,
+        "maximum": 70.0,
+        "median": 30.0,
+        "minimum": 3.0
+      },
+      "ticker_rank_spread_max_minus_min": {
+        "count": 80,
+        "maximum": 78.0,
+        "median": 50.0,
+        "minimum": 14.0
+      },
+      "year": 2023
+    },
+    {
+      "pairwise_insufficient_data_cells": 0,
+      "pairwise_off_diagonal_rank_spearman": {
+        "count": 72,
+        "maximum": 1.0,
+        "median": 0.2551636883,
+        "minimum": -0.3563444203
+      },
+      "ticker_insufficient_data_rows": 0,
+      "ticker_rank_iqr": {
+        "count": 80,
+        "maximum": 71.0,
+        "median": 22.5,
+        "minimum": 2.0
+      },
+      "ticker_rank_spread_max_minus_min": {
+        "count": 80,
+        "maximum": 75.0,
+        "median": 46.5,
+        "minimum": 14.0
+      },
+      "year": 2024
+    },
+    {
+      "pairwise_insufficient_data_cells": 0,
+      "pairwise_off_diagonal_rank_spearman": {
+        "count": 72,
+        "maximum": 1.0,
+        "median": 0.0387847446,
+        "minimum": -0.3821869561
+      },
+      "ticker_insufficient_data_rows": 0,
+      "ticker_rank_iqr": {
+        "count": 80,
+        "maximum": 77.0,
+        "median": 29.5,
+        "minimum": 2.0
+      },
+      "ticker_rank_spread_max_minus_min": {
+        "count": 80,
+        "maximum": 78.0,
+        "median": 51.5,
+        "minimum": 12.0
+      },
+      "year": 2025
+    }
+  ],
+  "schema_version": "1.0.0",
+  "source_artifacts": [
+    {
+      "models": [
+        "baseline_equal_weight",
+        "baseline_rank_score",
+        "elasticnet",
+        "gradient_boosting",
+        "lasso",
+        "linear_regression",
+        "random_forest",
+        "ridge",
+        "robust_rank_aggregation"
+      ],
+      "path": "experiments/results/predictions_test_2023.csv",
+      "rows": 720,
+      "sha256": "c954822ec52c4bdc7704cc0c7d9ac26c58817b2a75ec92c842915603eb5b72c8",
+      "year": 2023
+    },
+    {
+      "models": [
+        "baseline_equal_weight",
+        "baseline_rank_score",
+        "elasticnet",
+        "gradient_boosting",
+        "lasso",
+        "linear_regression",
+        "random_forest",
+        "ridge",
+        "robust_rank_aggregation"
+      ],
+      "path": "experiments/results/predictions_test_2024.csv",
+      "rows": 720,
+      "sha256": "cf88016a3f310811baaf3fed677230ffd98db4db0ea1417393c9afe87bb4c457",
+      "year": 2024
+    },
+    {
+      "models": [
+        "baseline_equal_weight",
+        "baseline_rank_score",
+        "elasticnet",
+        "gradient_boosting",
+        "lasso",
+        "linear_regression",
+        "random_forest",
+        "ridge",
+        "robust_rank_aggregation"
+      ],
+      "path": "experiments/results/predictions_test_2025.csv",
+      "rows": 720,
+      "sha256": "295dac3a1b056aa20b9320ff0844ec3cd6aca61fd602f195258a4bc7182cafb1",
+      "year": 2025
+    }
+  ],
+  "task": "R3-STAT-02",
+  "ticker_year_rank_spread": [
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 18.0,
+      "rank_spread_max_minus_min": 24.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AEFES",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 25.0,
+      "rank_spread_max_minus_min": 43.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AGESA",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 51.0,
+      "rank_spread_max_minus_min": 62.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AGHOL",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 13.0,
+      "rank_spread_max_minus_min": 43.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKBNK",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 25.0,
+      "rank_spread_max_minus_min": 40.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKENR",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 6.0,
+      "rank_spread_max_minus_min": 40.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKSA",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 43.0,
+      "rank_spread_max_minus_min": 50.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKSEN",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 17.0,
+      "rank_spread_max_minus_min": 47.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ALARK",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 31.0,
+      "rank_spread_max_minus_min": 38.5,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ALBRK",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 29.5,
+      "rank_spread_max_minus_min": 39.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ANHYT",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 58.0,
+      "rank_spread_max_minus_min": 67.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ARCLK",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 55.0,
+      "rank_spread_max_minus_min": 70.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ASELS",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 38.0,
+      "rank_spread_max_minus_min": 70.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ASTOR",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 39.0,
+      "rank_spread_max_minus_min": 52.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BERA",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 54.0,
+      "rank_spread_max_minus_min": 58.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BIMAS",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 12.0,
+      "rank_spread_max_minus_min": 30.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BRSAN",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 59.0,
+      "rank_spread_max_minus_min": 66.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BTCIM",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 60.0,
+      "rank_spread_max_minus_min": 71.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CANTE",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 44.0,
+      "rank_spread_max_minus_min": 53.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CCOLA",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 35.0,
+      "rank_spread_max_minus_min": 62.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CEMTS",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 27.0,
+      "rank_spread_max_minus_min": 36.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CIMSA",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 18.0,
+      "rank_spread_max_minus_min": 45.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DEVA",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 9.0,
+      "rank_spread_max_minus_min": 21.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DOAS",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 22.0,
+      "rank_spread_max_minus_min": 44.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DOHOL",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 12.0,
+      "rank_spread_max_minus_min": 52.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DSTKF",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 39.0,
+      "rank_spread_max_minus_min": 55.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "EGEEN",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 20.0,
+      "rank_spread_max_minus_min": 42.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "EKGYO",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 46.0,
+      "rank_spread_max_minus_min": 53.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ENJSA",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 53.0,
+      "rank_spread_max_minus_min": 67.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ENKAI",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 64.0,
+      "rank_spread_max_minus_min": 69.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "EREGL",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 45.0,
+      "rank_spread_max_minus_min": 65.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "FROTO",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 4.5,
+      "rank_spread_max_minus_min": 50.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "GARAN",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 11.0,
+      "rank_spread_max_minus_min": 39.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "GUBRF",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 9.0,
+      "rank_spread_max_minus_min": 39.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "HALKB",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 21.0,
+      "rank_spread_max_minus_min": 26.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "HEKTS",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 39.0,
+      "rank_spread_max_minus_min": 62.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ISCTR",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 43.0,
+      "rank_spread_max_minus_min": 52.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ISGYO",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 67.0,
+      "rank_spread_max_minus_min": 78.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KCHOL",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 30.0,
+      "rank_spread_max_minus_min": 34.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KONTR",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 16.0,
+      "rank_spread_max_minus_min": 37.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KRDMD",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 48.0,
+      "rank_spread_max_minus_min": 52.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KRVGD",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 47.0,
+      "rank_spread_max_minus_min": 67.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KUYAS",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 46.0,
+      "rank_spread_max_minus_min": 67.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "LOGO",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 38.0,
+      "rank_spread_max_minus_min": 49.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MAVI",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 18.0,
+      "rank_spread_max_minus_min": 33.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MGROS",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 69.0,
+      "rank_spread_max_minus_min": 72.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MIATK",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 8.0,
+      "rank_spread_max_minus_min": 32.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MPARK",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 45.0,
+      "rank_spread_max_minus_min": 68.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "NETAS",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 58.0,
+      "rank_spread_max_minus_min": 64.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "NTGAZ",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 24.0,
+      "rank_spread_max_minus_min": 37.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ODAS",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 8.0,
+      "rank_spread_max_minus_min": 35.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "OTKAR",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 36.0,
+      "rank_spread_max_minus_min": 45.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "OYAKC",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 51.0,
+      "rank_spread_max_minus_min": 61.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PASEU",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 27.0,
+      "rank_spread_max_minus_min": 51.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PETKM",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 10.0,
+      "rank_spread_max_minus_min": 53.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PGSUS",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 66.0,
+      "rank_spread_max_minus_min": 70.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PRKME",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 39.0,
+      "rank_spread_max_minus_min": 68.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SAHOL",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 10.0,
+      "rank_spread_max_minus_min": 14.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SASA",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 15.0,
+      "rank_spread_max_minus_min": 29.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SELEC",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 68.0,
+      "rank_spread_max_minus_min": 70.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SISE",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 47.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SKBNK",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 70.0,
+      "rank_spread_max_minus_min": 74.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SMRTG",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 11.0,
+      "rank_spread_max_minus_min": 44.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SOKM",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 29.0,
+      "rank_spread_max_minus_min": 55.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TAVHL",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 18.0,
+      "rank_spread_max_minus_min": 35.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TBORG",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 60.0,
+      "rank_spread_max_minus_min": 69.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TCELL",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 3.0,
+      "rank_spread_max_minus_min": 16.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "THYAO",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 55.0,
+      "rank_spread_max_minus_min": 63.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TOASO",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 17.0,
+      "rank_spread_max_minus_min": 35.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TRALT",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 16.0,
+      "rank_spread_max_minus_min": 31.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TRMET",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 47.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TSKB",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 53.0,
+      "rank_spread_max_minus_min": 75.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TTKOM",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 36.0,
+      "rank_spread_max_minus_min": 50.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TUPRS",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 30.0,
+      "rank_spread_max_minus_min": 34.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TURSG",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 19.0,
+      "rank_spread_max_minus_min": 36.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ULKER",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 56.0,
+      "rank_spread_max_minus_min": 69.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ULUSE",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 15.0,
+      "rank_spread_max_minus_min": 41.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "VAKBN",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 16.0,
+      "rank_spread_max_minus_min": 38.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "VESTL",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 39.0,
+      "rank_spread_max_minus_min": 52.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "YKBNK",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 17.0,
+      "rank_spread_max_minus_min": 47.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ZOREN",
+      "year": 2023
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 4.0,
+      "rank_spread_max_minus_min": 41.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AEFES",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 25.0,
+      "rank_spread_max_minus_min": 32.5,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AGESA",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 44.0,
+      "rank_spread_max_minus_min": 66.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AGHOL",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 30.5,
+      "rank_spread_max_minus_min": 36.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKBNK",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 11.0,
+      "rank_spread_max_minus_min": 46.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKENR",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 24.0,
+      "rank_spread_max_minus_min": 43.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKSA",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 24.5,
+      "rank_spread_max_minus_min": 35.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKSEN",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 11.0,
+      "rank_spread_max_minus_min": 52.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ALARK",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 30.0,
+      "rank_spread_max_minus_min": 40.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ALBRK",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 12.5,
+      "rank_spread_max_minus_min": 25.5,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ANHYT",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 36.0,
+      "rank_spread_max_minus_min": 57.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ARCLK",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 56.0,
+      "rank_spread_max_minus_min": 69.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ASELS",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 21.0,
+      "rank_spread_max_minus_min": 45.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ASTOR",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 10.0,
+      "rank_spread_max_minus_min": 37.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BERA",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 54.0,
+      "rank_spread_max_minus_min": 63.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BIMAS",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 28.0,
+      "rank_spread_max_minus_min": 70.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BRSAN",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 59.0,
+      "rank_spread_max_minus_min": 66.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BTCIM",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 71.0,
+      "rank_spread_max_minus_min": 75.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CANTE",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 58.0,
+      "rank_spread_max_minus_min": 70.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CCOLA",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 6.0,
+      "rank_spread_max_minus_min": 35.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CEMTS",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 21.0,
+      "rank_spread_max_minus_min": 41.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CIMSA",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 20.0,
+      "rank_spread_max_minus_min": 48.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DEVA",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 16.0,
+      "rank_spread_max_minus_min": 51.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DOAS",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 7.0,
+      "rank_spread_max_minus_min": 35.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DOHOL",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 42.0,
+      "rank_spread_max_minus_min": 74.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DSTKF",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 26.0,
+      "rank_spread_max_minus_min": 53.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "EGEEN",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 4.0,
+      "rank_spread_max_minus_min": 31.5,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "EKGYO",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 26.0,
+      "rank_spread_max_minus_min": 41.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ENJSA",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 13.0,
+      "rank_spread_max_minus_min": 60.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ENKAI",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 34.0,
+      "rank_spread_max_minus_min": 50.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "EREGL",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 13.0,
+      "rank_spread_max_minus_min": 31.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "FROTO",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 26.0,
+      "rank_spread_max_minus_min": 39.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "GARAN",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 11.0,
+      "rank_spread_max_minus_min": 33.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "GUBRF",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 30.5,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "HALKB",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 18.0,
+      "rank_spread_max_minus_min": 45.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "HEKTS",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 43.0,
+      "rank_spread_max_minus_min": 53.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ISCTR",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 8.0,
+      "rank_spread_max_minus_min": 42.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ISGYO",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 38.0,
+      "rank_spread_max_minus_min": 60.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KCHOL",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 44.0,
+      "rank_spread_max_minus_min": 56.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KONTR",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 20.0,
+      "rank_spread_max_minus_min": 38.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KRDMD",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 22.0,
+      "rank_spread_max_minus_min": 31.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KRVGD",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 61.0,
+      "rank_spread_max_minus_min": 68.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KUYAS",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 51.0,
+      "rank_spread_max_minus_min": 67.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "LOGO",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 31.0,
+      "rank_spread_max_minus_min": 48.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MAVI",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 33.0,
+      "rank_spread_max_minus_min": 53.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MGROS",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 51.0,
+      "rank_spread_max_minus_min": 65.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MIATK",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 14.0,
+      "rank_spread_max_minus_min": 31.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MPARK",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 60.0,
+      "rank_spread_max_minus_min": 67.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "NETAS",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 38.0,
+      "rank_spread_max_minus_min": 72.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "NTGAZ",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 14.0,
+      "rank_spread_max_minus_min": 37.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ODAS",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 11.0,
+      "rank_spread_max_minus_min": 47.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "OTKAR",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 7.0,
+      "rank_spread_max_minus_min": 45.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "OYAKC",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 44.0,
+      "rank_spread_max_minus_min": 71.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PASEU",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 21.0,
+      "rank_spread_max_minus_min": 47.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PETKM",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 3.0,
+      "rank_spread_max_minus_min": 40.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PGSUS",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 18.0,
+      "rank_spread_max_minus_min": 56.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PRKME",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 17.0,
+      "rank_spread_max_minus_min": 35.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SAHOL",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 8.0,
+      "rank_spread_max_minus_min": 38.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SASA",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 24.0,
+      "rank_spread_max_minus_min": 55.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SELEC",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 39.0,
+      "rank_spread_max_minus_min": 65.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SISE",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 14.0,
+      "rank_spread_max_minus_min": 42.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SKBNK",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 57.5,
+      "rank_spread_max_minus_min": 63.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SMRTG",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 6.0,
+      "rank_spread_max_minus_min": 27.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SOKM",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 6.0,
+      "rank_spread_max_minus_min": 32.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TAVHL",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 3.0,
+      "rank_spread_max_minus_min": 41.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TBORG",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 56.0,
+      "rank_spread_max_minus_min": 66.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TCELL",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 9.0,
+      "rank_spread_max_minus_min": 26.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "THYAO",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 30.0,
+      "rank_spread_max_minus_min": 49.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TOASO",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 20.0,
+      "rank_spread_max_minus_min": 62.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TRALT",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 18.0,
+      "rank_spread_max_minus_min": 60.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TRMET",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 49.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TSKB",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 47.0,
+      "rank_spread_max_minus_min": 50.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TTKOM",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 59.0,
+      "rank_spread_max_minus_min": 61.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TUPRS",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 11.0,
+      "rank_spread_max_minus_min": 24.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TURSG",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 7.0,
+      "rank_spread_max_minus_min": 50.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ULKER",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 11.0,
+      "rank_spread_max_minus_min": 34.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ULUSE",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 2.0,
+      "rank_spread_max_minus_min": 14.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "VAKBN",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 9.0,
+      "rank_spread_max_minus_min": 35.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "VESTL",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 31.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "YKBNK",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 35.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ZOREN",
+      "year": 2024
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 53.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AEFES",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 20.0,
+      "rank_spread_max_minus_min": 41.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AGESA",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 51.0,
+      "rank_spread_max_minus_min": 67.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AGHOL",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 41.0,
+      "rank_spread_max_minus_min": 47.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKBNK",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 31.0,
+      "rank_spread_max_minus_min": 72.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKENR",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 2.0,
+      "rank_spread_max_minus_min": 17.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKSA",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 21.0,
+      "rank_spread_max_minus_min": 25.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "AKSEN",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 28.0,
+      "rank_spread_max_minus_min": 49.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ALARK",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 8.0,
+      "rank_spread_max_minus_min": 51.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ALBRK",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 42.0,
+      "rank_spread_max_minus_min": 57.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ANHYT",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 47.0,
+      "rank_spread_max_minus_min": 63.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ARCLK",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 51.0,
+      "rank_spread_max_minus_min": 75.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ASELS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 28.0,
+      "rank_spread_max_minus_min": 62.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ASTOR",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 8.0,
+      "rank_spread_max_minus_min": 27.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BERA",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 61.0,
+      "rank_spread_max_minus_min": 68.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BIMAS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 27.0,
+      "rank_spread_max_minus_min": 50.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BRSAN",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 51.5,
+      "rank_spread_max_minus_min": 67.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "BTCIM",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 77.0,
+      "rank_spread_max_minus_min": 78.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CANTE",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 48.0,
+      "rank_spread_max_minus_min": 56.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CCOLA",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 24.0,
+      "rank_spread_max_minus_min": 70.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CEMTS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 7.0,
+      "rank_spread_max_minus_min": 26.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "CIMSA",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 29.0,
+      "rank_spread_max_minus_min": 40.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DEVA",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 7.0,
+      "rank_spread_max_minus_min": 34.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DOAS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 19.0,
+      "rank_spread_max_minus_min": 27.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DOHOL",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 37.0,
+      "rank_spread_max_minus_min": 57.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "DSTKF",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 8.0,
+      "rank_spread_max_minus_min": 31.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "EKGYO",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 52.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ENJSA",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 62.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ENKAI",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 46.0,
+      "rank_spread_max_minus_min": 65.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "EREGL",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 27.0,
+      "rank_spread_max_minus_min": 48.5,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "FROTO",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 36.0,
+      "rank_spread_max_minus_min": 43.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "GARAN",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 30.0,
+      "rank_spread_max_minus_min": 38.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "GUBRF",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 20.0,
+      "rank_spread_max_minus_min": 38.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "HALKB",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 29.0,
+      "rank_spread_max_minus_min": 72.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "HEKTS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 22.0,
+      "rank_spread_max_minus_min": 35.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ISCTR",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 33.0,
+      "rank_spread_max_minus_min": 43.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ISGYO",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 39.0,
+      "rank_spread_max_minus_min": 59.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KCHOL",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 39.0,
+      "rank_spread_max_minus_min": 57.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KONTR",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 50.0,
+      "rank_spread_max_minus_min": 55.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KRDMD",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 51.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KRVGD",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 53.0,
+      "rank_spread_max_minus_min": 65.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "KUYAS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 37.0,
+      "rank_spread_max_minus_min": 40.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "LOGO",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 15.0,
+      "rank_spread_max_minus_min": 49.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MAVI",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 6.0,
+      "rank_spread_max_minus_min": 40.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MGROS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 13.0,
+      "rank_spread_max_minus_min": 43.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MIATK",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 28.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "MPARK",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 34.0,
+      "rank_spread_max_minus_min": 71.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "NETAS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 14.0,
+      "rank_spread_max_minus_min": 52.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "NTGAZ",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 24.0,
+      "rank_spread_max_minus_min": 56.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ODAS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 10.0,
+      "rank_spread_max_minus_min": 54.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "OTKAR",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 38.0,
+      "rank_spread_max_minus_min": 48.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "OYAKC",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 56.0,
+      "rank_spread_max_minus_min": 65.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PASEU",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 48.0,
+      "rank_spread_max_minus_min": 61.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PETKM",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 52.0,
+      "rank_spread_max_minus_min": 64.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PGSUS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 62.5,
+      "rank_spread_max_minus_min": 64.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "PRKME",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 31.0,
+      "rank_spread_max_minus_min": 58.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "RGYAS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 13.0,
+      "rank_spread_max_minus_min": 19.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SAHOL",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 35.0,
+      "rank_spread_max_minus_min": 49.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SASA",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 21.0,
+      "rank_spread_max_minus_min": 46.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SELEC",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 21.0,
+      "rank_spread_max_minus_min": 52.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SISE",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 24.0,
+      "rank_spread_max_minus_min": 38.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SKBNK",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 32.0,
+      "rank_spread_max_minus_min": 48.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SMRTG",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 26.0,
+      "rank_spread_max_minus_min": 50.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "SOKM",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 51.0,
+      "rank_spread_max_minus_min": 57.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TAVHL",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 26.0,
+      "rank_spread_max_minus_min": 37.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TBORG",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 55.0,
+      "rank_spread_max_minus_min": 70.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TCELL",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 8.0,
+      "rank_spread_max_minus_min": 12.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "THYAO",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 30.0,
+      "rank_spread_max_minus_min": 45.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TOASO",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 45.0,
+      "rank_spread_max_minus_min": 57.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TRALT",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 60.0,
+      "rank_spread_max_minus_min": 66.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TRMET",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 23.0,
+      "rank_spread_max_minus_min": 62.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TSKB",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 39.0,
+      "rank_spread_max_minus_min": 64.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TTKOM",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 39.0,
+      "rank_spread_max_minus_min": 66.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TUPRS",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 39.0,
+      "rank_spread_max_minus_min": 52.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "TURSG",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 31.0,
+      "rank_spread_max_minus_min": 38.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ULKER",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 26.0,
+      "rank_spread_max_minus_min": 75.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ULUSE",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 13.0,
+      "rank_spread_max_minus_min": 44.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "VAKBN",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 28.0,
+      "rank_spread_max_minus_min": 43.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "VESTL",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 33.5,
+      "rank_spread_max_minus_min": 51.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "YKBNK",
+      "year": 2025
+    },
+    {
+      "expected_model_count": 9,
+      "rank_iqr": 37.0,
+      "rank_spread_max_minus_min": 42.0,
+      "ranked_model_count": 9,
+      "status": "complete",
+      "ticker": "ZOREN",
+      "year": 2025
+    }
+  ]
+}
