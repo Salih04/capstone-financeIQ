@@ -11,6 +11,7 @@
     "experiments/results_rank_stability",
     "experiments/results_real_terms",
     "experiments/results_regime",
+    "experiments/results_serving_eval",
     "data/trusted_clean"
   ],
   "coverage_rule": "Every file under a governed root, excluding experiments/results/runs/**, must be matched by exactly one entry below. An unmatched file (orphan) or a file matched by more than one entry (duplicate ownership) is a governance failure enforced by tests/test_artifact_registry.py.",
@@ -387,6 +388,70 @@
       ],
       "hand_edit_forbidden": true,
       "notes": "Written by experiments/rank_stability.py (TICKER_OUTPUT). Exact per-file registration avoids a broad glob."
+    },
+    {
+      "path_or_glob": "experiments/results_serving_eval/predictions_serving_2023.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-serving-eval",
+      "inputs": [
+        "backend/app/services/forecasting_csv_service.py",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "experiments/results/predictions_test_2023.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/serving_eval.py after invoking the unchanged train_parameters and run_forecast service functions through an isolated RESEARCH_REPO_ROOT. Contains the exact canonical eligible cohort for target year 2023 and the service's serialized four-decimal scores."
+    },
+    {
+      "path_or_glob": "experiments/results_serving_eval/predictions_serving_2024.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-serving-eval",
+      "inputs": [
+        "backend/app/services/forecasting_csv_service.py",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "experiments/results/predictions_test_2024.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/serving_eval.py after invoking the unchanged service path on the exact canonical eligible target-year-2024 cohort."
+    },
+    {
+      "path_or_glob": "experiments/results_serving_eval/predictions_serving_2025.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-serving-eval",
+      "inputs": [
+        "backend/app/services/forecasting_csv_service.py",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/serving_eval.py after invoking the unchanged service path on the exact canonical eligible target-year-2025 cohort."
+    },
+    {
+      "path_or_glob": "experiments/results_serving_eval/serving_eval_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make research-serving-eval",
+      "inputs": [
+        "backend/app/services/forecasting_csv_service.py",
+        "experiments/serving_eval.py",
+        "experiments/run_experiments.py",
+        "experiments/significance.py",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv",
+        "experiments/results/significance_report.json"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/serving_eval.py. Embeds exact service-function identity, split/cohort definitions, source checksums, a raw single-test permutation p-value outside the six-model Bonferroni family, claim-safe precommitted wording, limitations, and PENDING independent-review status."
+    },
+    {
+      "path_or_glob": "experiments/results_serving_eval/serving_eval_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make research-serving-eval",
+      "inputs": [
+        "experiments/results_serving_eval/serving_eval_report.json"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/serving_eval.py (render_markdown) as the human-readable companion to serving_eval_report.json."
     },
     {
       "path_or_glob": "experiments/results_real_terms/**",

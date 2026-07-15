@@ -1,0 +1,506 @@
+{
+  "artifact_ownership": {
+    "generated_artifacts": [
+      "experiments/results_serving_eval/predictions_serving_2023.csv",
+      "experiments/results_serving_eval/predictions_serving_2024.csv",
+      "experiments/results_serving_eval/predictions_serving_2025.csv",
+      "experiments/results_serving_eval/serving_eval_report.json",
+      "experiments/results_serving_eval/serving_eval_report.md"
+    ],
+    "hand_edit_forbidden": true,
+    "owner": "make research-serving-eval",
+    "regeneration_command": "make research-serving-eval"
+  },
+  "claim_safety": {
+    "implementability_established": false,
+    "investment_value_established": false,
+    "mcc_conclusion_changed": false,
+    "negative_result_interpreted_as_contrarian": false,
+    "precommitted_conclusion": "The user-facing serving heuristic's walk-forward IC is 0.050 (95% CI [-0.075,0.174], permutation p=0.4427); this is not distinguishable from the within-year null, and in either case does not establish investment value, implementability, or a reliable predictive edge.",
+    "reliable_predictive_edge_established": false,
+    "statement": "One prespecified retrospective serving-path test cannot establish investment value, implementability, or a reliable predictive edge."
+  },
+  "evaluation_design": {
+    "cohort": "81-ticker internal training universe; exact canonical eligible evaluation panel of 80 tickers per target year",
+    "deterministic_ties": "The eligible scoring panel is ticker-sorted before run_forecast; the service's stable score sort and ordinal rank assignment are retained unchanged.",
+    "missing_data": "Missing features remain null and follow run_forecast omission/confidence behavior; missing outcomes are excluded before within-year service percentiles are computed.",
+    "return_basis": "nominal TRY T+1 realized return",
+    "splits": [
+      {
+        "eligible_rows": 80,
+        "excluded_missing_outcome": [
+          "RGYAS"
+        ],
+        "name": "test_2023",
+        "panel_rows": 81,
+        "prediction_artifact": "experiments/results_serving_eval/predictions_serving_2023.csv",
+        "selected_parameters": [
+          {
+            "name": "net_debt_to_ebitda",
+            "rank": 1,
+            "weight": 1.0
+          },
+          {
+            "name": "financial_debt_ratio",
+            "rank": 2,
+            "weight": 0.7696
+          },
+          {
+            "name": "ebitda",
+            "rank": 3,
+            "weight": 0.7312
+          },
+          {
+            "name": "operating_income",
+            "rank": 4,
+            "weight": 0.6829
+          },
+          {
+            "name": "revenue",
+            "rank": 5,
+            "weight": 0.6545
+          },
+          {
+            "name": "gross_profit",
+            "rank": 6,
+            "weight": 0.6064
+          },
+          {
+            "name": "market_cap",
+            "rank": 7,
+            "weight": 0.6015
+          },
+          {
+            "name": "gross_profit_growth_pct",
+            "rank": 8,
+            "weight": 0.598
+          },
+          {
+            "name": "pb_ratio",
+            "rank": 9,
+            "weight": 0.5654
+          },
+          {
+            "name": "net_margin",
+            "rank": 10,
+            "weight": 0.5418
+          },
+          {
+            "name": "ebitda_growth_pct",
+            "rank": 11,
+            "weight": 0.5411
+          },
+          {
+            "name": "net_income",
+            "rank": 12,
+            "weight": 0.4418
+          }
+        ],
+        "service_training_window": [
+          2020,
+          2021
+        ],
+        "test_feature_year": 2022,
+        "test_target_year": 2023,
+        "train_feature_years": [
+          2020,
+          2021
+        ],
+        "train_target_years": [
+          2021,
+          2022
+        ],
+        "training_rows": 81
+      },
+      {
+        "eligible_rows": 80,
+        "excluded_missing_outcome": [
+          "RGYAS"
+        ],
+        "name": "test_2024",
+        "panel_rows": 81,
+        "prediction_artifact": "experiments/results_serving_eval/predictions_serving_2024.csv",
+        "selected_parameters": [
+          {
+            "name": "market_cap",
+            "rank": 1,
+            "weight": 1.0
+          },
+          {
+            "name": "gross_profit_growth_pct",
+            "rank": 2,
+            "weight": 0.9722
+          },
+          {
+            "name": "net_debt_to_ebitda",
+            "rank": 3,
+            "weight": 0.8701
+          },
+          {
+            "name": "net_income",
+            "rank": 4,
+            "weight": 0.8421
+          },
+          {
+            "name": "ebitda_growth_pct",
+            "rank": 5,
+            "weight": 0.7806
+          },
+          {
+            "name": "pe_ratio",
+            "rank": 6,
+            "weight": 0.6316
+          },
+          {
+            "name": "financial_debt_ratio",
+            "rank": 7,
+            "weight": 0.6249
+          },
+          {
+            "name": "pb_ratio",
+            "rank": 8,
+            "weight": 0.605
+          },
+          {
+            "name": "current_ratio",
+            "rank": 9,
+            "weight": 0.5636
+          },
+          {
+            "name": "ebitda_margin",
+            "rank": 10,
+            "weight": 0.5258
+          },
+          {
+            "name": "revenue_growth_pct",
+            "rank": 11,
+            "weight": 0.494
+          },
+          {
+            "name": "roe",
+            "rank": 12,
+            "weight": 0.4833
+          }
+        ],
+        "service_training_window": [
+          2020,
+          2022
+        ],
+        "test_feature_year": 2023,
+        "test_target_year": 2024,
+        "train_feature_years": [
+          2020,
+          2021,
+          2022
+        ],
+        "train_target_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "training_rows": 161
+      },
+      {
+        "eligible_rows": 80,
+        "excluded_missing_outcome": [],
+        "name": "test_2025",
+        "panel_rows": 80,
+        "prediction_artifact": "experiments/results_serving_eval/predictions_serving_2025.csv",
+        "selected_parameters": [
+          {
+            "name": "market_cap",
+            "rank": 1,
+            "weight": 1.0
+          },
+          {
+            "name": "pb_ratio",
+            "rank": 2,
+            "weight": 0.8877
+          },
+          {
+            "name": "net_income",
+            "rank": 3,
+            "weight": 0.741
+          },
+          {
+            "name": "roe",
+            "rank": 4,
+            "weight": 0.7271
+          },
+          {
+            "name": "pe_ratio",
+            "rank": 5,
+            "weight": 0.6972
+          },
+          {
+            "name": "net_debt_to_ebitda",
+            "rank": 6,
+            "weight": 0.689
+          },
+          {
+            "name": "price_momentum_2y_pct",
+            "rank": 7,
+            "weight": 0.6517
+          },
+          {
+            "name": "gross_profit_growth_pct",
+            "rank": 8,
+            "weight": 0.6103
+          },
+          {
+            "name": "enterprise_value",
+            "rank": 9,
+            "weight": 0.5641
+          },
+          {
+            "name": "ebitda_growth_pct",
+            "rank": 10,
+            "weight": 0.5452
+          },
+          {
+            "name": "price_adjclose_t",
+            "rank": 11,
+            "weight": 0.5059
+          },
+          {
+            "name": "operating_income",
+            "rank": 12,
+            "weight": 0.4957
+          }
+        ],
+        "service_training_window": [
+          2020,
+          2023
+        ],
+        "test_feature_year": 2024,
+        "test_target_year": 2025,
+        "train_feature_years": [
+          2020,
+          2021,
+          2022,
+          2023
+        ],
+        "train_target_years": [
+          2021,
+          2022,
+          2023,
+          2024
+        ],
+        "training_rows": 241
+      }
+    ],
+    "statistic": "equal-weighted mean of within-year Spearman ICs with average ranks for ties"
+  },
+  "independent_review": {
+    "handoff": "docs/R3_SERV_01_FABLE5_REVIEW_HANDOFF.md",
+    "merge_ready": false,
+    "required_reviewer": "Fable 5 in a separate context/model family from the implementer",
+    "status": "PENDING"
+  },
+  "limitations": [
+    "Only three target years are observed, with 80 eligible tickers per year; estimates remain low-power and noisy.",
+    "The cohort is retrospectively fixed and is not verified point-in-time BIST100 membership; survivorship and universe-selection look-ahead risks remain.",
+    "Missing feature values remain null and reduce service coverage; no value is fabricated or imputed by this harness.",
+    "Rows without realized outcomes are excluded and reported; the result does not generalize to those missing observations.",
+    "Outcomes are nominal TRY returns from one unusual macro regime; regime robustness and economic implementation are not established.",
+    "Exact artifact reproduction is numerical-environment-qualified even though seeded same-environment reruns are byte-deterministic.",
+    "The raw serving p-value belongs to one prespecified test outside the six-model Bonferroni family and is not family-corrected.",
+    "Research support only; not investment advice."
+  ],
+  "schema_version": "1.0.0",
+  "service_path_parity": {
+    "approximation_or_reimplementation_used": false,
+    "functions_invoked": [
+      "backend/app/services/forecasting_csv_service.py::train_parameters",
+      "backend/app/services/forecasting_csv_service.py::run_forecast"
+    ],
+    "invocation_mechanism": "The unchanged backend service is loaded against an isolated temporary data root through the documented RESEARCH_REPO_ROOT override.",
+    "test_outcomes_visible_to_training_or_scoring": false
+  },
+  "serving_result": {
+    "bootstrap_ci_95": [
+      -0.07516743119178339,
+      0.17407572159652826
+    ],
+    "conclusion": "The user-facing serving heuristic's walk-forward IC is 0.050 (95% CI [-0.075,0.174], permutation p=0.4427); this is not distinguishable from the within-year null, and in either case does not establish investment value, implementability, or a reliable predictive edge.",
+    "distinguishable_from_within_year_null_0_05": false,
+    "exploratory_by_year": [
+      {
+        "bootstrap_ci_95": [
+          -0.09722126534433953,
+          0.3058891681438153
+        ],
+        "n": 80,
+        "observed_ic": 0.103202742712349,
+        "observed_null_percentile": 82.6,
+        "permutation_p_value_two_sided": 0.35696430356964304,
+        "split": "test_2023",
+        "year": 2023
+      },
+      {
+        "bootstrap_ci_95": [
+          -0.2329715025922273,
+          0.19839617592874328
+        ],
+        "n": 80,
+        "observed_ic": -0.02062822315986873,
+        "observed_null_percentile": 43.235,
+        "permutation_p_value_two_sided": 0.8579142085791421,
+        "split": "test_2024",
+        "year": 2024
+      },
+      {
+        "bootstrap_ci_95": [
+          -0.1668986080600771,
+          0.29129043104966196
+        ],
+        "n": 80,
+        "observed_ic": 0.06790904828879513,
+        "observed_null_percentile": 72.28,
+        "permutation_p_value_two_sided": 0.551044895510449,
+        "split": "test_2025",
+        "year": 2025
+      }
+    ],
+    "pooled_ic": 0.05016118928042513,
+    "raw_permutation_p_value_two_sided": 0.44265573442655737,
+    "test_label": "single prespecified test, outside the six-model Bonferroni family"
+  },
+  "six_model_family_context": {
+    "canonical_conclusion": "No ML model is statistically distinguishable from the within-year null after Bonferroni correction; the data do not support a reliable predictive edge.",
+    "family": [
+      "linear_regression",
+      "ridge",
+      "lasso",
+      "elasticnet",
+      "random_forest",
+      "gradient_boosting"
+    ],
+    "family_size": 6,
+    "method": "Bonferroni",
+    "models": [
+      {
+        "bonferroni_adjusted_p_value": 1.0,
+        "model": "linear_regression",
+        "pooled_ic": 0.045866196556466586,
+        "raw_permutation_p_value": 0.48025197480251974,
+        "significant_fwer_0_05": false
+      },
+      {
+        "bonferroni_adjusted_p_value": 0.9419058094190582,
+        "model": "ridge",
+        "pooled_ic": 0.09265503733469788,
+        "raw_permutation_p_value": 0.15698430156984303,
+        "significant_fwer_0_05": false
+      },
+      {
+        "bonferroni_adjusted_p_value": 1.0,
+        "model": "lasso",
+        "pooled_ic": 0.08954532588495062,
+        "raw_permutation_p_value": 0.16998300169983002,
+        "significant_fwer_0_05": false
+      },
+      {
+        "bonferroni_adjusted_p_value": 1.0,
+        "model": "elasticnet",
+        "pooled_ic": -0.019824182332074943,
+        "raw_permutation_p_value": 0.754024597540246,
+        "significant_fwer_0_05": false
+      },
+      {
+        "bonferroni_adjusted_p_value": 0.10978902109789021,
+        "model": "random_forest",
+        "pooled_ic": -0.15328380688030444,
+        "raw_permutation_p_value": 0.0182981701829817,
+        "significant_fwer_0_05": false
+      },
+      {
+        "bonferroni_adjusted_p_value": 0.6263373662633737,
+        "model": "gradient_boosting",
+        "pooled_ic": -0.10525340071593085,
+        "raw_permutation_p_value": 0.10438956104389562,
+        "significant_fwer_0_05": false
+      }
+    ],
+    "scope": "separate canonical ML family context; the serving heuristic is not a seventh model",
+    "source": "experiments/results/significance_report.json"
+  },
+  "source_artifacts": [
+    {
+      "path": "backend/app/services/forecasting_csv_service.py",
+      "role": "authoritative serving implementation invoked read-only",
+      "sha256": "7438ab40a47b5a1122ec8079d977bde7b7482a31f90dee0de79fd0f5f0212cb1",
+      "size_bytes": 27852
+    },
+    {
+      "path": "experiments/serving_eval.py",
+      "role": "R3-SERV-01 isolated evaluation harness",
+      "sha256": "6f8a1c47b2357e91ecaae56758f5d570229a70bcc5e1e7f50b4204ca56918922",
+      "size_bytes": 36118
+    },
+    {
+      "path": "experiments/run_experiments.py",
+      "role": "canonical split definitions",
+      "sha256": "265f58678d522eea0c48fbccba415ed30b3e20abc6bb7ae0a8e33857c5feb543",
+      "size_bytes": 32280
+    },
+    {
+      "path": "experiments/significance.py",
+      "role": "canonical Spearman and resampling treatment",
+      "sha256": "5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6",
+      "size_bytes": 32055
+    },
+    {
+      "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "role": "raw feature-year and prior-outcome input",
+      "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+      "size_bytes": 256050
+    },
+    {
+      "path": "experiments/leaderboard.csv",
+      "role": "protected canonical leaderboard",
+      "sha256": "8b3dfce2ca9ee702411c76cfcf699723cfde076df073837b4ca9db74e5936822",
+      "size_bytes": 1977
+    },
+    {
+      "path": "experiments/results/significance_report.json",
+      "role": "separate six-model family context",
+      "sha256": "0358ed01b70b99d491f3babb4810604c09e64ef4726f12ee0b7ea0a8af12fc29",
+      "size_bytes": 40901
+    },
+    {
+      "path": "experiments/results/runs/20260712T222717.997241Z_97e4fc33/manifest.json",
+      "role": "current clean reproducibility manifest of record",
+      "sha256": "fbeb253dfdc29a64f34b9a9724531fcd149c094bd79cd818a56f9568b317165f",
+      "size_bytes": 14640
+    },
+    {
+      "path": "experiments/results/predictions_test_2023.csv",
+      "role": "canonical evaluated cohort and outcome reference for 2023",
+      "sha256": "c954822ec52c4bdc7704cc0c7d9ac26c58817b2a75ec92c842915603eb5b72c8",
+      "size_bytes": 45401
+    },
+    {
+      "path": "experiments/results/predictions_test_2024.csv",
+      "role": "canonical evaluated cohort and outcome reference for 2024",
+      "sha256": "cf88016a3f310811baaf3fed677230ffd98db4db0ea1417393c9afe87bb4c457",
+      "size_bytes": 45479
+    },
+    {
+      "path": "experiments/results/predictions_test_2025.csv",
+      "role": "canonical evaluated cohort and outcome reference for 2025",
+      "sha256": "295dac3a1b056aa20b9320ff0844ec3cd6aca61fd602f195258a4bc7182cafb1",
+      "size_bytes": 46043
+    }
+  ],
+  "statistical_treatment": {
+    "alpha_two_sided": 0.05,
+    "bootstrap": "tickers resampled with replacement independently within each test year",
+    "bootstraps": 10000,
+    "permutation": "two-sided; realized outcomes shuffled independently within each test year",
+    "permutations": 10000,
+    "seed": 42
+  },
+  "status": "estimated",
+  "task": "R3-SERV-01"
+}

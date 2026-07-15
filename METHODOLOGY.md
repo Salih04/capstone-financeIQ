@@ -165,6 +165,38 @@ parameters, and the walk-forward experiment result remains weak/unstable
 (Spearman IC near zero, with no reliable predictive edge). The ranking is
 therefore research support only, not investment advice.
 
+### Serving-heuristic walk-forward evaluation (R3-SERV-01)
+
+`make research-serving-eval` now measures this exact service path without
+changing or copying it. For each canonical split, the harness restricts
+`train_parameters()` to the prior feature years, passes the exact 80-ticker
+eligible evaluation panel to the unchanged `run_forecast()` through an isolated
+`RESEARCH_REPO_ROOT`, and keeps realized test outcomes outside the service until
+scoring is complete. Missing features retain the service's omission and
+confidence behavior; rows without realized outcomes are excluded before the
+within-year percentiles are calculated. The evaluated target years are
+2023–2025, with 80 eligible tickers in each year from the retrospective internal
+training cohort.
+
+The user-facing serving heuristic's walk-forward IC is 0.050 (95% CI
+[-0.075,0.174], permutation p=0.4427); this is not distinguishable from the
+within-year null, and in either case does not establish investment value,
+implementability, or a reliable predictive edge. This is a **single
+prespecified test, outside the six-model Bonferroni family**: its permutation
+p-value is raw and is not family-corrected. The canonical six-model family
+remains separate, no model is added retrospectively, and the Model Confidence
+Contract conclusion does not change.
+
+Full split definitions, per-year counts and exploratory ICs, selected service
+parameters, source checksums, six-model family context, limitations, and the
+pending independent-review status are in
+`experiments/results_serving_eval/serving_eval_report.json` and
+`experiments/results_serving_eval/serving_eval_report.md`. Interpretation remains
+constrained by three low-power test years, a retrospectively fixed cohort with
+survivorship/universe-selection risk, null feature and outcome coverage, nominal
+TRY returns in one macro regime, and environment-qualified reproducibility.
+Research support only; not investment advice.
+
 ## Confidence calibration bench (R2-CAL-01)
 
 `make research-calibration` audits the user-facing hybrid research score's 0.20

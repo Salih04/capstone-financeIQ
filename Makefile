@@ -6,7 +6,7 @@
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration \
-	fetch-usdtry alternative-targets research-real-terms research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo claims-lint docs-lint
+	fetch-usdtry alternative-targets research-real-terms research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo research-serving-eval claims-lint docs-lint
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -251,6 +251,12 @@ research-rank-stability:
 # dir; deterministic reports stay governed while timing goes to ignored local runtime.
 research-placebo:
 	PYTHONPATH=. python experiments/placebo_lab.py
+
+# Evaluate the unchanged user-facing serving heuristic on the canonical
+# walk-forward panels. Uses an isolated RESEARCH_REPO_ROOT and writes only to
+# experiments/results_serving_eval/; canonical artifacts remain read-only.
+research-serving-eval:
+	PYTHONPATH=. python experiments/serving_eval.py
 
 # Split modeling_dataset_2020_2025.csv into training and public subsets.
 # Requires data/config/universe_*.csv to exist (created in data/config/).
