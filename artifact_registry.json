@@ -7,6 +7,7 @@
     "experiments/results",
     "experiments/results_disagreement",
     "experiments/results_influence",
+    "experiments/results_placebo",
     "experiments/results_rank_stability",
     "experiments/results_real_terms",
     "experiments/results_regime",
@@ -327,6 +328,26 @@
       ],
       "hand_edit_forbidden": true,
       "notes": "Written by experiments/influence_map.py (OBSERVATION_OUTPUT). Exact per-file registration avoids a broad glob."
+    },
+    {
+      "path_or_glob": "experiments/results_placebo/placebo_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make research-placebo",
+      "inputs": [
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/placebo_lab.py (JSON_OUTPUT). R3-NULL-01 negative control: features replaced with N(0,1) noise, scored through the six-model ML family + Bonferroni gate from experiments/significance.py. Embeds a source_artifacts checksum for the read-only structural-template dataset (features are discarded). Deterministic and byte-identical across seeded reruns."
+    },
+    {
+      "path_or_glob": "experiments/results_placebo/placebo_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make research-placebo",
+      "inputs": [
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/placebo_lab.py (MARKDOWN_OUTPUT). Human-readable companion to placebo_report.json; deterministic and byte-identical across seeded reruns."
     },
     {
       "path_or_glob": "experiments/results_rank_stability/rank_stability_report.json",

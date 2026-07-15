@@ -1,0 +1,801 @@
+{
+  "analysis_status": "complete",
+  "claim_safety": {
+    "alpha_captured": false,
+    "canonical_artifacts_modified": false,
+    "expected_outcome_is_nonrejection_at_rate_one_minus_alpha": true,
+    "market_edge_established": false,
+    "placebo_significance_is_a_signal": false,
+    "predictive_validity_established": false,
+    "profitable_strategy_established": false,
+    "rejecting_repetitions_hidden": false,
+    "reliable_predictive_edge_established": false,
+    "tests_the_evaluation_machinery_not_the_market": true
+  },
+  "claim_safety_sentence": "Placebo runs test the evaluation machinery, not the market; the expected outcome is failure to reject known-null inputs in approximately (1 − α) of repetitions, and any placebo ‘significance’ is a false positive at rate α or a numerical artifact — never a signal.",
+  "design": {
+    "base_noise_seed": 314159,
+    "bootstraps": 10000,
+    "family_wise_alpha": 0.05,
+    "family_wise_gate": "reject the family iff min_raw_permutation_p * family_size < 0.05 (Bonferroni)",
+    "feature_columns": [
+      "benchmark_same_year_return_pct",
+      "current_assets",
+      "current_ratio",
+      "ebitda",
+      "ebitda_growth_pct",
+      "ebitda_margin",
+      "enterprise_value",
+      "equity",
+      "ev_ebitda",
+      "financial_debt_ratio",
+      "gross_margin",
+      "gross_profit",
+      "gross_profit_growth_pct",
+      "leverage_ratio",
+      "long_term_liabilities",
+      "market_cap",
+      "net_debt",
+      "net_debt_to_ebitda",
+      "net_income",
+      "net_income_growth_pct",
+      "net_margin",
+      "non_current_assets",
+      "operating_income",
+      "operating_income_growth_pct",
+      "pb_ratio",
+      "pe_ratio",
+      "price_adjclose_t",
+      "price_data_available",
+      "price_drawdown_from_3y_high_pct",
+      "price_history_years_available",
+      "price_momentum_1y_pct",
+      "price_momentum_2y_pct",
+      "price_vs_bist100_1y_pct",
+      "revenue",
+      "revenue_growth_pct",
+      "roa",
+      "roe",
+      "short_term_liabilities",
+      "total_assets",
+      "working_capital"
+    ],
+    "feature_count": 40,
+    "feature_years": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "features_replaced": "all",
+    "model_definitions_identical_to_real_run": true,
+    "model_family": [
+      "linear_regression",
+      "ridge",
+      "lasso",
+      "elasticnet",
+      "random_forest",
+      "gradient_boosting"
+    ],
+    "model_family_choice": "Six-model ML family only -- identical to the real evaluation's Bonferroni selection family in experiments/significance.py. Baseline models and the analytic power analysis are outside the family-wise gate and are omitted to keep the 20x-harness runtime tractable, as the R3-NULL-01 packet permits.",
+    "model_family_size": 6,
+    "noise_distribution": "independent N(0,1) per (row, feature); a fresh (rows x features) draw per repetition",
+    "noise_independence": "varies across rows, features, years, and repetitions; never seeded per ticker",
+    "panel_rows": 321,
+    "permutations": 10000,
+    "question": "Does the committed significance rig fail to reject known-null (pure-noise) inputs in approximately (1 - alpha) of repetitions, with any rejection counted as a family-wise false positive?",
+    "repetitions": 25,
+    "significance_seed": 42,
+    "significance_settings_identical_to_real_run": true,
+    "splits": [
+      "test_2023",
+      "test_2024",
+      "test_2025"
+    ],
+    "splits_identical_to_real_run": true,
+    "target_years": [
+      2023,
+      2024,
+      2025
+    ],
+    "targets_identical_to_real_run": true
+  },
+  "findings": [
+    "The rejection count is the result: it is compared with the Binomial(R, alpha) expectation, and every repetition -- including any that rejected -- is retained in full.",
+    "A placebo repetition that rejects is a false positive of the rig at rate alpha or a numerical artifact, never evidence about any market or ticker.",
+    "Features are fully overwritten by independent N(0,1) noise; only the real tickers, feature-years, splits, and targets are kept so the machinery runs unchanged.",
+    "No canonical dataset, prediction dump, leaderboard, or significance artifact is modified; each repetition is scored in a private temporary directory."
+  ],
+  "generated_by": {
+    "determinism": "fixed base_seed + repetition index for feature noise; fixed significance seed for permutation/bootstrap resampling",
+    "deterministic_ordering": "repetitions in ascending rep_index; per-model maps sorted by model name",
+    "generator_command": "make research-placebo",
+    "isolation": "each repetition scores an in-memory noise panel written to a private tempfile.TemporaryDirectory; no canonical dataset, dump, leaderboard, or significance artifact is read for features or written to",
+    "module": "experiments/placebo_lab.py",
+    "pooled_ic_and_gate_source": "experiments.significance.analyze_model + build_report Bonferroni arithmetic (reused verbatim)",
+    "serialization": "sorted-key UTF-8 JSON, newline-terminated; Markdown newline-terminated"
+  },
+  "limitations": [
+    "This is a test of the evaluation rig on synthetic noise, not a market study; nothing here supports or refutes any claim about BIST equities.",
+    "The gate uses the six-model ML Bonferroni family and the committed permutation/bootstrap settings; it does not re-run the analytic power analysis or the baseline models.",
+    "Bonferroni control is conservative, so the empirical rejection rate is expected to sit at or below alpha rather than exactly at it.",
+    "R=25 is a low-resolution negative-control smoke test.",
+    "0/25 does not certify exact family-wise calibration at alpha=0.05.",
+    "It can expose gross anti-conservatism but cannot precisely estimate the Type-I error rate.",
+    "For 0/25, the exact two-sided 95% Clopper-Pearson binomial upper bound is approximately 0.137 (unrounded 0.1371851715) using the documented zero-event closed form.",
+    "Reproduction is numerical-environment-qualified; byte identity holds within a fixed Python and numerical-package environment.",
+    "The conclusion of the project is unchanged: no reliable predictive edge. Research support only; not investment advice."
+  ],
+  "repetitions": [
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "linear_regression",
+      "min_raw_p_value": 0.5833416658,
+      "pooled_ic_by_model": {
+        "elasticnet": 0.0333027269,
+        "gradient_boosting": -0.0190178982,
+        "lasso": 0.0347717722,
+        "linear_regression": 0.0357797627,
+        "random_forest": -0.0200419617,
+        "ridge": 0.0338497329
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.6096390361,
+        "gradient_boosting": 0.7687231277,
+        "lasso": 0.5928407159,
+        "linear_regression": 0.5833416658,
+        "random_forest": 0.7614238576,
+        "ridge": 0.604139586
+      },
+      "rep_index": 0,
+      "seed": 314159,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "linear_regression",
+      "min_raw_p_value": 0.6905309469,
+      "pooled_ic_by_model": {
+        "elasticnet": 0.0191986581,
+        "gradient_boosting": 0.0176514853,
+        "lasso": 0.0249418407,
+        "linear_regression": 0.0260045317,
+        "random_forest": -0.0221602447,
+        "ridge": 0.0237228765
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.7690230977,
+        "gradient_boosting": 0.7873212679,
+        "lasso": 0.703829617,
+        "linear_regression": 0.6905309469,
+        "random_forest": 0.7394260574,
+        "ridge": 0.7164283572
+      },
+      "rep_index": 1,
+      "seed": 314160,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "gradient_boosting",
+      "min_raw_p_value": 0.5829417058,
+      "pooled_ic_by_model": {
+        "elasticnet": 0.0239023541,
+        "gradient_boosting": 0.0358420405,
+        "lasso": 0.0220348486,
+        "linear_regression": 0.0211050127,
+        "random_forest": -0.0204172018,
+        "ridge": 0.0235585594
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.7169283072,
+        "gradient_boosting": 0.5829417058,
+        "lasso": 0.7350264974,
+        "linear_regression": 0.7450254975,
+        "random_forest": 0.7513248675,
+        "ridge": 0.7192280772
+      },
+      "rep_index": 2,
+      "seed": 314161,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "gradient_boosting",
+      "min_raw_p_value": 0.3512648735,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0447032171,
+        "gradient_boosting": 0.0610719905,
+        "lasso": -0.0427731812,
+        "linear_regression": -0.0437342835,
+        "random_forest": 0.0210502476,
+        "ridge": -0.0412885451
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.4910508949,
+        "gradient_boosting": 0.3512648735,
+        "lasso": 0.5087491251,
+        "linear_regression": 0.499550045,
+        "random_forest": 0.7467253275,
+        "ridge": 0.5246475352
+      },
+      "rep_index": 3,
+      "seed": 314162,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "gradient_boosting",
+      "min_raw_p_value": 0.5708429157,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0046163506,
+        "gradient_boosting": -0.0368265597,
+        "lasso": -0.0039443208,
+        "linear_regression": -0.0041943482,
+        "random_forest": 0.0135574366,
+        "ridge": -0.0047413138
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.9472052795,
+        "gradient_boosting": 0.5708429157,
+        "lasso": 0.9534046595,
+        "linear_regression": 0.9519048095,
+        "random_forest": 0.8291170883,
+        "ridge": 0.9463053695
+      },
+      "rep_index": 4,
+      "seed": 314163,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 0.6071392861,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "random_forest",
+      "min_raw_p_value": 0.101189881,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.063613032,
+        "gradient_boosting": -0.0304339859,
+        "lasso": -0.0618783814,
+        "linear_regression": -0.0604953445,
+        "random_forest": -0.1059845217,
+        "ridge": -0.0608469752
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.3341665833,
+        "gradient_boosting": 0.6342365763,
+        "lasso": 0.3472652735,
+        "linear_regression": 0.3574642536,
+        "random_forest": 0.101189881,
+        "ridge": 0.3550644936
+      },
+      "rep_index": 5,
+      "seed": 314164,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 0.8375162484,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "random_forest",
+      "min_raw_p_value": 0.1395860414,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0223395224,
+        "gradient_boosting": 0.0336695981,
+        "lasso": -0.0291453586,
+        "linear_regression": -0.029965824,
+        "random_forest": 0.0973834529,
+        "ridge": -0.0294735384
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.7353264674,
+        "gradient_boosting": 0.6064393561,
+        "lasso": 0.6545345465,
+        "linear_regression": 0.6463353665,
+        "random_forest": 0.1395860414,
+        "ridge": 0.6506349365
+      },
+      "rep_index": 6,
+      "seed": 314165,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "gradient_boosting",
+      "min_raw_p_value": 0.204379562,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0682771499,
+        "gradient_boosting": -0.0815675643,
+        "lasso": -0.0562828439,
+        "linear_regression": -0.0560093864,
+        "random_forest": 0.0135103412,
+        "ridge": -0.0558061958
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.295570443,
+        "gradient_boosting": 0.204379562,
+        "lasso": 0.3875612439,
+        "linear_regression": 0.3907609239,
+        "random_forest": 0.8392160784,
+        "ridge": 0.3906609339
+      },
+      "rep_index": 7,
+      "seed": 314166,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 0.7733226677,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "elasticnet",
+      "min_raw_p_value": 0.1288871113,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.097500984,
+        "gradient_boosting": 0.0217774644,
+        "lasso": -0.0939457536,
+        "linear_regression": -0.0947974305,
+        "random_forest": -0.0376778096,
+        "ridge": -0.0958991793
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.1288871113,
+        "gradient_boosting": 0.7317268273,
+        "lasso": 0.1444855514,
+        "linear_regression": 0.1403859614,
+        "random_forest": 0.5708429157,
+        "ridge": 0.1349865013
+      },
+      "rep_index": 8,
+      "seed": 314167,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 0.297570243,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "gradient_boosting",
+      "min_raw_p_value": 0.0495950405,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.064126916,
+        "gradient_boosting": -0.1272101741,
+        "lasso": -0.0640644359,
+        "linear_regression": -0.0639159603,
+        "random_forest": -0.0742471786,
+        "ridge": -0.064126961
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.3245675432,
+        "gradient_boosting": 0.0495950405,
+        "lasso": 0.3215678432,
+        "linear_regression": 0.3226677332,
+        "random_forest": 0.2634736526,
+        "ridge": 0.3205679432
+      },
+      "rep_index": 9,
+      "seed": 314168,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "gradient_boosting",
+      "min_raw_p_value": 0.3705629437,
+      "pooled_ic_by_model": {
+        "elasticnet": 0.0045706421,
+        "gradient_boosting": 0.0586961365,
+        "lasso": 0.0009371921,
+        "linear_regression": 0.0018514071,
+        "random_forest": -0.0228554144,
+        "ridge": 0.0020779946
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.9441055894,
+        "gradient_boosting": 0.3705629437,
+        "lasso": 0.9882011799,
+        "linear_regression": 0.9775022498,
+        "random_forest": 0.7214278572,
+        "ridge": 0.9767023298
+      },
+      "rep_index": 10,
+      "seed": 314169,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "linear_regression",
+      "min_raw_p_value": 0.3472652735,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0530637922,
+        "gradient_boosting": -0.0142983872,
+        "lasso": -0.0596430405,
+        "linear_regression": -0.0598930825,
+        "random_forest": -0.0245811985,
+        "ridge": -0.0580646361
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.403259674,
+        "gradient_boosting": 0.8282171783,
+        "lasso": 0.3488651135,
+        "linear_regression": 0.3472652735,
+        "random_forest": 0.7096290371,
+        "ridge": 0.3636636336
+      },
+      "rep_index": 11,
+      "seed": 314170,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "random_forest",
+      "min_raw_p_value": 0.2067793221,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0327953781,
+        "gradient_boosting": -0.0250451742,
+        "lasso": -0.0301230167,
+        "linear_regression": -0.0292166298,
+        "random_forest": -0.0810615466,
+        "ridge": -0.0322093155
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.6128387161,
+        "gradient_boosting": 0.701729827,
+        "lasso": 0.6425357464,
+        "linear_regression": 0.6524347565,
+        "random_forest": 0.2067793221,
+        "ridge": 0.6192380762
+      },
+      "rep_index": 12,
+      "seed": 314171,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 0.9251074893,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "gradient_boosting",
+      "min_raw_p_value": 0.1541845815,
+      "pooled_ic_by_model": {
+        "elasticnet": 0.00961122,
+        "gradient_boosting": 0.09264006,
+        "lasso": 0.0146121138,
+        "linear_regression": 0.0114709746,
+        "random_forest": 0.0297544001,
+        "ridge": 0.0119163711
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.8839116088,
+        "gradient_boosting": 0.1541845815,
+        "lasso": 0.8184181582,
+        "linear_regression": 0.8571142886,
+        "random_forest": 0.6485351465,
+        "ridge": 0.8530146985
+      },
+      "rep_index": 13,
+      "seed": 314172,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "elasticnet",
+      "min_raw_p_value": 0.2255774423,
+      "pooled_ic_by_model": {
+        "elasticnet": 0.0778881421,
+        "gradient_boosting": -0.0590410248,
+        "lasso": 0.0734342611,
+        "linear_regression": 0.0717933743,
+        "random_forest": 0.0098535563,
+        "ridge": 0.0737937192
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.2255774423,
+        "gradient_boosting": 0.3592640736,
+        "lasso": 0.2558744126,
+        "linear_regression": 0.2639736026,
+        "random_forest": 0.8805119488,
+        "ridge": 0.2529747025
+      },
+      "rep_index": 14,
+      "seed": 314173,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "gradient_boosting",
+      "min_raw_p_value": 0.303269673,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0201117116,
+        "gradient_boosting": 0.0674485734,
+        "lasso": -0.0135245793,
+        "linear_regression": -0.0122821955,
+        "random_forest": 0.0149873948,
+        "ridge": -0.0141575186
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.7579242076,
+        "gradient_boosting": 0.303269673,
+        "lasso": 0.8344165583,
+        "linear_regression": 0.8515148485,
+        "random_forest": 0.8188181182,
+        "ridge": 0.8283171683
+      },
+      "rep_index": 15,
+      "seed": 314174,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 0.3689631037,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "gradient_boosting",
+      "min_raw_p_value": 0.0614938506,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0985929696,
+        "gradient_boosting": -0.1199258292,
+        "lasso": -0.0944828492,
+        "linear_regression": -0.0974676888,
+        "random_forest": -0.0762932747,
+        "ridge": -0.099366492
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.1228877112,
+        "gradient_boosting": 0.0614938506,
+        "lasso": 0.1404859514,
+        "linear_regression": 0.1276872313,
+        "random_forest": 0.2383761624,
+        "ridge": 0.1201879812
+      },
+      "rep_index": 16,
+      "seed": 314175,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "gradient_boosting",
+      "min_raw_p_value": 0.4612538746,
+      "pooled_ic_by_model": {
+        "elasticnet": 0.0288396637,
+        "gradient_boosting": -0.0473835983,
+        "lasso": 0.0259407604,
+        "linear_regression": 0.0262064224,
+        "random_forest": -0.0231282726,
+        "ridge": 0.0279879714
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.6537346265,
+        "gradient_boosting": 0.4612538746,
+        "lasso": 0.6879312069,
+        "linear_regression": 0.6848315168,
+        "random_forest": 0.7250274973,
+        "ridge": 0.6634336566
+      },
+      "rep_index": 17,
+      "seed": 314176,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "random_forest",
+      "min_raw_p_value": 0.2880711929,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0266992826,
+        "gradient_boosting": -0.006625736,
+        "lasso": -0.022972155,
+        "linear_regression": -0.022558017,
+        "random_forest": 0.0700129066,
+        "ridge": -0.0232690723
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.6776322368,
+        "gradient_boosting": 0.9166083392,
+        "lasso": 0.7239276072,
+        "linear_regression": 0.7298270173,
+        "random_forest": 0.2880711929,
+        "ridge": 0.7209279072
+      },
+      "rep_index": 18,
+      "seed": 314177,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 0.6347365263,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "random_forest",
+      "min_raw_p_value": 0.1057894211,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0458276319,
+        "gradient_boosting": 0.0757217235,
+        "lasso": -0.0448822002,
+        "linear_regression": -0.044804069,
+        "random_forest": 0.1047351121,
+        "ridge": -0.0441789567
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.4802519748,
+        "gradient_boosting": 0.2443755624,
+        "lasso": 0.4896510349,
+        "linear_regression": 0.4907509249,
+        "random_forest": 0.1057894211,
+        "ridge": 0.496950305
+      },
+      "rep_index": 19,
+      "seed": 314178,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 1.0,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "random_forest",
+      "min_raw_p_value": 0.5616438356,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0315983277,
+        "gradient_boosting": 0.024582433,
+        "lasso": -0.0369039305,
+        "linear_regression": -0.0356615425,
+        "random_forest": -0.0364978159,
+        "ridge": -0.0364663539
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.6246375362,
+        "gradient_boosting": 0.701129887,
+        "lasso": 0.5687431257,
+        "linear_regression": 0.5809419058,
+        "random_forest": 0.5616438356,
+        "ridge": 0.5719428057
+      },
+      "rep_index": 20,
+      "seed": 314179,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 0.7133286671,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "random_forest",
+      "min_raw_p_value": 0.1188881112,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0452032652,
+        "gradient_boosting": 0.0220031424,
+        "lasso": -0.0531422339,
+        "linear_regression": -0.056470966,
+        "random_forest": 0.1004540439,
+        "ridge": -0.0505480289
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.4738526147,
+        "gradient_boosting": 0.7342265773,
+        "lasso": 0.398860114,
+        "linear_regression": 0.3728627137,
+        "random_forest": 0.1188881112,
+        "ridge": 0.4207579242
+      },
+      "rep_index": 21,
+      "seed": 314180,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 0.3467653235,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "random_forest",
+      "min_raw_p_value": 0.0577942206,
+      "pooled_ic_by_model": {
+        "elasticnet": 0.0548071697,
+        "gradient_boosting": -0.0609092334,
+        "lasso": 0.0471340095,
+        "linear_regression": 0.0458681665,
+        "random_forest": -0.1236687981,
+        "ridge": 0.0481419899
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.395360464,
+        "gradient_boosting": 0.3455654435,
+        "lasso": 0.4675532447,
+        "linear_regression": 0.4796520348,
+        "random_forest": 0.0577942206,
+        "ridge": 0.4569543046
+      },
+      "rep_index": 22,
+      "seed": 314181,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 0.9443055694,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "elasticnet",
+      "min_raw_p_value": 0.1573842616,
+      "pooled_ic_by_model": {
+        "elasticnet": -0.0920858366,
+        "gradient_boosting": -0.0157048883,
+        "lasso": -0.0903354937,
+        "linear_regression": -0.0908590221,
+        "random_forest": 0.0023996628,
+        "ridge": -0.0909840402
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.1573842616,
+        "gradient_boosting": 0.8104189581,
+        "lasso": 0.1640835916,
+        "linear_regression": 0.1621837816,
+        "random_forest": 0.9724027597,
+        "ridge": 0.1605839416
+      },
+      "rep_index": 23,
+      "seed": 314182,
+      "status": "complete"
+    },
+    {
+      "bonferroni_adjusted_min_p": 0.1151884812,
+      "family_wise_rejected": false,
+      "min_raw_p_model": "gradient_boosting",
+      "min_raw_p_value": 0.0191980802,
+      "pooled_ic_by_model": {
+        "elasticnet": 0.0107125844,
+        "gradient_boosting": 0.1512355114,
+        "lasso": 0.0134630841,
+        "linear_regression": 0.0130723851,
+        "random_forest": 0.1094078218,
+        "ridge": 0.0131270918
+      },
+      "raw_p_by_model": {
+        "elasticnet": 0.8719128087,
+        "gradient_boosting": 0.0191980802,
+        "lasso": 0.8365163484,
+        "linear_regression": 0.8415158484,
+        "random_forest": 0.097190281,
+        "ridge": 0.8413158684
+      },
+      "rep_index": 24,
+      "seed": 314183,
+      "status": "complete"
+    }
+  ],
+  "schema_version": "1.1.0",
+  "source_artifacts": [
+    {
+      "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "role": "read-only structural template (tickers, years, targets); features are discarded and replaced by noise",
+      "rows": 403,
+      "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+    }
+  ],
+  "summary": {
+    "binomial_reference": {
+      "alpha": 0.05,
+      "exact_interval_method": "For 0/n events, solve (1 - p_upper)^n = (1 - confidence)/2, so p_upper = 1 - ((1 - confidence)/2)^(1/n).",
+      "exact_two_sided_clopper_pearson_upper_bound": 0.1371851715,
+      "exact_two_sided_confidence_level": 0.95,
+      "expected_rejections": 1.25,
+      "note": "Bonferroni control makes alpha*n an upper reference; observed at or below it is the expected, on-spec outcome and is not evidence of skill.",
+      "observed_rate": 0.0,
+      "observed_rejections": 0,
+      "p_value_lower_tail_le_observed": 0.2773895731,
+      "p_value_upper_tail_ge_observed": 1.0,
+      "pmf_at_observed": 0.2773895731,
+      "repetitions_scored": 25
+    },
+    "failed_rep_indices": [],
+    "family_wise_rejection_count": 0,
+    "family_wise_rejection_rate": 0.0,
+    "min_raw_p_value_distribution": {
+      "count": 25,
+      "max": 0.6905309469,
+      "mean": 0.2736686331,
+      "min": 0.0191980802
+    },
+    "pooled_ic_distribution": {
+      "count": 150,
+      "max": 0.1512355114,
+      "mean": -0.0149645295,
+      "min": -0.1272101741
+    },
+    "repetitions_completed": 25,
+    "repetitions_failed": 0,
+    "repetitions_total": 25
+  },
+  "task": "R3-NULL-01"
+}

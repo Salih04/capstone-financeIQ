@@ -6,7 +6,7 @@
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration \
-	fetch-usdtry alternative-targets research-real-terms research-regime research-friction research-disagreement research-influence research-rank-stability claims-lint docs-lint
+	fetch-usdtry alternative-targets research-real-terms research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo claims-lint docs-lint
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -244,6 +244,13 @@ research-influence:
 # pooled-IC definition and never retrains, reranks, or produces new p-values.
 research-rank-stability:
 	PYTHONPATH=. python experiments/rank_stability.py
+
+# Negative-control / placebo laboratory. Seeded repetitions replace every feature
+# with independent N(0,1) noise and drive the SAME six-model ML family + permutation
+# Bonferroni gate from significance.py. Each repetition is scored in a private temp
+# dir; deterministic reports stay governed while timing goes to ignored local runtime.
+research-placebo:
+	PYTHONPATH=. python experiments/placebo_lab.py
 
 # Split modeling_dataset_2020_2025.csv into training and public subsets.
 # Requires data/config/universe_*.csv to exist (created in data/config/).

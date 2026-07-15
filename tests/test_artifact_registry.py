@@ -22,10 +22,13 @@ from pathlib import Path
 
 import pytest
 
+from experiments import placebo_lab as pl
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = REPO_ROOT / "artifact_registry.json"
 MAKEFILE_PATH = REPO_ROOT / "Makefile"
+GITIGNORE_PATH = REPO_ROOT / ".gitignore"
 
 RUNS_MARKER = "/runs/"
 REQUIRED_ENTRY_FIELDS = {
@@ -256,6 +259,67 @@ def test_registry_wording_stays_ownership_neutral():
     blob = json.dumps(registry).lower()
     hits = [phrase for phrase in FORBIDDEN_CERTIFYING_PHRASES if phrase in blob]
     assert hits == [], f"registry contains non-neutral certifying language: {hits}"
+
+
+def test_placebo_results_contain_only_governed_deterministic_reports():
+    registry = load_registry()
+    placebo_root = REPO_ROOT / "experiments" / "results_placebo"
+    expected = {
+        "experiments/results_placebo/placebo_report.json",
+        "experiments/results_placebo/placebo_report.md",
+    }
+    actual = {
+        str(path.relative_to(REPO_ROOT)) for path in placebo_root.iterdir() if path.is_file()
+    }
+    placebo_entries = {
+        entry["path_or_glob"]
+        for entry in registry["entries"]
+        if entry["path_or_glob"].startswith("experiments/results_placebo/")
+    }
+    assert actual == expected
+    assert placebo_entries == expected
+    assert not any(
+        "placebo_runtime.json" in entry["path_or_glob"]
+        for entry in registry["entries"]
+    )
+
+
+def test_placebo_runtime_is_ignored_local_output_outside_governed_roots():
+    registry = load_registry()
+    runtime_rel = pl.RUNTIME_OUTPUT.relative_to(REPO_ROOT).as_posix()
+    assert runtime_rel == "experiments/runtime/placebo_runtime.json"
+    assert not any(
+        runtime_rel == root or runtime_rel.startswith(f"{root}/")
+        for root in registry["governed_roots"]
+    )
+    assert "experiments/runtime/" in GITIGNORE_PATH.read_text(
+        encoding="utf-8"
+    ).splitlines()
+
+
+def test_placebo_scientific_reports_do_not_depend_on_runtime_checksums():
+    registry = load_registry()
+    report_entries = [
+        entry
+        for entry in registry["entries"]
+        if entry["path_or_glob"]
+        in {
+            "experiments/results_placebo/placebo_report.json",
+            "experiments/results_placebo/placebo_report.md",
+        }
+    ]
+    assert len(report_entries) == 2
+    assert all("runtime" not in json.dumps(entry).lower() for entry in report_entries)
+
+    report = json.loads(
+        (REPO_ROOT / "experiments/results_placebo/placebo_report.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert all(
+        "runtime" not in json.dumps(source).lower()
+        for source in report.get("source_artifacts", [])
+    )
 
 
 # --------------------------------------------------------------------------- #
