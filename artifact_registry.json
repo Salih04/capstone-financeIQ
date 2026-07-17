@@ -12,6 +12,7 @@
     "experiments/results_real_terms",
     "experiments/results_regime",
     "experiments/results_serving_eval",
+    "experiments/results_forward_2026",
     "data/trusted_clean"
   ],
   "coverage_rule": "Every file under a governed root, excluding experiments/results/runs/**, must be matched by exactly one entry below. An unmatched file (orphan) or a file matched by more than one entry (duplicate ownership) is a governance failure enforced by tests/test_artifact_registry.py.",
@@ -452,6 +453,34 @@
       ],
       "hand_edit_forbidden": true,
       "notes": "Written by experiments/serving_eval.py (render_markdown) as the human-readable companion to serving_eval_report.json."
+    },
+    {
+      "path_or_glob": "experiments/results_forward_2026/forward_ranking_2026.csv",
+      "artifact_class": "generated",
+      "generator_command": "make freeze-forward-2026",
+      "inputs": [
+        "backend/app/services/forecasting_csv_service.py",
+        "experiments/freeze_forward_ranking.py",
+        "data/trusted_clean/modeling_dataset_public_2020_2025.csv",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "data/trusted_clean/modeling_dataset_2020_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Immutable pre-registered 2026 forward ranking (R3-PREREG-01). Written once by experiments/freeze_forward_ranking.py after invoking the unchanged forecasting_csv_service.inference_forecast(input_year=2025) through an isolated RESEARCH_REPO_ROOT. Identical reruns are write-free; any Git, service, data, universe, ranking, CSV, manifest, or manual-artifact drift refuses before canonical writes. A future amendment requires a separately reviewed protocol amendment before outcomes are inspected; no amendment workflow exists here. Not a prediction, recommendation, or evidence of a reliable predictive edge."
+    },
+    {
+      "path_or_glob": "experiments/results_forward_2026/freeze_manifest.json",
+      "artifact_class": "generated",
+      "generator_command": "make freeze-forward-2026",
+      "inputs": [
+        "experiments/results_forward_2026/forward_ranking_2026.csv",
+        "backend/app/services/forecasting_csv_service.py",
+        "data/trusted_clean/modeling_dataset_public_2020_2025.csv",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "data/trusted_clean/modeling_dataset_2020_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Deterministic freeze-once manifest for the pre-registered 2026 ranking. Records the frozen ranking checksum, original parent/pre-freeze git SHA, service-function identity, and input checksums; its source_artifacts list (including the frozen ranking itself) is re-verified by the staleness test. Identical reruns leave it untouched and drift refuses without replacement."
     },
     {
       "path_or_glob": "experiments/results_real_terms/**",

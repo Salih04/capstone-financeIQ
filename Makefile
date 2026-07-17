@@ -6,7 +6,8 @@
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration \
-	fetch-usdtry alternative-targets research-real-terms research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo research-serving-eval claims-lint docs-lint
+	fetch-usdtry alternative-targets research-real-terms research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo research-serving-eval \
+	freeze-forward-2026 evaluate-forward-2026 claims-lint docs-lint
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -257,6 +258,20 @@ research-placebo:
 # experiments/results_serving_eval/; canonical artifacts remain read-only.
 research-serving-eval:
 	PYTHONPATH=. python experiments/serving_eval.py
+
+# Freeze the 2026 forward ranking for pre-registered evaluation (R3-PREREG-01).
+# Replays the unchanged production inference path offline and writes an immutable
+# ranking + deterministic manifest to experiments/results_forward_2026/ once.
+# An identical rerun is write-free; any Git/service/data/ranking/artifact drift
+# refuses non-zero without replacing the frozen pair.
+freeze-forward-2026:
+	PYTHONPATH=. python experiments/freeze_forward_ranking.py
+
+# Inert evaluator for the pre-registered 2026 protocol (R3-PREREG-01). Until real
+# 2026 outcomes are sourced it returns the structured `outcome_data_absent` state
+# and computes no IC or p-value. See docs/PREREGISTERED_2026_EVALUATION.md.
+evaluate-forward-2026:
+	PYTHONPATH=. python experiments/evaluate_preregistered_2026.py
 
 # Split modeling_dataset_2020_2025.csv into training and public subsets.
 # Requires data/config/universe_*.csv to exist (created in data/config/).

@@ -452,6 +452,21 @@ Endpoint: `GET /forecasting/inference?year=2025` (public). Each row carries
 `realized_return_available=false`. This is the main forward output and is kept
 separate from the experimental partial-target mode below.
 
+### Pre-registered 2026 evaluation (R3-PREREG-01)
+
+Before any 2026 outcomes exist, this forward ranking is frozen verbatim (via the
+unchanged inference path) and its single evaluation is pre-registered in
+`docs/PREREGISTERED_2026_EVALUATION.md`: one Spearman rank IC against realized
+2026 returns with a within-year seeded permutation p-value, plus a pre-written
+interpretation for every result cell. The pre-registered test is nearly powerless
+by design: the minimum usable cohort is 30, and the pre-frozen n=30–40 Fisher-z
+table ranges from detectable \|IC\| 0.492 to 0.431 at 80% power. The n-specific
+value is descriptive context, never a second test or validation threshold. The
+outcome is the nominal-TRY Yahoo adjusted-close calendar-year return, independently
+recomputed from retained year-end snapshots. Freeze reruns are write-free when
+identical and refuse any Git/service/data/ranking drift. Reproducibility remains
+environment-qualified; no result changes a product or MCC claim automatically.
+
 ## Experimental: 2025 partial 2026-YTD target mode (opt-in)
 
 The headline methodology is **finalized annual T+1 only** (2020–2024 training). It
