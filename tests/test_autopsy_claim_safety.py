@@ -59,5 +59,5 @@ def test_autopsy_sources_and_contract_registration_are_explicit():
     ):
         assert source in page
 
-    assert contract["version"] == "1.7.0"
+    assert contract["version"] == "1.8.0"
     assert "frontend/src/pages/AutopsyPage.jsx" in contract["required_disclaimer"]["pages"]

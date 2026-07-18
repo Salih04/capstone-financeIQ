@@ -19,6 +19,7 @@ from app.services.research import (
     feature_passports,
     feature_registry,
     profit,
+    real_terms,
     regime,
     scoring,
     significance,
@@ -122,6 +123,15 @@ def regime_context(_: User | None = Depends(require_access)):
     try:
         return regime.payload()
     except regime.RegimeContextReportMissing as exc:
+        raise HTTPException(503, str(exc))
+
+
+@router.get("/return-basis")
+def return_basis(_: User | None = Depends(require_access)):
+    """Serve committed per-basis significance evidence; never recompute returns or p-values."""
+    try:
+        return real_terms.payload()
+    except real_terms.ReturnBasisReportMissing as exc:
         raise HTTPException(503, str(exc))
 
 

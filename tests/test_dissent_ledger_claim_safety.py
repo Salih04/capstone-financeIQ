@@ -26,7 +26,7 @@ def test_both_existing_labs_render_the_same_pinned_boundary():
 def test_contract_registers_the_dissent_boundary_and_response_service():
     contract = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
 
-    assert contract["version"] == "1.7.0"
+    assert contract["version"] == "1.8.0"
     assert contract["approved_wording"]["dissent_ledger_boundary"] == BOUNDARY
     assert "backend/app/services/analyst_verdict_service.py" in contract["scan"]["backend_response_files"]
     assert contract["evidence_state"]["reliable_predictive_edge_observed"] is False

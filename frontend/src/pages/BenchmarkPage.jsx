@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useCachedResource, CACHE_TTL } from '../api/useCachedResource'
+import researchApi from '../api/researchApi'
 import CacheTag from '../components/CacheTag'
 import RegimeStrip from '../components/RegimeStrip'
 
@@ -190,11 +191,130 @@ export default function BenchmarkPage() {
 
       <RegimeStrip years={rows.map((row) => row.year)} />
 
+      <ReturnBasisLens />
+
       <footer className="td-caveat">
         <span className="td-caveat-pulse" aria-hidden="true" />
         Model above BIST100 in {beat}/5 years · Walk-forward IC ≈ 0 — gap not attributable to ranking skill · Research only · Not investment advice
       </footer>
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Return-basis lens — DISPLAY ONLY. Renders the committed per-basis significance
+// evidence (nominal / CPI-deflated real TRY / USD) exactly as the backend
+// composes it. No basis toggles the chart; nothing is recomputed client-side.
+// Raw and adjusted p-values always render together, and raw p is never shown
+// without its family-wise-adjusted partner. Negative ICs are styled neutrally.
+// ---------------------------------------------------------------------------
+const fmtIcVal = (v) =>
+  typeof v === 'number' ? `${v < 0 ? '−' : ''}${Math.abs(v).toFixed(3)}` : '—'
+const fmtPVal = (v) => (typeof v === 'number' ? v.toFixed(4) : '—')
+const fmtIllus = (v) => (typeof v === 'number' ? `${v.toFixed(2)}%` : '—')
+
+function ReturnBasisLens() {
+  const [state, setState] = useState({ data: null, error: null, loading: true })
+
+  useEffect(() => {
+    let live = true
+    // Fetched through researchApi.js; the chart above is untouched by this call.
+    researchApi.returnBasis().then(({ data, error }) => {
+      if (live) setState({ data, error, loading: false })
+    })
+    return () => { live = false }
+  }, [])
+
+  const { data, error, loading } = state
+  const illus = data?.illustration_2022
+
+  return (
+    <section className="rb" aria-labelledby="rb-title">
+      <div className="rb-head">
+        <div className="rb-kicker">RETURN-BASIS LENS · NOMINAL · REAL TRY · USD</div>
+        <h2 id="rb-title" className="rb-title">One conclusion, three units of measurement.</h2>
+      </div>
+
+      {/* Mandatory caveat — always visible, never collapsed into a tooltip/accordion. */}
+      <p className="rb-caveat">
+        {data?.caveat ||
+          'The no-reliable-edge conclusion was re-evaluated separately on CPI-deflated TRY and USD bases; neither survives family-wise correction. Basis changes the unit of measurement, not the conclusion.'}
+      </p>
+
+      {loading && <div className="rb-state">Loading committed return-basis evidence…</div>}
+      {!loading && error && (
+        <div className="rb-state rb-state-muted">
+          Return-basis evidence unavailable — {error}
+        </div>
+      )}
+
+      {!loading && !error && data && (
+        <>
+          <div className="rb-grid">
+            {data.bases.map((b) => {
+              // Structural guard: never render raw p without its adjusted partner.
+              const paired =
+                typeof b.raw_p_value === 'number' && typeof b.adjusted_p_value === 'number'
+              return (
+                <article key={b.basis_id} className="rb-card">
+                  <div className="rb-card-basis">{b.label}</div>
+                  <div className="rb-card-model">
+                    FAMILY-SELECTED MODEL · {String(b.selected_model || '—').replace(/_/g, ' ')}
+                  </div>
+                  <div className="rb-row">
+                    <span className="rb-row-k">POOLED IC</span>
+                    <span className="rb-row-v">{fmtIcVal(b.pooled_ic)}</span>
+                  </div>
+                  {paired ? (
+                    <div className="rb-prow">
+                      <span className="rb-p">
+                        <span className="rb-p-k">RAW p</span>
+                        <span className="rb-p-v">{fmtPVal(b.raw_p_value)}</span>
+                      </span>
+                      <span className="rb-p">
+                        <span className="rb-p-k">ADJUSTED p{b.correction_method ? ` · ${b.correction_method.toUpperCase()}` : ''}</span>
+                        <span className="rb-p-v">{fmtPVal(b.adjusted_p_value)}</span>
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="rb-prow rb-pmissing">
+                      Paired raw/adjusted p-values unavailable — omitted.
+                    </div>
+                  )}
+                  <div className="rb-survival">
+                    {b.significant_fwer_0_05 === false
+                      ? `Does not survive family-wise correction${
+                          typeof b.family_wise_alpha === 'number' ? ` (α=${b.family_wise_alpha})` : ''
+                        }.`
+                      : b.significance_statement}
+                  </div>
+                  <div className="rb-src">source: {b.source_artifact}</div>
+                </article>
+              )
+            })}
+          </div>
+
+          {illus && (
+            <div className="rb-illus">
+              <div className="rb-illus-title">2022 BIST100 · nominal vs. CPI-deflated real TRY</div>
+              <div className="rb-illus-nums">
+                <span className="rb-illus-num">
+                  <span className="rb-illus-k">NOMINAL TRY</span>
+                  <span className="rb-illus-v">{fmtIllus(illus.nominal_return_pct)}</span>
+                </span>
+                <span className="rb-illus-num">
+                  <span className="rb-illus-k">CPI-DEFLATED REAL TRY</span>
+                  <span className="rb-illus-v">{fmtIllus(illus.real_return_pct)}</span>
+                </span>
+              </div>
+              {/* Qualifier rendered immediately adjacent to the numbers, verbatim. */}
+              <p className="rb-illus-note">{illus.qualifier}</p>
+              <div className="rb-src">source: {illus.source_artifact} · cross-ref: {illus.cross_reference_artifact}</div>
+            </div>
+          )}
+        </>
+      )}
+    </section>
   )
 }
 
@@ -271,4 +391,43 @@ const CSS = `
 @media (prefers-reduced-motion: reduce) {
   .td, .td *, .td *::before, .td *::after { animation: none !important; transition: none !important; }
 }
+
+/* Return-basis lens — neutral display panel; no success color, arrows, or good/bad cues. */
+.td .rb { margin-top: 28px; border: 1px solid rgba(200,211,202,0.16); border-radius: 3px;
+  background: rgba(11,16,15,0.55); padding: 20px clamp(16px, 2.2vw, 26px); }
+.td .rb-head { margin-bottom: 12px; }
+.td .rb-kicker { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.3em; color: var(--td-faint); margin-bottom: 9px; }
+.td .rb-title { margin: 0; font-size: clamp(18px, 2vw, 24px); font-weight: 620; letter-spacing: -0.01em; color: var(--td-paper); }
+.td .rb-caveat { margin: 0 0 18px; max-width: 92ch; font-size: 13px; line-height: 1.6; color: var(--td-dim);
+  border-left: 2px solid rgba(200,163,90,0.5); padding: 8px 0 8px 14px; }
+.td .rb-state { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--td-dim); padding: 10px 0; }
+.td .rb-state-muted { color: #a8674b; }
+
+.td .rb-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+@media (max-width: 900px) { .td .rb-grid { grid-template-columns: 1fr; } }
+.td .rb-card { border: 1px solid rgba(200,211,202,0.14); border-radius: 3px; background: rgba(14,20,19,0.6); padding: 14px 16px; }
+.td .rb-card-basis { font-size: 14px; font-weight: 600; color: var(--td-paper); margin-bottom: 4px; }
+.td .rb-card-model { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; color: var(--td-faint);
+  text-transform: uppercase; margin-bottom: 12px; }
+.td .rb-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+  border-top: 1px dashed rgba(200,211,202,0.14); padding: 9px 0; }
+.td .rb-row-k { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; color: var(--td-dim); }
+.td .rb-row-v { font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--td-paper); }
+/* raw and adjusted p share one row so they read as an inseparable pair */
+.td .rb-prow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-top: 1px dashed rgba(200,211,202,0.14); padding: 10px 0; }
+.td .rb-p { display: flex; flex-direction: column; gap: 3px; }
+.td .rb-p-k { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.12em; color: var(--td-faint); }
+.td .rb-p-v { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--td-paper); }
+.td .rb-pmissing { display: block; font-family: var(--font-mono); font-size: 10px; color: #a8674b; }
+.td .rb-survival { font-size: 11.5px; line-height: 1.5; color: var(--td-dim); border-top: 1px dashed rgba(200,211,202,0.14); padding-top: 10px; margin-top: 2px; }
+.td .rb-src { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.05em; color: var(--td-faint); margin-top: 10px; word-break: break-all; }
+
+.td .rb-illus { margin-top: 16px; border: 1px solid rgba(200,211,202,0.14); border-radius: 3px;
+  background: rgba(10,14,13,0.5); padding: 14px 16px; }
+.td .rb-illus-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; color: var(--td-dim); text-transform: uppercase; margin-bottom: 12px; }
+.td .rb-illus-nums { display: flex; flex-wrap: wrap; gap: 28px; }
+.td .rb-illus-num { display: flex; flex-direction: column; gap: 4px; }
+.td .rb-illus-k { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; color: var(--td-faint); }
+.td .rb-illus-v { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--td-paper); }
+.td .rb-illus-note { margin: 12px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--td-dim); max-width: 80ch; }
 `

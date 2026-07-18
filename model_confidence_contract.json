@@ -1,7 +1,7 @@
 {
   "contract_name": "FinanceIQ Model Confidence Contract",
-  "version": "1.7.0",
-  "effective_date": "2026-07-13",
+  "version": "1.8.0",
+  "effective_date": "2026-07-18",
   "authority": "FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md",
   "versioning_procedure": {
     "minor_bump": "Any change to rules, scan coverage, required_disclaimer.pages, route aliases, exemptions, or evidence_state requires a minor version bump and an effective_date update.",
@@ -92,6 +92,7 @@
       "backend/app/services/courtroom_service.py",
       "backend/app/services/research/significance.py",
       "backend/app/services/research/regime.py",
+      "backend/app/services/research/real_terms.py",
       "backend/app/services/analyst_verdict_service.py"
     ],
     "allowlist": [
