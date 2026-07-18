@@ -53,6 +53,12 @@ PATH_VALUE_EXCLUSIONS = {
     "data/trusted_raw/bist100_daily.csv": "documented optional input example",
     "backend/backend/Dockerfile": "documented invalid Render configuration example",
     "experiments/results|reports/": "compact shorthand for two existing directories",
+    "backend/experiments/": "documented untracked local directory with no repository role",
+    "frontend/dist": "gitignored Vite build output cited by deployment documentation",
+    "data/trusted_raw/prices/yahoo_chart_raw/SMRTG.IS_2022.json": "dated investigation observed local files that were never committed",
+    "data/trusted_raw/prices/yahoo_chart_raw/SMRTG.IS_2023.json": "dated investigation observed local files that were never committed",
+    "data/trusted_raw/prices/yahoo_chart_raw/SMRTG.IS_2024.json": "dated investigation observed local files that were never committed",
+    "data/trusted_raw/prices/yahoo_chart_raw/SMRTG.IS_2025.json": "dated investigation observed local files that were never committed",
 }
 PLANNED_PATH_EXCLUSIONS = {
     "backend/app/services/research/calibration.py": "future task output in the queue",

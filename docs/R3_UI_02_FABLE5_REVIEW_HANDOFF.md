@@ -1,6 +1,6 @@
 # R3-UI-02 — Return-basis lens · Independent Fable 5 copy-review handoff
 
-**Status: PENDING INDEPENDENT FABLE 5 COPY REVIEW.** Not merge-ready. No commit or push has occurred.
+Status: **APPROVED — independent Fable 5 copy review completed 2026-07-18 (recorded under Reviewer decision). Originally PENDING; committed at 18514ac5.**
 
 - **Task:** R3-UI-02 — Return-basis lens (nominal / real-TRY / USD display).
 - **Worktree / branch:** `return-basis-lens-ui-f7c7bf` / `local/return-basis-lens-ui-f7c7bf`.
@@ -110,5 +110,4 @@ are unrounded in the payload; only the panel rounds for display.
 
 ## Reviewer decision
 
-Record APPROVED / CHANGES-REQUESTED here. The owner commits only after approval; this
-task must not be marked merge-ready until then.
+**APPROVED (2026-07-18).** Independent Fable 5 copy review performed outside the repository record and verified against committed HEAD 18514ac51f7e7912caf5a04b3b6526e77ce53f98 by the REV-01 governance session: exact worktree/branch/base verification; byte-exact verification of both mandatory sentences; number-by-number extraction from all source artifacts (all nine per-basis values and the 185.94% / 74.07% / 64.27% illustration match at full precision, the 74.07% accepted as METHODOLOGY-owned); raw/adjusted pairing structural; no recomputation; chart integrity preserved; 503 semantics correct; MCC v1.8.0 scoped; backend, root claim-safety, frontend-build, and claims-lint verification green; protected artifacts unchanged; no required fixes. The worktree-name discrepancy flagged at the top of this document is accepted. R3-UI-02 was committed as-is at 18514ac5 and is closed. Implementation date 2026-07-18; review date 2026-07-18 (distinct events).

@@ -1,6 +1,6 @@
 # R3-SERV-01 independent Fable 5 review handoff
 
-Status: **PENDING — not yet independently reviewed and not merge-ready.**
+Status: **APPROVED — independent Fable 5 review completed 2026-07-18 (see Review closure below). Originally PENDING; the pending statements below are retained as the historical review brief.**
 
 This handoff is for a separate Fable 5 review context/model family. It records
 what must be checked before the owner considers a manual commit. It is not a
@@ -115,3 +115,7 @@ Return one of:
 
 Do not commit, push, modify the backend service, change the MCC, or start another
 task during this review.
+
+## Review closure (2026-07-18)
+
+Independent Fable 5 review (REV-01 governance session) of implementation commit bd9aa71a39e33e62d43197e034e8db86b82df0a5, performed at repository HEAD 18514ac51f7e7912caf5a04b3b6526e77ce53f98. Disposition: **APPROVE FOR OWNER CONSIDERATION — APPROVED, no required fixes.** All ten mandatory review questions were answered with evidence: service-path parity (pin test + source-file guard), split boundaries 2020–2021→2022/2023, 2020–2022→2023/2024, 2020–2023→2024/2025, training rows 81/161/241 from the service response, exact 80-row cohort parity with RGYAS-only exclusions, null-preserving missing-data handling, canonical significance parity (10k/10k, seed 42), outside-family raw-p framing with no serving adjusted field, exact pre-committed wording in both reports and METHODOLOGY, hostile-editor read clean, and every generated/protected checksum in this document re-verified byte-identical at HEAD. Two-run generator byte-identity was not re-executed (read-only review); committed artifacts match all recorded checksums. Fresh commands: root 356/356; backend 99/99; claims lint PASSED (MCC v1.8.0); docs lint 9 pre-existing/ledger violations outside this task. Note: the generated reports embed independent_review.status=PENDING as a dated generation-time statement; this closure supersedes it without hand-editing generated artifacts. Implementation date 2026-07-15; review date 2026-07-18.
