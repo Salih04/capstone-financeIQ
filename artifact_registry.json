@@ -6,6 +6,7 @@
   "governed_roots": [
     "experiments/results",
     "experiments/results_disagreement",
+    "experiments/results_excess",
     "experiments/results_influence",
     "experiments/results_placebo",
     "experiments/results_rank_stability",
@@ -35,6 +36,7 @@
     "known_reports_on_creation": [
       "experiments/results/significance_report.json",
       "experiments/results/friction_report.json",
+      "experiments/results_excess/significance_report.json",
       "experiments/results_real_terms/real_try/significance_report.json",
       "experiments/results_real_terms/usd/significance_report.json",
       "experiments/results_regime/regime_context_report.json"
@@ -294,6 +296,17 @@
       ],
       "hand_edit_forbidden": true,
       "notes": "Written by experiments/disagreement_atlas.py (MATRIX_OUTPUT). Exact per-file registration avoids a broad glob."
+    },
+    {
+      "path_or_glob": "experiments/results_excess/**",
+      "artifact_class": "generated",
+      "generator_command": "make research-excess",
+      "inputs": [
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "experiments/results/leaderboard_by_target.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Single exact glob for the isolated R3-TGT-01 namespace: row-level excess-target prediction dumps, dump-reconstructed leaderboard, significance reports, and deterministic artifact manifest. Written by experiments/run_excess_basis.py; the canonical aggregate is read-only comparison evidence, disagreements are reported rather than patched, and source checksums are re-verified."
     },
     {
       "path_or_glob": "experiments/results_influence/influence_report.json",
