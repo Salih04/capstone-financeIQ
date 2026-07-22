@@ -605,6 +605,38 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
     - the branch has **not yet been pushed or merged**;
     - the task is **not MERGE_COMPLETE or CLOSED**;
     - **owner push or integration remains pending.**
+- **Merge and closure record (2026-07-23; append-only; supersedes nothing above; all historical text above is preserved unchanged):** the R3-TGT-01 implementation branch was published and merged into `main` via pull request, and post-merge verification passed. This record changes **no scientific evidence, no result, no artifact, and no claim.**
+  - **Pull request:**
+    - **PR number:** 1
+    - **title:** `Add R3-TGT-01 excess-return robustness analysis`
+    - **base branch:** `main`
+    - **head branch:** `local/r3-tgt-01-excess-implementation`
+    - **state:** MERGED
+    - **merge method:** merge commit
+    - **merge commit:** `1961decf3955011d7824c7142ccbb4d21c9357f2`
+    - **merged timestamp:** `2026-07-22T22:56:06Z`
+  - **Pre-merge checks (all successful):** the PR was **MERGEABLE**; the merge state was **CLEAN**; the **Vercel** check passed; the **Vercel Preview Comments** check passed; **0 failing and 0 pending checks**.
+  - **Ancestry verification:** implementation commit `ac4ba8a8` (`Add R3-TGT-01 excess-return robustness analysis`) is an **ancestor of `origin/main`**; post-commit governance commit `91408e6c` (`Record R3-TGT-01 post-commit verification`) is an **ancestor of `origin/main`**; **both audited commit hashes were preserved by the merge-commit strategy** (no rebase or squash rewriting).
+  - **Merged scope (exact):** **two branch commits**; **fourteen task files**; **no unrelated file**; **no rebase or squash rewriting of the audited commits.**
+  - **Post-merge verification (local `main` fast-forwarded to `origin/main`; all passed):**
+    - `git diff --check` passed;
+    - **docs-lint passed**;
+    - **claims-lint passed** against **Model Confidence Contract v1.8.0**;
+    - **data validation passed:** **403 modeling rows**, **40 governed features**, **321 target rows**, **82 inference-only rows**, **benchmark available**, **valid T-to-T+1 modeling dataset**;
+    - **focused excess-basis suite: 165 passed in 18.55 seconds**;
+    - **full root suite: 521 passed in 120.71 seconds**;
+    - the existing **pytest-asyncio default-loop-scope deprecation warning** was **unrelated and non-blocking**.
+  - **Final scientific and governance boundary (preserved explicitly, undiminished):**
+    - **no qualified-human statistical/domain attestation was obtained**;
+    - **no human-review approval exists**;
+    - the **owner human-gate waiver remains an internal governance decision**;
+    - **no AI, repository reviewer, advisory assessment, or owner statement is represented as qualified-human approval**;
+    - the **waiver changed the internal completion rule, not the scientific evidence**;
+    - the study **remains limited by 40 tickers, three evaluation years, retrospective cohort membership, low statistical power, one unusual macro regime, cross-basis multiplicity, and the post-review status of the trajectory-preserving sensitivity**;
+    - **non-rejection does not prove that the true IC is zero**;
+    - **nothing establishes reliable predictive edge, alpha, profitability, investment value, a tradable strategy, deployment validity, or production validity.**
+  - **Closure disposition:** the implementation was **committed**; **post-commit verification passed**; the **branch was published**; **PR #1 was merged into `main`**; **both audited commits are present on `origin/main`**; **post-merge verification passed**; **no blocking implementation, repository, governance, or integration defect remains for the bounded R3-TGT-01 task**; **R3-TGT-01 is MERGE_COMPLETE and CLOSED under the owner-amended internal governance standard.**
+  - **What CLOSED means here (binding):** it means **only** that the **authorized R3-TGT-01 repository task is complete** and that **no further implementation is required within this task**. **Dataset expansion, future prospective years, or genuine qualified-human review must be separately authorized and recorded.** **Closure does not strengthen the statistical evidence or the external-validation status**, and this task must **never** be described as qualified-human reviewed, human-statistician approved, externally validated, or independently human attested.
 
 ### R3-NULL-01 — Negative-control / placebo laboratory
 - **Priority:** P1. **Wave:** 3B (harness-running — fresh context). **Owner role:** Research/Statistics. **Risk:** medium-high. **Model/effort:** **Opus, high.** Independent review: **Fable, medium (design mandatory before merge).**
