@@ -6,7 +6,7 @@
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration \
-	fetch-usdtry alternative-targets research-real-terms research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo research-serving-eval \
+	fetch-usdtry alternative-targets research-real-terms research-excess research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo research-serving-eval \
 	freeze-forward-2026 evaluate-forward-2026 claims-lint docs-lint
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
@@ -219,6 +219,12 @@ alternative-targets: fetch-usdtry
 # Outputs are isolated under experiments/results_real_terms/.
 research-real-terms: alternative-targets
 	PYTHONPATH=. python experiments/run_alternative_targets.py
+
+# Fit the frozen walk-forward family on the existing excess-return target and
+# write row-level predictions, reconstructed aggregates, and significance only
+# under experiments/results_excess/ (R3-TGT-01).
+research-excess:
+	PYTHONPATH=. python experiments/run_excess_basis.py
 
 # Validate and expose effective-dated macro context. With one observed period,
 # the workflow emits an explicit untestable state and no per-regime statistics.

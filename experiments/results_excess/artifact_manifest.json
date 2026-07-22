@@ -1,0 +1,815 @@
+{
+  "artifacts": [
+    {
+      "path": "experiments/results_excess/leaderboard.csv",
+      "sha256": "2c2a7ac8fbfe98da7c1baab079bca7d2462987bae6d7ad9a530d3b0d11fed03c",
+      "size_bytes": 2948
+    },
+    {
+      "path": "experiments/results_excess/predictions_test_2023.csv",
+      "sha256": "4159ff988ee4ab0a11fef33988f6a66deea98486ba5b4243aa164efbe6b97d6b",
+      "size_bytes": 23469
+    },
+    {
+      "path": "experiments/results_excess/predictions_test_2024.csv",
+      "sha256": "fcbd508361a922fab09acc8b1a5656f1bb88b861fa641cef020c16df2e25e4a1",
+      "size_bytes": 23419
+    },
+    {
+      "path": "experiments/results_excess/predictions_test_2025.csv",
+      "sha256": "52b4b3a7eaa2c99bc67bd62106399824b1c0696b22ab81af97e3fa4a6aa392c1",
+      "size_bytes": 23422
+    },
+    {
+      "path": "experiments/results_excess/significance_report.json",
+      "sha256": "c9d7e4a3c90587c8de4b097988ee964600c60ab10561f96d7ee49182818470fb",
+      "size_bytes": 116430
+    },
+    {
+      "path": "experiments/results_excess/significance_report.md",
+      "sha256": "6fabb3587f1420c6880e7bef8f5fb90235b29d19dcc1e5eee14c30e9841c3145",
+      "size_bytes": 21653
+    }
+  ],
+  "claim_safety": {
+    "descriptive_research_evidence_only": true,
+    "investment_value_established": false,
+    "reliable_predictive_edge_established": false
+  },
+  "coincident_baselines": {
+    "compared_models": [
+      "baseline_equal_weight",
+      "baseline_rank_score"
+    ],
+    "equality_level": "identical_prediction_values",
+    "evidence_source": "persisted R3-TGT-01 prediction dumps",
+    "identical_ic_values": true,
+    "identical_prediction_ranks": true,
+    "identical_prediction_values": true,
+    "independent_baseline_diversity": false,
+    "interpretation": "Coincident baseline results must not be interpreted as independent baseline diversity: two baselines that agree at this level contribute one distinct comparison, not two.",
+    "max_absolute_prediction_difference": 0.0,
+    "per_year": [
+      {
+        "evaluation_year": 2023,
+        "identical_prediction_ranks": true,
+        "identical_prediction_values": true,
+        "identical_within_year_ic": true,
+        "max_absolute_prediction_difference": 0.0,
+        "rows": 40
+      },
+      {
+        "evaluation_year": 2024,
+        "identical_prediction_ranks": true,
+        "identical_prediction_values": true,
+        "identical_within_year_ic": true,
+        "max_absolute_prediction_difference": 0.0,
+        "rows": 40
+      },
+      {
+        "evaluation_year": 2025,
+        "identical_prediction_ranks": true,
+        "identical_prediction_values": true,
+        "identical_within_year_ic": true,
+        "max_absolute_prediction_difference": 0.0,
+        "rows": 40
+      }
+    ],
+    "removal_permitted_by_repository_authority": false,
+    "retention_policy": "Both specifications are retained for frozen-specification continuity. Neither is removed, because no repository authority has explicitly permitted removing a frozen model specification.",
+    "specifications_retained": true,
+    "strongest_supported_statement": "`baseline_equal_weight` and `baseline_rank_score` produce bitwise-identical prediction values on every evaluated ticker and year in the persisted dumps, which necessarily makes their ranks and their ICs identical as well.",
+    "wording_policy": "Only the strongest level the persisted evidence actually supports is stated; weaker or stronger characterisations are not used."
+  },
+  "cross_basis_multiplicity": {
+    "confirmatory_family": {
+      "basis_id": "nominal_try_return",
+      "note": "Nominal return is the only confirmatory target basis in this repository. Its artifacts and conclusion are unchanged by this task.",
+      "role": "sole confirmatory family",
+      "target_column": "next_year_return_pct"
+    },
+    "controls_multiplicity_across_target_bases": false,
+    "cross_basis_correction_prespecified": false,
+    "exploratory_bases": [
+      {
+        "basis_id": "real_try_return",
+        "label": "CPI-deflated real TRY return",
+        "role": "exploratory robustness evaluation",
+        "target_column": "next_year_real_return_pct"
+      },
+      {
+        "basis_id": "usd_return",
+        "label": "USD-converted return",
+        "role": "exploratory robustness evaluation",
+        "target_column": "next_year_usd_return_pct"
+      },
+      {
+        "basis_id": "excess_vs_bist100",
+        "label": "Excess return vs BIST100 (nominal TRY, percentage points)",
+        "role": "exploratory robustness evaluation",
+        "target_column": "next_year_excess_return_vs_bist100"
+      }
+    ],
+    "future_result_policy": "A future significant alternative-basis result must not be described as confirmatory without a separately prespecified cross-basis correction.",
+    "nominal_artifacts_altered": false,
+    "statement": "Nominal return is the sole confirmatory family. The real-TRY, USD, and excess-return analyses are exploratory robustness evaluations. Within-basis Bonferroni corrections do not control multiplicity across the several target bases, so the number of bases examined inflates the chance that some basis eventually produces a small p-value.",
+    "this_basis_id": "excess_vs_bist100",
+    "this_basis_role": "exploratory robustness evaluation",
+    "within_basis_correction": {
+      "family": [
+        "linear_regression",
+        "ridge",
+        "lasso",
+        "elasticnet",
+        "random_forest",
+        "gradient_boosting"
+      ],
+      "family_size": 6,
+      "method": "Bonferroni",
+      "scope": "the six-model ML family within this single target basis"
+    }
+  },
+  "effective_estimator_parameters": {
+    "baseline_equal_weight": {
+      "callable": "_score_equal_weight",
+      "estimator_class": null,
+      "estimator_module": "experiments.run_experiments",
+      "extraction": "deterministic scoring function; no fitted estimator",
+      "parameters": {}
+    },
+    "baseline_rank_score": {
+      "callable": "_score_rank",
+      "estimator_class": null,
+      "estimator_module": "experiments.run_experiments",
+      "extraction": "deterministic scoring function; no fitted estimator",
+      "parameters": {}
+    },
+    "elasticnet": {
+      "estimator_class": "ElasticNet",
+      "estimator_module": "sklearn.linear_model._coordinate_descent",
+      "extraction": "estimator.get_params(deep=False)",
+      "parameters": {
+        "alpha": 0.1,
+        "copy_X": true,
+        "fit_intercept": true,
+        "l1_ratio": 0.5,
+        "max_iter": 5000,
+        "positive": false,
+        "precompute": false,
+        "random_state": null,
+        "selection": "cyclic",
+        "tol": 0.0001,
+        "warm_start": false
+      }
+    },
+    "gradient_boosting": {
+      "estimator_class": "GradientBoostingRegressor",
+      "estimator_module": "sklearn.ensemble._gb",
+      "extraction": "estimator.get_params(deep=False)",
+      "parameters": {
+        "alpha": 0.9,
+        "ccp_alpha": 0.0,
+        "criterion": "friedman_mse",
+        "init": null,
+        "learning_rate": 0.1,
+        "loss": "squared_error",
+        "max_depth": 2,
+        "max_features": null,
+        "max_leaf_nodes": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 1,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "n_estimators": 120,
+        "n_iter_no_change": null,
+        "random_state": 42,
+        "subsample": 1.0,
+        "tol": 0.0001,
+        "validation_fraction": 0.1,
+        "verbose": 0,
+        "warm_start": false
+      }
+    },
+    "lasso": {
+      "estimator_class": "Lasso",
+      "estimator_module": "sklearn.linear_model._coordinate_descent",
+      "extraction": "estimator.get_params(deep=False)",
+      "parameters": {
+        "alpha": 0.1,
+        "copy_X": true,
+        "fit_intercept": true,
+        "max_iter": 5000,
+        "positive": false,
+        "precompute": false,
+        "random_state": null,
+        "selection": "cyclic",
+        "tol": 0.0001,
+        "warm_start": false
+      }
+    },
+    "linear_regression": {
+      "estimator_class": "LinearRegression",
+      "estimator_module": "sklearn.linear_model._base",
+      "extraction": "estimator.get_params(deep=False)",
+      "parameters": {
+        "copy_X": true,
+        "fit_intercept": true,
+        "n_jobs": null,
+        "positive": false
+      }
+    },
+    "random_forest": {
+      "estimator_class": "RandomForestRegressor",
+      "estimator_module": "sklearn.ensemble._forest",
+      "extraction": "estimator.get_params(deep=False)",
+      "parameters": {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "criterion": "squared_error",
+        "max_depth": 4,
+        "max_features": 1.0,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 1,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 200,
+        "n_jobs": null,
+        "oob_score": false,
+        "random_state": 42,
+        "verbose": 0,
+        "warm_start": false
+      }
+    },
+    "ridge": {
+      "estimator_class": "Ridge",
+      "estimator_module": "sklearn.linear_model._ridge",
+      "extraction": "estimator.get_params(deep=False)",
+      "parameters": {
+        "alpha": 1.0,
+        "copy_X": true,
+        "fit_intercept": true,
+        "max_iter": null,
+        "positive": false,
+        "random_state": null,
+        "solver": "auto",
+        "tol": 0.0001
+      }
+    },
+    "robust_rank_aggregation": {
+      "callable": "_score_robust_rank_aggregation",
+      "estimator_class": null,
+      "estimator_module": "experiments.run_experiments",
+      "extraction": "deterministic scoring function; no fitted estimator",
+      "parameters": {}
+    }
+  },
+  "environment": {
+    "determinism": "Regeneration is deterministic within this recorded numerical environment: repeated runs of the recorded command on the same interpreter, package versions, and platform reproduce identical output bytes. Byte identity across different environments is not claimed.",
+    "machine": "arm64",
+    "packages": {
+      "numpy": "1.26.4",
+      "pandas": "2.2.2",
+      "scikit-learn": "1.5.1",
+      "scipy": "1.13.1"
+    },
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "processor": "arm",
+    "python_implementation": "CPython",
+    "python_version": "3.12.3",
+    "python_version_info": [
+      3,
+      12,
+      3
+    ],
+    "release": "25.5.0",
+    "system": "Darwin"
+  },
+  "estimand_invariance_audit": {
+    "audit_id": "estimand_rank_invariance",
+    "benchmark_column": "next_year_bist100_return_pct",
+    "benchmark_subtraction_alters_within_year_evaluation_ranks": false,
+    "benchmark_subtraction_may_affect_fitting": true,
+    "declared_targets_in_order": [
+      "next_year_return_pct",
+      "next_year_excess_return_vs_bist100",
+      "next_year_outperform_bist100",
+      "next_year_top_20pct_returner"
+    ],
+    "derivation": "next_year_excess_return_vs_bist100 = next_year_return_pct - next_year_bist100_return_pct",
+    "derivation_traced_not_assumed": true,
+    "establishes_investment_value": false,
+    "estimand": "within-year ordinal cross-sectional ranking",
+    "estimand_statement": "The within-year Spearman IC evaluates ordinal cross-sectional ranking: whether a model orders the evaluated cohort correctly inside one evaluation year. It does not evaluate benchmark-relative magnitude accuracy, and it does not estimate alpha, economic outperformance, investment value, or a tradable strategy.",
+    "estimates_alpha": false,
+    "estimates_economic_outperformance": false,
+    "evaluated_years": [
+      2023,
+      2024,
+      2025
+    ],
+    "evaluates_benchmark_relative_magnitude_accuracy": false,
+    "evaluates_ordinal_cross_sectional_ranking": true,
+    "excess_derivation_authority": "scripts/data_collection/pipeline.py",
+    "excess_target_column": "next_year_excess_return_vs_bist100",
+    "failure_policy": "The run fails with ExcessEstimandError if the common within-year benchmark subtraction or the resulting rank invariance does not hold.",
+    "fitting_effect_note": "Benchmark subtraction may still affect fitting: it shifts the target by a year-level constant across the training panel, so models trained on pooled years can learn different coefficients than on the nominal basis. It does not alter within-year evaluation ranks, so the evaluated estimand is unchanged.",
+    "interpretation": "Within each evaluation year the benchmark subtraction is one common constant, so the next_year_excess_return_vs_bist100 ranks equal the next_year_return_pct ranks in every year and the total rank mismatch count is 0. The within-year Spearman IC reported here is therefore the same ordinal ranking estimand as on the nominal basis, evaluated on a different cohort. Identical evaluation ranks do not make the two analyses identical: the shifted target can still change what the models fit, and an unchanged ordinal estimand is not evidence of alpha, benchmark-relative magnitude accuracy, investment value, or a tradable strategy.",
+    "nominal_target_authority": "experiments/run_experiments.py::TARGETS[0]",
+    "nominal_target_column": "next_year_return_pct",
+    "per_year": [
+      {
+        "common_benchmark_return_pct": 31.96,
+        "common_subtrahend_confirmed": true,
+        "evaluated_rows": 40,
+        "evaluation_year": 2023,
+        "persisted_benchmark_column_value": 31.96,
+        "rank_mismatch_count": 0,
+        "ranks_identical": true,
+        "within_year_subtrahend_spread": 5.684341886080802e-14
+      },
+      {
+        "common_benchmark_return_pct": 28.94,
+        "common_subtrahend_confirmed": true,
+        "evaluated_rows": 40,
+        "evaluation_year": 2024,
+        "persisted_benchmark_column_value": 28.94,
+        "rank_mismatch_count": 0,
+        "ranks_identical": true,
+        "within_year_subtrahend_spread": 1.4210854715202004e-14
+      },
+      {
+        "common_benchmark_return_pct": 12.64,
+        "common_subtrahend_confirmed": true,
+        "evaluated_rows": 40,
+        "evaluation_year": 2025,
+        "persisted_benchmark_column_value": 12.64,
+        "rank_mismatch_count": 0,
+        "ranks_identical": true,
+        "within_year_subtrahend_spread": 2.842170943040401e-14
+      }
+    ],
+    "rank_method": "average ranks, computed independently within each evaluation year",
+    "ranks_identical_in_every_year": true,
+    "represents_a_tradable_strategy": false,
+    "total_rank_mismatch_count": 0,
+    "trace_method": "AST parse of the pipeline assignment, cross-checked against the declared target order; no column name is hardcoded as the nominal target",
+    "within_year_subtrahend_tolerance": 1e-09
+  },
+  "family_conclusion": {
+    "any_model_survives_either_family_wise_correction": false,
+    "any_model_survives_family_wise_correction": false,
+    "any_model_survives_sensitivity_family_wise_correction": false,
+    "bootstrap_interpretation": "A bootstrap interval is descriptive uncertainty evidence and does not replace the closed-family correction. No model survives family-wise correction, and no reliable predictive edge is established.",
+    "conclusion": "No model in the prespecified six-model ML family is distinguishable from the within-year null after Bonferroni correction across the family, and none is distinguishable under the post-review trajectory-preserving sensitivity after the same six-model correction. The excess return basis establishes no reliable predictive edge.",
+    "conclusion_derivation": "computed from the adjusted p-values of both family-corrected analyses; non-rejection is never assumed",
+    "count_surviving_family_wise_correction": 0,
+    "count_surviving_sensitivity_family_wise_correction": 0,
+    "family_size": 6,
+    "family_wise_alpha": 0.05,
+    "models_surviving_either_family_wise_correction": [],
+    "models_surviving_family_wise_correction": [],
+    "models_surviving_sensitivity_family_wise_correction": [],
+    "multiplicity_method": "Bonferroni",
+    "primary_analysis_id": "primary_independent_within_year_permutation",
+    "reliable_predictive_edge_established": false,
+    "scope": "prespecified six-model ML family",
+    "sensitivity_analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
+    "sensitivity_is_prespecified": false,
+    "sensitivity_status": "post_review_sensitivity"
+  },
+  "feature_columns": {
+    "checksum_definition": "sha256 of the newline-joined feature column names in fitting order",
+    "columns": [
+      "benchmark_same_year_return_pct",
+      "current_assets",
+      "current_ratio",
+      "ebitda",
+      "ebitda_growth_pct",
+      "ebitda_margin",
+      "enterprise_value",
+      "equity",
+      "ev_ebitda",
+      "financial_debt_ratio",
+      "gross_margin",
+      "gross_profit",
+      "gross_profit_growth_pct",
+      "leverage_ratio",
+      "long_term_liabilities",
+      "market_cap",
+      "net_debt",
+      "net_debt_to_ebitda",
+      "net_income",
+      "net_income_growth_pct",
+      "net_margin",
+      "non_current_assets",
+      "operating_income",
+      "operating_income_growth_pct",
+      "pb_ratio",
+      "pe_ratio",
+      "price_adjclose_t",
+      "price_data_available",
+      "price_drawdown_from_3y_high_pct",
+      "price_history_years_available",
+      "price_momentum_1y_pct",
+      "price_momentum_2y_pct",
+      "price_vs_bist100_1y_pct",
+      "revenue",
+      "revenue_growth_pct",
+      "roa",
+      "roe",
+      "short_term_liabilities",
+      "total_assets",
+      "working_capital"
+    ],
+    "count": 40,
+    "sha256": "041566fc685b043c8618af859c268aa736fa5ae87b0d2679a2b35df779659575"
+  },
+  "generator": "experiments/run_excess_basis.py",
+  "ic_sign_note": {
+    "family_size": 6,
+    "interpreted_as_actionable_signal": false,
+    "interpreted_as_contrarian_strategy": false,
+    "interpreted_as_inverse_alpha": false,
+    "interpreted_as_validated_predictive_evidence": false,
+    "models_with_negative_pooled_ic": [
+      "elasticnet",
+      "gradient_boosting",
+      "lasso",
+      "linear_regression",
+      "random_forest",
+      "ridge"
+    ],
+    "models_with_positive_pooled_ic": [],
+    "negative_pooled_ic_count": 6,
+    "note": "Predominantly negative IC signs may reflect sampling variation, feature-orientation effects, or systematic construction effects. They are not interpreted as inverse alpha, a contrarian strategy, an actionable signal, or validated predictive evidence.",
+    "positive_pooled_ic_count": 0,
+    "possible_explanations": [
+      "sampling variation",
+      "feature-orientation effects",
+      "systematic construction effects"
+    ],
+    "predominantly_negative": true,
+    "scope": "prespecified six-model ML family",
+    "selection_note": "The note is family-level. No member is selected or privileged by the sign or magnitude of its IC, and the tree-based members are not singled out.",
+    "tree_models_selected_or_privileged": false,
+    "zero_pooled_ic_count": 0
+  },
+  "manifest_self_record": {
+    "path": "experiments/results_excess/artifact_manifest.json",
+    "reason": "A deterministic manifest cannot embed its own checksum without recursion.",
+    "sha256": null
+  },
+  "model_family_membership": {
+    "baselines_outside_family": [
+      "baseline_equal_weight",
+      "baseline_rank_score",
+      "robust_rank_aggregation"
+    ],
+    "ml_family": [
+      "linear_regression",
+      "ridge",
+      "lasso",
+      "elasticnet",
+      "random_forest",
+      "gradient_boosting"
+    ]
+  },
+  "model_specifications": {
+    "baseline_equal_weight": {
+      "kind": "baseline",
+      "parameters": {},
+      "seed": null
+    },
+    "baseline_rank_score": {
+      "kind": "baseline",
+      "parameters": {},
+      "seed": null
+    },
+    "elasticnet": {
+      "kind": "ml",
+      "parameters": {
+        "alpha": 0.1,
+        "max_iter": 5000
+      },
+      "seed": null
+    },
+    "gradient_boosting": {
+      "kind": "ml",
+      "parameters": {
+        "max_depth": 2,
+        "n_estimators": 120
+      },
+      "seed": 42
+    },
+    "lasso": {
+      "kind": "ml",
+      "parameters": {
+        "alpha": 0.1,
+        "max_iter": 5000
+      },
+      "seed": null
+    },
+    "linear_regression": {
+      "kind": "ml",
+      "parameters": {},
+      "seed": null
+    },
+    "random_forest": {
+      "kind": "ml",
+      "parameters": {
+        "max_depth": 4,
+        "n_estimators": 200
+      },
+      "seed": 42
+    },
+    "ridge": {
+      "kind": "ml",
+      "parameters": {
+        "alpha": 1.0
+      },
+      "seed": null
+    },
+    "robust_rank_aggregation": {
+      "kind": "baseline",
+      "parameters": {},
+      "seed": null
+    }
+  },
+  "output_path_policy": {
+    "arbitrary_external_paths_accepted": false,
+    "default_is_the_only_repository_destination": true,
+    "default_output_directory": "experiments/results_excess",
+    "refusal_exception": "ExcessOutputPathError",
+    "refusal_timing": "before any output file is created or overwritten",
+    "required_destination_name_prefix": "financeiq-r3-tgt-01-",
+    "resolved_containment_under_temporary_root_required": true,
+    "symlinked_destination_accepted": false,
+    "symlinked_path_component_accepted": false,
+    "temporary_override_scope": "isolated tests and deterministic verification only; this generator is not a general arbitrary-output utility",
+    "temporary_root_authority": "tempfile.gettempdir()",
+    "temporary_root_hardcoded": false,
+    "temporary_root_itself_accepted": false
+  },
+  "permutation_analyses": {
+    "post_review_sensitivity": {
+      "added_after_human_review": true,
+      "algorithm": [
+        "Use the balanced 40-ticker x 3-year panel of persisted prediction rows.",
+        "Sort and validate the unique ticker universe.",
+        "Generate one permutation of ticker identities per draw.",
+        "Apply that same ticker permutation mapping in 2023, 2024, and 2025.",
+        "Keep the prediction rows fixed.",
+        "Move each realized-outcome ticker trajectory as a complete block across all years.",
+        "Recompute the Spearman IC independently within each year.",
+        "Take the equal-year mean of the valid yearly ICs.",
+        "Repeat for 10,000 draws from the frozen documented seed.",
+        "Compute the two-sided Monte Carlo p-value (extreme_count + 1) / (draw_count + 1).",
+        "Apply the same frozen six-model Bonferroni correction min(1, raw_p * 6)."
+      ],
+      "analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
+      "duplicate_free_one_to_one_mapping": true,
+      "extreme_count": 2230,
+      "family_size": 6,
+      "independent_per_year_mapping": false,
+      "invalid_draws": 0,
+      "is_bootstrap": false,
+      "multiplicity_method": "Bonferroni",
+      "null_hypothesis": "Ticker identities are exchangeable as complete cross-year trajectories: one permutation of the ticker universe is drawn per replication and applied identically in every evaluation year, so a ticker's realized outcomes move together and any cross-year persistence in the realized panel is preserved under the null.",
+      "p_value_denominator": 10001,
+      "p_value_formula": "(extreme_count + 1) / (draw_count + 1)",
+      "permutation_unit": "complete cross-year ticker trajectory",
+      "prediction_rows_fixed": true,
+      "prespecified": false,
+      "provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
+      "refusal_exceptions": [
+        "ExcessPermutationError",
+        "ExcessPanelError"
+      ],
+      "refused_inputs": [
+        "ragged ticker coverage",
+        "missing years",
+        "duplicate ticker/year rows",
+        "malformed ticker or year values",
+        "unequal ticker sets across years",
+        "non-finite targets or predictions",
+        "insufficient tickers",
+        "insufficient valid permutation draws",
+        "independently generated per-year permutation mappings",
+        "mappings that are not duplicate-free one-to-one permutations"
+      ],
+      "replaces_primary_analysis": false,
+      "requested_draws": 10000,
+      "seed": 42,
+      "seed_frozen_and_documented": true,
+      "shared_mapping_across_years": true,
+      "statistic": "equal-year mean of the valid within-year Spearman ICs",
+      "status": "post_review_sensitivity",
+      "ticker_universe_size": 40,
+      "trajectory_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "two_sided": true,
+      "valid_draws": 10000
+    },
+    "primary": {
+      "analysis_id": "primary_independent_within_year_permutation",
+      "draws": 10000,
+      "family_size": 6,
+      "family_wise_alpha": 0.05,
+      "independent_per_year_permutation": true,
+      "monte_carlo_correction": "(extreme_count + 1) / (draw_count + 1)",
+      "multiplicity_method": "Bonferroni",
+      "null_hypothesis": "Within each evaluation year, realized cross-sectional outcomes are exchangeable relative to the model predictions, with each year permuted independently.",
+      "permutation_unit": "within-year row permutation of realized returns",
+      "prespecified": true,
+      "renamed_or_replaced_by_the_sensitivity": false,
+      "seed": 42,
+      "statistic": "equal-weighted mean of within-year Spearman ICs",
+      "status": "prespecified",
+      "tail": "absolute; |null| >= |observed|",
+      "two_sided": true,
+      "unchanged_by_human_review": true
+    }
+  },
+  "preprocessing": "Existing build_panel_for_target rules: year-local feature percentile ranks, existing feature registry exclusions, null target rows dropped, and ML-only missing-feature rank-center handling unchanged.",
+  "regeneration_command": "make research-excess",
+  "reporting_policy": {
+    "frozen_baseline_order": [
+      "baseline_equal_weight",
+      "baseline_rank_score",
+      "robust_rank_aggregation"
+    ],
+    "frozen_ml_family_order": [
+      "linear_regression",
+      "ridge",
+      "lasso",
+      "elasticnet",
+      "random_forest",
+      "gradient_boosting"
+    ],
+    "headline_scope": "family-level only; no individual model is singled out",
+    "model_presentation": "symmetric across the prespecified ML family",
+    "ordering": "frozen prespecified order; never reordered by an outcome statistic",
+    "outcome_statistics_excluded_from_selection": [
+      "observed_ic",
+      "permutation_p_value_two_sided",
+      "bonferroni_adjusted_p_value",
+      "bootstrap_ci_95",
+      "observed_null_percentile"
+    ],
+    "report_construction": {
+      "builder": "experiments/run_excess_basis.py::build_family_report",
+      "note": "The report is assembled from per-model, non-selecting analyses. No helper that chooses a minimum raw p-value, minimum adjusted p-value, strongest IC, narrowest interval, or any other outcome-derived winner is executed at any intermediate or final layer, so no selected field ever exists to be deleted afterwards.",
+      "outcome_dependent_selection_helpers_invoked": [],
+      "significance_build_report_invoked": false
+    },
+    "result_driven_selection_performed": false,
+    "statement": "All six prespecified ML-family members are reported symmetrically. No model is selected or privileged using the observed excess-target IC, raw p-value, adjusted p-value, bootstrap interval, or any other outcome-derived statistic."
+  },
+  "resampling": {
+    "bootstrap_cluster_key": "ticker",
+    "bootstrap_unit": "ticker_cluster",
+    "bootstraps": 10000,
+    "permutation_unit": "within-year row permutation of realized returns",
+    "permutations": 10000
+  },
+  "review_package_scope": {
+    "complete_independent_fitting_stage_replication_claimed": false,
+    "repository_technical_review_covers": [
+      "governed source paths",
+      "protected hashes",
+      "split tracing",
+      "implementation behavior"
+    ],
+    "standalone_feature_construction_reproduction": false,
+    "standalone_model_fitting_reproduction": false,
+    "statements": [
+      "The compact package supports review of the persisted prediction-to-significance layer: the row-level prediction dumps, the dump-reconstructed leaderboard, the significance report, and the artifact manifest.",
+      "It does not alone provide standalone reproduction of feature construction and model fitting.",
+      "The repository technical review separately covers governed source paths, protected hashes, split tracing, and implementation behavior.",
+      "No claim of complete independent fitting-stage replication is made from the compact package alone."
+    ],
+    "supports": "review of the persisted prediction-to-significance layer: row-level prediction dumps, the dump-reconstructed leaderboard, the significance report, and the artifact manifest"
+  },
+  "schema_version": "2.0.0",
+  "schema_versions": {
+    "artifact_manifest_json": {
+      "version": "2.0.0"
+    },
+    "leaderboard_csv": {
+      "key_columns": [
+        "target",
+        "split",
+        "model",
+        "kind"
+      ],
+      "line_terminator": "\\n",
+      "version": "1.0.0"
+    },
+    "prediction_csv": {
+      "columns": [
+        "ticker",
+        "year",
+        "model",
+        "y_true",
+        "y_pred"
+      ],
+      "float_format": "%.17g",
+      "line_terminator": "\\n",
+      "version": "1.0.0"
+    },
+    "significance_report_json": {
+      "version": 2
+    }
+  },
+  "seeds": {
+    "bootstrap_seed": 42,
+    "model_seeds": {
+      "gradient_boosting": 42,
+      "random_forest": 42
+    },
+    "permutation_seed": 42,
+    "significance_seed": 42
+  },
+  "selection_policy": "Frozen nine-model family; no search, additions, removals, tuning, or selection based on excess-target results. All six prespecified ML-family members are reported symmetrically. No model is selected or privileged using the observed excess-target IC, raw p-value, adjusted p-value, bootstrap interval, or any other outcome-derived statistic.",
+  "source_artifacts": [
+    {
+      "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "role": "trusted modeling features and excess-return target",
+      "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+      "size_bytes": 256050
+    },
+    {
+      "path": "experiments/results/leaderboard_by_target.csv",
+      "role": "read-only aggregate excess leaderboard used only for comparison",
+      "sha256": "a9e671f992336378df9e12c464ce08267180d8f1c9820a78d69b10ff748e9a9b",
+      "size_bytes": 10305
+    },
+    {
+      "path": "experiments/run_excess_basis.py",
+      "role": "R3-TGT-01 generator",
+      "sha256": "c93c1f762f4b7a06734ebe3c57f1ce1ae5351ff426a6cb461351a978f3ae5d76",
+      "size_bytes": 149960
+    },
+    {
+      "path": "experiments/run_experiments.py",
+      "role": "frozen preprocessing, splits, models, and metrics",
+      "sha256": "265f58678d522eea0c48fbccba415ed30b3e20abc6bb7ae0a8e33857c5feb543",
+      "size_bytes": 32280
+    },
+    {
+      "path": "experiments/run_alternative_targets.py",
+      "role": "existing isolated prediction-dump fitting path",
+      "sha256": "4afa0576d817ed1d8de4cac852796266faf7b8bd7fdf3e5e57fe43910a77abd0",
+      "size_bytes": 8566
+    },
+    {
+      "path": "experiments/significance.py",
+      "role": "seeded IC, permutation, and Bonferroni conventions",
+      "sha256": "5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6",
+      "size_bytes": 32055
+    },
+    {
+      "path": "Makefile",
+      "role": "regeneration command definition",
+      "sha256": "33374f5509b4a8c472ebe757b41a5cd9879d269dd32307af060488d155e560e9",
+      "size_bytes": 14510
+    }
+  ],
+  "target": "next_year_excess_return_vs_bist100",
+  "task": "R3-TGT-01",
+  "walk_forward_splits": [
+    {
+      "name": "test_2023",
+      "test_feature_year": 2022,
+      "train_target_years": [
+        2021,
+        2022
+      ]
+    },
+    {
+      "name": "test_2024",
+      "test_feature_year": 2023,
+      "train_target_years": [
+        2021,
+        2022,
+        2023
+      ]
+    },
+    {
+      "name": "test_2025",
+      "test_feature_year": 2024,
+      "train_target_years": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    }
+  ]
+}

@@ -259,6 +259,194 @@ coverage, prediction dumps, corrected tests, and limitations are in
 `experiments/results_real_terms/`. The nominal artifacts and the conclusion —
 no reliable predictive edge — remain unchanged.
 
+## Excess-return-basis evaluation (R3-TGT-01)
+
+`make research-excess` applies the existing significance treatment to the
+trusted `next_year_excess_return_vs_bist100` target (nominal TRY stock return
+minus the BIST100 nominal TRY index return, in percentage points). The isolated
+runner uses the same year-local feature ranking and missing-feature rules,
+frozen walk-forward splits, nine model specifications and hyperparameters, and
+fixed stochastic seeds as the canonical harness. It performs no hyperparameter
+search or result-driven model-family selection and writes only to
+`experiments/results_excess/`; canonical nominal models, prediction dumps,
+leaderboards, significance reports, and trusted datasets remain read-only.
+
+The evaluated cohort is the **benchmark-covered public 40** — the 40 tickers
+carrying a valid BIST100-relative excess target — not the wider internal
+training universe used by the nominal basis. That leaves **40 evaluated rows per
+model in each of the 2023, 2024, and 2025 test years**, versus 80 nominal-basis
+rows per test year. Missing excess targets remain null and are excluded rather
+than filled. Aggregate metrics are reconstructed from the new per-ticker
+prediction dumps. The reconstructed 27-row excess leaderboard matches the
+existing aggregate target leaderboard at zero relative tolerance and `1e-12`
+absolute tolerance; any future disagreement is emitted in the report and must
+not be patched silently.
+
+### What the within-year IC does and does not estimate
+
+The reported statistic is a **within-year Spearman IC, so the estimand is ordinal
+cross-sectional ranking** inside one evaluation year. It does not evaluate
+benchmark-relative magnitude accuracy, and it does not estimate alpha, economic
+outperformance, investment value, or a tradable strategy.
+
+The runner proves the ordinal claim rather than asserting it. The nominal target
+column is traced from repository authority — `run_experiments.TARGETS[0]`,
+cross-checked against the pipeline assignment
+`next_year_excess_return_vs_bist100 = next_year_return_pct - next_year_bist100_return_pct`
+read out of `scripts/data_collection/pipeline.py` by AST parse — and a persisted
+**estimand-invariance audit** then checks, on the exact evaluated rows, that the
+subtraction is one common value inside each year and that both targets rank the
+cohort identically:
+
+| Evaluation year | Evaluated rows | Common BIST100 return subtracted (pp) | Rank mismatches |
+| ---: | ---: | ---: | ---: |
+| 2023 | 40 | 31.96 | 0 |
+| 2024 | 40 | 28.94 | 0 |
+| 2025 | 40 | 12.64 | 0 |
+
+Total rank mismatch count: **0**. The run fails with `ExcessEstimandError` if
+either the common within-year subtraction or the rank invariance does not hold.
+Benchmark subtraction may still affect *fitting* — it shifts the target by a
+year-level constant across the training panel, so pooled-year fits can learn
+different coefficients — but it does not alter within-year evaluation ranks.
+
+### Two permutation analyses, reported side by side
+
+Significance uses the same equal-year Spearman IC and Bonferroni correction
+across the same six-model ML family. Two permutation analyses are reported; they
+answer different questions and neither replaces the other.
+
+**`primary_independent_within_year_permutation`** (prespecified, unchanged by
+human review). Null: within each evaluation year, realized cross-sectional
+outcomes are exchangeable relative to the model predictions, with each year
+permuted independently. It retains its seed (42), 10,000 draws, two-sided
+absolute tail, the Monte Carlo correction `(extreme_count + 1) / (draw_count + 1)`,
+the equal-year pooled IC, and six-model Bonferroni adjustment.
+
+**`trajectory_preserving_ticker_permutation_sensitivity`** (added after human
+review; a sensitivity analysis, **not** a prespecified replacement). Null: ticker
+identities are exchangeable as complete cross-year trajectories. Each of the
+10,000 draws generates **one** permutation of the sorted 40-ticker universe and
+applies that **same mapping in 2023, 2024, and 2025**; prediction rows stay
+fixed, each realized-outcome trajectory moves as a complete block, the Spearman
+IC is recomputed independently within each year, and the equal-year mean is the
+null statistic. Every mapping is a duplicate-free one-to-one permutation — this
+is a permutation test, not a bootstrap — and ragged coverage, missing years,
+duplicate ticker/year rows, malformed keys, unequal ticker sets across years,
+non-finite values, too few tickers, too few valid draws, and independently
+generated per-year mappings are all refused with `ExcessPermutationError`.
+
+Uncertainty intervals come from a **ticker-cluster bootstrap**: each of the
+10,000 resamples draws 40 ticker identities with replacement, and that **single
+sampled ticker vector is shared by all three evaluation years**, so a ticker's
+complete 2023–2025 trajectory moves together and a ticker drawn twice contributes
+its whole trajectory twice. Years are never resampled independently.
+
+All six family members are reported symmetrically for both analyses:
+
+| Model | Pooled IC | Primary raw p | Primary Bonferroni p | Sensitivity raw p | Sensitivity Bonferroni p | Either rejects at FWER 0.05 | Ticker-cluster 95% interval |
+| --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| linear_regression | −0.117 | 0.2074 | 1.0000 | 0.2231 | 1.0000 | no | [−0.264, 0.047] |
+| ridge | −0.038 | 0.6820 | 1.0000 | 0.6963 | 1.0000 | no | [−0.222, 0.155] |
+| lasso | −0.095 | 0.2993 | 1.0000 | 0.3300 | 1.0000 | no | [−0.249, 0.072] |
+| elasticnet | −0.063 | 0.4873 | 1.0000 | 0.5565 | 1.0000 | no | [−0.281, 0.166] |
+| random_forest | −0.211 | 0.0223 | 0.1338 | 0.0416 | 0.2496 | no | [−0.420, 0.014] |
+| gradient_boosting | −0.211 | 0.0217 | 0.1302 | 0.0411 | 0.2466 | no | [−0.424, 0.010] |
+
+No model is selected or privileged using the observed excess-target IC, raw
+p-value, adjusted p-value, bootstrap interval, or any other outcome-derived
+statistic, and there is no headline model. The conclusion is computed from the
+adjusted p-values above, not assumed: **0 of 6 family members reject under the
+primary permutation and 0 of 6 reject under the sensitivity**, so **no ML model
+survives the six-model Bonferroni correction under either analysis** and **no
+reliable predictive edge is established** on this basis. A bootstrap interval is
+descriptive uncertainty evidence and cannot override the closed-family
+inference, so an interval that happens to approach zero does not upgrade any
+model. Three non-family baselines are reported separately with unadjusted
+p-values, under both analyses, and are not part of the corrected family.
+
+### Cross-basis multiplicity
+
+Bonferroni correction here is **within-basis only**. `next_year_return_pct`
+(nominal TRY) is the **sole confirmatory family**; the real-TRY, USD, and
+excess-return analyses are **exploratory robustness evaluations**. No correction
+in this repository controls multiplicity across the several target bases, so the
+number of bases examined inflates the chance that some basis eventually produces
+a small p-value. A future significant alternative-basis result must not be
+described as confirmatory without a separately prespecified cross-basis
+correction. This task alters no nominal artifact.
+
+### Coincident baselines, IC signs, and review-package scope
+
+`baseline_equal_weight` and `baseline_rank_score` produce **bitwise-identical
+prediction values** on every evaluated ticker and year in the persisted dumps
+(maximum absolute difference 0.0), which necessarily makes their ranks and their
+ICs identical too — the strongest of the three levels the runner tests, and the
+only one it states. Both specifications are retained for frozen-specification
+continuity; no repository authority has permitted removing a frozen
+specification. Coincident results must not be read as independent baseline
+diversity: two baselines that agree at this level contribute one distinct
+comparison, not two.
+
+All six family members have a negative pooled IC on this basis. Predominantly
+negative IC signs may reflect sampling variation, feature-orientation effects, or
+systematic construction effects. They are **not** interpreted as inverse alpha, a
+contrarian strategy, an actionable signal, or validated predictive evidence, and
+the tree-based members are not singled out.
+
+The compact human-review package supports review of the persisted
+**prediction-to-significance layer** — row-level dumps, the dump-reconstructed
+leaderboard, the significance report, and the artifact manifest. It does not
+alone provide standalone reproduction of feature construction and model fitting;
+the repository technical review separately covers governed source paths,
+protected hashes, split tracing, and implementation behavior. No claim of
+complete independent fitting-stage replication is made from the compact package
+alone.
+
+Symmetry is enforced by construction, not by cleanup. The shared
+`significance.build_report` helper internally picks the family member with the
+smallest raw permutation p-value, so the R3-TGT-01 runner **never calls it**;
+deleting that field afterwards would still mean the selection had run. The
+report is assembled instead from per-model, non-selecting analyses, and no
+helper choosing a minimum raw p, minimum adjusted p, strongest IC, or narrowest
+interval is executed at any layer. The nominal report path is unchanged.
+
+Power is reported for the design that was actually evaluated, read from the
+persisted dumps: `current_design` is **40 rows per evaluation year across 2023,
+2024, and 2025** (120 evaluated rows per model), marked `observed`, and reported
+once. The per-year and pooled rows are two views of that single design rather
+than two designs. Longer-horizon rows are kept in a separate, explicitly
+hypothetical planning structure, deduplicated against the observed design on
+(rows per year, test years), so no planning row restates current evidence; the
+80-row figure appears only as nominal-basis context on a different target and a
+wider cohort. The detectable |IC| at this design is large, so the family-wide
+non-rejection is a low-power non-rejection: it does not establish that the true
+IC is zero, and no power figure is a statement of predictive validity.
+
+Cluster keys are validated strictly before any grouping or integer conversion.
+Years must be finite mathematical integers inside the exact set {2023, 2024,
+2025}; nulls, booleans, strings, non-numeric objects, NaN, ±infinity, and
+fractional values such as 2023.5 are refused with `ExcessBootstrapError` rather
+than floored, rounded, or cast. Tickers must be non-empty strings without
+leading or trailing whitespace, unique per year, and present in every evaluation
+year. Generated output is confined by a bounded destination policy: the default
+`experiments/results_excess`, or — for isolated tests and deterministic
+verification only — a `financeiq-r3-tgt-01-*` directory under the root reported
+by `tempfile.gettempdir()`, with symlinked destinations, symlinked path
+components, and the temporary root itself refused before any file is written.
+
+The generated manifest records the target, generator, frozen model
+specifications, splits, seeds, model-family membership, effective estimator
+parameters read directly from each fitted estimator, feature-column checksum,
+CSV and report schema versions, the Python/NumPy/pandas/SciPy/scikit-learn
+versions and platform, source checksums, output checksums, and the
+`make research-excess` regeneration command. Regeneration is deterministic
+within that recorded environment; byte identity across different environments is
+not claimed. Nominal findings and artifacts are untouched, and this is isolated
+research fitting rather than production retraining. This is a descriptive
+historical research result; it does not establish signal, investment value,
+implementability, or a reliable predictive edge.
+
 ## Regime Lens (R2-REGIME-01)
 
 `make research-regime` validates effective-dated annual CPI, year-end TCMB
