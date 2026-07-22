@@ -580,6 +580,31 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
   - **Scientific and governance limitations (preserved explicitly, undiminished):** **no qualified-human attestation was obtained**; the human gate was **waived only by the owner for this internal repository task**; **the waiver changes governance, not evidence**; **40 tickers**; **three evaluation years**; **retrospective cohort membership**; **low statistical power**; **one unusual macro regime**; **cross-basis multiplicity**; **post-review sensitivity status**; **environment-qualified byte reproducibility**; **limited compact-package coverage**; **non-rejection does not prove that true IC is zero**; and **nothing establishes alpha, profitability, investment value, a tradable strategy, deployment validity, or production validity**.
   - **Commit-readiness disposition:** all four requirements of the owner-amended completion standard are now satisfied — (1) **independent repository technical rereview APPROVED**; (2) **multiple independent advisory statistical assessments supported the corrected methodology**; (3) **owner methodological acceptance recorded**; (4) **final repository commit-readiness audit APPROVED**. Therefore **R3-TGT-01 is COMMIT_READY under the owner-amended internal governance standard**.
   - **What COMMIT_READY means here (binding):** the **complete current R3-TGT-01 change set may be staged and committed manually by the owner**. It does **not** mean qualified-human reviewed. It does **not** mean merge-complete or closed. **The commit has not yet occurred.** **Final post-commit verification remains required after the owner creates the commit.** The task must still **not** be marked HUMAN_REVIEW_APPROVED, QUALIFIED_HUMAN_VALIDATED, EXTERNAL_VALIDATION_COMPLETE, MERGE_COMPLETE, or CLOSED, and nothing here establishes a predictive edge, alpha, investment value, or production validity.
+- **Post-commit verification record (2026-07-23; append-only; supersedes nothing above; all historical text above is preserved unchanged):** the owner-created implementation commit for R3-TGT-01 was recorded and its post-commit verification passed.
+  - **Implementation commit created successfully:**
+    - **commit:** `ac4ba8a80d6143fe3fccebc5637fc4d3dab79e43`
+    - **parent:** `26051a35992ea65b789c35f715d7c3aa5cae434c`
+    - **subject:** `Add R3-TGT-01 excess-return robustness analysis`
+    - **committed inventory:** exactly the **14 approved R3-TGT-01 task files**
+    - **diff summary:** **11,845 insertions and 1 deletion**
+    - **no unrelated file entered the commit.**
+  - **Post-commit verification results (all passed):**
+    - `git status` was **clean** immediately after the implementation commit;
+    - `git diff HEAD^ HEAD --check` **passed**;
+    - **docs-lint passed**;
+    - **claims-lint passed** against **Model Confidence Contract v1.8.0**;
+    - **data validation passed:** **403 modeling rows**, **40 governed features**, **321 target rows**, **82 inference-only rows**, **benchmark available**;
+    - **focused excess-basis suite passed: 165 tests**;
+    - the existing **pytest-asyncio default-loop-scope deprecation warning** was **non-blocking and unrelated**.
+  - **Governance status (binding, unchanged in substance):**
+    - the implementation commit is **locally complete and verified**;
+    - **no qualified-human attestation exists**;
+    - the **owner human-gate waiver remains active**;
+    - **COMMIT_READY was applied only under the owner-amended internal standard**;
+    - **nothing establishes predictive edge, alpha, profitability, investment value, tradable-strategy validity, deployment validity, or production validity**;
+    - the branch has **not yet been pushed or merged**;
+    - the task is **not MERGE_COMPLETE or CLOSED**;
+    - **owner push or integration remains pending.**
 
 ### R3-NULL-01 — Negative-control / placebo laboratory
 - **Priority:** P1. **Wave:** 3B (harness-running — fresh context). **Owner role:** Research/Statistics. **Risk:** medium-high. **Model/effort:** **Opus, high.** Independent review: **Fable, medium (design mandatory before merge).**
