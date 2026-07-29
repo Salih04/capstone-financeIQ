@@ -5,11 +5,17 @@ An honest, leakage-safe **T→T+1 equity-research system** for 40 public BIST co
 valuation reconstruction, an explainable hybrid research agent, and the Fable 5
 "Research Terminal" frontend. No paid APIs, no synthetic/fabricated data, no scrapers.
 
+**Maturity:** Completed research project
+
+**Live research interface:** [capstone-finance-iq.vercel.app](https://capstone-finance-iq.vercel.app/)
+
+**Portfolio case study:** [salih04.github.io/projects.html](https://salih04.github.io/projects.html)
+
 > **Capstone status: complete.** The pipeline is rigorous and transparent. The
 > honest finding is that the model still shows **no reliable predictive edge** after
 > expanding internal training to 81 tickers (walk-forward Spearman remains weak/unstable).
 > That is a defensible negative result,
-> not a bug see `TASK_STATE.md`.
+> not a bug. See `TASK_STATE.md`.
 
 **Validated features: 40** balance-sheet + growth (reference), real per-year
 income/profitability (corrected yearly: revenue, margins, ROE, ROA, …), and
@@ -438,4 +444,3 @@ reintroduce them:
 - Dataset is **yearly**; the quarterly Fintables exports are a frozen snapshot and
   are excluded (see `make inspect-quarterly`). No future-year leakage (enforced in
   `validate.py`).
-```
