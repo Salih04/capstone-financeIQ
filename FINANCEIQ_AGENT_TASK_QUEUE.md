@@ -885,6 +885,17 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 
 - **Current state (2026-07-30; append-only):** `INDEPENDENT_REVIEW_APPROVED / COMMIT_READY / OWNER_MANUAL_COMMIT_PENDING`.
 
+
+- **R3-MISS-01 post-merge closure (2026-07-30; append-only):** PR `#2` was merged into `main` through merge commit `fa0999577a9e0509bf3f2c53077734f7bcd5a201`. The merged change set preserves the independently approved 14-path scope.
+
+- **Post-merge verification (2026-07-30; append-only):** focused missingness, excess, and artifact-registry suites passed `553/553`; the complete root suite passed `893/893`; backend passed `99/99`. Documentation lint, claims lint, and data validation passed.
+
+- **Post-merge artifact verification (2026-07-30; append-only):** `missingness_report.json` `5e9b6dff8720c5633cd4213fdbdc84dd9b6791671ede1fcf868b40271b7a61c8`; `missingness_report.md` `80b52934c6cac69f7b267f2f8b3a11abbaa48437a884b4527ed2e613b597200f`; `rank_deltas.csv` `cb7c60064d0f25ce67304e1527d3399057c47f9606e3acad88e1d5215866c9cd`; excess `artifact_manifest.json` `a39c55977fe767458961fafb072d5b9fc8bb3bde2fee6832b01797ee4b067b33`; excess `significance_report.json` `737ce290240a180c6af3f5a8b95e3dc3705d2240e087890045fa7551bf6bd054`; excess `significance_report.md` `5b74228fe6aeae49cca9545b5d133e25d7f73491f48561176993b446871404af`.
+
+- **Scientific standing at closure (2026-07-30; append-only):** R3-TGT-01 remains primary `0/6`, sensitivity `0/6`, either `0/6`; no reliable predictive edge is established. Missingness analysis remains a serving-heuristic sensitivity measurement, not evidence of predictive skill.
+
+- **Final state (2026-07-30; append-only):** `MERGED / POST_MERGE_VERIFIED / R3_MISS_01_CLOSED`.
+
 ### R3-UI-01 — Skeptic challenge panel (per-ticker UI)
 - **Priority:** P1. **Wave:** 3D (first UI task). **Owner role:** Frontend. **Risk:** medium (claim surface). **Model/effort:** **Terra, medium.** Review: Opus low.
 - **Verified current state:** `GET /research/skeptic/{ticker}` shipped + tested (R2-SKEPTIC-01), returns `{ticker, checks[], footer}` with verdict/evidence/severity per check; grep confirms no frontend surface besides the Courtroom embed; R2-SKEPTIC-01 explicitly deferred the panel. `CompanyResearchDetailPage.jsx` (route `/research/companies/:ticker`) is already in the MCC `required_disclaimer.pages`.

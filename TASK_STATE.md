@@ -387,3 +387,20 @@ KAP cross-check recommended before claiming any result.
 | Scientific preservation | `CONFIRMED` |
 | Immutable leaderboard / predictions | `CONFIRMED` |
 | Current state | `COMMIT_READY / OWNER_MANUAL_COMMIT_PENDING` |
+
+### R3-MISS-01 post-merge closure (2026-07-30; append-only)
+
+| State item | Status |
+|---|---|
+| Pull request | `#2 MERGED` |
+| Merge commit | `fa0999577a9e0509bf3f2c53077734f7bcd5a201` |
+| Focused post-merge suites | `553 PASSED / 0 FAILED` |
+| Full root suite | `893 PASSED / 0 FAILED` |
+| Backend suite | `99 PASSED / 0 FAILED` |
+| Documentation lint | `PASSED` |
+| Claims lint | `PASSED` |
+| Data validation | `PASSED` |
+| Artifact hashes | `MATCH APPROVED RECORD` |
+| Scientific preservation | `CONFIRMED` |
+| Final state | `MERGED / POST_MERGE_VERIFIED / CLOSED` |
+
