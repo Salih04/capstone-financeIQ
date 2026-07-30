@@ -108,6 +108,25 @@ claim.
 | R3-TGT-01 post-merge verification (2026-07-23) | POST_MERGE_VERIFICATION_PASSED | after local `main` was fast-forwarded to `origin/main`: `git diff --check` passed; **docs-lint passed**; **claims-lint passed** against **Model Confidence Contract v1.8.0**; **data validation passed** (**403 modeling rows, 40 governed features, 321 target rows, 82 inference-only rows, benchmark available, valid T-to-T+1 modeling dataset**); **focused excess-basis suite 165 passed in 18.55 seconds**; **full root suite 521 passed in 120.71 seconds**; the existing pytest-asyncio default-loop-scope deprecation warning was unrelated and non-blocking |
 | R3-TGT-01 integration disposition (2026-07-23) | MERGE_COMPLETE | the implementation was committed, post-commit verification passed, the branch was published, **PR #1 was merged into `main`**, **both audited commits are present on `origin/main`**, and post-merge verification passed; **no blocking implementation, repository, governance, or integration defect remains for the bounded R3-TGT-01 task**; **no qualified-human approval exists**, the **owner waiver remains active**, and nothing here establishes reliable predictive edge, alpha, investment value, or production validity |
 | R3-TGT-01 final task state (2026-07-23) | CLOSED_UNDER_OWNER_AMENDED_INTERNAL_STANDARD | R3-TGT-01 is **MERGE_COMPLETE and CLOSED under the owner-amended internal governance standard**; CLOSED means **only** that the authorized R3-TGT-01 repository task is complete and no further implementation is required within this task — **dataset expansion, future prospective years, or genuine qualified-human review must be separately authorized and recorded**, and **closure does not strengthen the statistical evidence or external-validation status**; the task is retained as **QUALIFIED_HUMAN_ATTESTATION_UNAVAILABLE** and **HUMAN_REVIEW_GATE_WAIVED_BY_OWNER**, with **no external validation** and **active scientific limitations** (40 tickers, three evaluation years, retrospective cohort membership, low statistical power, one unusual macro regime, cross-basis multiplicity, post-review sensitivity status; non-rejection does not prove the true IC is zero); the task is **not** HUMAN_REVIEW_APPROVED, **not** QUALIFIED_HUMAN_VALIDATED, **not** EXTERNAL_VALIDATION_COMPLETE, **not** PREDICTIVE_EDGE_ESTABLISHED, **not** ALPHA_ESTABLISHED, and **not** PRODUCTION_VALIDATED; all prior R3-TGT-01 rows above are preserved unchanged as historical record; this governance pass appended merge and closure records only — it changed no implementation, test, methodology, Makefile, artifact-registry, generated-artifact, trusted-dataset, nominal-artifact, backend, frontend, or MCC file, regenerated nothing, and performed no staging, commit, amend, merge, or push |
+| R3-MISS-01 implementation (2026-07-24) | IMPLEMENTATION_COMPLETE / ROOT_SUITE_BLOCKED | deterministic serving-heuristic missingness sensitivity **complete** in worktree `r3-miss-01-missingness-sensitivity-ad3e40` on branch `local/r3-miss-01-missingness-sensitivity-ad3e40` at `4fc1136a` (uncommitted: `M Makefile`, `M artifact_registry.json`, `?? experiments/missingness_sensitivity.py`, `?? experiments/results_missingness/`, `?? tests/test_missingness_sensitivity.py`); this governance session ran in the sibling worktree `r3-tgt-01-excess-basis-2e6992` on branch `local/r3-miss-01-amendment-fbc80d` at the same commit, naming discrepancy recorded honestly per R3-UI-02 precedent; unchanged serving seam replayed read-only via `RESEARCH_REPO_ROOT`, **unmasked replay == service output (True)**; input year 2025, forecast year 2026, public cohort 40 tickers, 12 selected features across four governed source classes; four exhaustive scenario families (A 4, B 160, C 12, D 480) = **656 scenarios / 26,240 row-level observations**, deterministic no sampling; `experiments/results_missingness/` contains **exactly** `missingness_report.json`, `missingness_report.md`, `rank_deltas.csv`; independently re-verified this pass — **focused 37 passed, backend 99 passed**, docs-lint/claims-lint (MCC v1.8.0)/data-validate passed; two-run byte-identity attested by the implementation session (not re-executed here, this pass regenerates nothing); service, backend, frontend, datasets, models, weights, feature definitions, canonical artifacts, and all other result namespaces untouched; mandatory boundary recorded verbatim — *serving-heuristic sensitivity only; it does not measure predictive skill, which remains indistinguishable from the null*; full root suite **554 passed / 4 failed** blocks commit; independent review must wait until the full root suite passes; NOT approved, NOT COMMIT_READY, no staging/commit/push |
+| R3-MISS-01 blocker classification (2026-07-24) | CROSS_TASK_PROVENANCE_COMPATIBILITY_DEFECT | the four root-suite failures are R3-TGT-01 provenance/test compatibility defects, not evidence that the R3-MISS-01 serving replay or generated results are incorrect; **class 1 (frozen boundary vs dynamic discovery)** — `test_protected_boundary_and_determinism_survive_the_corrections` (in `tests/test_excess_basis.py`) freezes `protected_count == 351` while its helper dynamically discovers every `experiments/results_*` namespace, so the three new authorized missingness artifacts raise the count (observed `assert 354 == 351`), with `test_protected_artifacts_are_byte_identical_across_regeneration` and `test_generated_artifacts_are_isolated_complete_and_claim_safe` failing from the same drift; **class 2 (stale whole-Makefile-SHA provenance)** — `test_embedded_source_artifact_checksums_are_current` (in `tests/test_artifact_registry.py`) (and the `test_excess_basis.py` embedded-source checksum assertion) fail because R3-TGT-01 excess provenance embeds the SHA-256 of the entire `Makefile`, so the mandatory additive `research-missingness` target marks that provenance stale even though the research-excess recipe, statistical implementation, predictions, leaderboard, and results are unchanged |
+| R3-MISS-01 owner amendment (2026-07-24) | NARROW_R3_TGT_COMPATIBILITY_REPAIR_AUTHORIZED | owner authorizes a narrow compatibility repair recorded append-only in the R3-MISS-01 section of `FINANCEIQ_AGENT_TASK_QUEUE.md`; permitted paths only — `experiments/run_excess_basis.py` (only if the production provenance/protected-boundary implementation shares the defect), `tests/test_excess_basis.py`, `experiments/results_excess/artifact_manifest.json`, `experiments/results_excess/significance_report.json`, `experiments/results_excess/significance_report.md`; no other prior-task file authorized; report/provenance files must be regenerated through the governed runner, never hand-edited; nine durable invariants recorded (unrelated namespace must not invalidate the boundary; unrelated Makefile target must not stale provenance; recipe/statistical-input changes still detected; protected-boundary file mutations still detected; no `results_missingness` special-case and no 351→354 hardcode; no weakening of registry ownership/stale-detection/output-confinement/mutation-detection; R3-TGT-01 dumps/leaderboard/ICs/p-values/intervals/conclusions/claim boundaries unchanged; all three R3-MISS-01 artifacts byte-identical; governed-runner regeneration only); prohibited — service/dataset/model/feature/weight/split/seed/company/year changes, changing R3-MISS-01 scenario results, weakening tests to ignore failures, hardcoding the new file count, one-off `results_missingness` exclusion, modifying prediction dumps/leaderboards, altering statistical conclusions, and staging/committing/pushing |
+| R3-MISS-01 current task state (2026-07-24) | COMPATIBILITY_REPAIR_REQUIRED / REVIEW_PENDING / NOT_COMMIT_READY | R3-MISS-01 is **not** APPROVED, **not** COMMIT_READY, **not** MERGE_COMPLETE, and **not** CLOSED; the authorized narrow R3-TGT-01 compatibility repair must land and the **full root suite must pass** before independent review may begin; all prior rows above are preserved unchanged as historical record; this governance/amendment pass appended implementation-evidence and owner-authorization records to `FINANCEIQ_AGENT_TASK_QUEUE.md` and `TASK_STATE.md` only — it changed no implementation, test, methodology, Makefile, artifact-registry, generated-artifact, dataset, backend, frontend, or MCC file, regenerated nothing, and performed no staging, commit, or push |
+| R3-MISS-01 compatibility repair (2026-07-24) | COMPATIBILITY_REPAIR_COMPLETE | independently re-verified this pass in worktree `r3-miss-01-missingness-sensitivity-ad3e40` at `4fc1136a`: the narrow R3-TGT-01 repair (frozen-boundary member set + pinned digest replacing dynamic `results_*` discovery; normalized `research-excess` target recipe/prerequisite provenance replacing whole-Makefile SHA-256) is present in `experiments/run_excess_basis.py` and `tests/test_excess_basis.py`; no literal `results_missingness` exclusion and no 351→354 hardcode found by grep; the three R3-MISS-01 artifacts are byte-identical to their previously recorded hashes; see `FINANCEIQ_AGENT_TASK_QUEUE.md` R3-MISS-01 section for the full evidence block |
+| R3-MISS-01 full-suite state (2026-07-24) | ROOT_SUITE_GREEN | independently re-run this pass: `PYTHONPATH=. python -m pytest tests/ -q` → **570 passed, 0 failed** (188.46s); focused excess **177 passed**; focused missingness **37 passed**; artifact-registry **16 passed**; backend **99 passed**; `make docs-lint` PASSED; `make claims-lint` PASSED (MCC v1.8.0); `make data-validate` VALID (403 modeling rows, 40 features, 321 target rows, benchmark available); `git diff --check` passed; nothing staged, committed, or pushed |
+| R3-MISS-01 review readiness (2026-07-24) | INDEPENDENT_TECHNICAL_REVIEW_READY | the root-suite blocker recorded 2026-07-24 is resolved; the repair satisfies the nine owner-authorized durable invariants on inspection; R3-MISS-01 is ready for independent technical review, which has not yet occurred |
+| R3-MISS-01 current state (2026-07-24) | REVIEW_PENDING / NOT_COMMIT_READY | R3-MISS-01 is **not** APPROVED, **not** COMMIT_READY, **not** MERGE_COMPLETE, and **not** CLOSED; this recording pass changed only `FINANCEIQ_AGENT_TASK_QUEUE.md` and `TASK_STATE.md`; it did not touch implementation, tests, the Makefile, the artifact registry, generated artifacts, datasets, backend, frontend, or MCC files, regenerated nothing, and performed no staging, commit, or push; the repair does not establish predictive robustness, reliability, stability, edge, alpha, profitability, investment value, tradable-strategy validity, deployment validity, or production validity |
+| R3-MISS-01 independent technical review (2026-07-24) | CHANGES_REQUIRED | independent reviewer examined the full uncommitted change set in worktree `r3-miss-01-missingness-sensitivity-ad3e40` at `4fc1136a`; branch/HEAD confirmed, complete change set present, nothing staged; independently confirmed serving-seam replay correct against the real unchanged service (unmasked replay == complete service response), input year 2025 / forecast 2026 / cohort 40, all 12 selected serving features covered, all four scenario families exhaustive, 656 scenarios / 26,240 row-level observations coherent, JSON+Markdown aggregates reconstruct exactly from the CSV, mandatory scientific label present in JSON+Markdown+every CSV row, deterministic missingness generation, the original four root failures reconstructed, R3-TGT-01 historical boundary reconstructs to the genuine 351-member set and pinned digest, R3-TGT-01 dumps/leaderboard/statistics/multiplicity/intervals/rank-audit/0-of-6 conclusions unchanged, full repaired suite 570 passing, backend/registry/lints/data-validation pass — **but none of these makes the task commit-ready**; verdict `CHANGES_REQUIRED`; see the R3-MISS-01 section of `FINANCEIQ_AGENT_TASK_QUEUE.md` for the full evidence block |
+| R3-MISS-01 blocking defect count (2026-07-24) | THREE_BLOCKING_DEFECTS | (1) missingness output confinement — `experiments/missingness_sensitivity.py` accepts an arbitrary caller-supplied `--results-dir` and confines filenames only relative to it; reviewer wrote all three artifacts under a `backend/` subdirectory outside `experiments/results_missingness`; traversal/absolute-path/symlink escapes must fail closed. (2) Makefile provenance authority — the custom research-excess parser is not GNU-Make-equivalent; in the adversarial case GNU Make executed the later duplicate recipe while provenance hashed the earlier one, so the effective recipe change went undetected; repair must use GNU Make (or a demonstrably equivalent mechanism), not another partial parser. (3) frozen-boundary symlink safety — replacing a protected member with a symlink to an identical external file preserved the digest and was accepted; all members and ancestors must be genuine repository-contained non-symlink regular files, failing closed on symlink members/ancestors/escapes/missing/modified |
+| R3-MISS-01 mandatory repair (2026-07-24) | OUTPUT_CONFINEMENT_MAKE_PROVENANCE_SYMLINK_SAFETY | owner authorizes a narrow repair; new edits only to `experiments/missingness_sensitivity.py`, `tests/test_missingness_sensitivity.py`, `experiments/results_missingness/{missingness_report.json,missingness_report.md,rank_deltas.csv}`, `experiments/run_excess_basis.py`, `tests/test_excess_basis.py`, `experiments/results_excess/{artifact_manifest.json,significance_report.json,significance_report.md}`; generated files regenerated only via `make research-missingness` and `make research-excess`, never hand-edited; **not** authorized — Makefile, artifact_registry.json, service/backend, frontend, datasets, feature passports, models, weights, splits, seeds, companies, years, canonical nominal artifacts, excess prediction dumps, excess leaderboard, MCC, or any other path; if Makefile/registry changes appear necessary, stop and request a separate owner amendment; 17 durable invariants recorded in the queue section |
+| R3-MISS-01 hardening (2026-07-24) | FRACTIONAL_YEAR_VALIDATION_AUTHORIZED | `load_public_frame()` casts numeric years before proving mathematical integrality; values such as `2025.5` must be rejected rather than truncated; non-blocking in the committed dataset but authorized for correction in the same repair pass — fractional, non-finite, malformed, or non-integral years must fail before integer conversion |
+| R3-MISS-01 current state (2026-07-24) | REPAIR_REQUIRED / REVIEW_PENDING / NOT_COMMIT_READY | R3-MISS-01 is **not** APPROVED, **not** COMMIT_READY, **not** MERGE_COMPLETE, and **not** CLOSED; the mandatory three-defect repair plus the authorized fractional-year hardening must land and be re-reviewed before commit; scientific claim boundary preserved verbatim — *serving-heuristic sensitivity only; it does not measure predictive skill, which remains indistinguishable from the null* — green tests and correct sensitivity measurements do not establish predictive robustness, reliability, edge, alpha, profitability, investment value, tradable-strategy validity, deployment validity, or production validity; this recording pass changed only `FINANCEIQ_AGENT_TASK_QUEUE.md` and `TASK_STATE.md`, touched no implementation/test/Makefile/registry/generated-artifact/dataset/backend/frontend/MCC file, regenerated nothing, and performed no staging, commit, or push |
+| R3-MISS-01 mandatory review repair (2026-07-24) | MANDATORY_REPAIR_COMPLETE | the mandatory three-defect repair plus the authorized fractional-year hardening is complete in worktree `r3-miss-01-missingness-sensitivity-ad3e40` at `4fc1136a`; independently re-run/re-hashed this pass; a fresh independent technical re-review is required; see the R3-MISS-01 section of `FINANCEIQ_AGENT_TASK_QUEUE.md` for the full evidence block |
+| R3-MISS-01 blocking defects (2026-07-24) | THREE_BLOCKERS_REPAIRED | (1) missingness output confinement — canonical output restricted to exactly `experiments/results_missingness`, noncanonical requires a separate explicit bounded `--temp-root` authority, traversal/absolute/symlinked-destination/symlinked-ancestor/symlink-escape all fail closed, exactly three governed filenames, failed writes roll back partial files, `make research-missingness` unchanged. (2) effective GNU Make provenance — ad hoc Makefile parser removed; GNU Make itself is the authority via controlled `--print-data-base --dry-run` subprocesses for effective prerequisites/expanded recipe/duplicate-rule/continuation/comment/blank-line/variable handling; unrelated targets/vars do not change the authority; recipe/prerequisite changes detected; statistical sources separately hashed; whole-Makefile SHA not reintroduced. (3) frozen-boundary symlink & path safety — normalized/validated authority paths, absolute/traversal rejected, every member and ancestor lstat-checked without following symlinks, symlinked members/ancestors/non-regular/duplicate/missing/modified/escape fail closed; historical boundary remains 351 members; pinned digest remains `634d7151e75f0ec7a85e412f748ac81499a4fad5e9eac71ab1a5c920f0137dd9` |
+| R3-MISS-01 hardening (2026-07-24) | FRACTIONAL_YEAR_VALIDATION_REPAIRED | year values validated for finiteness and mathematical integrality before integer conversion; `2025.5`, NaN, infinities, empty strings, malformed strings, and truncation/rounding-requiring values rejected; valid integer years and permitted canonical integer strings still accepted |
+| R3-MISS-01 full-suite state (2026-07-24) | ROOT_SUITE_GREEN_AFTER_MANDATORY_REPAIR | independently re-run this pass: full root suite `PYTHONPATH=. python -m pytest tests/ -q` → **638 passed, 0 failed** (221.91s); focused missingness **78 passed**; focused excess **204 passed**; artifact-registry **16 passed**; backend **99 passed**; `make docs-lint` PASSED; `make claims-lint` PASSED (MCC v1.8.0); `make data-validate` VALID (403 modeling rows, 40 features, 321 target rows, 82 inference-only, benchmark available); isolated two-run missingness determinism byte-identical and equal to committed target artifacts (JSON `e351dbf5…`); isolated excess determinism byte-identical except embedded output-path (normalized diff 0, same-path double-run identical), path-independent outputs equal to committed target bytes; target in-place double-run intentionally not performed (override forbids regenerating artifacts) — reproducibility confirmed non-destructively; `git diff --check` clean; nothing staged, committed, or pushed |
+| R3-MISS-01 re-review readiness (2026-07-24) | FRESH_INDEPENDENT_TECHNICAL_REREVIEW_READY | all three blocking defects repaired and the authorized fractional-year hardening applied; scientific evidence for R3-MISS-01 and R3-TGT-01 preserved (byte-identical `.md`/`.csv` artifacts; JSON deltas explained solely by truthful embedded source checksums / GNU Make provenance); R3-MISS-01 is ready for a fresh independent technical re-review, which has not yet occurred |
+| R3-MISS-01 current state (2026-07-24) | REREVIEW_PENDING / NOT_COMMIT_READY | R3-MISS-01 is **not** APPROVED, **not** COMMIT_READY, **not** MERGE_COMPLETE, and **not** CLOSED; a fresh independent technical re-review must occur before commit; scientific claim boundary preserved verbatim — *serving-heuristic sensitivity only; it does not measure predictive skill, which remains indistinguishable from the null* — green tests and correct sensitivity measurements do not establish predictive robustness, reliability, edge, alpha, profitability, investment value, tradable-strategy validity, deployment validity, or production validity; this recording pass changed only `FINANCEIQ_AGENT_TASK_QUEUE.md` and `TASK_STATE.md`, touched no implementation/test/Makefile/registry/generated-artifact/dataset/backend/frontend/MCC file, regenerated no committed artifact, and performed no staging, commit, or push |
 | Reliable predictive edge | LIMIT | weak/unstable; needs larger universe + longer history |
 
 ---
@@ -216,3 +235,155 @@ KAP cross-check recommended before claiming any result.
 ### Other optional items
 - Quarterly fundamentals with genuine per-period variation (current quarterly exports are frozen).
 - Optional: point the research agent at a fine-tuned local model (see `research_agent_training/mlx_training_plan.md`).
+
+### R3-MISS-01 fresh independent technical re-review (2026-07-24; append-only)
+
+| State item | Status |
+|---|---|
+| Fresh independent technical re-review | `CHANGES_REQUIRED` |
+| Blocking defect count | `FIVE_BLOCKING_DEFECTS` |
+| Output publication repair | `SYMLINK_SAFE_TRANSACTIONAL_PUBLICATION_AUTHORIZED` |
+| GNU Make provenance repair | `NON_EXECUTING_EXECUTION_SEMANTICS_REPAIR_AUTHORIZED` |
+| Frozen-boundary repair | `DESCRIPTOR_ANCHORED_HASHING_REPAIR_AUTHORIZED` |
+| Review state | `REREVIEW_REQUIRED` |
+| Current state | `REPAIR_REQUIRED / NOT_COMMIT_READY` |
+
+### R3-MISS-01 five-blocker mandatory repair completion (2026-07-24; append-only)
+
+| State item | Status |
+|---|---|
+| Five-blocker mandatory repair | `COMPLETE` |
+| Canonical output confinement | `DESCRIPTOR_ANCHORED_REPAIRED` |
+| Artifact publication | `TRANSACTIONAL_PUBLICATION_REPAIRED` |
+| Make provenance | `NON_EXECUTING_STATIC_CONTRACT_REPAIRED` |
+| Frozen-boundary hashing | `DESCRIPTOR_ANCHORED_REPAIRED` |
+| Full root suite | `666 PASSED / 0 FAILED` |
+| Re-review readiness | `FRESH_INDEPENDENT_TECHNICAL_REREVIEW_READY` |
+| Current state | `REREVIEW_PENDING / NOT_COMMIT_READY` |
+
+### R3-MISS-01 post-five-blocker fresh independent re-review (2026-07-29; append-only)
+
+| State item | Status |
+|---|---|
+| Fresh independent technical re-review | `CHANGES_REQUIRED` |
+| Scientific preservation | `CONFIRMED` |
+| Required suite status | `GREEN` |
+| Remaining blocking defects | `FIVE` |
+| Temporary-output authority | `POST_AUTHORIZATION_SYMLINK_RACE_REPAIR_REQUIRED` |
+| Publication transaction | `CLEANUP_COMMIT_POINT_REPAIR_REQUIRED` |
+| Make provenance | `GLOBAL_AND_AMBIGUOUS_SEMANTICS_REPAIR_REQUIRED` |
+| Frozen boundary | `ANCESTOR_REVALIDATION_REPAIR_REQUIRED` |
+| Service replay guard | `COMPLETE_RESPONSE_ASSERTION_REPAIR_REQUIRED` |
+| Repair authorization | `SECOND_MANDATORY_REPAIR_AUTHORIZED` |
+| Review state | `FRESH_REREVIEW_REQUIRED` |
+| Current state | `REPAIR_REQUIRED / NOT_COMMIT_READY` |
+
+### R3-MISS-01 second mandatory repair completion (2026-07-29; append-only)
+
+| State item | Status |
+|---|---|
+| Second mandatory repair | `COMPLETE` |
+| Temporary output authority | `CONTINUOUS_DESCRIPTOR_AUTHORITY_REPAIRED` |
+| Publication transaction | `EXPLICIT_COMMIT_POINT_REPAIRED` |
+| Make provenance | `STRICT_NON_EXECUTING_SUBSET_REPAIRED` |
+| Frozen-boundary hashing | `FULL_ANCESTOR_REVALIDATION_REPAIRED` |
+| Complete service replay | `CANONICAL_FULL_RESPONSE_ASSERTION_REPAIRED` |
+| Focused missingness | `133 PASSED / 0 FAILED` |
+| Focused excess | `253 PASSED / 0 FAILED` |
+| Full root suite | `742 PASSED / 0 FAILED` |
+| Backend suite | `99 PASSED / 0 FAILED` |
+| Re-review readiness | `FRESH_INDEPENDENT_TECHNICAL_REREVIEW_READY` |
+| Current state | `REREVIEW_PENDING / NOT_COMMIT_READY` |
+
+### R3-MISS-01 second-repair fresh independent re-review (2026-07-29; append-only)
+
+| State item | Status |
+|---|---|
+| Independent verdict | `CHANGES_REQUIRED` |
+| Passing repairs | `TRANSACTION / FROZEN_BOUNDARY / COMPLETE_REPLAY` |
+| Remaining blockers | `TWO` |
+| Output authority | `REAL_DIRECTORY_REPLACEMENT_REPAIR_REQUIRED` |
+| Make provenance | `GLOBAL_SEMANTICS_REPAIR_REQUIRED` |
+| Repair authorization | `NARROW_REPAIR_AUTHORIZED` |
+| Current state | `REPAIR_REQUIRED / NOT_COMMIT_READY` |
+
+### R3-MISS-01 two-blocker narrow repair completion (2026-07-29; append-only)
+
+| State item | Status |
+|---|---|
+| Two-blocker narrow repair | `COMPLETE` |
+| Output authority | `DESCRIPTOR_IDENTITY_CHAIN_REPAIRED` |
+| Make provenance | `GLOBAL_SEMANTICS_REPAIRED` |
+| Full root suite | `794 PASSED / 0 FAILED` |
+| Backend suite | `99 PASSED / 0 FAILED` |
+| Current state | `REREVIEW_PENDING / NOT_COMMIT_READY` |
+
+### R3-MISS-01 final fresh independent re-review (2026-07-29; append-only)
+
+| State item | Status |
+|---|---|
+| Independent verdict | `CHANGES_REQUIRED` |
+| Remaining blockers | `TWO` |
+| Final directory identity | `REPAIR_REQUIRED` |
+| Make target parsing | `REPAIR_REQUIRED` |
+| Repair authorization | `FINAL_NARROW_REPAIR_AUTHORIZED` |
+| Current state | `REPAIR_REQUIRED / NOT_COMMIT_READY` |
+
+### R3-MISS-01 final two-blocker repair completion (2026-07-29; append-only)
+
+| State item | Status |
+|---|---|
+| Final two-blocker repair | `COMPLETE` |
+| Final directory identity | `REPAIRED` |
+| Ambiguous Make targets | `REPAIRED` |
+| Full root suite | `861 PASSED / 0 FAILED` |
+| Backend suite | `99 PASSED / 0 FAILED` |
+| Current state | `REREVIEW_PENDING / NOT_COMMIT_READY` |
+
+### R3-MISS-01 legacy publication blocker (2026-07-29; append-only)
+
+| State item | Status |
+|---|---|
+| Independent verdict | `CHANGES_REQUIRED` |
+| Remaining blockers | `ONE` |
+| Structured publication | `PASSED` |
+| Make provenance | `PASSED` |
+| Legacy publication | `FINAL_DIRECTORY_SYMLINK_REPAIR_REQUIRED` |
+| Repair authorization | `FINAL_LEGACY_REPAIR_AUTHORIZED` |
+| Current state | `REPAIR_REQUIRED / NOT_COMMIT_READY` |
+
+### R3-MISS-01 final legacy publication repair completion (2026-07-30; append-only)
+
+| State item | Status |
+|---|---|
+| Final legacy publication repair | `COMPLETE` |
+| Final-component normalization | `PARENT_ONLY / REPAIRED` |
+| Retained legacy authority | `DURABLE_CLAIM_REPAIRED` |
+| Path-only fallback | `REMOVED` |
+| Legacy publication authorization | `EXPLICIT_ASSERTION_REPAIRED` |
+| Focused missingness | `202 PASSED / 0 FAILED` |
+| Artifact registry | `16 PASSED / 0 FAILED` |
+| Full root suite | `893 PASSED / 0 FAILED` |
+| Backend suite | `99 PASSED / 0 FAILED` |
+| Documentation / claims / data validation | `PASSED` |
+| Review readiness | `FRESH_INDEPENDENT_TECHNICAL_REREVIEW_READY` |
+| Current state | `REREVIEW_PENDING / NOT_COMMIT_READY` |
+
+### R3-MISS-01 final independent approval (2026-07-30; append-only)
+
+| State item | Status |
+|---|---|
+| Independent verdict | `APPROVED` |
+| Inspected change scope | `14 AUTHORIZED PATHS` |
+| Independent publication attacks | `15/15 FAILED CLOSED` |
+| Governed-file leakage | `ZERO` |
+| Focused missingness | `202 PASSED / 0 FAILED` |
+| Focused excess | `335 PASSED / 0 FAILED` |
+| Artifact registry | `16 PASSED / 0 FAILED` |
+| Full root suite | `893 PASSED / 0 FAILED` |
+| Backend suite | `99 PASSED / 0 FAILED` |
+| Documentation / claims / data validation | `PASSED` |
+| Deterministic missingness regeneration | `BYTE_IDENTICAL` |
+| Scientific preservation | `CONFIRMED` |
+| Immutable leaderboard / predictions | `CONFIRMED` |
+| Current state | `COMMIT_READY / OWNER_MANUAL_COMMIT_PENDING` |

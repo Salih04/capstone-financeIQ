@@ -14,6 +14,7 @@
     "experiments/results_regime",
     "experiments/results_serving_eval",
     "experiments/results_forward_2026",
+    "experiments/results_missingness",
     "data/trusted_clean"
   ],
   "coverage_rule": "Every file under a governed root, excluding experiments/results/runs/**, must be matched by exactly one entry below. An unmatched file (orphan) or a file matched by more than one entry (duplicate ownership) is a governance failure enforced by tests/test_artifact_registry.py.",
@@ -39,7 +40,8 @@
       "experiments/results_excess/significance_report.json",
       "experiments/results_real_terms/real_try/significance_report.json",
       "experiments/results_real_terms/usd/significance_report.json",
-      "experiments/results_regime/regime_context_report.json"
+      "experiments/results_regime/regime_context_report.json",
+      "experiments/results_missingness/missingness_report.json"
     ]
   },
   "reproducibility_note": "Regeneration reproduces content in an environment-qualified sense only: byte identity requires matching Python, platform, and numerical-package versions (see METHODOLOGY 'Reproducibility and run provenance'). This registry does not claim universal byte reproducibility.",
@@ -494,6 +496,44 @@
       ],
       "hand_edit_forbidden": true,
       "notes": "Deterministic freeze-once manifest for the pre-registered 2026 ranking. Records the frozen ranking checksum, original parent/pre-freeze git SHA, service-function identity, and input checksums; its source_artifacts list (including the frozen ranking itself) is re-verified by the staleness test. Identical reruns leave it untouched and drift refuses without replacement."
+    },
+    {
+      "path_or_glob": "experiments/results_missingness/missingness_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make research-missingness",
+      "inputs": [
+        "backend/app/services/forecasting_csv_service.py",
+        "experiments/missingness_sensitivity.py",
+        "data/trusted_clean/modeling_dataset_public_2020_2025.csv",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "data/trusted_clean/feature_passports.json"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by experiments/missingness_sensitivity.py (R3-MISS-01) after invoking the unchanged train_parameters/run_forecast/get_options service functions read-only through an isolated RESEARCH_REPO_ROOT. Records the deterministic serving-heuristic missingness sensitivity: baseline replay audit, governed feature-category (source_class) authority, all four scenario families, aggregate summaries, source checksums, and the mandatory sensitivity label. Serving-recipe sensitivity only; predictive skill was not measured."
+    },
+    {
+      "path_or_glob": "experiments/results_missingness/missingness_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make research-missingness",
+      "inputs": [
+        "experiments/results_missingness/missingness_report.json"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Human-readable companion to missingness_report.json, rendered by experiments/missingness_sensitivity.py (render_markdown) from the same computed in-memory result. Carries the mandatory sensitivity label verbatim."
+    },
+    {
+      "path_or_glob": "experiments/results_missingness/rank_deltas.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-missingness",
+      "inputs": [
+        "backend/app/services/forecasting_csv_service.py",
+        "experiments/missingness_sensitivity.py",
+        "data/trusted_clean/modeling_dataset_public_2020_2025.csv",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "data/trusted_clean/feature_passports.json"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Complete row-level scenario evidence for R3-MISS-01: one row per (scenario, ticker) with baseline/masked rank, signed and absolute rank deltas, confidence and score deltas, usable/missing selected-feature counts, and the mandatory sensitivity label on every row."
     },
     {
       "path_or_glob": "experiments/results_real_terms/**",

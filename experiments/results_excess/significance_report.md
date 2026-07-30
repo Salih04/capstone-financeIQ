@@ -224,6 +224,14 @@ The note is family-level. No member is selected or privileged by the sign or mag
 - The repository technical review separately covers governed source paths, protected hashes, split tracing, and implementation behavior.
 - No claim of complete independent fitting-stage replication is made from the compact package alone.
 
+## Provenance and protected boundary
+
+Provenance here is descriptive metadata about how these artifacts are regenerated and bounded. It does not affect any statistical result, conclusion, or claim boundary above, and neither the owner-authorized compatibility repair nor this metadata strengthens statistical validity.
+
+- Statistical source inputs are recorded under `source_artifacts` (the trusted modeling dataset, the read-only canonical leaderboard, and the frozen generator, experiment, and significance modules), each pinned by whole-file sha256.
+- Regeneration-recipe provenance is the single `research-excess` Makefile target recipe (`14758a5aa275…`), not the whole Makefile. Unrelated Makefile targets added by other tasks do not stale these artifacts, while editing this recipe or its prerequisites is still detected.
+- The frozen protected boundary is an explicit historical allow-list of 351 curated-data and pre-existing generated files that this regeneration must never mutate, pinned by a content digest. Namespaces added by later, unrelated governed tasks are not members of this historical set, were not part of the R3-TGT-01 review, and are governed by their own tasks; they cannot enlarge or invalidate this boundary.
+
 ## Required limitations
 
 - Only three test years with 40 evaluated tickers per model and split; estimates remain noisy.

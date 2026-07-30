@@ -7,7 +7,7 @@
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration \
 	fetch-usdtry alternative-targets research-real-terms research-excess research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo research-serving-eval \
-	freeze-forward-2026 evaluate-forward-2026 claims-lint docs-lint
+	freeze-forward-2026 evaluate-forward-2026 research-missingness claims-lint docs-lint
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -264,6 +264,15 @@ research-placebo:
 # experiments/results_serving_eval/; canonical artifacts remain read-only.
 research-serving-eval:
 	PYTHONPATH=. python experiments/serving_eval.py
+
+# Serving-heuristic missingness sensitivity (R3-MISS-01). Deterministic OFFLINE
+# replay: masks selected serving inputs to the service's own null value and
+# re-invokes the unchanged run_forecast through an isolated RESEARCH_REPO_ROOT to
+# measure rank/confidence response. Writes only to experiments/results_missingness/;
+# the service and canonical artifacts stay read-only. Serving-recipe sensitivity
+# only — it does not measure predictive skill.
+research-missingness:
+	PYTHONPATH=. python experiments/missingness_sensitivity.py
 
 # Freeze the 2026 forward ranking for pre-registered evaluation (R3-PREREG-01).
 # Replays the unchanged production inference path offline and writes an immutable

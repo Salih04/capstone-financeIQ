@@ -55,11 +55,13 @@ import argparse
 import ast
 import hashlib
 import importlib.metadata
+import fnmatch
 import json
 import math
 import os
 import platform
 import re
+import stat
 import sys
 import tempfile
 from pathlib import Path
@@ -108,6 +110,57 @@ BOOTSTRAP_INTERVAL_CONVENTION = "percentile; 2.5th and 97.5th quantiles of the r
 MIN_CLUSTERS = 3
 MIN_VALID_RESAMPLE_FRACTION = 0.9
 MIN_VALID_RESAMPLES = 1_000
+
+# ---------------------------------------------------------------------------
+# Task-specific regeneration-recipe provenance
+# ---------------------------------------------------------------------------
+#
+# R3-TGT-01 depends on its own regeneration *recipe*, not on the byte content of
+# the whole Makefile.  The whole file is an invocation wrapper: unrelated targets
+# added by other tasks change its bytes without changing how the excess artifacts
+# are produced.  Only this named target's recipe and prerequisites are a genuine
+# provenance dependency, so only they are hashed.
+RESEARCH_EXCESS_TARGET = "research-excess"
+MAKEFILE_NAME = "Makefile"
+
+# ---------------------------------------------------------------------------
+# Frozen R3-TGT-01 protected boundary
+# ---------------------------------------------------------------------------
+#
+# The protected boundary is the curated data and the generated namespaces that
+# already existed when R3-TGT-01 was frozen, and that the excess regeneration
+# must never mutate.  It is an explicit *historical allow-list*, not a live
+# ``results_*`` wildcard: namespaces introduced by later, unrelated governed
+# tasks are deliberately NOT members (they are protected by their own tasks), so
+# adding one can never enlarge or invalidate this boundary.  The excess task's
+# own output namespace (``experiments/results_excess``) is excluded here and is
+# verified separately as this task's artifacts.
+FROZEN_BOUNDARY_DATA_DIRS = ("trusted", "trusted_clean", "config", "exports", "interim")
+FROZEN_BOUNDARY_EXPERIMENT_DIRS = (
+    "reports",
+    "results",
+    "results_disagreement",
+    "results_forward_2026",
+    "results_influence",
+    "results_placebo",
+    "results_rank_stability",
+    "results_real_terms",
+    "results_regime",
+    "results_serving_eval",
+)
+FROZEN_BOUNDARY_EXTRA_FILES = (
+    "experiments/leaderboard.csv",
+    "model_confidence_contract.json",
+)
+# Pinned content identity of the frozen boundary: the sha256 of the sorted
+# ``<repo-relative-posix-path>:<sha256>`` records of every member (see
+# ``_frozen_boundary_digest``).  Computed once at freeze and re-asserted on every
+# regeneration so a modified or removed original member fails closed, and so the
+# set is never silently redefined from the current filesystem.  It is a content
+# digest, not a file count, and does not move when unrelated namespaces appear.
+FROZEN_PROTECTED_BOUNDARY_SHA256 = (
+    "634d7151e75f0ec7a85e412f748ac81499a4fad5e9eac71ab1a5c920f0137dd9"
+)
 
 # ---------------------------------------------------------------------------
 # Estimand tracing (correction 1)
@@ -372,6 +425,30 @@ class ExcessEstimandError(ValueError):
     """
 
 
+class ExcessMakefileProvenanceError(ValueError):
+    """Raised when the ``research-excess`` Makefile recipe cannot be located.
+
+    The excess task depends on its own regeneration recipe, not on the whole
+    Makefile.  If the target rule is missing the recipe-provenance authority
+    cannot be built, so the run fails rather than silently recording an empty or
+    misattributed recipe.  A distinct type keeps a removed/renamed target
+    separable from an incidental parse or filesystem error.
+    """
+
+
+class ExcessFrozenBoundaryError(ValueError):
+    """Raised when the frozen R3-TGT-01 protected boundary no longer matches its
+    pinned authority.
+
+    The boundary is a fixed historical set: the curated data and the generated
+    namespaces that already existed when R3-TGT-01 was frozen.  It is never
+    silently redefined from whatever files happen to exist now, so a mismatch
+    (a modified or removed original member) fails closed instead of quietly
+    re-freezing a new set.  Namespaces that later tasks add are not members and
+    do not trigger this error.
+    """
+
+
 def validate_excess_claim_safety_text(text: str) -> None:
     """Reject benchmark-relative performance interpretations of this analysis."""
     alt.validate_claim_safety_text(text)
@@ -528,12 +605,1121 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+# Descriptor-anchored hashing flags (present on Linux/macOS; ``getattr`` keeps the
+# import portable — the lexical symlink guards during collection still apply).
+_EX_O_NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
+_EX_O_DIRECTORY = getattr(os, "O_DIRECTORY", 0)
+
+
+def _fd_identity(fd: int) -> tuple[int, int]:
+    """``(st_dev, st_ino)`` of an open descriptor — its stable object identity."""
+    info = os.fstat(fd)
+    return info.st_dev, info.st_ino
+
+
+def _revalidate_frozen_chain(
+    root_fd: int,
+    ancestors: list[str],
+    ancestor_ids: list[tuple[int, int]],
+    final: str,
+    member_id: tuple[int, int],
+    relative_posix: str,
+) -> None:
+    """Re-walk ``ancestors``/``final`` from ``root_fd`` and prove identity is stable.
+
+    The first traversal opened and retained a descriptor for every ancestor and
+    the final member.  Those descriptors keep pointing at the *original* objects
+    even if the repository path is later re-pointed elsewhere — so verifying the
+    member only against a retained parent descriptor cannot see an ancestor that
+    was renamed away and replaced during hashing.  This re-opens each component
+    fresh from ``root_fd`` with ``O_NOFOLLOW`` and requires the *current* path to
+    still reach the very same ``(dev, ino)`` objects; anything else (a swapped,
+    renamed-and-replaced, symlinked, deleted, or type-changed component anywhere
+    in the chain) fails closed.
+    """
+    parent_fd = root_fd
+    reopened: list[int] = []
+    try:
+        for depth, component in enumerate(ancestors):
+            try:
+                nxt = os.open(
+                    component,
+                    os.O_RDONLY | _EX_O_DIRECTORY | _EX_O_NOFOLLOW,
+                    dir_fd=parent_fd,
+                )
+            except OSError as exc:
+                raise ExcessFrozenBoundaryError(
+                    f"frozen-boundary ancestor {component!r} of {relative_posix} could "
+                    f"not be re-opened from the repository root after hashing (renamed, "
+                    f"replaced, symlinked, or deleted during hashing): {exc}"
+                ) from exc
+            reopened.append(nxt)
+            if _fd_identity(nxt) != ancestor_ids[depth]:
+                raise ExcessFrozenBoundaryError(
+                    f"frozen-boundary ancestor {component!r} of {relative_posix} no "
+                    "longer identifies the object hashed under it (the current "
+                    "repository path was re-pointed to a different directory during "
+                    "hashing); failing closed"
+                )
+            parent_fd = nxt
+        try:
+            info = os.stat(final, dir_fd=parent_fd, follow_symlinks=False)
+        except FileNotFoundError as exc:
+            raise ExcessFrozenBoundaryError(
+                f"frozen-boundary member {relative_posix} is no longer reachable from "
+                "the repository root after hashing (deleted or renamed during hashing)"
+            ) from exc
+        if stat.S_ISLNK(info.st_mode):
+            raise ExcessFrozenBoundaryError(
+                f"frozen-boundary member {relative_posix} became a symlink on the "
+                "current repository path during hashing; failing closed"
+            )
+        if (info.st_dev, info.st_ino) != member_id:
+            raise ExcessFrozenBoundaryError(
+                f"frozen-boundary member {relative_posix} on the current repository "
+                "path no longer identifies the hashed object (ancestor renamed and "
+                "replaced during hashing); failing closed"
+            )
+    finally:
+        for fd in reversed(reopened):
+            os.close(fd)
+
+
+def _sha256_member_anchored(root_fd: int, relative_posix: str) -> str:
+    """Hash a frozen-boundary member strictly beneath ``root_fd`` without following.
+
+    Never hashes by reopening a previously validated pathname: every ancestor
+    component is opened with ``O_NOFOLLOW`` relative to the prior descriptor, the
+    final member is opened ``O_RDONLY | O_NOFOLLOW``, validated by ``fstat`` on
+    that exact descriptor (must be a regular file), and hashed from it.  A second
+    ``fstat`` after hashing and a ``follow_symlinks=False`` stat of the path via
+    the member's parent descriptor prove the member descriptor still identifies
+    the same device/inode object with unchanged size and mtime, so a file swapped
+    for a symlink, replaced by another regular file, truncated, or deleted between
+    validation and hashing all fail closed.
+
+    A retained parent descriptor is not enough on its own: it keeps pointing at
+    the original directory even if a *higher* ancestor (e.g. ``data/trusted``) is
+    renamed away and a different tree is installed on the same repository path
+    while the member is being hashed.  After hashing, the whole chain is therefore
+    re-walked from ``root_fd`` (:func:`_revalidate_frozen_chain`) and the current
+    repository path is required to still reach the very same ``(dev, ino)`` objects
+    for every ancestor and for the final member; an ancestor-replacement race fails
+    closed instead of being silently accepted.
+    """
+    parts = relative_posix.split("/")
+    ancestors, final = parts[:-1], parts[-1]
+    opened: list[int] = []
+    ancestor_ids: list[tuple[int, int]] = []
+    parent_fd = root_fd
+    try:
+        for component in ancestors:
+            try:
+                nxt = os.open(
+                    component,
+                    os.O_RDONLY | _EX_O_DIRECTORY | _EX_O_NOFOLLOW,
+                    dir_fd=parent_fd,
+                )
+            except OSError as exc:
+                raise ExcessFrozenBoundaryError(
+                    f"frozen-boundary ancestor {component!r} of {relative_posix} could "
+                    f"not be opened without following a symlink: {exc}"
+                ) from exc
+            opened.append(nxt)
+            ancestor_ids.append(_fd_identity(nxt))
+            parent_fd = nxt
+
+        try:
+            member_fd = os.open(
+                final, os.O_RDONLY | _EX_O_NOFOLLOW, dir_fd=parent_fd
+            )
+        except OSError as exc:
+            raise ExcessFrozenBoundaryError(
+                f"frozen-boundary member {relative_posix} could not be opened without "
+                f"following a symlink (a symlink, missing, or non-regular file): {exc}"
+            ) from exc
+        try:
+            first = os.fstat(member_fd)
+            if not stat.S_ISREG(first.st_mode):
+                raise ExcessFrozenBoundaryError(
+                    f"frozen-boundary member is not a regular file: {relative_posix}"
+                )
+            digest = hashlib.sha256()
+            while True:
+                block = os.read(member_fd, 1024 * 1024)
+                if not block:
+                    break
+                digest.update(block)
+            after = os.fstat(member_fd)
+            if (
+                (first.st_dev, first.st_ino) != (after.st_dev, after.st_ino)
+                or first.st_size != after.st_size
+                or first.st_mtime_ns != after.st_mtime_ns
+            ):
+                raise ExcessFrozenBoundaryError(
+                    f"frozen-boundary member changed while it was being hashed: "
+                    f"{relative_posix}"
+                )
+            try:
+                path_info = os.stat(final, dir_fd=parent_fd, follow_symlinks=False)
+            except FileNotFoundError as exc:
+                raise ExcessFrozenBoundaryError(
+                    f"frozen-boundary member was deleted while being hashed: "
+                    f"{relative_posix}"
+                ) from exc
+            if stat.S_ISLNK(path_info.st_mode):
+                raise ExcessFrozenBoundaryError(
+                    f"frozen-boundary member was replaced by a symlink while being "
+                    f"hashed: {relative_posix}"
+                )
+            if (path_info.st_dev, path_info.st_ino) != (first.st_dev, first.st_ino):
+                raise ExcessFrozenBoundaryError(
+                    f"frozen-boundary member path no longer identifies the hashed "
+                    f"object (replaced during hashing): {relative_posix}"
+                )
+            # Post-hash whole-chain revalidation from the repository root: the
+            # current path must still reach the same ancestor and member objects.
+            _revalidate_frozen_chain(
+                root_fd,
+                ancestors,
+                ancestor_ids,
+                final,
+                (first.st_dev, first.st_ino),
+                relative_posix,
+            )
+            return digest.hexdigest()
+        finally:
+            os.close(member_fd)
+    finally:
+        for fd in reversed(opened):
+            os.close(fd)
+
+
 def _source_record(path: Path, role: str) -> dict:
     return {
         "path": _display_path(path),
         "sha256": _sha256(path),
         "size_bytes": path.stat().st_size,
         "role": role,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Task-specific Makefile recipe provenance (static, non-executing parser)
+# ---------------------------------------------------------------------------
+#
+# SECURITY CONTRACT — this authority NEVER invokes GNU Make.  The previous
+# implementation shelled out to ``make --dry-run`` / ``make --print-data-base``
+# to discover the effective recipe; but ``--dry-run`` still *executes* recursive
+# sub-makes and force-run (``+``) recipe lines, can touch the filesystem, and can
+# leak machine-specific executable paths.  Discovering a recipe by running a
+# program that may itself run that recipe is unsafe, so recipe discovery is now a
+# pure, side-effect-free parse of the Makefile bytes: no subprocess is launched,
+# and no code path can execute a recipe command.
+#
+# It is deliberately NOT a general GNU Make implementation.  It supports only the
+# narrow, statically reviewable form the repository's ``research-excess`` target
+# actually uses, and it fails closed on anything outside that form BEFORE any
+# command text could ever run.  ``MAKEFILE_ACCEPTED_SUBSET`` documents the exact
+# contract, which is also embedded in the generated provenance metadata.  Only
+# this one target's prerequisites and verbatim recipe lines are hashed; the whole
+# Makefile is never hashed, so unrelated targets or variables added by other
+# tasks never stale these artifacts, while a change to the research-excess recipe
+# or its prerequisites always does.
+
+MAKEFILE_ACCEPTED_SUBSET = (
+    "Static, non-executing parse of a single research-excess rule; GNU Make is "
+    "never invoked. Directive and rule detection operates on logical lines "
+    "(backslash continuations joined) after leading whitespace is stripped, so a "
+    "space-indented directive or rule is seen exactly as GNU Make sees it. "
+    "Accepted: exactly one target-rule line 'research-excess:' (single ':', never "
+    "'::' or ':='), optional whitespace-separated prerequisites with backslash "
+    "continuation, and a contiguous block of tab-indented recipe lines recorded "
+    "verbatim with backslash continuation preserved. Execution-significant recipe "
+    "prefixes '@' and '-' are preserved as literal text so, e.g., 'false', "
+    "'-false', '@false', and '-@false' produce distinct provenance. '.PHONY' is "
+    "the one accepted special target and is NOT inert: whether research-excess is "
+    "a .PHONY member decides whether an existing file of that name would suppress "
+    "the recipe, so membership is parsed from every .PHONY line (leading "
+    "whitespace and continuations included) and recorded truthfully as a hashed "
+    "provenance field. Rejected (fail closed, before any command could run): a "
+    "missing or renamed target, duplicate research-excess rule lines (at column 0 "
+    "or space-indented), a '::' or ':=' form, a '+' recipe prefix, a global or "
+    "target-scoped SHELL/.SHELLFLAGS/MAKESHELL/MAKEFLAGS assignment, any other "
+    "special target ('.IGNORE', '.SILENT', '.ONESHELL', '.POSIX', '.RECIPEPREFIX', "
+    "'.DELETE_ON_ERROR', '.NOTPARALLEL', '.SECONDEXPANSION', "
+    "'.EXPORT_ALL_VARIABLES') whether global, target-scoped, or space-indented, an "
+    "unsupported '.PHONY' form, '$(MAKE)'/'${MAKE}' or any recursive 'make' "
+    "invocation, and any '$(...)' or '${...}' make variable/function reference "
+    "(covering '$(shell ...)', '$(eval ...)', '$(call ...)', and ordinary variable "
+    "expansion) in the recipe, the prerequisites, or a .PHONY member list. Escaped "
+    "'$$' is left intact. Every rule line in the file is additionally checked for "
+    "target-identity ambiguity, because a target expression this parser could not "
+    "resolve might silently define, duplicate, or override research-excess: a "
+    "multi-target rule naming research-excess in any position (including one "
+    "assembled across backslash continuations), a target expression containing any "
+    "'$(...)'/'${...}' variable-derived name (e.g. '$(TARGET):' or '${TARGET}:'), a "
+    "pattern ('%') or glob ('*', '?', '[...]') target that could cover "
+    "research-excess, a variable assignment whose literal value is research-excess, "
+    "and more than one effective research-excess target definition in any mixture "
+    "of literal and derived forms all fail closed, as do a static pattern rule and "
+    "a ';' inline recipe on the research-excess rule line. No target expression whose "
+    "effective identity cannot be established statically — without executing or "
+    "expanding Make — is ever accepted. No general GNU Make equivalence is claimed."
+)
+
+# A research-excess rule line at column 0: single ':' (never '::' or ':='),
+# capturing the prerequisite text that follows.
+_RESEARCH_EXCESS_RULE_RE = re.compile(
+    r"^" + re.escape(RESEARCH_EXCESS_TARGET) + r"[ \t]*:(?![:=])(?P<prereqs>.*)$"
+)
+# A '::' or ':=' definition of the target is outside the accepted simple form.
+_RESEARCH_EXCESS_UNSUPPORTED_RE = re.compile(
+    r"^" + re.escape(RESEARCH_EXCESS_TARGET) + r"[ \t]*(?:::|:?=)"
+)
+# Any make variable/function reference — rejected wholesale inside the target's
+# recipe or prerequisites (covers $(MAKE), $(shell ...), $(eval ...), $(call ...),
+# and ordinary $(VAR)/${VAR} expansion). An escaped '$$' is preceded by '$' and
+# is left intact.
+_MAKE_EXPANSION_RE = re.compile(r"(?<!\$)\$[({]")
+# A recursive make invocation appearing as a command word (in addition to
+# $(MAKE)): 'make' at the start or after a shell separator.
+_RECURSIVE_MAKE_RE = re.compile(r"(?:^|[\s;&|()])make(?:\s|$)")
+
+# Special-target directives (e.g. '.ONESHELL:', '.IGNORE:', '.SILENT:'). Matched
+# on the *stripped* logical line, because GNU Make strips leading whitespace from
+# any non-recipe line: '  .SILENT:' is as effective as '.SILENT:' at column 0.
+# Only '.PHONY' is inside the accepted subset, and it is NOT treated as inert:
+# .PHONY membership decides whether an existing file named 'research-excess'
+# would make the target up to date and suppress the recipe, so membership is
+# recorded truthfully in provenance instead of being ignored. Every other special
+# target — '.IGNORE'/'.SILENT'/'.ONESHELL'/'.POSIX'/'.RECIPEPREFIX'/
+# '.DELETE_ON_ERROR'/'.NOTPARALLEL'/'.SECONDEXPANSION'/'.EXPORT_ALL_VARIABLES',
+# global, target-scoped, or whitespace-prefixed — changes execution semantics
+# (error handling, echoing, one-shell recipes, the recipe-prefix character,
+# parallelism, second expansion) and fails closed.
+_SPECIAL_TARGET_RE = re.compile(r"^(\.[A-Za-z_][A-Za-z0-9_]*)\b")
+_ALLOWED_SPECIAL_TARGETS = frozenset({".PHONY"})
+# The only accepted '.PHONY' form: a single ':' followed by a literal member list.
+_PHONY_RULE_RE = re.compile(r"^\.PHONY[ \t]*:(?![:=])(?P<members>.*)$")
+# A global (or whitespace-prefixed) assignment to a variable that changes which
+# shell runs every recipe, or with which flags. GNU Make honours these for
+# research-excess too, while the recipe text stays byte-identical, so they are
+# refused rather than silently misrepresented.
+_SHELL_ASSIGNMENT_RE = re.compile(
+    r"^(SHELL|MAKESHELL|MAKEFLAGS|\.SHELLFLAGS)[ \t]*(?:::=|:=|\+=|\?=|!=|=)"
+)
+# Column-0 global directives that can inject rules, expand text dynamically, or
+# change execution for every target (including research-excess). None are part of
+# the accepted subset; each fails closed before any recipe could be discovered.
+_GLOBAL_DIRECTIVE_RE = re.compile(
+    r"^(include|-include|sinclude|load|-load|define|endef|override|export|unexport|"
+    r"vpath|VPATH)\b"
+)
+# A make variable assignment operator ('=', ':=', '::=', '+=', '?=', '!='). Used
+# to tell a target-specific/global variable definition apart from a plain
+# prerequisite list on the research-excess rule line.
+_ASSIGNMENT_OPERATOR_RE = re.compile(r"(::=|:=|\+=|\?=|!=|=)")
+# A whole-line variable definition ('NAME = value', 'NAME := value', ...). The
+# name may not contain ':', '=', or whitespace, so a rule line such as
+# 'target: VAR = value' is never mistaken for a plain variable definition, and a
+# value that itself contains ':' (a URL, for instance) is never mistaken for a
+# rule.
+_VARIABLE_DEFINITION_RE = re.compile(
+    r"^(?P<name>[^:=\s]+)[ \t]*(?P<op>::=|:=|\+=|\?=|!=|=)(?P<value>.*)$"
+)
+# Shell/Make glob metacharacters. GNU Make expands wildcards in target names, so
+# a target token carrying one of these may resolve to research-excess.
+_TARGET_GLOB_CHARS = "*?["
+
+
+def _logical_make_lines(lines: list[str]) -> list[tuple[int, bool, str]]:
+    """Group physical lines into ``(start_index, is_recipe_line, joined_text)``.
+
+    GNU Make joins backslash-continued lines *before* deciding what a line means,
+    so a directive whose member list continues onto tab-indented lines is one
+    logical line, not a directive followed by recipe lines.  Classification uses
+    the first physical line: a line that starts with a tab is recipe text (its
+    continuations are consumed but its text is not interpreted as a directive),
+    and everything else is a makefile line whose comment is stripped and whose
+    continuations are joined with a single space, exactly as Make does.  Nothing
+    here executes: it is string handling over the Makefile bytes.
+    """
+    grouped: list[tuple[int, bool, str]] = []
+    index = 0
+    total = len(lines)
+    while index < total:
+        start = index
+        raw = lines[index]
+        if raw.startswith("\t"):
+            body = raw
+            while body.rstrip().endswith("\\") and index + 1 < total:
+                index += 1
+                body = lines[index]
+            grouped.append((start, True, ""))
+        else:
+            joined = _strip_make_comment(raw)
+            while joined.rstrip().endswith("\\") and index + 1 < total:
+                joined = joined.rstrip()[:-1]
+                index += 1
+                joined = joined + " " + _strip_make_comment(lines[index]).strip()
+            grouped.append((start, False, joined))
+        index += 1
+    return grouped
+
+
+def _rule_target_expression(text: str) -> str | None:
+    """Return the target expression of a Make rule line, or ``None`` if not a rule.
+
+    Pure string handling over one already-joined logical line: it scans for the
+    first unescaped ``:`` that introduces a rule and returns everything before it.
+    A ``:=`` or ``::=`` assignment operator is not a rule colon (so
+    ``VAR := value`` is not a rule), while ``::`` is a double-colon rule and *is*
+    reported so the caller can judge its target identity.  Nothing is executed and
+    nothing is expanded.
+    """
+    index = 0
+    total = len(text)
+    while index < total:
+        char = text[index]
+        if char == "\\" and index + 1 < total:
+            index += 2
+            continue
+        if char == ":":
+            following = text[index + 1 : index + 3]
+            if following.startswith("="):
+                return None  # ':=' assignment, not a rule
+            if following.startswith(":"):
+                if following.startswith(":="):
+                    return None  # '::=' assignment, not a rule
+                return text[:index]  # '::' double-colon rule
+            return text[:index]  # simple rule
+        index += 1
+    return None
+
+
+def _target_token_covers_governed(token: str) -> bool:
+    """True when a single target token could name ``research-excess``.
+
+    A literal match is exact.  A ``%`` pattern target covers the governed target
+    when its literal prefix and suffix bracket the name, and a glob target covers
+    it when the shell pattern matches.  Both are judged statically, on the token
+    text alone.
+    """
+    if token == RESEARCH_EXCESS_TARGET:
+        return True
+    if "%" in token:
+        prefix, _sep, suffix = token.partition("%")
+        return (
+            RESEARCH_EXCESS_TARGET.startswith(prefix)
+            and RESEARCH_EXCESS_TARGET.endswith(suffix)
+            and len(prefix) + len(suffix) <= len(RESEARCH_EXCESS_TARGET)
+        )
+    if any(char in token for char in _TARGET_GLOB_CHARS):
+        try:
+            return fnmatch.fnmatchcase(RESEARCH_EXCESS_TARGET, token)
+        except re.error:  # pragma: no cover - malformed pattern is ambiguous
+            return True
+    return False
+
+
+def _check_rule_target_identity(stripped: str, line_number: int) -> bool:
+    """Judge one rule line's target identity; return True when it defines the target.
+
+    Fails closed on every target expression whose effective identity cannot be
+    established statically without executing or expanding GNU Make:
+
+    * a multi-target rule naming ``research-excess`` in any position (a
+      backslash-continued target list is already one logical line here, so a
+      continued multi-target rule is judged the same way);
+    * a variable-derived target name (``$(TARGET):`` / ``${TARGET}:``), which
+      could resolve to ``research-excess`` only by expansion;
+    * a pattern or glob target that could cover ``research-excess``.
+
+    A rule whose targets are literal names none of which is (or could be) the
+    governed target is simply not this task's business and is left alone, so
+    unrelated targets never move the authority.
+    """
+    expression = _rule_target_expression(stripped)
+    if expression is None:
+        return False
+    expression = expression.strip()
+    if not expression:
+        return False
+    if _MAKE_EXPANSION_RE.search(expression):
+        raise ExcessMakefileProvenanceError(
+            f"Makefile line {line_number} defines a target through a make "
+            f"variable/function reference ({expression!r}); its effective target "
+            "identity cannot be established statically without expanding Make, so it "
+            f"could silently define, duplicate, or override {RESEARCH_EXCESS_TARGET!r} "
+            "— failing closed"
+        )
+    tokens = expression.split()
+    covering = [token for token in tokens if _target_token_covers_governed(token)]
+    if not covering:
+        return False
+    if len(tokens) > 1:
+        raise ExcessMakefileProvenanceError(
+            f"Makefile line {line_number} is a multi-target rule naming "
+            f"{RESEARCH_EXCESS_TARGET!r} ({expression!r}); a multi-target rule gives "
+            "every listed target the same recipe and is outside the accepted "
+            "single-target static subset — failing closed"
+        )
+    if covering[0] != RESEARCH_EXCESS_TARGET:
+        raise ExcessMakefileProvenanceError(
+            f"Makefile line {line_number} defines the governed target through the "
+            f"ambiguous pattern or wildcard expression {expression!r}; its effective "
+            "target identity cannot be established statically — failing closed"
+        )
+    return True
+
+
+def _scan_global_make_semantics(
+    lines: list[str],
+) -> tuple[frozenset, list[tuple[int, bool, str]]]:
+    """Fail closed on execution-affecting Make syntax; recover ``.PHONY`` membership.
+
+    A file-level construct (``.ONESHELL:``, ``.SILENT:``, ``SHELL = …``,
+    ``include``, ``define`` …) changes how *every* target — research-excess
+    included — is parsed or executed while leaving the recipe text byte-identical,
+    so the whole file is scanned, not merely the target's own lines.  Because GNU
+    Make strips leading whitespace from non-recipe lines, the scan runs on stripped
+    logical lines: ``  .IGNORE:`` and ``\\t.SILENT: research-excess`` written as a
+    continuation are caught exactly like their column-0 forms.
+
+    ``.PHONY`` is the one accepted special target, and it is represented rather
+    than ignored: its membership decides whether an existing file named
+    ``research-excess`` would suppress the recipe, so every ``.PHONY`` member list
+    in the file is collected and returned for truthful recording in provenance.
+
+    The same pass judges the *target identity* of every rule line in the file
+    (:func:`_check_rule_target_identity`) and the value of every variable
+    definition, so a multi-target rule, a variable-derived target name, a
+    pattern/glob target, a variable whose literal value is ``research-excess``, and
+    any duplicate mixture of literal and derived definitions all fail closed rather
+    than leaving the recorded authority unchanged.
+
+    This runs during a pure parse, strictly before any command could be executed by
+    any tool.
+    """
+    phony: set = set()
+    governed_rule_lines: list[int] = []
+    grouped = _logical_make_lines(lines)
+    for start, is_recipe, text in grouped:
+        if is_recipe:
+            continue
+        stripped = text.strip()
+        if not stripped:
+            continue
+        if _SHELL_ASSIGNMENT_RE.match(stripped):
+            raise ExcessMakefileProvenanceError(
+                f"Makefile line {start + 1} assigns an execution-affecting shell "
+                "variable (SHELL/MAKESHELL/MAKEFLAGS/.SHELLFLAGS), which changes how "
+                "the research-excess recipe is executed while leaving its text "
+                "unchanged; this is outside the accepted static subset — failing closed"
+            )
+        special = _SPECIAL_TARGET_RE.match(stripped)
+        if special:
+            name = special.group(1)
+            if name not in _ALLOWED_SPECIAL_TARGETS:
+                raise ExcessMakefileProvenanceError(
+                    f"Makefile line {start + 1} declares the execution-affecting "
+                    f"special target {name!r}, which is outside the accepted static "
+                    "subset and could change how research-excess runs; failing closed"
+                )
+            phony_match = _PHONY_RULE_RE.match(stripped)
+            if phony_match is None:
+                raise ExcessMakefileProvenanceError(
+                    f"Makefile line {start + 1} uses an unsupported '.PHONY' form "
+                    f"({stripped!r}); the accepted subset requires a single ':' "
+                    "followed by a literal member list — failing closed"
+                )
+            members = phony_match.group("members")
+            _reject_unsafe_make_text(members, where=".PHONY member list")
+            phony.update(members.split())
+            continue
+        directive = _GLOBAL_DIRECTIVE_RE.match(stripped)
+        if directive:
+            raise ExcessMakefileProvenanceError(
+                f"Makefile line {start + 1} uses the {directive.group(1)!r} directive, "
+                "which is outside the accepted static subset (it can inject or alter "
+                "rules or variables affecting research-excess); failing closed"
+            )
+        # A whole-line variable definition is judged before rule detection: its
+        # value may legitimately contain ':' (a URL), and a variable whose literal
+        # value is the governed target could be used to derive a target name that
+        # only expansion would reveal.
+        definition = _VARIABLE_DEFINITION_RE.match(stripped)
+        if definition:
+            value = definition.group("value")
+            if RESEARCH_EXCESS_TARGET in value.split():
+                raise ExcessMakefileProvenanceError(
+                    f"Makefile line {start + 1} defines the variable "
+                    f"{definition.group('name')!r} as {RESEARCH_EXCESS_TARGET!r}; a "
+                    "variable that resolves to the governed target could derive a "
+                    "target definition this static parser cannot distinguish from an "
+                    "unrelated rule without expanding Make — failing closed"
+                )
+            continue
+        if _check_rule_target_identity(stripped, start + 1):
+            governed_rule_lines.append(start)
+    if len(governed_rule_lines) > 1:
+        raise ExcessMakefileProvenanceError(
+            "multiple effective research-excess target definitions were found "
+            f"(Makefile lines {[i + 1 for i in governed_rule_lines]}); duplicate or "
+            "derived duplicate definitions fail closed rather than guessing which "
+            "recipe GNU Make would execute"
+        )
+    return frozenset(phony), grouped
+
+
+def _strip_make_comment(text: str) -> str:
+    """Drop an unescaped ``#`` comment from a Make rule/prerequisite line.
+
+    A backslash-escaped ``\\#`` is a literal hash and is preserved; the first
+    unescaped ``#`` and everything after it is a comment and is removed, so a
+    comment is never tokenised as a prerequisite.
+    """
+    out: list[str] = []
+    i = 0
+    while i < len(text):
+        ch = text[i]
+        if ch == "\\" and i + 1 < len(text):
+            out.append(ch)
+            out.append(text[i + 1])
+            i += 2
+            continue
+        if ch == "#":
+            break
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
+def _physical_lines(text: str) -> list[str]:
+    """Split Makefile text into physical lines without trailing newlines."""
+    return text.split("\n")
+
+
+def _reject_unsafe_make_text(text: str, *, where: str) -> None:
+    """Fail closed on any dynamic or recursive construct in ``text``.
+
+    This runs during a pure parse, so a rejection happens strictly before any
+    command could be executed by any tool.
+    """
+    if _MAKE_EXPANSION_RE.search(text):
+        raise ExcessMakefileProvenanceError(
+            f"{where} contains a make variable/function reference outside the "
+            f"accepted static subset (e.g. $(...) / ${{...}}): {text!r}"
+        )
+    if "$(MAKE)" in text or "${MAKE}" in text or _RECURSIVE_MAKE_RE.search(text):
+        raise ExcessMakefileProvenanceError(
+            f"{where} invokes a recursive make, which is outside the accepted "
+            f"static subset: {text!r}"
+        )
+
+
+def _effective_make_provenance(
+    *, root: Path = ROOT, makefile: str = MAKEFILE_NAME
+) -> dict:
+    """Statically parse the single research-excess rule; never run GNU Make.
+
+    ``root``/``makefile`` default to the repository Makefile; tests point them at
+    temporary Makefiles.  The returned prerequisites and verbatim recipe lines are
+    the only provenance dependency of this task, and computing them launches no
+    subprocess and touches no file other than reading the Makefile bytes.
+    """
+    path = Path(root) / makefile
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise ExcessMakefileProvenanceError(
+            f"cannot read Makefile for research-excess provenance: {exc}"
+        ) from exc
+
+    lines = _physical_lines(text)
+
+    # 0) Fail closed on any execution-affecting special target, shell assignment,
+    #    or global directive anywhere in the file: these change how research-excess
+    #    itself is parsed or executed, so a static recipe read would otherwise
+    #    misrepresent the run. The same pass recovers '.PHONY' membership, which is
+    #    execution-affecting and is recorded truthfully rather than ignored.
+    phony_members, grouped = _scan_global_make_semantics(lines)
+
+    # 1) Locate every research-excess *rule* line. Exactly one is required; zero
+    #    (removed/renamed) and duplicates both fail closed. Detection runs on the
+    #    start of each logical line with leading spaces stripped, so a
+    #    space-indented duplicate rule — which GNU Make honours and which would
+    #    override the recipe — is seen rather than skipped. Tab-started (recipe)
+    #    logical lines and continuation lines are never rule lines.
+    rule_indices: list[int] = []
+    rule_heads: dict[int, str] = {}
+    for start, is_recipe, _text in grouped:
+        if is_recipe:
+            continue
+        head = lines[start].lstrip(" ")
+        if _RESEARCH_EXCESS_RULE_RE.match(head):
+            rule_indices.append(start)
+            rule_heads[start] = head
+        elif _RESEARCH_EXCESS_UNSUPPORTED_RE.match(head):
+            raise ExcessMakefileProvenanceError(
+                "research-excess is defined with an unsupported '::' or ':=' form; "
+                "the accepted subset requires a single simple rule"
+            )
+    if not rule_indices:
+        raise ExcessMakefileProvenanceError(
+            f"Makefile target {RESEARCH_EXCESS_TARGET!r} was not found; the recipe "
+            "is a required R3-TGT-01 regeneration-provenance authority"
+        )
+    if len(rule_indices) > 1:
+        raise ExcessMakefileProvenanceError(
+            "multiple research-excess rule definitions were found (lines "
+            f"{[i + 1 for i in rule_indices]}); duplicate definitions fail closed "
+            "rather than guessing which one GNU Make would execute"
+        )
+
+    rule_index = rule_indices[0]
+    match = _RESEARCH_EXCESS_RULE_RE.match(rule_heads[rule_index])
+    assert match is not None  # guaranteed by the rule_indices membership above
+
+    # 2) Merge prerequisite continuations (a trailing backslash continues the
+    #    prerequisite list onto the next physical line). An inline '#' comment is
+    #    stripped from each physical line first, so a comment is never tokenised as
+    #    a prerequisite and a backslash inside a comment never continues the line.
+    prereq_text = _strip_make_comment(match.group("prereqs"))
+    cursor = rule_index
+    while prereq_text.rstrip().endswith("\\"):
+        prereq_text = prereq_text.rstrip()[:-1] + " "
+        cursor += 1
+        if cursor >= len(lines):
+            break
+        prereq_text += _strip_make_comment(lines[cursor])
+    # A static pattern rule ('research-excess: %.o: %.c') carries a second rule
+    # colon in what would otherwise be the prerequisite list. Its effective target
+    # identity and prerequisites cannot be established statically, so it fails
+    # closed instead of being mis-tokenised as ordinary prerequisites.
+    if _rule_target_expression(prereq_text) is not None:
+        raise ExcessMakefileProvenanceError(
+            "research-excess is written as a static pattern rule (a second rule "
+            f"colon appears after the target: {prereq_text!r}); its effective target "
+            "identity cannot be established statically — failing closed"
+        )
+    # A ';' recipe on the rule line itself is an execution-affecting command that
+    # this parser does not record; accepting it would silently drop a command from
+    # the recorded authority.
+    if ";" in prereq_text:
+        raise ExcessMakefileProvenanceError(
+            "research-excess carries a ';' recipe on its rule line "
+            f"({prereq_text!r}); an inline command is outside the accepted static "
+            "subset and must never be silently dropped — failing closed"
+        )
+    # A target-specific/global variable definition on the rule line (e.g.
+    # 'research-excess: VAR = value') is not a prerequisite list; it is an
+    # unsupported target-assignment form and fails closed rather than being
+    # mis-tokenised as prerequisites.
+    if _ASSIGNMENT_OPERATOR_RE.search(prereq_text):
+        raise ExcessMakefileProvenanceError(
+            "research-excess is written with a target-specific variable assignment "
+            f"rather than a plain prerequisite list: {prereq_text!r}; failing closed"
+        )
+    _reject_unsafe_make_text(prereq_text, where="research-excess prerequisites")
+    # Drop an order-only '|' separator; order-only prerequisites still count as
+    # prerequisites for provenance purposes.
+    prerequisites = [tok for tok in prereq_text.replace("|", " ").split() if tok]
+    if ".WAIT" in prerequisites:
+        raise ExcessMakefileProvenanceError(
+            "research-excess uses the '.WAIT' ordering prerequisite, which is outside "
+            "the accepted static subset; failing closed"
+        )
+
+    # 3) Collect the contiguous tab-indented recipe block immediately following
+    #    the rule (after any consumed prerequisite-continuation lines). A blank
+    #    line, a comment, or any column-0 content terminates the block; a backslash
+    #    continuation must continue onto another tab-indented recipe line, and any
+    #    tab-indented command appearing later (after a blank or comment line, before
+    #    the next column-0 rule) is an ambiguous, silently-ignored recipe line and
+    #    fails closed instead.
+    recipe: list[str] = []
+    i = cursor + 1
+    while i < len(lines):
+        line = lines[i]
+        if line.startswith("\t"):
+            body = line[1:]
+            while body.rstrip().endswith("\\"):
+                if i + 1 >= len(lines) or not lines[i + 1].startswith("\t"):
+                    raise ExcessMakefileProvenanceError(
+                        "a research-excess recipe line ends with an ambiguous "
+                        "backslash continuation not followed by a tab-indented recipe "
+                        f"line: {body!r}; failing closed"
+                    )
+                i += 1
+                body = body.rstrip()[:-1] + "\n" + lines[i][1:]
+            recipe.append(body)
+            i += 1
+            continue
+        break
+
+    if not recipe:
+        raise ExcessMakefileProvenanceError(
+            f"no recipe was found for {RESEARCH_EXCESS_TARGET!r}; the excess "
+            "artifacts cannot be regenerated and provenance cannot be recorded"
+        )
+
+    # A recipe command separated from the block by a blank or comment line must
+    # never be silently dropped: scan the gap up to the next column-0 rule/target
+    # and fail closed on any orphan tab-indented command.
+    scan = i
+    while scan < len(lines):
+        line = lines[scan]
+        if line.startswith("\t"):
+            raise ExcessMakefileProvenanceError(
+                f"an ambiguous tab-indented command appears at Makefile line "
+                f"{scan + 1} after the research-excess recipe block (separated by a "
+                "blank or comment line); a recipe command must never be silently "
+                "ignored — failing closed"
+            )
+        if not line.strip() or line.lstrip().startswith("#"):
+            scan += 1
+            continue
+        break
+
+    # 4) Enforce the recipe control-prefix and dynamic-construct contract. A '+'
+    #    prefix forces execution even under a dry run and is refused; '@' and '-'
+    #    are execution-significant and preserved verbatim in the recorded recipe.
+    for command in recipe:
+        _reject_unsafe_make_text(command, where="research-excess recipe")
+        prefix_run = command[: len(command) - len(command.lstrip("@-+ \t"))]
+        if "+" in prefix_run:
+            raise ExcessMakefileProvenanceError(
+                "a '+' recipe prefix forces command execution and is outside the "
+                f"accepted non-executing subset: {command!r}"
+            )
+
+    return {
+        "prerequisites": prerequisites,
+        "effective_recipe": recipe,
+        "recipe_source_file": _display_path(path),
+        "duplicate_recipe_overridden": False,
+        "phony": RESEARCH_EXCESS_TARGET in phony_members,
+    }
+
+
+def _recipe_provenance_digest(
+    prerequisites: list[str], recipe: list[str], *, phony: bool
+) -> str:
+    """Deterministic sha256 over the effective target/prerequisites/phony/recipe record.
+
+    Repository-relative and machine-independent: it contains no source-file line
+    numbers (so an unrelated target added above research-excess does not move it)
+    and no environment-derived values, only the parsed prerequisites, the
+    ``.PHONY`` membership of this target, and the verbatim recipe lines for this
+    one target.  ``.PHONY`` membership is inside the digest because it is
+    execution-affecting: without it, an existing file named ``research-excess``
+    would make the target up to date and the recipe would not run at all, while the
+    recorded recipe text stayed identical.
+    """
+    canonical = "\n".join(
+        [
+            f"target:{RESEARCH_EXCESS_TARGET}",
+            "prerequisites:" + " ".join(prerequisites),
+            f"phony:{'yes' if phony else 'no'}",
+            "recipe:",
+            *recipe,
+        ]
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def build_makefile_target_provenance() -> dict:
+    """Record the research-excess recipe as the task's Makefile provenance.
+
+    The authority is a static, non-executing parse of the Makefile bytes under the
+    narrow contract in :data:`MAKEFILE_ACCEPTED_SUBSET`; GNU Make is never invoked,
+    so no code path can execute the recipe while discovering it.  Editing the
+    recipe, changing its prerequisites, or removing/duplicating the target all
+    change the recorded value or fail closed, while unrelated targets and unrelated
+    variables never do.
+    """
+    makefile_path = ROOT / MAKEFILE_NAME
+    effective = _effective_make_provenance()
+    return {
+        "makefile": _display_path(makefile_path),
+        "target": RESEARCH_EXCESS_TARGET,
+        "authority": (
+            "Static, non-executing parse of the Makefile bytes under a narrow "
+            "research-excess contract; GNU Make is never invoked and no recipe "
+            "command can execute during provenance computation"
+        ),
+        "accepted_subset": MAKEFILE_ACCEPTED_SUBSET,
+        "make_invoked": False,
+        "prerequisites": effective["prerequisites"],
+        "recipe": effective["effective_recipe"],
+        "recipe_source_file": effective["recipe_source_file"],
+        "duplicate_recipe_overridden": effective["duplicate_recipe_overridden"],
+        "phony": effective["phony"],
+        "phony_semantics": (
+            "True when research-excess is declared a .PHONY member (any .PHONY line "
+            "in the file, leading whitespace and backslash continuations included). "
+            "Membership is execution-affecting — without it an existing file named "
+            "'research-excess' would make the target up to date and the recipe would "
+            "not run — so it is recorded truthfully and hashed, never ignored."
+        ),
+        "recipe_sha256": _recipe_provenance_digest(
+            effective["prerequisites"],
+            effective["effective_recipe"],
+            phony=effective["phony"],
+        ),
+        "recipe_sha256_definition": (
+            "sha256 of the newline-joined parsed authority: a 'target:<name>' line, "
+            "a 'prerequisites:<space-joined prerequisites>' line, a "
+            "'phony:<yes|no>' line, a 'recipe:' line, and each verbatim recipe "
+            "command line (execution-significant '@'/'-' prefixes preserved). No "
+            "source line numbers and no environment-derived values: "
+            "repository-relative and machine-independent."
+        ),
+        "provenance_scope": (
+            "Only the research-excess prerequisites and verbatim recipe lines are a "
+            "provenance dependency of this task. The whole Makefile is an invocation "
+            "wrapper, not a statistical source input, so unrelated targets or "
+            "variables added by other tasks do not change this recipe hash and do "
+            "not stale these artifacts, while a change to the research-excess recipe "
+            "or its prerequisites always does."
+        ),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Frozen R3-TGT-01 protected boundary
+# ---------------------------------------------------------------------------
+
+
+def _assert_relative_clean(relative: str) -> None:
+    """Reject an absolute or traversing frozen-boundary authority path."""
+    candidate = Path(relative)
+    if candidate.is_absolute():
+        raise ExcessFrozenBoundaryError(
+            f"frozen-boundary member path must be repository-relative: {relative!r}"
+        )
+    if ".." in candidate.parts:
+        raise ExcessFrozenBoundaryError(
+            f"frozen-boundary member path must not traverse with '..': {relative!r}"
+        )
+
+
+def _assert_no_symlink_ancestors(root: Path, target: Path) -> None:
+    """lstat every component from ``root`` down to ``target``; reject symlinks.
+
+    A protected member replaced by a symlink — or living under a symlinked parent
+    that points outside the repository — must never be followed and hashed as
+    though it were a genuine historical member.
+    """
+    try:
+        relative = target.relative_to(root)
+    except ValueError as exc:
+        raise ExcessFrozenBoundaryError(
+            f"frozen-boundary member is not inside the repository root: {target}"
+        ) from exc
+    walked = root
+    for part in relative.parts:
+        walked = walked / part
+        if walked.is_symlink():
+            raise ExcessFrozenBoundaryError(
+                f"frozen-boundary path passes through a symlink component: {walked}"
+            )
+
+
+def _collect_regular_files(base: Path, into: list[Path]) -> None:
+    """Recursively collect regular files under ``base`` without following symlinks.
+
+    Every entry is inspected with ``lstat`` (``follow_symlinks=False``): a symlink
+    is refused rather than followed, a directory is descended, a regular file is
+    collected, and any other type (device, FIFO, socket) is refused.
+    """
+    with os.scandir(base) as scan:
+        entries = sorted(scan, key=lambda entry: entry.name)
+    for entry in entries:
+        path = Path(entry.path)
+        if entry.is_symlink():
+            raise ExcessFrozenBoundaryError(
+                f"a symlink is not a permitted frozen-boundary member: {path}"
+            )
+        info = entry.stat(follow_symlinks=False)
+        mode = info.st_mode
+        if stat.S_ISDIR(mode):
+            _collect_regular_files(path, into)
+        elif stat.S_ISREG(mode):
+            into.append(path)
+        else:
+            raise ExcessFrozenBoundaryError(
+                f"a non-regular file is not a permitted frozen-boundary member: {path}"
+            )
+
+
+def _frozen_boundary_members(root: Path) -> list[tuple[str, str]]:
+    """``(<repo-relative posix path>, sha256)`` for every frozen-boundary member.
+
+    Membership is the explicit historical allow-list of
+    :data:`FROZEN_BOUNDARY_DATA_DIRS`, :data:`FROZEN_BOUNDARY_EXPERIMENT_DIRS`,
+    and :data:`FROZEN_BOUNDARY_EXTRA_FILES`.  Namespaces that are not on the
+    allow-list — including any added by later, unrelated tasks — are never
+    members.  Every member is validated before it is hashed: no symlinked
+    ancestor or member is followed, every member is a regular file that resolves
+    inside the repository, and duplicate normalized paths are rejected.  Members
+    are returned sorted by path so the digest is deterministic and identical to
+    the historical enumeration for an unmodified repository.
+    """
+    root_resolved = root.resolve()
+    collected: list[Path] = []
+
+    def add_namespace(base: Path) -> None:
+        _assert_relative_clean(base.relative_to(root).as_posix())
+        _assert_no_symlink_ancestors(root, base)
+        if base.is_symlink():
+            raise ExcessFrozenBoundaryError(
+                f"frozen-boundary namespace replaced by a symlink: {base}"
+            )
+        if not base.exists():
+            # A never-created allow-listed namespace contributes no members, exactly
+            # as the historical enumeration treated an absent directory.
+            return
+        if not base.is_dir():
+            raise ExcessFrozenBoundaryError(
+                f"frozen-boundary namespace is not a directory: {base}"
+            )
+        _collect_regular_files(base, collected)
+
+    for name in FROZEN_BOUNDARY_DATA_DIRS:
+        add_namespace(root / "data" / name)
+    for name in FROZEN_BOUNDARY_EXPERIMENT_DIRS:
+        add_namespace(root / "experiments" / name)
+    for relative in FROZEN_BOUNDARY_EXTRA_FILES:
+        _assert_relative_clean(relative)
+        candidate = root / relative
+        _assert_no_symlink_ancestors(root, candidate)
+        try:
+            info = os.lstat(candidate)
+        except FileNotFoundError as exc:
+            raise ExcessFrozenBoundaryError(
+                f"required frozen-boundary member is missing: {relative}"
+            ) from exc
+        if stat.S_ISLNK(info.st_mode):
+            raise ExcessFrozenBoundaryError(
+                f"required frozen-boundary member replaced by a symlink: {candidate}"
+            )
+        if not stat.S_ISREG(info.st_mode):
+            raise ExcessFrozenBoundaryError(
+                f"required frozen-boundary member is not a regular file: {candidate}"
+            )
+        collected.append(candidate)
+
+    # Reject duplicate normalized paths and prove containment before any hashing.
+    seen: dict[str, Path] = {}
+    for path in collected:
+        relative = path.relative_to(root).as_posix()
+        if ".." in Path(relative).parts:
+            raise ExcessFrozenBoundaryError(
+                f"frozen-boundary member path traverses with '..': {relative}"
+            )
+        if relative in seen:
+            raise ExcessFrozenBoundaryError(
+                f"duplicate normalized frozen-boundary member path: {relative}"
+            )
+        seen[relative] = path
+        resolved = path.resolve()
+        if resolved != root_resolved and root_resolved not in resolved.parents:
+            raise ExcessFrozenBoundaryError(
+                f"frozen-boundary member resolves outside the repository: {path}"
+            )
+
+    # Hash only after every containment and file-type check has passed, and hash
+    # each member through a descriptor anchored beneath the repository root — never
+    # by reopening the previously validated pathname — so a symlink or file swapped
+    # in after validation is refused rather than followed.
+    try:
+        root_fd = os.open(
+            str(root), os.O_RDONLY | _EX_O_DIRECTORY | _EX_O_NOFOLLOW
+        )
+    except OSError as exc:
+        raise ExcessFrozenBoundaryError(
+            f"frozen-boundary repository root could not be anchored: {exc}"
+        ) from exc
+    try:
+        return [
+            (relative, _sha256_member_anchored(root_fd, relative))
+            for relative in sorted(seen)
+        ]
+    finally:
+        os.close(root_fd)
+
+
+def _frozen_boundary_digest(members: list[tuple[str, str]]) -> str:
+    """sha256 over the sorted ``<path>:<sha256>`` records of the boundary members."""
+    joined = "\n".join(f"{relative}:{digest}" for relative, digest in members)
+    return hashlib.sha256(joined.encode("utf-8")).hexdigest()
+
+
+def frozen_boundary_files(root: Path) -> list[Path]:
+    """Absolute paths of the frozen-boundary members (one shared discovery rule)."""
+    return [root / relative for relative, _digest in _frozen_boundary_members(root)]
+
+
+def verify_frozen_boundary_digest(
+    digest: str, *, expected: str = FROZEN_PROTECTED_BOUNDARY_SHA256
+) -> None:
+    """Fail closed unless ``digest`` matches the pinned frozen-boundary authority.
+
+    Keeps the boundary from being silently redefined from whatever files happen
+    to exist now: a modified or removed original member changes the digest and is
+    rejected here.
+    """
+    if digest != expected:
+        raise ExcessFrozenBoundaryError(
+            "frozen R3-TGT-01 protected boundary does not match its pinned authority: "
+            f"expected {expected}, computed {digest}. The boundary is a fixed historical "
+            "set and is never silently redefined from the current filesystem; investigate "
+            "the change, or, if an original member changed deliberately, update the pinned "
+            "authority on purpose."
+        )
+
+
+def build_frozen_protected_boundary() -> dict:
+    """Enumerate, verify against the pinned authority, and describe the boundary."""
+    members = _frozen_boundary_members(ROOT)
+    digest = _frozen_boundary_digest(members)
+    verify_frozen_boundary_digest(digest)
+    by_root: dict[str, int] = {}
+    for relative, _digest in members:
+        parts = relative.split("/")
+        key = "/".join(parts[:2]) if len(parts) > 1 else relative
+        by_root[key] = by_root.get(key, 0) + 1
+    return {
+        "policy": (
+            "Curated data and the generated namespaces that already existed when "
+            "R3-TGT-01 was frozen, which this excess regeneration must never mutate. "
+            "Explicit historical allow-list: namespaces added by later, unrelated "
+            "governed tasks are not members and are protected by their own tasks, so "
+            "adding one never changes this boundary."
+        ),
+        "data_roots": [f"data/{name}" for name in FROZEN_BOUNDARY_DATA_DIRS],
+        "experiment_roots": [
+            f"experiments/{name}" for name in FROZEN_BOUNDARY_EXPERIMENT_DIRS
+        ],
+        "extra_files": list(FROZEN_BOUNDARY_EXTRA_FILES),
+        "excluded_namespaces": [
+            "experiments/results_excess (this task's own output namespace; verified "
+            "separately as this task's artifacts, not as a boundary member)"
+        ],
+        "later_unrelated_additions_are_members": False,
+        "member_count": len(members),
+        "member_count_by_root": dict(sorted(by_root.items())),
+        "members_sha256": digest,
+        "members_pinned_authority_sha256": FROZEN_PROTECTED_BOUNDARY_SHA256,
+        "members_sha256_definition": (
+            "sha256 of the newline-joined '<repo-relative-posix-path>:<sha256>' records "
+            "for every boundary member, sorted by path. A content digest, not a file "
+            "count: it detects modification or removal of an original member and is "
+            "unchanged by later, unrelated namespace additions."
+        ),
     }
 
 
@@ -2608,8 +3794,12 @@ def _read_only_sources() -> list[dict]:
             ROOT / "experiments" / "significance.py",
             "seeded IC, permutation, and Bonferroni conventions",
         ),
-        _source_record(ROOT / "Makefile", "regeneration command definition"),
     ]
+    # The whole Makefile is deliberately NOT a source_artifact: it is an
+    # invocation wrapper, not a statistical input, so unrelated targets added by
+    # other tasks would otherwise stale these artifacts. The research-excess
+    # regeneration recipe is recorded truthfully and task-specifically by
+    # build_makefile_target_provenance() instead.
 
 
 def _write_prediction_dumps(
@@ -2769,6 +3959,8 @@ def _write_manifest(
         "coincident_baselines": report["coincident_baselines"],
         "ic_sign_note": report["ic_sign_note"],
         "review_package_scope": report["review_package_scope"],
+        "makefile_target_provenance": report["makefile_target_provenance"],
+        "frozen_protected_boundary": report["frozen_protected_boundary"],
         "permutation_analyses": {
             "primary": report["analysis"]["primary_permutation"],
             "post_review_sensitivity": report["analysis"][
@@ -2829,6 +4021,8 @@ def render_family_markdown(
     coincident = report["coincident_baselines"]
     sign_note = report["ic_sign_note"]
     package_scope = report["review_package_scope"]
+    recipe_provenance = report["makefile_target_provenance"]
+    boundary = report["frozen_protected_boundary"]
 
     lines = [
         f"# {BASIS_LABEL} evaluation (R3-TGT-01)",
@@ -3184,6 +4378,28 @@ def render_family_markdown(
             "",
             *[f"- {statement}" for statement in package_scope["statements"]],
             "",
+            "## Provenance and protected boundary",
+            "",
+            "Provenance here is descriptive metadata about how these artifacts are "
+            "regenerated and bounded. It does not affect any statistical result, "
+            "conclusion, or claim boundary above, and neither the owner-authorized "
+            "compatibility repair nor this metadata strengthens statistical validity.",
+            "",
+            "- Statistical source inputs are recorded under `source_artifacts` (the trusted "
+            "modeling dataset, the read-only canonical leaderboard, and the frozen "
+            "generator, experiment, and significance modules), each pinned by whole-file "
+            "sha256.",
+            "- Regeneration-recipe provenance is the single `research-excess` Makefile "
+            f"target recipe (`{recipe_provenance['recipe_sha256'][:12]}…`), not the whole "
+            "Makefile. Unrelated Makefile targets added by other tasks do not stale these "
+            "artifacts, while editing this recipe or its prerequisites is still detected.",
+            "- The frozen protected boundary is an explicit historical allow-list of "
+            f"{boundary['member_count']} curated-data and pre-existing generated files that "
+            "this regeneration must never mutate, pinned by a content digest. Namespaces "
+            "added by later, unrelated governed tasks are not members of this historical "
+            "set, were not part of the R3-TGT-01 review, and are governed by their own "
+            "tasks; they cannot enlarge or invalidate this boundary.",
+            "",
             "## Required limitations",
             "",
             *[f"- {limitation}" for limitation in report["limitations"]],
@@ -3265,6 +4481,8 @@ def run(output_dir: Path | str | None = None) -> tuple[Path, Path, Path]:
     report["coincident_baselines"] = build_coincident_baseline_evidence(prediction_frame)
     report["ic_sign_note"] = build_ic_sign_note(report)
     report["review_package_scope"] = build_review_package_scope()
+    report["makefile_target_provenance"] = build_makefile_target_provenance()
+    report["frozen_protected_boundary"] = build_frozen_protected_boundary()
     report["family_conclusion"] = build_family_conclusion(report)
     report["target_basis"] = {
         "id": BASIS_ID,
