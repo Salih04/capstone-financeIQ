@@ -13,8 +13,10 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import os
 import re
 import shutil
+import stat
 import tempfile
 from decimal import Decimal
 from fractions import Fraction
@@ -51,6 +53,13 @@ def _load_committed_dumps() -> pd.DataFrame:
 
 def _committed_report() -> dict:
     path = excess.OUTPUT_DIR / "significance_report.json"
+    if not path.is_file():
+        pytest.skip("generate with make research-excess")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _committed_manifest() -> dict:
+    path = excess.OUTPUT_DIR / "artifact_manifest.json"
     if not path.is_file():
         pytest.skip("generate with make research-excess")
     return json.loads(path.read_text(encoding="utf-8"))
@@ -189,31 +198,17 @@ def _manual_equal_year_ic(sampled_names: list[str]) -> float:
 # module-scoped regeneration into an isolated temporary namespace
 # ---------------------------------------------------------------------------
 
-PROTECTED_EXCLUDED_DIRS = {"raw", "trusted_raw"}
-
-
 def _protected_paths() -> list[Path]:
-    """Curated data, every nominal artifact namespace, and the contract.
+    """The frozen R3-TGT-01 protected boundary, via the generator's own policy.
 
-    Raw inputs and the isolated excess namespace under correction are excluded.
+    Production and tests share exactly one discovery rule
+    (``excess.frozen_boundary_files``): the explicit historical allow-list of
+    curated data and the generated namespaces that already existed when R3-TGT-01
+    was frozen.  The excess namespace under correction and any later, unrelated
+    namespace are not members — the latter being the drift this repair fixes, so
+    adding a new governed namespace never changes this set.
     """
-    root = excess.ROOT
-    paths: set[Path] = set()
-    for name in ("trusted", "trusted_clean", "config", "exports", "interim"):
-        directory = root / "data" / name
-        if directory.is_dir():
-            paths.update(item for item in directory.rglob("*") if item.is_file())
-    for directory in (root / "experiments").iterdir():
-        if not directory.is_dir():
-            continue
-        if directory.name == "results_excess":
-            continue
-        if directory.name == "results" or directory.name.startswith("results_") or directory.name == "reports":
-            paths.update(item for item in directory.rglob("*") if item.is_file())
-    for extra in (root / "experiments" / "leaderboard.csv", root / "model_confidence_contract.json"):
-        if extra.is_file():
-            paths.add(extra)
-    return sorted(paths)
+    return excess.frozen_boundary_files(excess.ROOT)
 
 
 def _snapshot(paths: list[Path]) -> dict[str, str]:
@@ -1511,7 +1506,11 @@ def test_protected_artifacts_are_byte_identical_across_regeneration(
 ) -> None:
     before = isolated_regeneration["protected_before"]
     after = isolated_regeneration["protected_after"]
-    assert isolated_regeneration["protected_count"] == 351
+    # The count is derived from the frozen-boundary authority the generator
+    # records, not a hardcoded literal, so an unrelated new namespace never
+    # changes it.
+    boundary = _committed_manifest()["frozen_protected_boundary"]
+    assert isolated_regeneration["protected_count"] == boundary["member_count"]
     changed = sorted(path for path in before if before[path] != after.get(path))
     assert changed == []
     assert set(before) == set(after)
@@ -1781,6 +1780,28 @@ def test_generated_artifacts_are_isolated_complete_and_claim_safe() -> None:
     for source in report["source_artifacts"]:
         assert (excess.ROOT / source["path"]).is_file()
         assert source["sha256"] == _sha256(excess.ROOT / source["path"])
+
+    # The whole Makefile is an invocation wrapper, not a statistical source
+    # input: it must not appear in source_artifacts (that is what let an
+    # unrelated target stale these artifacts).
+    assert all(Path(s["path"]).name != "Makefile" for s in report["source_artifacts"])
+    assert all(Path(s["path"]).name != "Makefile" for s in manifest["source_artifacts"])
+
+    # Task-specific recipe provenance replaces it, in both report and manifest,
+    # and matches the current research-excess recipe.
+    recipe_provenance = excess.build_makefile_target_provenance()
+    assert report["makefile_target_provenance"] == recipe_provenance
+    assert manifest["makefile_target_provenance"] == recipe_provenance
+    assert recipe_provenance["target"] == "research-excess"
+
+    # Frozen-boundary authority is recorded, self-consistent, and pinned.
+    boundary = report["frozen_protected_boundary"]
+    assert manifest["frozen_protected_boundary"] == boundary
+    members = excess._frozen_boundary_members(excess.ROOT)
+    assert boundary["member_count"] == len(members)
+    assert boundary["members_sha256"] == excess._frozen_boundary_digest(members)
+    assert boundary["members_sha256"] == excess.FROZEN_PROTECTED_BOUNDARY_SHA256
+    assert boundary["later_unrelated_additions_are_members"] is False
 
     comparison = report["analysis"]["aggregate_leaderboard_reconstruction"]
     assert comparison["status"] == "match"
@@ -2665,7 +2686,8 @@ def test_corrections_changed_only_report_and_manifest_bytes(
 def test_protected_boundary_and_determinism_survive_the_corrections(
     isolated_regeneration: dict,
 ) -> None:
-    assert isolated_regeneration["protected_count"] == 351
+    boundary = _committed_manifest()["frozen_protected_boundary"]
+    assert isolated_regeneration["protected_count"] == boundary["member_count"]
     assert isolated_regeneration["protected_before"] == isolated_regeneration["protected_after"]
     assert isolated_regeneration["first"] == isolated_regeneration["second"]
     # The corrected report parses and carries every new section.
@@ -2679,5 +2701,1520 @@ def test_protected_boundary_and_determinism_survive_the_corrections(
         "coincident_baselines",
         "ic_sign_note",
         "review_package_scope",
+        "makefile_target_provenance",
+        "frozen_protected_boundary",
     ):
         assert section in report
+
+
+# ---------------------------------------------------------------------------
+# 19. durable cross-task compatibility invariants (R3-MISS-01 repair)
+#
+# Behavioural, adversarial guards proving that unrelated additive repository work
+# cannot invalidate the frozen R3-TGT-01 excess task, while real changes to its
+# recipe, statistical inputs, or protected boundary are still detected. None of
+# these mutate the working tree; boundary/recipe logic runs against isolated
+# temporary trees and in-memory Makefile text.
+# ---------------------------------------------------------------------------
+
+
+def _make_boundary_tree(root: Path) -> None:
+    """Populate the frozen-boundary roots so enumeration has real members.
+
+    Includes the explicitly-named extra-file members, which the hardened
+    enumeration requires to exist (a missing named member fails closed).
+    """
+    data_dir = root / "data" / excess.FROZEN_BOUNDARY_DATA_DIRS[0]
+    data_dir.mkdir(parents=True)
+    (data_dir / "curated.csv").write_text("col\n1\n", encoding="utf-8")
+    exp_dir = root / "experiments" / excess.FROZEN_BOUNDARY_EXPERIMENT_DIRS[0]
+    exp_dir.mkdir(parents=True)
+    (exp_dir / "artifact.md").write_text("# frozen\n", encoding="utf-8")
+    for relative in excess.FROZEN_BOUNDARY_EXTRA_FILES:
+        member = root / relative
+        member.parent.mkdir(parents=True, exist_ok=True)
+        member.write_text("extra\n", encoding="utf-8")
+
+
+def test_unrelated_new_governed_namespace_does_not_change_the_frozen_boundary(tmp_path):
+    """An arbitrary later namespace (generic name, several files) is not a member."""
+    _make_boundary_tree(tmp_path)
+    baseline = excess._frozen_boundary_members(tmp_path)
+    baseline_digest = excess._frozen_boundary_digest(baseline)
+    assert baseline  # non-empty frozen set
+
+    new_namespace = tmp_path / "experiments" / "results_quantum_widgets"
+    new_namespace.mkdir(parents=True)
+    (new_namespace / "one.json").write_text("{}\n", encoding="utf-8")
+    (new_namespace / "two.csv").write_text("a\n1\n", encoding="utf-8")
+    (new_namespace / "three.md").write_text("# later, unrelated\n", encoding="utf-8")
+
+    after = excess._frozen_boundary_members(tmp_path)
+    assert after == baseline
+    assert excess._frozen_boundary_digest(after) == baseline_digest
+
+
+def test_modifying_a_frozen_boundary_member_is_detected(tmp_path):
+    _make_boundary_tree(tmp_path)
+    members = excess._frozen_boundary_members(tmp_path)
+    digest = excess._frozen_boundary_digest(members)
+
+    member = tmp_path / "data" / excess.FROZEN_BOUNDARY_DATA_DIRS[0] / "curated.csv"
+    member.write_text("col\n2\n", encoding="utf-8")  # content mutated
+
+    mutated = excess._frozen_boundary_members(tmp_path)
+    assert len(mutated) == len(members)
+    assert excess._frozen_boundary_digest(mutated) != digest
+
+
+def test_removing_a_frozen_boundary_member_is_detected(tmp_path):
+    _make_boundary_tree(tmp_path)
+    members = excess._frozen_boundary_members(tmp_path)
+    digest = excess._frozen_boundary_digest(members)
+
+    (tmp_path / "data" / excess.FROZEN_BOUNDARY_DATA_DIRS[0] / "curated.csv").unlink()
+
+    reduced = excess._frozen_boundary_members(tmp_path)
+    assert len(reduced) == len(members) - 1
+    assert excess._frozen_boundary_digest(reduced) != digest
+
+
+def test_frozen_boundary_is_not_auto_redefined_from_the_filesystem():
+    """A drifted digest is rejected against the pinned authority.
+
+    The boundary is never accepted from whatever files happen to exist now: only
+    a digest matching the pinned constant passes.
+    """
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess.verify_frozen_boundary_digest("0" * 64)
+
+    members = excess._frozen_boundary_members(excess.ROOT)
+    working_tree_digest = excess._frozen_boundary_digest(members)
+    excess.verify_frozen_boundary_digest(working_tree_digest)  # does not raise
+    assert working_tree_digest == excess.FROZEN_PROTECTED_BOUNDARY_SHA256
+
+
+# The recipe-provenance invariants (unrelated target stable, recipe edit detected,
+# target removal fails closed, prerequisite change detected) are now proven against
+# real GNU Make subprocesses in the "BLOCKER 2" section below, because GNU Make —
+# not a hand-written text parser — is the provenance authority.
+
+
+def test_changing_a_statistical_source_input_is_detected(tmp_path):
+    """source_artifacts pin whole-file hashes, so a changed real input is caught."""
+    dep = tmp_path / "run_experiments.py"
+    dep.write_text("VERSION = 1\n", encoding="utf-8")
+    record = excess._source_record(dep, "frozen preprocessing, splits, models, and metrics")
+    dep.write_text("VERSION = 2\n", encoding="utf-8")  # a real input change
+    assert record["sha256"] != excess._sha256(dep)
+
+
+def test_statistical_source_inputs_stay_registered_for_staleness():
+    manifest = _committed_manifest()
+    names = {Path(source["path"]).name for source in manifest["source_artifacts"]}
+    assert {
+        "run_experiments.py",
+        "run_alternative_targets.py",
+        "significance.py",
+        "run_excess_basis.py",
+    } <= names
+    assert any(source["path"].endswith(".csv") for source in manifest["source_artifacts"])
+
+
+def test_generated_outputs_cannot_overwrite_another_governed_namespace():
+    """Only results_excess is an in-repo destination; sibling namespaces refuse."""
+    for sibling in ("results", "results_placebo", "reports"):
+        with pytest.raises(excess.ExcessOutputPathError):
+            excess._resolve_output_dir(excess.ROOT / "experiments" / sibling)
+
+
+def test_committed_boundary_and_recipe_match_the_current_working_tree():
+    """The committed report/manifest equal a fresh recomputation from the tree.
+
+    So a later edit to an original member or to the recipe, without regenerating,
+    is detected as a mismatch.
+    """
+    report = _committed_report()
+    manifest = _committed_manifest()
+
+    fresh_recipe = excess.build_makefile_target_provenance()
+    assert report["makefile_target_provenance"] == fresh_recipe
+    assert manifest["makefile_target_provenance"] == fresh_recipe
+
+    members = excess._frozen_boundary_members(excess.ROOT)
+    fresh_digest = excess._frozen_boundary_digest(members)
+    assert report["frozen_protected_boundary"]["members_sha256"] == fresh_digest
+    assert manifest["frozen_protected_boundary"]["members_sha256"] == fresh_digest
+    assert report["frozen_protected_boundary"]["member_count"] == len(members)
+
+
+# ===========================================================================
+# BLOCKER 3 & 4 — Safe, non-executing Make provenance (static parse only)
+# ===========================================================================
+#
+# The provenance authority never invokes GNU Make.  Each fixture writes a real
+# Makefile and the parser reads its bytes under the narrow research-excess
+# contract; anything outside that contract fails closed BEFORE any command could
+# run.  These tests assert the static contract, not GNU Make's full semantics.
+
+_RE = excess.RESEARCH_EXCESS_TARGET  # "research-excess"
+
+
+def _write_makefile(tmp_path: Path, name: str, body: str) -> Path:
+    d = tmp_path / name
+    d.mkdir()
+    (d / "Makefile").write_text(body)
+    return d
+
+
+def _prov(directory: Path) -> dict:
+    return excess._effective_make_provenance(root=directory)
+
+
+def _digest(directory: Path) -> str:
+    prov = _prov(directory)
+    return excess._recipe_provenance_digest(
+        prov["prerequisites"], prov["effective_recipe"], phony=prov["phony"]
+    )
+
+
+def test_current_repository_makefile_yields_a_stable_authority():
+    """1: the real Makefile produces a deterministic, well-formed authority."""
+    first = excess.build_makefile_target_provenance()
+    second = excess.build_makefile_target_provenance()
+    assert first == second
+    assert first["target"] == _RE
+    assert re.fullmatch(r"[0-9a-f]{64}", first["recipe_sha256"])
+    assert first["recipe"], "the effective recipe must not be empty"
+    assert first["make_invoked"] is False
+    assert first["duplicate_recipe_overridden"] is False
+    # The recipe is recorded verbatim; the current recipe carries no prefix.
+    assert first["recipe"] == ["PYTHONPATH=. python experiments/run_excess_basis.py"]
+    assert first["prerequisites"] == []
+
+
+def test_provenance_computation_has_no_filesystem_side_effect(tmp_path):
+    """2: computing the authority never creates, removes, or mutates any file."""
+    d = _write_makefile(tmp_path, "sidefx", f"{_RE}:\n\techo canonical\n")
+    before = {p.name: p.stat().st_mtime_ns for p in d.iterdir()}
+    _prov(d)
+    _prov(d)
+    after = {p.name: p.stat().st_mtime_ns for p in d.iterdir()}
+    assert before == after, "provenance inspection mutated the directory"
+    # Nothing new appeared beside the Makefile.
+    assert sorted(before) == ["Makefile"]
+
+
+def test_no_subprocess_capable_of_recipe_execution_is_launched(tmp_path, monkeypatch):
+    """3: provenance runs even when every subprocess primitive is disabled."""
+    import subprocess as _subprocess
+
+    def _forbidden(*args, **kwargs):  # pragma: no cover - must never be called
+        raise AssertionError("provenance must not launch a subprocess")
+
+    monkeypatch.setattr(_subprocess, "run", _forbidden)
+    monkeypatch.setattr(_subprocess, "Popen", _forbidden)
+    monkeypatch.setattr(_subprocess, "call", _forbidden, raising=False)
+    monkeypatch.setattr(os, "system", _forbidden, raising=False)
+    monkeypatch.setattr(os, "popen", _forbidden, raising=False)
+    # The real repository authority and a temp fixture both succeed with no
+    # subprocess machinery available at all.
+    assert excess.build_makefile_target_provenance()["make_invoked"] is False
+    d = _write_makefile(tmp_path, "nosub", f"{_RE}:\n\techo canonical\n")
+    assert _prov(d)["effective_recipe"] == ["echo canonical"]
+
+
+def test_adding_an_unrelated_target_does_not_change_provenance(tmp_path):
+    """4: unrelated targets never move the research-excess authority."""
+    body = f".PHONY: {_RE}\n{_RE}:\n\techo canonical\n"
+    base = _write_makefile(tmp_path, "base", body)
+    extended = _write_makefile(
+        tmp_path, "extended", f".PHONY: {_RE} other\nother:\n\techo x\n" + body
+    )
+    assert _digest(base) == _digest(extended)
+
+
+def test_unrelated_variable_does_not_change_provenance(tmp_path):
+    """5: a variable the research-excess recipe does not use never moves it."""
+    base = _write_makefile(tmp_path, "u0", f"{_RE}:\n\techo canonical\n")
+    noisy = _write_makefile(
+        tmp_path, "u1", f"UNUSED = 999\nANOTHER := x\n{_RE}:\n\techo canonical\n"
+    )
+    assert _digest(base) == _digest(noisy)
+
+
+def test_editing_the_effective_recipe_changes_provenance(tmp_path):
+    """6: a change to the recorded recipe changes the authority."""
+    a = _write_makefile(tmp_path, "a", f"{_RE}:\n\techo one\n")
+    b = _write_makefile(tmp_path, "b", f"{_RE}:\n\techo two\n")
+    assert _digest(a) != _digest(b)
+
+
+def test_changing_prerequisites_changes_provenance(tmp_path):
+    """7: a prerequisite change moves the authority."""
+    a = _write_makefile(tmp_path, "a", f"{_RE}:\n\techo canonical\n")
+    b = _write_makefile(
+        tmp_path, "b", f"dep:\n\techo dep\n{_RE}: dep\n\techo canonical\n"
+    )
+    prov_b = _prov(b)
+    assert prov_b["prerequisites"] == ["dep"]
+    # Only research-excess's own recipe is recorded, never a prerequisite's.
+    assert prov_b["effective_recipe"] == ["echo canonical"]
+    assert _digest(a) != _digest(b)
+
+
+def test_removing_the_target_fails_closed(tmp_path):
+    """8: a missing research-excess target refuses to record provenance."""
+    d = _write_makefile(tmp_path, "gone", "other:\n\techo x\n")
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_duplicate_research_excess_rules_fail_closed(tmp_path):
+    """9: two research-excess rule lines fail closed rather than guessing."""
+    d = _write_makefile(
+        tmp_path, "dup", f"{_RE}:\n\techo OLD\n{_RE}:\n\techo NEW\n"
+    )
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_false_and_minus_false_produce_different_provenance(tmp_path):
+    """10: '-' is an execution-significant prefix, so 'false' != '-false'."""
+    a = _write_makefile(tmp_path, "false", f"{_RE}:\n\tfalse\n")
+    b = _write_makefile(tmp_path, "minusfalse", f"{_RE}:\n\t-false\n")
+    assert _prov(a)["effective_recipe"] == ["false"]
+    assert _prov(b)["effective_recipe"] == ["-false"]
+    assert _digest(a) != _digest(b)
+
+
+def test_at_prefix_is_preserved_as_execution_significant(tmp_path):
+    """11: GNU Make's '@' quiet prefix is preserved verbatim, not stripped."""
+    d = _write_makefile(tmp_path, "atsign", f"{_RE}:\n\t@false\n")
+    assert _prov(d)["effective_recipe"] == ["@false"]
+    plain = _write_makefile(tmp_path, "plain", f"{_RE}:\n\tfalse\n")
+    assert _digest(d) != _digest(plain)
+
+
+def test_combined_prefixes_are_represented(tmp_path):
+    """12: combined '-@' / '@-' prefixes are recorded verbatim and distinctly."""
+    a = _write_makefile(tmp_path, "da", f"{_RE}:\n\t-@false\n")
+    b = _write_makefile(tmp_path, "ad", f"{_RE}:\n\t@-false\n")
+    assert _prov(a)["effective_recipe"] == ["-@false"]
+    assert _prov(b)["effective_recipe"] == ["@-false"]
+    assert _digest(a) != _digest(b)
+
+
+def test_plus_recipe_prefix_fails_closed(tmp_path):
+    """13: a '+' recipe prefix forces execution and is refused."""
+    d = _write_makefile(tmp_path, "plus", f"{_RE}:\n\t+echo go\n")
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_make_variable_reference_fails_closed(tmp_path):
+    """14/16/17: $(MAKE), $(shell ...), $(eval ...)/$(call ...), and $(VAR) refuse."""
+    for label, recipe in (
+        ("make", "$(MAKE) -C sub"),
+        ("shell", "echo $(shell date)"),
+        ("eval", "$(eval X := 1)"),
+        ("call", "echo $(call fn,a)"),
+        ("var", "echo $(VAR)"),
+        ("brace", "echo ${VAR}"),
+    ):
+        d = _write_makefile(tmp_path, f"dyn-{label}", f"{_RE}:\n\t{recipe}\n")
+        with pytest.raises(excess.ExcessMakefileProvenanceError):
+            _prov(d)
+
+
+def test_recursive_make_text_fails_closed(tmp_path):
+    """15: a bare recursive 'make' invocation is refused."""
+    d = _write_makefile(tmp_path, "recmake", f"{_RE}:\n\tmake sub-thing\n")
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+    chained = _write_makefile(
+        tmp_path, "recmake2", f"{_RE}:\n\techo hi && make sub\n"
+    )
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(chained)
+
+
+def test_double_colon_and_assignment_forms_fail_closed(tmp_path):
+    """A '::' rule or ':=' assignment of the target is outside the subset."""
+    dc = _write_makefile(tmp_path, "dc", f"{_RE}::\n\techo x\n")
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(dc)
+    asg = _write_makefile(tmp_path, "asg", f"{_RE} := value\nother:\n\techo x\n")
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(asg)
+
+
+def test_recipe_command_continuations_are_represented(tmp_path):
+    """18: a backslash-continued recipe line is captured, not truncated."""
+    d = _write_makefile(tmp_path, "cont", f"{_RE}:\n\techo one \\\n\t  two\n")
+    joined = "\n".join(_prov(d)["effective_recipe"])
+    assert "one" in joined and "two" in joined
+    d2 = _write_makefile(tmp_path, "cont2", f"{_RE}:\n\techo one \\\n\t  three\n")
+    assert _digest(d) != _digest(d2)
+
+
+def test_prerequisite_continuations_are_represented(tmp_path):
+    """19: prerequisites split across a continuation are merged."""
+    body = (
+        "p1:\n\techo p1\np2:\n\techo p2\n"
+        f"{_RE}: p1 \\\n  p2\n\techo canonical\n"
+    )
+    d = _write_makefile(tmp_path, "prereq-cont", body)
+    prov = _prov(d)
+    assert prov["prerequisites"] == ["p1", "p2"]
+    assert prov["effective_recipe"] == ["echo canonical"]
+
+
+def test_comments_and_inline_hash_follow_the_narrow_contract(tmp_path):
+    """20: leading comments are ignored; a '#' inside a recipe line is kept."""
+    body = (
+        "# leading comment\n\n"
+        f".PHONY: {_RE}\n"
+        "# another comment\n"
+        f"{_RE}:\n"
+        "\techo hi # kept\n"
+    )
+    d = _write_makefile(tmp_path, "comments", body)
+    assert _prov(d)["effective_recipe"] == ["echo hi # kept"]
+
+
+def test_whole_makefile_is_not_hashed_as_a_source():
+    """21: the whole Makefile is never a statistical source; only the recipe is."""
+    for record in excess._read_only_sources():
+        assert Path(record["path"]).name != "Makefile"
+    provenance = excess.build_makefile_target_provenance()
+    assert "recipe_sha256" in provenance
+    assert provenance["recipe"]
+    # No whole-file digest field is present anywhere in the authority.
+    assert all("makefile_sha256" != key for key in provenance)
+
+
+def test_run_excess_basis_remains_a_separately_hashed_source():
+    """22: the generator itself stays a hashed statistical source."""
+    names = {Path(s["path"]).name for s in excess._read_only_sources()}
+    assert "run_excess_basis.py" in names
+
+
+def test_statistical_source_changes_remain_detectable():
+    """23: the true statistical sources are content-hashed, so edits are detectable."""
+    sources = {Path(s["path"]).name: s for s in excess._read_only_sources()}
+    assert "run_experiments.py" in sources
+    assert "significance.py" in sources
+    for record in sources.values():
+        path = excess.ROOT / record["path"]
+        assert record["sha256"] == _sha256(path)
+
+
+def test_accepted_subset_contract_is_documented():
+    """The narrow accepted subset is documented in source and generated metadata."""
+    prov = excess.build_makefile_target_provenance()
+    assert "accepted_subset" in prov
+    text = prov["accepted_subset"].lower()
+    assert "never invoked" in text or "non-executing" in text
+    assert "fail closed" in text
+    assert "no general gnu make equivalence" in text
+
+
+# ===========================================================================
+# BLOCKER 3 — Frozen-boundary symlink & path-anomaly safety (real filesystem)
+# ===========================================================================
+
+
+def _fake_repo(tmp_path: Path, name: str) -> Path:
+    """A minimal repo carrying one member in each frozen-boundary source kind."""
+    r = tmp_path / name
+    (r / "data" / "trusted").mkdir(parents=True)
+    (r / "data" / "trusted" / "a.csv").write_text("A\n")
+    (r / "experiments" / "results").mkdir(parents=True)
+    (r / "experiments" / "results" / "b.json").write_text("{}\n")
+    (r / "experiments" / "leaderboard.csv").write_text("L\n")
+    (r / "model_confidence_contract.json").write_text("{}\n")
+    return r
+
+
+def test_genuine_base_repository_reconstructs_351_members_with_pinned_digest():
+    """1 & 2: the real repo yields exactly 351 members and the pinned digest."""
+    members = excess._frozen_boundary_members(excess.ROOT)
+    assert len(members) == 351
+    assert (
+        excess._frozen_boundary_digest(members)
+        == "634d7151e75f0ec7a85e412f748ac81499a4fad5e9eac71ab1a5c920f0137dd9"
+    )
+    assert (
+        excess._frozen_boundary_digest(members)
+        == excess.FROZEN_PROTECTED_BOUNDARY_SHA256
+    )
+
+
+def test_arbitrary_later_result_namespace_is_ignored(tmp_path):
+    """3: a namespace not on the allow-list never becomes a member."""
+    r = _fake_repo(tmp_path, "later")
+    base = excess._frozen_boundary_members(r)
+    (r / "experiments" / "results_brand_new").mkdir(parents=True)
+    (r / "experiments" / "results_brand_new" / "x.json").write_text("x\n")
+    assert excess._frozen_boundary_members(r) == base
+
+
+def test_modified_genuine_member_changes_the_digest(tmp_path):
+    """4: modifying an original member is detected via the content digest."""
+    a = _fake_repo(tmp_path, "unmod")
+    b = _fake_repo(tmp_path, "mod")
+    (b / "data" / "trusted" / "a.csv").write_text("A-CHANGED\n")
+    assert excess._frozen_boundary_digest(
+        excess._frozen_boundary_members(a)
+    ) != excess._frozen_boundary_digest(excess._frozen_boundary_members(b))
+
+
+def test_missing_genuine_member_fails(tmp_path):
+    """5: a removed named member fails closed."""
+    r = _fake_repo(tmp_path, "missing")
+    (r / "model_confidence_contract.json").unlink()
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+
+def test_member_replaced_by_symlink_to_identical_external_file_fails(tmp_path):
+    """6: a symlink to an identical external file is refused, not followed."""
+    r = _fake_repo(tmp_path, "extsym")
+    external = tmp_path / "ext_a.csv"
+    external.write_text("A\n")  # byte-identical content
+    member = r / "data" / "trusted" / "a.csv"
+    member.unlink()
+    member.symlink_to(external)
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+
+def test_member_replaced_by_internal_symlink_fails(tmp_path):
+    """7: an in-repo symlink member is refused."""
+    r = _fake_repo(tmp_path, "intsym")
+    (r / "data" / "trusted" / "c.csv").write_text("A\n")
+    member = r / "data" / "trusted" / "a.csv"
+    member.unlink()
+    member.symlink_to(r / "data" / "trusted" / "c.csv")
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+
+def test_symlinked_parent_directory_fails(tmp_path):
+    """8: a namespace directory replaced by a symlink is refused."""
+    r = _fake_repo(tmp_path, "parentsym")
+    real = tmp_path / "real_results"
+    real.mkdir()
+    (real / "z.csv").write_text("Z\n")
+    shutil.rmtree(r / "experiments" / "results")
+    (r / "experiments" / "results").symlink_to(real, target_is_directory=True)
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+
+def test_traversal_path_in_the_authority_fails(tmp_path, monkeypatch):
+    """9: a '..' path in the frozen authority is refused."""
+    r = _fake_repo(tmp_path, "trav")
+    monkeypatch.setattr(excess, "FROZEN_BOUNDARY_EXTRA_FILES", ("../outside.txt",))
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+
+def test_absolute_path_in_the_authority_fails(tmp_path, monkeypatch):
+    """10: an absolute path in the frozen authority is refused."""
+    r = _fake_repo(tmp_path, "abs")
+    monkeypatch.setattr(excess, "FROZEN_BOUNDARY_EXTRA_FILES", ("/etc/hosts",))
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+
+def test_duplicate_normalized_paths_fail(tmp_path, monkeypatch):
+    """11: a duplicate normalized member path is refused."""
+    r = _fake_repo(tmp_path, "dup")
+    # An extra-file that is also enumerated under data/trusted collides.
+    monkeypatch.setattr(excess, "FROZEN_BOUNDARY_EXTRA_FILES", ("data/trusted/a.csv",))
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+
+def test_non_regular_member_type_fails(tmp_path):
+    """12: a FIFO (non-regular file) under the boundary is refused."""
+    r = _fake_repo(tmp_path, "fifo")
+    os.mkfifo(r / "data" / "trusted" / "pipe")
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+
+def test_boundary_cannot_redefine_itself_from_current_contents():
+    """13: the pinned digest guards against silent self-redefinition."""
+    # A digest that does not match the pinned authority is rejected outright,
+    # so the boundary can never re-freeze whatever files happen to exist now.
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess.verify_frozen_boundary_digest("0" * 64)
+    # The genuine digest still verifies.
+    excess.verify_frozen_boundary_digest(excess.FROZEN_PROTECTED_BOUNDARY_SHA256)
+
+
+def test_output_confinement_and_registry_ownership_remain_strict(tmp_path):
+    """14: the excess output policy still refuses sibling governed namespaces."""
+    with pytest.raises(excess.ExcessOutputPathError):
+        excess._resolve_output_dir(excess.ROOT / "experiments" / "results")
+
+
+# ===========================================================================
+# BLOCKER 5 — Descriptor-anchored frozen hashing (validation-to-hash races)
+# ===========================================================================
+#
+# Every member is opened and hashed through one descriptor anchored beneath the
+# repository root; a member swapped for a symlink, replaced by another regular
+# file, or deleted *between validation and hashing* must fail closed instead of
+# being followed or silently accepted.  The race is injected by wrapping
+# ``os.read`` so the swap happens mid-hash, while the descriptor already refers
+# to the original inode.
+
+
+def _member_swapping_read(target: Path, swap):
+    """Return an ``os.read`` wrapper that performs ``swap(target)`` once, mid-read."""
+    real_read = os.read
+    state = {"done": False}
+
+    def wrapper(fd, n):
+        if not state["done"]:
+            state["done"] = True
+            try:
+                swap(target)
+            except OSError:
+                pass
+        return real_read(fd, n)
+
+    return wrapper
+
+
+def test_member_swapped_to_symlink_during_hashing_fails(tmp_path, monkeypatch):
+    """8: a member replaced by a symlink mid-hash is refused, not followed."""
+    r = _fake_repo(tmp_path, "raceSym")
+    external = tmp_path / "ext.csv"
+    external.write_text("A\n")
+    target = r / "data" / "trusted" / "a.csv"
+
+    def swap(path: Path) -> None:
+        path.unlink()
+        path.symlink_to(external)
+
+    monkeypatch.setattr(os, "read", _member_swapping_read(target, swap))
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+
+def test_member_replaced_by_regular_file_during_hashing_fails(tmp_path, monkeypatch):
+    """9: a member replaced by a different regular file mid-hash is refused."""
+    r = _fake_repo(tmp_path, "raceReg")
+    other = tmp_path / "other.csv"
+    other.write_text("DIFFERENT CONTENT\n")
+    target = r / "data" / "trusted" / "a.csv"
+
+    def swap(path: Path) -> None:
+        path.unlink()
+        shutil.copy(other, path)
+
+    monkeypatch.setattr(os, "read", _member_swapping_read(target, swap))
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+
+def test_member_deleted_during_hashing_fails(tmp_path, monkeypatch):
+    """10: a member deleted mid-hash is refused, never accepted as hashed."""
+    r = _fake_repo(tmp_path, "raceDel")
+    target = r / "data" / "trusted" / "a.csv"
+
+    monkeypatch.setattr(os, "read", _member_swapping_read(target, lambda p: p.unlink()))
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+
+def test_hash_uses_the_same_validated_descriptor(tmp_path):
+    """14: the anchored hash equals the member's true content hash, no reopen."""
+    r = _fake_repo(tmp_path, "sameFd")
+    members = dict(excess._frozen_boundary_members(r))
+    for relative, digest in members.items():
+        assert digest == _sha256(r / relative)
+
+
+def test_directory_fifo_and_socket_members_fail(tmp_path, monkeypatch):
+    """11: directory, FIFO, and socket members are all refused."""
+    import socket
+
+    # FIFO discovered under a boundary namespace.
+    r = _fake_repo(tmp_path, "fifo2")
+    os.mkfifo(r / "data" / "trusted" / "pipe")
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r)
+
+    # A directory named as a required extra-file member is not a regular file.
+    r2 = _fake_repo(tmp_path, "dirmember")
+    (r2 / "a_directory_member").mkdir()
+    monkeypatch.setattr(
+        excess, "FROZEN_BOUNDARY_EXTRA_FILES", ("a_directory_member",)
+    )
+    with pytest.raises(excess.ExcessFrozenBoundaryError):
+        excess._frozen_boundary_members(r2)
+    monkeypatch.undo()
+
+    # UNIX domain socket discovered under a boundary namespace. sun_path is
+    # length-limited, so bind a short relative name from inside the directory.
+    r3 = _fake_repo(tmp_path, "sock")
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    prev_cwd = os.getcwd()
+    try:
+        os.chdir(r3 / "data" / "trusted")
+        sock.bind("s")
+        os.chdir(prev_cwd)
+        with pytest.raises(excess.ExcessFrozenBoundaryError):
+            excess._frozen_boundary_members(r3)
+    finally:
+        os.chdir(prev_cwd)
+        sock.close()
+
+
+def test_genuine_boundary_survives_the_descriptor_anchoring():
+    """15: after the fix the real boundary is still 351 members with the pinned digest."""
+    members = excess._frozen_boundary_members(excess.ROOT)
+    assert len(members) == 351
+    assert (
+        excess._frozen_boundary_digest(members)
+        == "634d7151e75f0ec7a85e412f748ac81499a4fad5e9eac71ab1a5c920f0137dd9"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Second mandatory repair — BLOCKER 3: truthful fail-closed Make subset
+# ---------------------------------------------------------------------------
+#
+# The static parser is non-executing, but it previously accepted or
+# misrepresented execution-affecting Make syntax: '.IGNORE: research-excess'
+# and '.ONESHELL:' produced the same authority as an ordinary recipe, a tabbed
+# command after a blank line was silently ignored (so editing it did not move
+# provenance), and an inline prerequisite comment was tokenised into
+# prerequisites such as ["dep", "#", "human", "note"].  The accepted subset is
+# now documented and everything outside it fails closed.
+
+
+@pytest.mark.parametrize(
+    "directive",
+    [
+        f".IGNORE: {_RE}",
+        ".IGNORE:",
+        ".ONESHELL:",
+        f".SILENT: {_RE}",
+        ".SILENT:",
+        ".POSIX:",
+        ".RECIPEPREFIX = >",
+        ".DELETE_ON_ERROR:",
+        ".NOTPARALLEL:",
+        ".SECONDEXPANSION:",
+        ".EXPORT_ALL_VARIABLES:",
+    ],
+)
+def test_execution_affecting_special_targets_fail_closed(tmp_path, directive):
+    """16-21: a special target that can change how research-excess runs is refused."""
+    body = f"{directive}\n{_RE}:\n\techo canonical\n"
+    d = _write_makefile(tmp_path, "special" + str(abs(hash(directive))), body)
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+@pytest.mark.parametrize(
+    "directive",
+    ["include other.mk", "-include other.mk", "sinclude other.mk", "override X = 1"],
+)
+def test_global_directives_fail_closed(tmp_path, directive):
+    """22: include/-include/sinclude/override can alter the effective rule; refused."""
+    body = f"{directive}\n{_RE}:\n\techo canonical\n"
+    d = _write_makefile(tmp_path, "glob" + str(abs(hash(directive))), body)
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_define_endef_block_fails_closed(tmp_path):
+    """22b: a define/endef block is outside the accepted subset."""
+    d = _write_makefile(
+        tmp_path, "define", f"define BODY\necho hi\nendef\n{_RE}:\n\techo canonical\n"
+    )
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_target_specific_variable_assignment_fails_closed(tmp_path):
+    """23: 'research-excess: CC = gcc' is a target assignment, not prerequisites."""
+    d = _write_makefile(tmp_path, "tsv", f"{_RE}: CC = gcc\n\techo canonical\n")
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_phony_membership_is_recorded_truthfully(tmp_path):
+    """.PHONY is accepted but NOT inert: membership is execution-affecting.
+
+    Without ``.PHONY`` membership an existing file named ``research-excess`` makes
+    the target up to date and the recipe never runs, while the recipe text stays
+    byte-identical — so membership is represented in provenance and hashed.
+    """
+    body = f"{_RE}:\n\techo canonical\n"
+    plain = _write_makefile(tmp_path, "nophony", body)
+    phony = _write_makefile(tmp_path, "phony", f".PHONY: {_RE}\n{body}")
+    assert _prov(plain)["phony"] is False
+    assert _prov(phony)["phony"] is True
+    assert _digest(plain) != _digest(phony)
+
+
+def test_inline_prerequisite_comment_is_not_tokenised_as_prerequisites(tmp_path):
+    """32: '# human note' must never become prerequisites."""
+    d = _write_makefile(tmp_path, "inline", f"{_RE}: dep # human note\n\techo canonical\n")
+    prov = _prov(d)
+    assert prov["prerequisites"] == ["dep"]
+    assert "#" not in prov["prerequisites"]
+    assert "human" not in prov["prerequisites"]
+    assert "note" not in prov["prerequisites"]
+
+
+def test_inline_comment_text_does_not_move_the_authority(tmp_path):
+    """32b: editing only the comment text leaves the recorded authority unchanged."""
+    a = _write_makefile(tmp_path, "cmt-a", f"{_RE}: dep # note one\n\techo canonical\n")
+    b = _write_makefile(tmp_path, "cmt-b", f"{_RE}: dep # a totally different note\n\techo canonical\n")
+    assert _digest(a) == _digest(b)
+
+
+def test_full_line_comments_are_ignored(tmp_path):
+    """33: ordinary full-line comments never affect the authority."""
+    plain = _write_makefile(tmp_path, "fl-a", f"{_RE}:\n\techo canonical\n")
+    commented = _write_makefile(
+        tmp_path, "fl-b", f"# leading note\n{_RE}:\n\techo canonical\n"
+    )
+    assert _digest(plain) == _digest(commented)
+
+
+def test_orphan_tab_command_after_a_blank_line_fails_closed(tmp_path):
+    """27/28: a recipe-looking command must never be silently ignored."""
+    d = _write_makefile(
+        tmp_path, "orphan", f"{_RE}:\n\techo canonical\n\n\techo hidden\n"
+    )
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_orphan_tab_command_after_a_comment_line_fails_closed(tmp_path):
+    """28b: the same applies when a comment separates the orphan command."""
+    d = _write_makefile(
+        tmp_path, "orphan-cmt", f"{_RE}:\n\techo canonical\n# note\n\techo hidden\n"
+    )
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_hidden_recipe_line_after_another_rule_is_not_attributed(tmp_path):
+    """29: a tabbed command belonging to a later rule never joins this recipe."""
+    d = _write_makefile(
+        tmp_path, "hidden", f"{_RE}:\n\techo canonical\nother:\n\techo other\n"
+    )
+    assert _prov(d)["effective_recipe"] == ["echo canonical"]
+
+
+def test_supported_prerequisite_continuation_is_accepted(tmp_path):
+    """30: a backslash-continued prerequisite list stays inside the subset."""
+    d = _write_makefile(tmp_path, "cont", f"{_RE}: one \\\n\ttwo\n\techo canonical\n")
+    assert _prov(d)["prerequisites"] == ["one", "two"]
+
+
+def test_unsupported_recipe_continuation_fails_closed(tmp_path):
+    """31: a recipe continuation that does not continue onto a tab line is refused."""
+    d = _write_makefile(tmp_path, "badcont", f"{_RE}:\n\techo canonical \\\nnot-a-recipe\n")
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_wait_prerequisite_fails_closed(tmp_path):
+    """.WAIT changes ordering semantics and is outside the accepted subset."""
+    d = _write_makefile(tmp_path, "wait", f"{_RE}: a .WAIT b\n\techo canonical\n")
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+@pytest.mark.parametrize(
+    "recipe, distinct",
+    [("false", True), ("-false", True), ("@false", True), ("-@false", True), ("@-false", True)],
+)
+def test_command_prefixes_produce_distinct_truthful_authorities(tmp_path, recipe, distinct):
+    """10-14: '@' and '-' are execution-significant and preserved verbatim."""
+    d = _write_makefile(tmp_path, "pfx" + str(abs(hash(recipe))), f"{_RE}:\n\t{recipe}\n")
+    prov = _prov(d)
+    assert prov["effective_recipe"] == [recipe]
+    plain = _write_makefile(tmp_path, "pfx-plain" + str(abs(hash(recipe))), f"{_RE}:\n\tfalse\n")
+    if recipe != "false":
+        assert _digest(d) != _digest(plain)
+
+
+def test_ignore_directive_no_longer_matches_a_plain_recipe_authority(tmp_path):
+    """16b: the reproduced defect — '.IGNORE: research-excess' once matched 'false'."""
+    plain = _write_makefile(tmp_path, "ign-plain", f"{_RE}:\n\tfalse\n")
+    plain_digest = _digest(plain)
+    ignored = _write_makefile(tmp_path, "ign-set", f".IGNORE: {_RE}\n{_RE}:\n\tfalse\n")
+    # Before the repair both produced the same authority; now the .IGNORE form
+    # fails closed instead of being silently equated with the plain recipe.
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(ignored)
+    assert re.fullmatch(r"[0-9a-f]{64}", plain_digest)
+
+
+def test_parser_claims_no_gnu_make_equivalence():
+    """The documented subset must not claim general GNU Make equivalence."""
+    assert "No general GNU Make equivalence is claimed." in excess.MAKEFILE_ACCEPTED_SUBSET
+
+
+# ---------------------------------------------------------------------------
+# Final repair — BLOCKER 2: ambiguous Make target definitions
+# ---------------------------------------------------------------------------
+#
+# The parser located research-excess only by matching the *start* of a rule line,
+# so a multi-target rule ('other research-excess:'), a continued target list, and
+# any variable-derived target name ('$(TARGET):') were invisible: the authority
+# stayed unchanged while GNU Make would have used a different or duplicated
+# recipe.  Every rule line's target expression is now judged statically, and any
+# expression whose effective identity cannot be established without executing or
+# expanding Make fails closed.
+#
+# All fixtures below are inert text.  No Make, shell, or subprocess is involved.
+
+
+def _refuses(tmp_path: Path, name: str, body: str) -> str:
+    d = _write_makefile(tmp_path, name, body)
+    with pytest.raises(excess.ExcessMakefileProvenanceError) as excinfo:
+        _prov(d)
+    return str(excinfo.value)
+
+
+@pytest.mark.parametrize(
+    "name,expression",
+    [
+        ("first", f"{_RE} other"),
+        ("last", f"other {_RE}"),
+        ("middle", f"a {_RE} b"),
+        ("tabbed", f"other\t{_RE}"),
+        ("many", f"one two {_RE} three four"),
+    ],
+)
+def test_multi_target_rule_naming_the_governed_target_fails_closed(
+    tmp_path, name, expression
+):
+    """A multi-target rule naming research-excess in ANY position fails closed."""
+    message = _refuses(tmp_path, f"multi-{name}", f"{expression}:\n\techo x\n")
+    assert "multi-target rule" in message
+
+
+def test_space_indented_multi_target_rule_fails_closed(tmp_path):
+    """GNU Make strips leading whitespace, so an indented multi-target rule counts."""
+    message = _refuses(
+        tmp_path, "multi-indent", f"  other {_RE}:\n\techo x\n"
+    )
+    assert "multi-target rule" in message
+
+
+@pytest.mark.parametrize(
+    "name,body",
+    [
+        ("leading", "other \\\n" + f"{_RE}:\n\techo x\n"),
+        ("trailing", f"{_RE} \\\n  other:\n\techo x\n"),
+        ("three-way", f"one \\\n  {_RE} \\\n  two:\n\techo x\n"),
+    ],
+)
+def test_continued_multi_target_rule_fails_closed(tmp_path, name, body):
+    """A target list assembled across backslash continuations is judged as one rule."""
+    message = _refuses(tmp_path, f"cont-multi-{name}", body)
+    assert "multi-target rule" in message
+
+
+@pytest.mark.parametrize(
+    "name,target",
+    [
+        ("paren", "$(TARGET)"),
+        ("brace", "${TARGET}"),
+        ("suffix", "$(PREFIX)-excess"),
+        ("prefix", "research-$(SUFFIX)"),
+        ("function", "$(firstword $(GOALS))"),
+    ],
+)
+def test_variable_derived_target_name_fails_closed(tmp_path, name, target):
+    """A target whose name requires expansion cannot be resolved statically."""
+    body = f"{target}:\n\techo x\n{_RE}:\n\techo canonical\n"
+    message = _refuses(tmp_path, f"vartgt-{name}", body)
+    assert "cannot be established statically" in message
+
+
+@pytest.mark.parametrize("operator", ["=", ":=", "::=", "+=", "?=", "!="])
+def test_variable_resolving_to_the_governed_target_fails_closed(tmp_path, operator):
+    """A variable whose literal value is research-excess fails closed."""
+    body = f"TARGET {operator} {_RE}\n{_RE}:\n\techo canonical\n"
+    message = _refuses(tmp_path, f"varval-{operator.replace(':', 'c').replace('=', 'e').replace('+', 'p').replace('?', 'q').replace('!', 'b')}", body)
+    assert "resolves to the governed target" in message
+
+
+def test_variable_resolving_to_the_governed_target_among_others_fails_closed(tmp_path):
+    """The governed name anywhere in a variable's literal value fails closed."""
+    body = f"GOALS = build {_RE} test\n{_RE}:\n\techo canonical\n"
+    message = _refuses(tmp_path, "varval-list", body)
+    assert "resolves to the governed target" in message
+
+
+def test_literal_plus_variable_derived_duplicate_fails_closed(tmp_path):
+    """A literal rule plus a variable-derived rule is a duplicate that is refused."""
+    body = f"{_RE}:\n\techo one\n$(TARGET):\n\techo two\n"
+    message = _refuses(tmp_path, "dup-literal-derived", body)
+    assert "cannot be established statically" in message
+
+
+def test_variable_definition_plus_derived_duplicate_fails_closed(tmp_path):
+    """Defining the variable AND using it as a target is refused at the definition."""
+    body = f"TARGET = {_RE}\n{_RE}:\n\techo one\n$(TARGET):\n\techo two\n"
+    message = _refuses(tmp_path, "dup-defined-derived", body)
+    assert "resolves to the governed target" in message
+
+
+def test_literal_duplicate_across_a_multi_target_rule_fails_closed(tmp_path):
+    """A literal rule plus a multi-target rule naming the target is refused."""
+    body = f"{_RE}:\n\techo one\nother {_RE}:\n\techo two\n"
+    message = _refuses(tmp_path, "dup-literal-multi", body)
+    assert "multi-target rule" in message
+
+
+def test_two_literal_definitions_report_a_duplicate(tmp_path):
+    """Two plain literal definitions are reported as effective duplicates."""
+    body = f"{_RE}:\n\techo one\n{_RE}:\n\techo two\n"
+    message = _refuses(tmp_path, "dup-two-literal", body)
+    assert "duplicate" in message.lower()
+
+
+@pytest.mark.parametrize(
+    "name,target",
+    [
+        ("pattern-suffix", "research-%"),
+        ("pattern-prefix", "%-excess"),
+        ("pattern-both", "research%excess"),
+        ("bare-pattern", "%"),
+        ("glob-star", "research-*"),
+        ("glob-question", "research-exces?"),
+        ("glob-class", "research-[ea]xcess"),
+    ],
+)
+def test_pattern_or_glob_target_covering_the_governed_target_fails_closed(
+    tmp_path, name, target
+):
+    """A pattern/glob target that could resolve to research-excess is refused."""
+    body = f"{target}:\n\techo x\n{_RE}:\n\techo canonical\n"
+    message = _refuses(tmp_path, f"amb-{name}", body)
+    assert "ambiguous pattern or wildcard" in message
+
+
+def test_static_pattern_rule_on_the_governed_target_fails_closed(tmp_path):
+    """A static pattern rule carries a second rule colon and is refused."""
+    body = f"{_RE}: %.o: %.c\n\techo x\n"
+    message = _refuses(tmp_path, "static-pattern", body)
+    assert "static pattern rule" in message
+
+
+def test_semicolon_inline_recipe_on_the_rule_line_fails_closed(tmp_path):
+    """An inline ';' command would be silently dropped, so it fails closed."""
+    body = f"{_RE}: ; echo inline\n\techo x\n"
+    message = _refuses(tmp_path, "semicolon", body)
+    assert "';' recipe" in message
+
+
+@pytest.mark.parametrize(
+    "name,body",
+    [
+        ("unrelated-multi", "alpha beta:\n\techo x\n" + f"{_RE}:\n\techo canonical\n"),
+        (
+            "unrelated-pattern",
+            "%.o: %.c\n\techo compile\n" + f"{_RE}:\n\techo canonical\n",
+        ),
+        (
+            "unrelated-var-target",
+            "OTHER = alpha\nalpha:\n\techo x\n" + f"{_RE}:\n\techo canonical\n",
+        ),
+        (
+            "url-valued-variable",
+            "API ?= http://127.0.0.1:8000\n" + f"{_RE}:\n\techo canonical\n",
+        ),
+        (
+            "dynamic-unrelated-variable",
+            "M ?= $(shell ls -1t a/*/b.json | head -n 1)\n"
+            + f"{_RE}:\n\techo canonical\n",
+        ),
+    ],
+)
+def test_unrelated_target_forms_do_not_move_or_break_the_authority(
+    tmp_path, name, body
+):
+    """Ambiguity elsewhere in the file must not touch the governed authority."""
+    base = _write_makefile(tmp_path, f"base-{name}", f"{_RE}:\n\techo canonical\n")
+    other = _write_makefile(tmp_path, f"other-{name}", body)
+    assert _digest(base) == _digest(other)
+
+
+def test_repository_makefile_survives_the_target_identity_contract():
+    """The real Makefile still yields exactly one unambiguous governed definition."""
+    provenance = excess.build_makefile_target_provenance()
+    assert provenance["target"] == _RE
+    assert provenance["recipe"] == ["PYTHONPATH=. python experiments/run_excess_basis.py"]
+    assert provenance["prerequisites"] == []
+    assert provenance["make_invoked"] is False
+
+
+def test_target_identity_contract_is_documented():
+    """The generated accepted-subset text names the new fail-closed target forms."""
+    text = excess.build_makefile_target_provenance()["accepted_subset"]
+    for phrase in (
+        "multi-target rule",
+        "variable-derived",
+        "cannot be established statically",
+        "without executing or expanding Make",
+    ):
+        assert phrase in text
+
+
+def test_the_pre_repair_rule_detection_would_have_missed_these_target_forms():
+    """Evidence these tests are adversarial, not restatements of existing behaviour.
+
+    The pre-repair detector matched only a line *starting* with the literal target
+    name, so every form below was invisible to it and the recorded authority stayed
+    unchanged while GNU Make would have used a different or duplicated recipe.
+    """
+    ambiguous = (f"other {_RE}:", f"{_RE} other:", "$(TARGET):", "${TARGET}:", "research-%:")
+    for head in ambiguous:
+        assert excess._RESEARCH_EXCESS_RULE_RE.match(head) is None
+        assert excess._RESEARCH_EXCESS_UNSUPPORTED_RE.match(head) is None
+    # The repaired target-identity pass judges — and refuses — every one of them.
+    for head in ambiguous:
+        with pytest.raises(excess.ExcessMakefileProvenanceError):
+            excess._check_rule_target_identity(head, 1)
+    # A plain governed definition is still recognised, and an unrelated one is not.
+    assert excess._check_rule_target_identity(f"{_RE}: dep", 1) is True
+    assert excess._check_rule_target_identity("unrelated: dep", 1) is False
+
+
+def test_rule_target_expression_never_executes_or_expands(tmp_path, monkeypatch):
+    """The whole target-identity pass runs with every subprocess primitive disabled."""
+    import subprocess as _subprocess
+
+    def _forbidden(*args, **kwargs):  # pragma: no cover - must never be called
+        raise AssertionError("target identity analysis must not launch a subprocess")
+
+    monkeypatch.setattr(_subprocess, "run", _forbidden)
+    monkeypatch.setattr(_subprocess, "Popen", _forbidden)
+    monkeypatch.setattr(_subprocess, "call", _forbidden, raising=False)
+    monkeypatch.setattr(os, "system", _forbidden, raising=False)
+    monkeypatch.setattr(os, "popen", _forbidden, raising=False)
+    d = _write_makefile(tmp_path, "noexec-multi", f"other {_RE}:\n\techo x\n")
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+    assert excess._rule_target_expression("$(TARGET): dep") == "$(TARGET)"
+    assert excess._rule_target_expression("VAR := value") is None
+    assert excess._rule_target_expression("VAR ::= value") is None
+    assert excess._rule_target_expression("no colon here") is None
+    assert excess._rule_target_expression("dbl:: dep") == "dbl"
+
+
+# ---------------------------------------------------------------------------
+# Second mandatory repair — BLOCKER 4: post-hash ancestor-chain revalidation
+# ---------------------------------------------------------------------------
+#
+# The final member was safely opened and hashed from one descriptor, but while
+# hashing, an ancestor (e.g. data/trusted) could be renamed away and replaced;
+# the retained parent descriptor still pointed at the original directory, so the
+# swap was accepted even though the governed repository path now reached a
+# different tree.  The chain is now re-walked from the repository-root
+# descriptor after hashing and every component identity must still match.
+
+
+def _boundary_relative(root: Path) -> str:
+    """Repo-relative posix path of a real member inside the fake boundary tree."""
+    return f"data/{excess.FROZEN_BOUNDARY_DATA_DIRS[0]}/curated.csv"
+
+
+def test_ancestor_renamed_and_replaced_during_hashing_fails_closed(tmp_path, monkeypatch):
+    """11/12: an ancestor swapped mid-hash must not be silently accepted."""
+    _make_boundary_tree(tmp_path)
+    relative = _boundary_relative(tmp_path)
+    ancestor = tmp_path / "data" / excess.FROZEN_BOUNDARY_DATA_DIRS[0]
+
+    real_read = os.read
+    swapped = {"done": False}
+
+    def racing_read(fd, size):
+        # Perform the ancestor swap exactly once, while the member is being read.
+        if not swapped["done"]:
+            swapped["done"] = True
+            impostor = tmp_path / "data" / "impostor"
+            impostor.mkdir(parents=True, exist_ok=True)
+            (impostor / "curated.csv").write_text("col\n999\n", encoding="utf-8")
+            os.rename(ancestor, tmp_path / "data" / "moved-away")
+            os.rename(impostor, ancestor)
+        return real_read(fd, size)
+
+    monkeypatch.setattr(excess.os, "read", racing_read)
+    root_fd = os.open(str(tmp_path), os.O_RDONLY | excess._EX_O_DIRECTORY)
+    try:
+        with pytest.raises(excess.ExcessFrozenBoundaryError):
+            excess._sha256_member_anchored(root_fd, relative)
+    finally:
+        os.close(root_fd)
+
+
+def test_higher_ancestor_replaced_by_symlink_during_hashing_fails_closed(
+    tmp_path, monkeypatch
+):
+    """13/14: an ancestor replaced by a symlink mid-hash fails closed."""
+    _make_boundary_tree(tmp_path)
+    relative = _boundary_relative(tmp_path)
+    ancestor = tmp_path / "data" / excess.FROZEN_BOUNDARY_DATA_DIRS[0]
+    external = tmp_path / "external"
+    external.mkdir()
+    (external / "curated.csv").write_text("col\n999\n", encoding="utf-8")
+
+    real_read = os.read
+    swapped = {"done": False}
+
+    def racing_read(fd, size):
+        if not swapped["done"]:
+            swapped["done"] = True
+            os.rename(ancestor, tmp_path / "data" / "moved-away")
+            os.symlink(str(external), str(ancestor), target_is_directory=True)
+        return real_read(fd, size)
+
+    monkeypatch.setattr(excess.os, "read", racing_read)
+    root_fd = os.open(str(tmp_path), os.O_RDONLY | excess._EX_O_DIRECTORY)
+    try:
+        with pytest.raises(excess.ExcessFrozenBoundaryError):
+            excess._sha256_member_anchored(root_fd, relative)
+    finally:
+        os.close(root_fd)
+
+
+def test_unraced_member_still_hashes_from_the_validated_descriptor(tmp_path):
+    """20: without a race the member hashes normally through the anchored chain."""
+    _make_boundary_tree(tmp_path)
+    relative = _boundary_relative(tmp_path)
+    expected = hashlib.sha256((tmp_path / relative).read_bytes()).hexdigest()
+    root_fd = os.open(str(tmp_path), os.O_RDONLY | excess._EX_O_DIRECTORY)
+    try:
+        assert excess._sha256_member_anchored(root_fd, relative) == expected
+    finally:
+        os.close(root_fd)
+
+
+def test_historical_boundary_authority_is_unchanged_after_the_repair():
+    """1/2/18: the real boundary is still 351 members with the pinned digest."""
+    members = excess._frozen_boundary_members(excess.ROOT)
+    assert len(members) == 351
+    assert (
+        excess._frozen_boundary_digest(members)
+        == "634d7151e75f0ec7a85e412f748ac81499a4fad5e9eac71ab1a5c920f0137dd9"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Third mandatory repair — BLOCKER 2: complete static Make global semantics
+# ---------------------------------------------------------------------------
+#
+# The static, non-executing provenance subset skipped every line that began with
+# whitespace, so a space-indented '.IGNORE:'/'.SILENT:' changed how GNU Make runs
+# research-excess while provenance stayed identical; '.PHONY' membership was
+# treated as inert although it decides whether the recipe runs at all; and a
+# global 'SHELL' assignment changed the executing shell invisibly.  Each of these
+# is now either represented truthfully in provenance or refused fail-closed, and
+# the inspection remains a pure parse of the Makefile bytes.
+
+
+@pytest.mark.parametrize(
+    "directive",
+    [
+        "  .IGNORE:",
+        "   .IGNORE: research-excess",
+        "  .SILENT:",
+        " .SILENT: research-excess",
+        "  .ONESHELL:",
+        "   .RECIPEPREFIX = >",
+        "  .DELETE_ON_ERROR:",
+        "  .NOTPARALLEL:",
+        "  .SECONDEXPANSION:",
+        "  .POSIX:",
+        "  .EXPORT_ALL_VARIABLES:",
+    ],
+)
+def test_whitespace_prefixed_special_targets_fail_closed(tmp_path, directive):
+    """A leading-whitespace directive is honoured by GNU Make and must not be skipped."""
+    body = f"{directive}\n{_RE}:\n\tfalse\n"
+    d = _write_makefile(tmp_path, "ws" + str(abs(hash(directive))), body)
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_whitespace_prefixed_ignore_no_longer_matches_a_plain_authority(tmp_path):
+    """The reproduced defect: '  .IGNORE:' once produced the plain 'false' authority."""
+    plain = _write_makefile(tmp_path, "wsign-plain", f"{_RE}:\n\tfalse\n")
+    plain_digest = _digest(plain)
+    ignored = _write_makefile(tmp_path, "wsign-set", f"  .IGNORE:\n{_RE}:\n\tfalse\n")
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(ignored)
+    assert re.fullmatch(r"[0-9a-f]{64}", plain_digest)
+
+
+def test_whitespace_prefixed_silent_no_longer_matches_a_plain_authority(tmp_path):
+    """The same defect for '.SILENT', global and target-scoped."""
+    plain = _write_makefile(tmp_path, "wssil-plain", f"{_RE}:\n\techo canonical\n")
+    plain_digest = _digest(plain)
+    for label, directive in (
+        ("global", "  .SILENT:"),
+        ("scoped", f"  .SILENT: {_RE}"),
+    ):
+        d = _write_makefile(
+            tmp_path, f"wssil-{label}", f"{directive}\n{_RE}:\n\techo canonical\n"
+        )
+        with pytest.raises(excess.ExcessMakefileProvenanceError):
+            _prov(d)
+    assert re.fullmatch(r"[0-9a-f]{64}", plain_digest)
+
+
+def test_special_target_hidden_in_a_continuation_fails_closed(tmp_path):
+    """A directive reached through a backslash continuation is still seen."""
+    d = _write_makefile(
+        tmp_path, "contdirective", f"  .IGNORE: \\\n\t{_RE}\n{_RE}:\n\tfalse\n"
+    )
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_phony_inclusion_and_removal_change_the_recorded_authority(tmp_path):
+    """Adding or removing research-excess from .PHONY is execution-affecting."""
+    recipe = f"{_RE}:\n\techo canonical\n"
+    without = _write_makefile(tmp_path, "ph-without", f".PHONY: other\n{recipe}")
+    with_member = _write_makefile(
+        tmp_path, "ph-with", f".PHONY: other {_RE}\n{recipe}"
+    )
+    assert _prov(without)["phony"] is False
+    assert _prov(with_member)["phony"] is True
+    assert _digest(without) != _digest(with_member)
+
+
+def test_phony_membership_across_multiple_and_continued_lines(tmp_path):
+    """Membership is collected from every .PHONY line, continuations included."""
+    recipe = f"{_RE}:\n\techo canonical\n"
+    split = _write_makefile(
+        tmp_path, "ph-split", f".PHONY: alpha\n.PHONY: beta {_RE}\n{recipe}"
+    )
+    continued = _write_makefile(
+        tmp_path, "ph-cont", f"  .PHONY: alpha beta \\\n\t{_RE}\n{recipe}"
+    )
+    assert _prov(split)["phony"] is True
+    assert _prov(continued)["phony"] is True
+    assert _digest(split) == _digest(continued)
+
+
+def test_unrelated_phony_members_do_not_move_the_authority(tmp_path):
+    """Other targets joining .PHONY never stale this task's provenance."""
+    recipe = f"{_RE}:\n\techo canonical\n"
+    a = _write_makefile(tmp_path, "ph-u0", f".PHONY: {_RE}\n{recipe}")
+    b = _write_makefile(
+        tmp_path, "ph-u1", f".PHONY: {_RE} data research-missingness\n{recipe}"
+    )
+    assert _digest(a) == _digest(b)
+
+
+@pytest.mark.parametrize("form", [".PHONY:: research-excess", ".PHONY := research-excess"])
+def test_unsupported_phony_forms_fail_closed(tmp_path, form):
+    """An ambiguous '.PHONY' form is refused rather than guessed."""
+    d = _write_makefile(
+        tmp_path, "phbad" + str(abs(hash(form))), f"{form}\n{_RE}:\n\techo canonical\n"
+    )
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_dynamic_phony_member_list_fails_closed(tmp_path):
+    """A '$(...)' member list cannot be resolved statically and is refused."""
+    d = _write_makefile(
+        tmp_path, "phdyn", f".PHONY: $(TARGETS)\n{_RE}:\n\techo canonical\n"
+    )
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+@pytest.mark.parametrize(
+    "assignment",
+    [
+        "SHELL = /bin/bash",
+        "SHELL := /bin/zsh",
+        "SHELL ::= /bin/sh",
+        "SHELL ?= /bin/dash",
+        "  SHELL = /bin/bash",
+        ".SHELLFLAGS = -x -c",
+        "  .SHELLFLAGS := -e -c",
+        "MAKESHELL = cmd.exe",
+        "MAKEFLAGS += -k",
+    ],
+)
+def test_global_shell_assignments_fail_closed(tmp_path, assignment):
+    """A global SHELL/.SHELLFLAGS definition changes execution invisibly; refused."""
+    body = f"{assignment}\n{_RE}:\n\techo canonical\n"
+    d = _write_makefile(tmp_path, "shl" + str(abs(hash(assignment))), body)
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_global_shell_assignment_no_longer_matches_a_plain_authority(tmp_path):
+    """The reproduced defect: a global SHELL left the recorded authority unchanged."""
+    plain = _write_makefile(tmp_path, "shl-plain", f"{_RE}:\n\techo canonical\n")
+    plain_digest = _digest(plain)
+    swapped = _write_makefile(
+        tmp_path, "shl-swapped", f"SHELL := /bin/zsh\n{_RE}:\n\techo canonical\n"
+    )
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(swapped)
+    assert re.fullmatch(r"[0-9a-f]{64}", plain_digest)
+
+
+def test_target_scoped_shell_assignment_fails_closed(tmp_path):
+    """'research-excess: SHELL = …' is a target assignment, not prerequisites."""
+    d = _write_makefile(
+        tmp_path, "shl-target", f"{_RE}: SHELL = /bin/zsh\n\techo canonical\n"
+    )
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_shell_lookalike_variable_is_not_over_rejected(tmp_path):
+    """A variable merely containing 'SHELL' in its name is not an execution change."""
+    a = _write_makefile(tmp_path, "shl-ok0", f"{_RE}:\n\techo canonical\n")
+    b = _write_makefile(
+        tmp_path, "shl-ok1", f"SHELL_REPORT = docs/x.md\n{_RE}:\n\techo canonical\n"
+    )
+    assert _digest(a) == _digest(b)
+
+
+def test_whitespace_prefixed_duplicate_rule_fails_closed(tmp_path):
+    """A space-indented duplicate rule overrides the recipe in GNU Make; refused."""
+    d = _write_makefile(
+        tmp_path, "wsdup", f"{_RE}:\n\techo canonical\n  {_RE}:\n\techo hijacked\n"
+    )
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(d)
+
+
+def test_whitespace_prefixed_sole_rule_is_still_parsed(tmp_path):
+    """A single space-indented rule is a real rule and is recorded, not ignored."""
+    d = _write_makefile(tmp_path, "wssole", f"  {_RE}: dep\n\techo canonical\n")
+    prov = _prov(d)
+    assert prov["effective_recipe"] == ["echo canonical"]
+    assert prov["prerequisites"] == ["dep"]
+
+
+def test_repository_makefile_records_its_real_phony_membership():
+    """The committed Makefile declares research-excess .PHONY; provenance says so."""
+    provenance = excess.build_makefile_target_provenance()
+    assert provenance["phony"] is True
+    assert provenance["make_invoked"] is False
+    makefile = (excess.ROOT / excess.MAKEFILE_NAME).read_text(encoding="utf-8")
+    assert excess.RESEARCH_EXCESS_TARGET in makefile.split("\n")[0] or any(
+        excess.RESEARCH_EXCESS_TARGET in line
+        for line in makefile.split("\n")[:12]
+    )
+
+
+def test_phony_membership_participates_in_the_recorded_digest():
+    """The documented digest definition and the computed digest agree on .PHONY."""
+    provenance = excess.build_makefile_target_provenance()
+    assert "phony:<yes|no>" in provenance["recipe_sha256_definition"]
+    assert provenance["recipe_sha256"] == excess._recipe_provenance_digest(
+        provenance["prerequisites"], provenance["recipe"], phony=provenance["phony"]
+    )
+    flipped = excess._recipe_provenance_digest(
+        provenance["prerequisites"], provenance["recipe"], phony=not provenance["phony"]
+    )
+    assert flipped != provenance["recipe_sha256"]
+
+
+def test_global_semantics_scan_executes_no_command(tmp_path, monkeypatch):
+    """Provenance inspection stays completely non-executing under the new semantics.
+
+    Every process-spawning primitive is disabled, including the low-level ones a
+    subprocess would ultimately need, and the whole authority is still computed —
+    for the real repository Makefile and for adversarial fixtures.
+    """
+    import subprocess as _subprocess
+
+    def _forbidden(*args, **kwargs):  # pragma: no cover - must never be called
+        raise AssertionError("Make provenance must never execute a command")
+
+    for target, name in (
+        (_subprocess, "run"),
+        (_subprocess, "Popen"),
+        (_subprocess, "call"),
+        (_subprocess, "check_call"),
+        (_subprocess, "check_output"),
+        (_subprocess, "getoutput"),
+        (os, "system"),
+        (os, "popen"),
+        (os, "execv"),
+        (os, "execve"),
+        (os, "spawnv"),
+        (os, "posix_spawn"),
+        (os, "fork"),
+    ):
+        monkeypatch.setattr(target, name, _forbidden, raising=False)
+
+    provenance = excess.build_makefile_target_provenance()
+    assert provenance["make_invoked"] is False
+    assert provenance["phony"] is True
+    d = _write_makefile(
+        tmp_path, "nonexec", f".PHONY: {_RE}\n{_RE}:\n\techo canonical\n"
+    )
+    assert _prov(d)["effective_recipe"] == ["echo canonical"]
+    # A fail-closed rejection also happens without any process machinery.
+    bad = _write_makefile(tmp_path, "nonexec-bad", f"  .SILENT:\n{_RE}:\n\tfalse\n")
+    with pytest.raises(excess.ExcessMakefileProvenanceError):
+        _prov(bad)
+
+
+def test_provenance_scan_reads_only_the_makefile_and_mutates_nothing(tmp_path):
+    """The scan opens the Makefile and nothing else, and writes nothing at all."""
+    d = _write_makefile(
+        tmp_path, "readonly", f".PHONY: {_RE}\n{_RE}:\n\techo canonical\n"
+    )
+    before = {p.name: p.stat().st_mtime_ns for p in d.iterdir()}
+    opened: list[str] = []
+    real_open = Path.read_text
+
+    def tracking_read_text(self, *args, **kwargs):
+        opened.append(self.name)
+        return real_open(self, *args, **kwargs)
+
+    Path.read_text = tracking_read_text
+    try:
+        _prov(d)
+    finally:
+        Path.read_text = real_open
+    assert opened == ["Makefile"]
+    assert {p.name: p.stat().st_mtime_ns for p in d.iterdir()} == before
+    assert sorted(before) == ["Makefile"]
+
+
+def test_tab_indented_pseudo_directive_is_recorded_as_recipe_text(tmp_path):
+    """A tab-indented '.SILENT:' is recipe text to GNU Make, and is recorded as such.
+
+    Leading *whitespace* is stripped by Make for makefile lines, but a leading TAB
+    marks a recipe line — so this is a shell command, not a global directive, and
+    the truthful record is the verbatim recipe line.
+    """
+    d = _write_makefile(tmp_path, "tabpseudo", f"{_RE}:\n\t.SILENT:\n\techo canonical\n")
+    prov = _prov(d)
+    assert prov["effective_recipe"] == [".SILENT:", "echo canonical"]
+    plain = _write_makefile(tmp_path, "tabpseudo-plain", f"{_RE}:\n\techo canonical\n")
+    assert _digest(d) != _digest(plain)
