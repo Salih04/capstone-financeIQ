@@ -404,3 +404,20 @@ KAP cross-check recommended before claiming any result.
 | Scientific preservation | `CONFIRMED` |
 | Final state | `MERGED / POST_MERGE_VERIFIED / CLOSED` |
 
+### R3-UI-01 post-merge closure (2026-07-30; append-only)
+
+| State item | Status |
+|---|---|
+| Pull request | `#3 MERGED` |
+| Merge commit | `9d8622d16b697284b0930e42d969340ce016c59d` |
+| Changed scope | `2 AUTHORIZED FRONTEND FILES` |
+| Initial independent verdict | `CHANGES_REQUIRED — INDEX KEY` |
+| Stable-key repair | `COMPLETE` |
+| Fresh independent re-review | `APPROVED` |
+| Frontend build | `PASSED` |
+| Claims lint | `PASSED — MCC v1.8.0` |
+| Backend suite | `99 PASSED / 0 FAILED` |
+| ASELS / ASTOR contract verification | `CONFIRMED` |
+| Live authenticated browser verification | `NOT PERFORMED / NON-BLOCKING` |
+| Final state | `MERGED / POST_MERGE_VERIFIED / CLOSED` |
+

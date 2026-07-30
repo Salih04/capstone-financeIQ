@@ -907,6 +907,17 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 - **Generated artifacts:** none. **Failure modes:** styling "pass" verdicts as endorsements (green-glow trap — use neutral terminal chips); hiding the footer below the fold. **Rollback:** revert two files. **Stop:** response shape differs from the backend test's pin (report, don't adapt silently).
 - **Commit scope:** two frontend files. **Theme:** "Surface Skeptic challenge report per ticker". Manual commit: yes. **/clear:** yes.
 
+
+- **R3-UI-01 implementation and review closure (2026-07-30; append-only):** the company research detail page now surfaces the existing `GET /research/skeptic/{ticker}` report through one new `researchApi.skeptic` fetch function. The panel renders one expandable row per backend check, neutral verdict chips, evidence facts with `source_file`, and the backend-authored footer verbatim in an always-visible non-collapsible block. Skeptic-fetch failures remain isolated from the existing company score and feature panels.
+
+- **Independent review (2026-07-30; append-only):** the first review returned `CHANGES_REQUIRED` solely because evidence rows used array-index React keys. The repair replaced them with deterministic keys derived from `check_id`, `source_file`, and `fact`. Fresh independent re-review returned `APPROVED`, confirming the exact two-file scope, stable keys, semantic toggle buttons, correct `aria-expanded`, neutral PASS presentation, claim safety, and the pinned ASELS and ASTOR backend behavior.
+
+- **Merge and post-merge verification (2026-07-30; append-only):** PR `#3` merged into `main` through merge commit `9d8622d16b697284b0930e42d969340ce016c59d`. On merged `main`, the frontend production build passed, claims lint passed under Model Confidence Contract `v1.8.0`, backend passed `99/99`, and `git diff --check` passed. The merged API function and deterministic evidence key were confirmed directly in source.
+
+- **Verification limitation (2026-07-30; append-only):** no live authenticated Supabase browser session was recorded. UI behavior was verified through the complete source diff, production build, pinned backend tests, real ASELS and ASTOR fixture reports, and independent review. This limitation was judged non-blocking.
+
+- **Final state (2026-07-30; append-only):** `MERGED / POST_MERGE_VERIFIED / R3_UI_01_CLOSED`.
+
 ### R3-UI-03 — Calibration audit surfaced
 - **Priority:** P2. **Wave:** 3D. **Owner role:** Backend+Frontend. **Risk:** low-medium. **Model/effort:** **Terra, medium.** Review: Opus low.
 - **Verified current state:** `experiments/results/calibration_report.{json,md}` committed (R2-CAL-01): hybrid confidence constant 0.25 across 240 audited ticker-year outcomes → calibration not estimable; the UI displays confidence numbers on multiple pages while this audit result is invisible; no backend endpoint serves the report.
