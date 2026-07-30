@@ -37,6 +37,7 @@ export const researchApi = {
   frozenEvidence: () => safeGet('/research/frozen-evidence'),
   company: (ticker) => safeGet(`/research/company/${encodeURIComponent(ticker)}`),
   companyScore: (ticker) => safeGet(`/research/company/${encodeURIComponent(ticker)}/score`),
+  skeptic: (ticker) => safeGet(`/research/skeptic/${encodeURIComponent(ticker)}`),
   ask: (question, ticker) => safePost('/research/ask', ticker ? { question, ticker } : { question }),
 }
 

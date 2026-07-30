@@ -4,6 +4,7 @@ import { Building2 } from 'lucide-react'
 import { EmptyState } from '../components/ui'
 import { cachedGet, CACHE_TTL } from '../api/cache'
 import api from '../api/client'
+import researchApi from '../api/researchApi'
 import CacheTag from '../components/CacheTag'
 import { humanizeWarning, asText } from '../utils/safeRender'
 
@@ -86,6 +87,102 @@ function errInfo(error) {
   if (status === 401 || status === 403) return { kind: 'auth', status, message: 'session expired or access denied — sign in again' }
   if (status) return { kind: 'server', status, message: typeof detail === 'string' ? detail : `server error (${status})` }
   return { kind: 'network', status: null, message: 'could not reach the API — check your connection and retry' }
+}
+
+// ---------------------------------------------------------------------------
+// Skeptic challenge panel — DISPLAY ONLY. Renders the backend's six-check
+// report exactly as returned (checks[], footer). No verdict is recomputed and
+// no claim copy is invented here: check facts and the footer render verbatim.
+// Verdict chips are neutral terminal labels — "pass" is never styled as an
+// endorsement (no emerald glow), matching the Return-Basis Lens precedent.
+// ---------------------------------------------------------------------------
+const checkLabel = (checkId) => String(checkId || '').replace(/_/g, ' ').toUpperCase()
+
+const VERDICT_LABEL = {
+  pass: 'PASS',
+  warn: 'WARN',
+  fail: 'FAIL',
+  insufficient_data: 'INSUFFICIENT DATA',
+}
+
+function SkepticPanel({ ticker }) {
+  const [state, setState] = useState({ data: null, error: null, loading: true })
+  const [open, setOpen] = useState(() => new Set())
+
+  useEffect(() => {
+    let live = true
+    setState({ data: null, error: null, loading: true })
+    setOpen(new Set())
+    // Fetched through researchApi.js; independent of the score/detail requests above.
+    researchApi.skeptic(ticker).then(({ data, error }) => {
+      if (live) setState({ data, error, loading: false })
+    })
+    return () => { live = false }
+  }, [ticker])
+
+  const toggle = (checkId) => {
+    setOpen((prev) => {
+      const next = new Set(prev)
+      if (next.has(checkId)) next.delete(checkId)
+      else next.add(checkId)
+      return next
+    })
+  }
+
+  const { data, error, loading } = state
+
+  return (
+    <section className="ca-panel ca-skeptic" aria-labelledby="ca-skeptic-title">
+      <div className="ca-panel-label" id="ca-skeptic-title">SKEPTIC CHALLENGE · DETERMINISTIC EVIDENCE CHECKS</div>
+
+      {loading && <p className="ca-panel-note">Loading skeptic challenge results…</p>}
+      {!loading && error && (
+        <div className="ca-scoreerr">
+          <div className="ca-scoreerr-head">SKEPTIC CHALLENGE UNAVAILABLE</div>
+          <p>{error}. Score and feature evidence above are unaffected.</p>
+        </div>
+      )}
+
+      {!loading && !error && data && (
+        <>
+          <div className="ca-skeptic-rows">
+            {(data.checks || []).map((check) => {
+              const isOpen = open.has(check.check_id)
+              return (
+                <div key={check.check_id} className="ca-skeptic-row">
+                  <button
+                    type="button"
+                    className="ca-skeptic-rowhead"
+                    aria-expanded={isOpen}
+                    onClick={() => toggle(check.check_id)}
+                  >
+                    <span className="ca-skeptic-name">{checkLabel(check.check_id)}</span>
+                    <span className={`ca-skeptic-chip is-${check.verdict}`}>
+                      {VERDICT_LABEL[check.verdict] || asText(check.verdict)}
+                    </span>
+                    <span className="ca-skeptic-caret">{isOpen ? '▾' : '▸'}</span>
+                  </button>
+                  {isOpen && (
+                    <ul className="ca-skeptic-evidence">
+                      {(check.evidence || []).map((item) => (
+                        <li key={`${check.check_id}::${asText(item.source_file)}::${asText(item.fact)}`}>
+                          <p>{asText(item.fact)}</p>
+                          <span className="ca-skeptic-source">source: {asText(item.source_file)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Backend footer — verbatim, always visible, never collapsed. */}
+          <div className="ca-skeptic-footer">{data.footer}</div>
+        </>
+      )}
+    </section>
+  )
 }
 
 export default function CompanyResearchDetailPage() {
@@ -327,6 +424,9 @@ export default function CompanyResearchDetailPage() {
               </div>
             </div>
           </section>
+
+          {/* ── skeptic challenge ── */}
+          <SkepticPanel ticker={tk} />
         </main>
 
         {/* ── Signal Readout ── */}
@@ -489,6 +589,27 @@ const CSS = `
 .ca-meta-grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 18px; font-family: var(--font-mono); }
 .ca-meta-grid span { font-size: 9px; letter-spacing: 0.18em; color: var(--ca-faint); align-self: center; }
 .ca-meta-grid strong { font-size: 11px; color: var(--ca-dim); word-break: break-all; }
+
+/* ── skeptic challenge panel ── */
+.ca-skeptic-rows { display: flex; flex-direction: column; gap: 6px; }
+.ca-skeptic-row { border: 1px solid rgba(200,211,202,0.14); border-radius: 2px; background: rgba(14,20,19,0.5); }
+.ca-skeptic-rowhead { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; width: 100%;
+  padding: 10px 12px; background: transparent; border: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.ca-skeptic-rowhead:hover, .ca-skeptic-rowhead:focus-visible { background: rgba(18,26,24,0.6); outline: none; }
+.ca-skeptic-name { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; color: var(--ca-paper); }
+.ca-skeptic-chip { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; border: 1px solid rgba(200,211,202,0.3);
+  border-radius: 2px; padding: 3px 8px; color: var(--ca-dim); background: rgba(200,211,202,0.05); }
+.ca-skeptic-chip.is-pass { border-color: rgba(200,211,202,0.35); color: var(--ca-dim); }
+.ca-skeptic-chip.is-warn { border-color: rgba(200,163,90,0.5); color: var(--ca-gold); }
+.ca-skeptic-chip.is-fail { border-color: rgba(168,103,75,0.55); color: var(--ca-copper); }
+.ca-skeptic-chip.is-insufficient_data { border-style: dashed; border-color: rgba(200,211,202,0.35); color: var(--ca-faint); }
+.ca-skeptic-caret { font-size: 11px; color: var(--ca-faint); }
+.ca-skeptic-evidence { list-style: none; margin: 0; padding: 2px 12px 12px; display: flex; flex-direction: column; gap: 9px; }
+.ca-skeptic-evidence li { border-left: 2px solid rgba(200,211,202,0.2); padding-left: 12px; }
+.ca-skeptic-evidence p { margin: 0 0 4px; font-size: 12.5px; line-height: 1.6; color: var(--ca-dim); }
+.ca-skeptic-source { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.04em; color: var(--ca-faint); word-break: break-all; }
+.ca-skeptic-footer { margin-top: 12px; padding: 12px 14px; border: 1px solid rgba(200,163,90,0.4); border-left: 3px solid var(--ca-gold);
+  border-radius: 2px; background: rgba(200,163,90,0.06); font-size: 12.5px; line-height: 1.6; color: var(--ca-paper); }
 
 /* ── readout ── */
 .ca-readout { border: 1px solid rgba(200,211,202,0.18); border-left: 3px solid var(--ca-emerald);
