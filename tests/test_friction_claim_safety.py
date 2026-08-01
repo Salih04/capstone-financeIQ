@@ -27,7 +27,7 @@ def test_autopsy_friction_panel_has_in_drawing_stamp_and_scope_boundaries() -> N
 def test_contract_registers_friction_evidence_and_passthrough_service() -> None:
     contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
 
-    assert contract["version"] == "1.8.0"
+    assert contract["version"] == "1.9.0"
     assert contract["evidence_state"]["friction_sensitivity_establishes_implementable_returns"] is False
     assert "backend/app/services/research/significance.py" in contract["scan"]["backend_response_files"]
     assert any(item["path"] == "experiments/results/friction_report.md" for item in contract["evidence_basis"])

@@ -1,7 +1,7 @@
 {
   "contract_name": "FinanceIQ Model Confidence Contract",
-  "version": "1.8.0",
-  "effective_date": "2026-07-18",
+  "version": "1.9.0",
+  "effective_date": "2026-07-30",
   "authority": "FINANCEIQ_DEMO_AND_CLAIMS_GUIDE.md",
   "versioning_procedure": {
     "minor_bump": "Any change to rules, scan coverage, required_disclaimer.pages, route aliases, exemptions, or evidence_state requires a minor version bump and an effective_date update.",
@@ -90,6 +90,7 @@
       "backend/app/services/forecasting_csv_service.py",
       "backend/app/services/skeptic_service.py",
       "backend/app/services/courtroom_service.py",
+      "backend/app/services/research/calibration.py",
       "backend/app/services/research/significance.py",
       "backend/app/services/research/regime.py",
       "backend/app/services/research/real_terms.py",
@@ -158,7 +159,7 @@
       },
       {
         "path": "frontend/src/pages/ValidationLabPage.jsx",
-        "line": 344,
+        "line": 468,
         "text": "Experimental ranking signal — research support only, NOT investment advice. Do not use for buy/sell/hold decisions.",
         "reason": "Authoritative primary disclaimer forbids recommendation use."
       }

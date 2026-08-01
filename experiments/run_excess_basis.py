@@ -158,8 +158,21 @@ FROZEN_BOUNDARY_EXTRA_FILES = (
 # regeneration so a modified or removed original member fails closed, and so the
 # set is never silently redefined from the current filesystem.  It is a content
 # digest, not a file count, and does not move when unrelated namespaces appear.
+#
+# Deliberate re-pin (2026-07-30, R3-UI-03 cross-task compatibility repair):
+# ``634d7151e75f0ec7a85e412f748ac81499a4fad5e9eac71ab1a5c920f0137dd9`` ->
+# ``0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba``.  The
+# R3-UI-03 calibration-audit surface required the Model Confidence Contract minor
+# bump v1.8.0 -> v1.9.0, and ``model_confidence_contract.json`` is a member of
+# this boundary by design.  The member set is unchanged (351 members) and exactly
+# one member's content moved: ``model_confidence_contract.json``
+# (5767a9b6464680497fe3be168a2dcae7bbed20dac88182fe5abeeaea4472b702 ->
+# 1797ee7873b8ba0d1a4ecabf805f6de305c2dedcff2dbfa6a10a7efa87e413de).  No curated
+# data and no other generated artifact changed, and no excess statistical result
+# changed.  The MCC is NOT exempted, removed, or special-cased: it stays a member
+# and any further change to it still fails closed here.
 FROZEN_PROTECTED_BOUNDARY_SHA256 = (
-    "634d7151e75f0ec7a85e412f748ac81499a4fad5e9eac71ab1a5c920f0137dd9"
+    "0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba"
 )
 
 # ---------------------------------------------------------------------------

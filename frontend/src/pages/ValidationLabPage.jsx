@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { FlaskConical, Play, BarChart3, Clock, TrendingUp, TrendingDown, AlertCircle, ShieldCheck, Sparkles } from 'lucide-react'
+import { FlaskConical, Play, BarChart3, Clock, TrendingUp, TrendingDown, AlertCircle, ShieldCheck, Sparkles, ScanLine } from 'lucide-react'
 import api from '../api/client'
+import researchApi from '../api/researchApi'
 import { Card, EmptyState } from '../components/ui'
 import DissentLedger from '../components/DissentLedger'
 
@@ -123,6 +124,127 @@ function FeatureImportances({ importances }) {
         </tbody>
       </table>
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Confidence calibration audit (R2-CAL-01) — DISPLAY ONLY. Every value comes
+// from the committed calibration report served by /research/calibration; the
+// page never recomputes calibration, monotonicity, or any confidence value.
+// The audit sentence is fixed backend-owned copy and is always visible, both
+// when the fetch succeeds and when it fails.
+// ---------------------------------------------------------------------------
+const CALIBRATION_AUDIT_COPY =
+  'Confidence audited (R2-CAL-01, replay of git `a95e1e1c`): the hybrid confidence component was constant at 0.25 across all 240 audited ticker-year outcomes, so calibration against rank error is not estimable at this scale. Confidence is not a probability of return or recommendation strength.'
+
+const calFactLabel = { fontSize: 10.5, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.7, fontWeight: 700, marginBottom: 4 }
+const calFactValue = { fontSize: 13, color: 'var(--text-1)', fontWeight: 600, wordBreak: 'break-word' }
+const calFactBox = { background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 12px' }
+const calStateBox = { background: 'var(--surface-1)', border: '1px dashed var(--border-strong)', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: 12.5, color: 'var(--text-3)' }
+
+function CalibrationFact({ label, value }) {
+  return (
+    <div style={calFactBox}>
+      <div style={calFactLabel}>{label}</div>
+      <div style={calFactValue}>{value ?? '–'}</div>
+    </div>
+  )
+}
+
+function CalibrationAudit() {
+  const [state, setState] = useState({ data: null, error: null, loading: true })
+
+  useEffect(() => {
+    let live = true
+    researchApi.calibration().then(({ data, error }) => {
+      if (live) setState({ data, error, loading: false })
+    })
+    return () => { live = false }
+  }, [])
+
+  const { data, error, loading } = state
+  const cal = data?.calibration
+  const mono = cal?.monotonicity
+  const sample = data?.sample
+  const quantity = data?.confidence_quantity
+  const provenance = data?.replay_provenance
+  const constantValue = cal?.confidence_values?.length === 1 ? cal.confidence_values[0] : null
+
+  return (
+    <Card style={{ marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <ScanLine size={15} style={{ color: 'var(--text-3)' }} />
+        <span style={{ fontSize: 11, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>
+          Confidence Calibration Audit · R2-CAL-01
+        </span>
+      </div>
+
+      {/* Fixed backend-owned copy — always visible, never collapsed. */}
+      <p style={{ margin: '0 0 14px', fontSize: 13, lineHeight: 1.7, color: 'var(--text-2)' }}>
+        {data?.panel_copy || CALIBRATION_AUDIT_COPY}
+      </p>
+
+      {loading && <div style={calStateBox}>Loading the committed calibration audit…</div>}
+
+      {!loading && error && (
+        <div style={calStateBox}>
+          Calibration audit detail unavailable — {error}. The audited finding above is the committed R2-CAL-01 result; the per-field replay detail is not loaded.
+        </div>
+      )}
+
+      {!loading && !error && data && (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 10 }}>
+            <CalibrationFact label="Calibration status" value={cal?.status} />
+            <CalibrationFact label="Monotonicity status" value={mono?.status} />
+            <CalibrationFact
+              label="Replayed confidence"
+              value={constantValue != null ? `${constantValue} (constant, ${cal.confidence_unique_values} unique value)` : null}
+            />
+            <CalibrationFact
+              label="Bins realized / requested"
+              value={cal ? `${cal.realized_bins} / ${cal.requested_bins}` : null}
+            />
+            <CalibrationFact label="Audited ticker-year outcomes" value={sample?.independent_ticker_year_outcomes} />
+            <CalibrationFact
+              label="Target years"
+              value={sample?.target_years?.join(', ')}
+            />
+            <CalibrationFact label="Audited quantity" value={quantity?.quantity} />
+            <CalibrationFact label="Quantity scope" value={quantity?.scope} />
+            <CalibrationFact label="Replay git SHA" value={provenance?.git_sha} />
+            <CalibrationFact label="Replay date · seed" value={provenance ? `${provenance.replay_date} · seed ${provenance.random_seed}` : null} />
+          </div>
+
+          {mono?.reason && (
+            <div style={{ marginTop: 12, ...calFactBox }}>
+              <div style={calFactLabel}>Why monotonicity is not estimable</div>
+              <div style={{ fontSize: 12.5, color: 'var(--text-2)', lineHeight: 1.6 }}>{mono.reason}</div>
+            </div>
+          )}
+
+          {data.claim_safety?.statement && (
+            <div style={{ marginTop: 10, ...calFactBox }}>
+              <div style={calFactLabel}>Claim boundary</div>
+              <div style={{ fontSize: 12.5, color: 'var(--text-2)', lineHeight: 1.6 }}>{data.claim_safety.statement}</div>
+            </div>
+          )}
+
+          {data.limitations?.length > 0 && (
+            <div style={{ marginTop: 10, ...calFactBox }}>
+              <div style={calFactLabel}>Audit limitations</div>
+              <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--text-2)', fontSize: 12.5, lineHeight: 1.7 }}>
+                {data.limitations.map((item) => <li key={item}>{item}</li>)}
+              </ul>
+            </div>
+          )}
+
+          <div style={{ marginTop: 10, fontSize: 11, color: 'var(--text-3)' }}>
+            Source artifact: {data.source_artifact}
+          </div>
+        </>
+      )}
+    </Card>
   )
 }
 
@@ -337,6 +459,8 @@ export default function ValidationLabPage() {
           description="Select a model above and click Validate."
         />
       )}
+
+      <CalibrationAudit />
 
       <DissentLedger />
 
