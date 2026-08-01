@@ -217,7 +217,7 @@ const CSS = `
 .cq-persona.is-emerald { --accent: var(--cq-emerald); }
 .cq-persona.is-copper { --accent: var(--cq-copper); }
 .cq-persona.is-gold { --accent: var(--cq-gold); }
-.cq-persona.is-risk { --accent: #d47d5a; grid-column: 1 / -1; position: sticky; bottom: 12px; z-index: 3; border-width: 1px 1px 2px; box-shadow: 0 -12px 38px rgba(0,0,0,.42); }
+.cq-persona.is-risk { --accent: #d47d5a; grid-column: 1 / -1; border-width: 1px 1px 2px; box-shadow: 0 -12px 38px rgba(0,0,0,.42); }
 .cq-persona > header { display: grid; grid-template-columns: auto 1fr auto; gap: 13px; align-items: start; padding-bottom: 13px; border-bottom: 1px solid rgba(232,236,230,.1); }
 .cq-persona-index { color: var(--accent); font-size: 26px; line-height: 1; }
 .cq-persona-type { color: var(--accent); font-size: 8px; letter-spacing: .22em; }
