@@ -1132,3 +1132,11 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 Hard rules: R3-GOV-01 first (everything else cites its baseline); harness-running tasks (TGT/NULL/SERV) in separate fresh contexts; only one MCC-bumping task per context; R3-MEMO-01 after R3-UI-01 (shared skeptic surface conventions); R3-PREREG-01 before any 2026 outcome data exists. 3A/3B/3D may interleave across sessions where files are disjoint. The demo-critical chain is GOV-01 → UI-01 → SERV-01 → MEMO-01.
 
 **Standing instruction (unchanged):** one task per context; on completion add the ledger row here + a TASK_STATE.md row, leave the tree clean for the owner's manual commit, and recommend `/clear`.
+
+- **Research Courtroom Evidence Lens overlap post-merge closure (2026-08-02; append-only):** PR `#5` merged into `main` through merge commit `ab01dc9f58ded173465f59b561de35b59922a91b`. The fix removes sticky positioning from the Risk evidence panel and adds Playwright regression coverage for the overlap condition.
+
+- **Verification (2026-08-02; append-only):** the rebased two-file scope passed the frontend production build, claims lint under MCC `v1.9.0`, and `git diff --check`. The Vercel deployment was manually inspected in the browser and the Evidence Lens panels no longer overlap during scrolling or responsive layout checks.
+
+- **Final state (2026-08-02; append-only):** `MERGED / MANUALLY_VISUALLY_VERIFIED / CLOSED`.
+
+

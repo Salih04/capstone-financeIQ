@@ -600,3 +600,16 @@ KAP cross-check recommended before claiming any result.
 | Live authenticated browser verification | `NOT PERFORMED / NON-BLOCKING` |
 | Final state | `MERGED / POST_MERGE_VERIFIED / CLOSED` |
 
+### Research Courtroom Evidence Lens overlap closure (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Pull request | `#5 MERGED` |
+| Fix commit | `112ce758` |
+| Merge commit | `ab01dc9f58ded173465f59b561de35b59922a91b` |
+| Changed scope | `2 FRONTEND FILES` |
+| Frontend production build | `PASSED` |
+| Claims lint | `PASSED — MCC v1.9.0` |
+| Manual production verification | `PASSED` |
+| Final state | `MERGED / VERIFIED / CLOSED` |
+
