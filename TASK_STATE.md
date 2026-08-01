@@ -579,3 +579,24 @@ KAP cross-check recommended before claiming any result.
 | Live authenticated browser verification | `NOT PERFORMED / NON-BLOCKING` |
 | Current state | `INDEPENDENTLY APPROVED / COMMIT READY` |
 
+### R3-UI-03 post-merge closure (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Pull request | `#4 MERGED` |
+| Implementation commit | `f1de4d71` |
+| Merge commit | `663f2825c8835fbf4fd059ca98e859357929b52a` |
+| Changed scope | `17 AUTHORIZED PATHS` |
+| Final independent review | `APPROVED` |
+| Root suite | `893 PASSED / 0 FAILED` |
+| Backend suite | `495 PASSED / 0 FAILED` |
+| Frontend production build | `PASSED — 2,445 MODULES` |
+| Documentation lint | `PASSED` |
+| Claims lint | `PASSED — MCC v1.9.0` |
+| Data validation | `PASSED — 403 ROWS / 40 FEATURES / 321 TARGET ROWS` |
+| Protected-boundary members | `351 / UNCHANGED` |
+| Protected-boundary digest | `0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba` |
+| Scientific conclusion | `UNCHANGED — NO RELIABLE PREDICTIVE EDGE / 0 OF 6` |
+| Live authenticated browser verification | `NOT PERFORMED / NON-BLOCKING` |
+| Final state | `MERGED / POST_MERGE_VERIFIED / CLOSED` |
+

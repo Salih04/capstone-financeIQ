@@ -1059,6 +1059,17 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 
 - **Final state (2026-08-02; append-only):** `INDEPENDENTLY_APPROVED / COMMIT_READY`.
 
+
+- **R3-UI-03 post-merge closure (2026-08-02; append-only):** PR `#4` merged into `main` through merge commit `663f2825c8835fbf4fd059ca98e859357929b52a`. The Validation Lab now surfaces the committed R2-CAL-01 calibration audit through the authenticated `GET /research/calibration` endpoint with byte-verbatim claim-safe copy, explicit loading and fallback states, strict response whitelists, and fail-closed artifact validation.
+
+- **Post-merge verification (2026-08-02; append-only):** on merged `main`, the root suite passed `893/893`, the complete backend suite passed `495/495`, the frontend production build completed successfully across `2,445` modules, documentation lint passed, claims lint passed under Model Confidence Contract `v1.9.0`, data validation passed with `403` modeling rows, `40` features, and `321` target rows, and `git diff --check` passed.
+
+- **Boundary and scientific preservation (2026-08-02; append-only):** `model_confidence_contract.json` remains inside the `351`-member R3-MISS-01 protected boundary with digest `0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba`. The governed excess findings, leaderboard, prediction dumps, ICs, p-values, intervals, counts, and `0/6` family-wise conclusion remain unchanged. No reliable predictive edge is established.
+
+- **Verification limitations (2026-08-02; append-only):** no live authenticated Supabase browser session was recorded. The frontend build emitted only the existing non-blocking large-chunk warning. Python dependencies emitted existing deprecation warnings; no test failed because of them.
+
+- **Final state (2026-08-02; append-only):** `MERGED / POST_MERGE_VERIFIED / R3_UI_03_CLOSED`.
+
 ### R3-LIMITS-01 — Automated limitations register
 - **Priority:** P1. **Wave:** 3D. **Owner role:** Research/Docs. **Risk:** low-medium. **Model/effort:** **Terra, medium.** Review: Opus low.
 - **Verified current state:** machine-readable `limitations` arrays exist in the significance, calibration, friction, regime, alternative-targets, and disagreement/stability (once landed) reports; more limitations live in METHODOLOGY prose, `docs/universe_audit.md`, and the audit doc; no aggregate exists — examiner-grade "list ALL known weaknesses" answers are assembled by hand.
