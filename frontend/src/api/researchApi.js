@@ -30,6 +30,7 @@ export const researchApi = {
   significance: () => safeGet('/research/significance'),
   regimeContext: () => safeGet('/research/regime-context'),
   returnBasis: () => safeGet('/research/return-basis'),
+  calibration: () => safeGet('/research/calibration'),
   autopsy: () => safeGet('/research/significance/autopsy'),
   courtroom: (ticker, year) => safePost('/research/courtroom', year ? { ticker, year: Number(year) } : { ticker }),
   benchmark: () => safeGet('/research/benchmark'),

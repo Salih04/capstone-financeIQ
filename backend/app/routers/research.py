@@ -14,6 +14,7 @@ from app.models.user import User
 from app.services import courtroom_service, skeptic_service
 from app.services.research import (
     benchmark,
+    calibration,
     company,
     data,
     feature_passports,
@@ -132,6 +133,15 @@ def return_basis(_: User | None = Depends(require_access)):
     try:
         return real_terms.payload()
     except real_terms.ReturnBasisReportMissing as exc:
+        raise HTTPException(503, str(exc))
+
+
+@router.get("/calibration")
+def calibration_audit(_: User | None = Depends(require_access)):
+    """Serve the committed confidence calibration audit; never recompute it at request time."""
+    try:
+        return calibration.payload()
+    except calibration.CalibrationReportMissing as exc:
         raise HTTPException(503, str(exc))
 
 

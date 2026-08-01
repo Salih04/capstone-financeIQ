@@ -421,3 +421,161 @@ KAP cross-check recommended before claiming any result.
 | Live authenticated browser verification | `NOT PERFORMED / NON-BLOCKING` |
 | Final state | `MERGED / POST_MERGE_VERIFIED / CLOSED` |
 
+### R3-UI-03 cross-task frozen-boundary authorization (2026-07-30; append-only)
+
+| State item | Status |
+|---|---|
+| MCC change | `v1.8.0 → v1.9.0 REQUIRED` |
+| Frozen-boundary conflict | `CONFIRMED` |
+| MCC boundary membership | `RETAINED` |
+| Boundary exemption | `REJECTED` |
+| Excess digest re-pin | `AUTHORIZED` |
+| Governed excess regeneration | `AUTHORIZED` |
+| Scientific-result changes | `FORBIDDEN` |
+| Review state | `FRESH INDEPENDENT REVIEW REQUIRED` |
+| Current state | `REPAIR AUTHORIZED / NOT COMMIT READY` |
+
+### R3-UI-03 frozen-boundary compatibility repair completion (2026-07-30; append-only)
+
+| State item | Status |
+|---|---|
+| MCC version | `v1.9.0` |
+| Protected-boundary members | `351 / UNCHANGED` |
+| Old boundary digest | `634d7151e75f0ec7a85e412f748ac81499a4fad5e9eac71ab1a5c920f0137dd9` |
+| New boundary digest | `0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba` |
+| Changed boundary member | `model_confidence_contract.json ONLY` |
+| Boundary exemption | `NONE` |
+| Governed excess regeneration | `COMPLETE` |
+| Scientific findings | `UNCHANGED` |
+| Focused excess | `335 PASSED / 0 FAILED` |
+| Calibration API | `9 PASSED / 0 FAILED` |
+| Backend suite | `108 PASSED / 0 FAILED` |
+| MCC / claim-safety pins | `17 PASSED / 0 FAILED` |
+| Disposable staged root suite | `893 PASSED / 0 FAILED` |
+| Frontend build / lints / data validation | `PASSED` |
+| Review state | `FRESH INDEPENDENT REVIEW REQUIRED` |
+| Current state | `NOT COMMIT READY` |
+
+### R3-UI-03 first independent review and repair authorization (2026-07-30; append-only)
+
+| State item | Status |
+|---|---|
+| Independent verdict | `CHANGES_REQUIRED` |
+| Frozen-boundary compatibility | `PASSED` |
+| Scientific preservation | `CONFIRMED` |
+| Remaining blockers | `TWO` |
+| Contradictory artifact behavior | `503 REPAIR REQUIRED` |
+| Malformed nested artifact behavior | `503 REPAIR REQUIRED` |
+| Documentation lint citation | `REPAIR AUTHORIZED` |
+| Repair scope | `CALIBRATION SERVICE / ROUTE IF NEEDED / TESTS / GOVERNANCE` |
+| Review state | `FRESH REREVIEW REQUIRED` |
+| Current state | `NOT COMMIT READY` |
+
+### R3-UI-03 blocking-findings repair completion (2026-07-31; append-only)
+
+| State item | Status |
+|---|---|
+| Calibration fail-closed repair | `COMPLETE` |
+| Missing / malformed / contradictory artifacts | `PUBLIC ROUTE 503` |
+| Invalid UTF-8 / unreadable artifact | `PUBLIC ROUTE 503` |
+| Unrelated programming errors | `NOT DISGUISED` |
+| Documentation lint defect | `REPAIRED` |
+| Calibration API suite | `160 PASSED / 0 FAILED` |
+| Backend suite | `259 PASSED / 0 FAILED` |
+| MCC / claim-safety pins | `17 PASSED / 0 FAILED` |
+| Frontend build / lints / data validation | `PASSED` |
+| Staged root suite in Python 3.11 environment | `885 PASSED / 8 ENVIRONMENT-MATCHED FAILURES` |
+| Clean-HEAD control | `SAME 8 FAILURES` |
+| Boundary / artifacts / scientific findings | `UNCHANGED` |
+| Review state | `FRESH INDEPENDENT REREVIEW REQUIRED` |
+| Current state | `NOT COMMIT READY` |
+
+### R3-UI-03 second re-review and final repair authorization (2026-08-01; append-only)
+
+| State item | Status |
+|---|---|
+| Independent verdict | `CHANGES_REQUIRED` |
+| Previous 503 blockers | `REPAIRED` |
+| Documentation lint | `PASSED` |
+| Changed root suite | `893 PASSED / 0 FAILED` |
+| Clean-HEAD root suite | `893 PASSED / 0 FAILED` |
+| Remaining blockers | `ONE` |
+| Nested element validation | `REPAIR REQUIRED` |
+| Repair scope | `CALIBRATION SERVICE + FOCUSED TESTS` |
+| Review state | `FRESH REREVIEW REQUIRED` |
+| Current state | `NOT COMMIT READY` |
+
+### R3-UI-03 final nested-validation repair completion (2026-08-01; append-only)
+
+| State item | Status |
+|---|---|
+| Remaining nested-validation blocker | `REPAIRED` |
+| Returned fields explicitly validated | `ALL` |
+| Additional adversarial mutations | `71` |
+| Total mutation matrix | `134 CASES` |
+| Calibration API suite | `302 PASSED / 0 FAILED` |
+| Backend suite | `401 PASSED / 0 FAILED` |
+| Excess-basis suite | `335 PASSED / 0 FAILED` |
+| Disposable staged root suite | `893 PASSED / 0 FAILED` |
+| Documentation / claims lint | `PASSED` |
+| Frontend production build | `PASSED` |
+| Protected boundary and artifacts | `UNCHANGED` |
+| Review state | `FRESH INDEPENDENT REREVIEW REQUIRED` |
+| Current state | `NOT COMMIT READY` |
+
+### R3-UI-03 third re-review and repair authorization (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Independent verdict | `CHANGES_REQUIRED` |
+| Standard root suite | `893 PASSED / 0 FAILED` |
+| Remaining blockers | `THREE` |
+| Whole-block passthrough | `REPAIR REQUIRED` |
+| NaN / Infinity serialization escape | `REPAIR REQUIRED` |
+| Bootstrap request count | `REPAIR REQUIRED` |
+| Correct parametrized matrix | `144 CASES` |
+| Correct focused total before repair | `302 TESTS` |
+| Repair scope | `CALIBRATION SERVICE + FOCUSED TESTS` |
+| Review state | `FRESH REREVIEW REQUIRED` |
+| Current state | `NOT COMMIT READY` |
+
+### R3-UI-03 third-blocker repair completion (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Whole-block passthrough blocker | `REPAIRED` |
+| Unknown response keys | `REJECTED WITH 503` |
+| NaN / Infinity blocker | `REPAIRED` |
+| Bootstrap-count blocker | `REPAIRED` |
+| Mutable cached response references | `REMOVED` |
+| Parametrized mutation matrix | `185 CASES` |
+| Additional non-parametrized tests | `26` |
+| Calibration API suite | `396 PASSED / 0 FAILED` |
+| Backend suite | `495 PASSED / 0 FAILED` |
+| Excess-basis suite | `335 PASSED / 0 FAILED` |
+| Disposable staged root suite | `893 PASSED / 0 FAILED` |
+| Documentation / claims lint | `PASSED` |
+| Frontend production build | `PASSED` |
+| Accidental index staging | `REVERSED / NO RESIDUE` |
+| Protected boundary and artifacts | `UNCHANGED` |
+| Review state | `FRESH INDEPENDENT REREVIEW REQUIRED` |
+| Current state | `NOT COMMIT READY` |
+
+### R3-UI-03 final independent approval (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Final independent verdict | `APPROVED` |
+| Changed scope | `17 AUTHORIZED PATHS` |
+| Calibration API suite | `396 PASSED / 0 FAILED` |
+| Backend suite | `495 PASSED / 0 FAILED` |
+| Excess-basis suite | `335 PASSED / 0 FAILED` |
+| MCC / claim-safety suite | `348 PASSED / 0 FAILED` |
+| Disposable staged root suite | `893 PASSED / 0 FAILED` |
+| Frontend build / lints / data validation | `PASSED` |
+| Protected-boundary members | `351 / UNCHANGED` |
+| Protected-boundary digest | `0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba` |
+| Scientific findings | `UNCHANGED — 0/6` |
+| Live authenticated browser verification | `NOT PERFORMED / NON-BLOCKING` |
+| Current state | `INDEPENDENTLY APPROVED / COMMIT READY` |
+
