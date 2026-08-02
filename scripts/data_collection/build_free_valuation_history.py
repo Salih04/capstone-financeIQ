@@ -62,6 +62,12 @@ REPORT_MD = CLEAN / "free_valuation_history_report.md"
 YEARS = list(range(2020, 2026))
 PE_ABS_MAX, PB_ABS_MAX, EV_EBITDA_ABS_MAX = 1000.0, 100.0, 500.0
 TARGET_COLS = ["market_cap", "enterprise_value", "pe", "pb", "ev_ebitda"]
+LIMITATION_TEXT = (
+    "Shares outstanding is the binding gap: without a real per-ticker-year share count "
+    "(KAP/company reports), market_cap cannot be computed and all derived ratios stay null. "
+    "Yahoo provides only year-end PRICE freely, not historical shares. 2024 equity/net_debt are "
+    "misaligned and were rejected, not imputed."
+)
 
 
 # --------------------------------------------------------------------------- #
@@ -467,11 +473,7 @@ def build(log=print) -> dict:
         "feature_count_before": 27,
         "feature_count_after_if_accepted": 27 + len(keep_targets),
         "candidate_csv": _rel(CANDIDATE),
-        "limitations": (
-            "Shares outstanding is the binding gap: without a real per-ticker-year share count "
-            "(KAP/company reports), market_cap cannot be computed and all derived ratios stay null. "
-            "Yahoo provides only year-end PRICE freely, not historical shares. 2024 equity/net_debt are "
-            "misaligned and were rejected, not imputed."),
+        "limitations": [LIMITATION_TEXT],
         "not_investment_advice": True,
     }
     REPORT_JSON.write_text(json.dumps(report, indent=2, default=str))
@@ -504,7 +506,7 @@ def _write_md(r: dict, have_shares: bool) -> None:
     for col, reasons in r["rejection_summary"].items():
         if reasons:
             lines.append(f"- **{col}**: " + ", ".join(f"{k}={v}" for k, v in reasons.items()))
-    lines += ["", "## Limitation", "", r["limitations"]]
+    lines += ["", "## Limitation", "", *r["limitations"]]
     if not have_shares:
         lines += ["", "## ACTION REQUIRED",
                   "Provide real shares-outstanding (KAP/company reports) in "

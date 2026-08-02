@@ -1070,6 +1070,30 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 
 - **Final state (2026-08-02; append-only):** `MERGED / POST_MERGE_VERIFIED / R3_UI_03_CLOSED`.
 
+
+- **R3-LIMITS-01 valuation-limitations prerequisite authorization (2026-08-02; append-only):** discovery found that the registered generated artifact `data/trusted_clean/free_valuation_history_report.json` exposed `limitations` as a scalar string, while all other registered research reports use `limitations[]`. The producer-owned schema is authorized to normalize this field to a non-empty `list[str]` while preserving the existing limitation text byte-for-byte.
+
+- **Frozen-boundary consequence (2026-08-02; append-only):** `data/trusted_clean/free_valuation_history_report.json` is a member of the R3-MISS-01 protected boundary. The intentional generated-artifact schema correction therefore changes the protected-boundary digest. Retain the report inside the boundary; do not exempt, remove, weaken, or special-case it.
+
+- **Owner-authorized compatibility repair (2026-08-02; append-only):** authorize a narrow compatibility update limited to the pinned digest authority in `experiments/run_excess_basis.py`, its independent hard-coded authorities in `tests/test_excess_basis.py`, and governed regeneration of `experiments/results_excess/{artifact_manifest.json,significance_report.json,significance_report.md}`. Only truthful provenance, boundary digest, source-artifact metadata, and directly dependent hashes may change. Leaderboard, prediction dumps, estimands, ICs, p-values, intervals, counts, and family conclusions must remain unchanged.
+
+- **Stop condition (2026-08-02; append-only):** before accepting the repair, independently compare all protected members against `main`. Stop if any protected member other than `data/trusted_clean/free_valuation_history_report.json` changed.
+
+- **Current state (2026-08-02; append-only):** `PREREQUISITE_SCHEMA_REPAIR_COMPLETE / BOUNDARY_REPIN_AUTHORIZED / FRESH_INDEPENDENT_REVIEW_REQUIRED / NOT_COMMIT_READY`.
+
+
+- **R3-LIMITS-01 valuation prerequisite compatibility completion (2026-08-02; append-only):** the registered valuation producer now emits `limitations` as a non-empty `list[str]`. The former scalar text is preserved byte-for-byte as the sole list item, and the Markdown report remains byte-identical.
+
+- **Protected-boundary update (2026-08-02; append-only):** the R3-MISS-01 protected boundary retains exactly `351` members. Independent member comparison against `main` found exactly one changed member: `data/trusted_clean/free_valuation_history_report.json`. The pinned digest moved from `0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba` to `e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f`. No exemption, removal, weakening, or special case was introduced.
+
+- **Governed regeneration (2026-08-02; append-only):** excess artifacts were regenerated through `make research-excess`. `artifact_manifest.json` now hashes to `97d3e7be72aa114d20e3a09028802e99f6c1e72e30e9a6370931c5ee0b6aa2a5`; `significance_report.json` now hashes to `c7e5374bb80b2b377ca815c82ae6c3206e841b22e2972bfbae46db2e96e65cef`; `significance_report.md`, the leaderboard, and all three prediction dumps remain byte-identical.
+
+- **Scientific preservation (2026-08-02; append-only):** only boundary-digest, generator-source metadata, environment provenance, file-size, and directly dependent hash leaves changed. All model records, ICs, p-values, adjusted p-values, intervals, counts, estimands, rank audits, claim-safety fields, limitations, and family conclusions remain identical. Primary, sensitivity, and either-basis survivors remain `0/6`; no reliable predictive edge is established.
+
+- **Verification (2026-08-02; append-only):** valuation tests passed `9/9`, excess-basis tests passed `335/335`, and the full root suite passed `895/895`. Data validation passed with `403` modeling rows, `40` features, `321` target rows, and `82` inference-only rows. Documentation lint, claims lint under MCC `v1.9.0`, and `git diff --check` passed.
+
+- **Current state (2026-08-02; append-only):** `PREREQUISITE_REPAIR_COMPLETE / FRESH_INDEPENDENT_REVIEW_REQUIRED / NOT_COMMIT_READY`.
+
 ### R3-LIMITS-01 — Automated limitations register
 - **Priority:** P1. **Wave:** 3D. **Owner role:** Research/Docs. **Risk:** low-medium. **Model/effort:** **Terra, medium.** Review: Opus low.
 - **Verified current state:** machine-readable `limitations` arrays exist in the significance, calibration, friction, regime, alternative-targets, and disagreement/stability (once landed) reports; more limitations live in METHODOLOGY prose, `docs/universe_audit.md`, and the audit doc; no aggregate exists — examiner-grade "list ALL known weaknesses" answers are assembled by hand.

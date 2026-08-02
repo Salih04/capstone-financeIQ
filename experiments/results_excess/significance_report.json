@@ -386,8 +386,8 @@
       "experiments/results_serving_eval": 5,
       "model_confidence_contract.json": 1
     },
-    "members_pinned_authority_sha256": "0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba",
-    "members_sha256": "0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba",
+    "members_pinned_authority_sha256": "e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f",
+    "members_sha256": "e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f",
     "members_sha256_definition": "sha256 of the newline-joined '<repo-relative-posix-path>:<sha256>' records for every boundary member, sorted by path. A content digest, not a file count: it detects modification or removal of an original member and is unchanged by later, unrelated namespace additions.",
     "policy": "Curated data and the generated namespaces that already existed when R3-TGT-01 was frozen, which this excess regeneration must never mutate. Explicit historical allow-list: namespaces added by later, unrelated governed tasks are not members and are protected by their own tasks, so adding one never changes this boundary."
   },
@@ -2796,7 +2796,7 @@
         "scikit-learn": "1.5.1",
         "scipy": "1.13.1"
       },
-      "platform": "macOS-26.5.2-arm64-arm-64bit",
+      "platform": "macOS-26.6-arm64-arm-64bit",
       "processor": "arm",
       "python_implementation": "CPython",
       "python_version": "3.12.3",
@@ -2805,7 +2805,7 @@
         12,
         3
       ],
-      "release": "25.5.0",
+      "release": "25.6.0",
       "system": "Darwin"
     },
     "feature_columns": {
@@ -3304,8 +3304,8 @@
     {
       "path": "experiments/run_excess_basis.py",
       "role": "R3-TGT-01 generator",
-      "sha256": "0e6c1f6527d1d20bf01076bc7f8b980ce9793ff0cea22a19ee376486e92c47a0",
-      "size_bytes": 210818
+      "sha256": "601c9feec055b87ccf8d4a636cb20a6f1def1fee246ed1c73033be83317316af",
+      "size_bytes": 211412
     },
     {
       "path": "experiments/run_experiments.py",
