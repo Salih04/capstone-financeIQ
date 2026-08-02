@@ -757,3 +757,21 @@ KAP cross-check recommended before claiming any result.
 | Scientific findings | `UNCHANGED — 0/6 PRIMARY, SENSITIVITY, EITHER` |
 | Final state | `MERGED / POST-MERGE VERIFIED / CLOSED` |
 
+### R3-MEMO-01 actual post-merge verification (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Sequencing correction | `INITIAL CLOSURE PRECEDED FULL POST-MERGE RERUN` |
+| Implementation commit | `8a2bc7b4` |
+| Merge commit | `5fb7d7ad932067ebbfe7ec83aba051c0022d145e` |
+| Closure commit | `c62d9c50` |
+| Memo tests | `42 PASSED / 0 FAILED` |
+| Focused tests | `60 PASSED / 0 FAILED` |
+| Backend suite | `537 PASSED / 0 FAILED` |
+| Root suite | `927 PASSED / 0 FAILED` |
+| Data validation | `PASSED` |
+| Documentation lint | `PASSED` |
+| Claims lint | `PASSED — MCC v1.10.0` |
+| Diff validation | `PASSED` |
+| Corrected final state | `MERGED / ACTUAL POST-MERGE VERIFIED / CLOSED` |
+

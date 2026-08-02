@@ -1193,6 +1193,12 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 
 - **Final state (2026-08-02; append-only):** `MERGED / POST_MERGE_VERIFIED / R3_MEMO_01_CLOSED`.
 
+- **R3-MEMO-01 post-merge verification process correction (2026-08-02; append-only):** the initial closure record was committed as `c62d9c50` before the complete post-merge command set was rerun on `main`. The earlier staged-final-tree verification remained valid, but it was not itself a post-merge execution. This sequencing issue is recorded explicitly rather than hidden or rewritten.
+
+- **Actual post-merge verification (2026-08-02; append-only):** the complete verification set was subsequently executed on `main` after PR `#9` and closure commit `c62d9c50`: memo tests passed `42/42`, focused Courtroom/Skeptic/MCC tests passed `60/60`, the backend suite passed `537/537`, and the root suite passed `927/927`. Data validation, documentation lint, claims lint under MCC `v1.10.0`, and `git diff --check` passed.
+
+- **Corrected final state (2026-08-02; append-only):** `MERGED / ACTUAL_POST_MERGE_VERIFICATION_COMPLETE / R3_MEMO_01_CLOSED`.
+
 
 ### R3-SPIKE-01 — Point-in-time universe history sourcing spike (memo only)
 - **Priority:** P2. **Wave:** 3C. **Owner role:** Research/Data. **Risk:** low (no data, no code). **Model/effort:** **Opus, medium.** Review: Fable low.
