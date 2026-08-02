@@ -848,6 +848,33 @@
       "notes": "Single non-recursive glob for the per-company RAG context files (240 files). Written by scripts/build_company_contexts.py; scoped to one generator-owned directory and one extension, so the glob is exact, not broad."
     },
     {
+      "path_or_glob": "docs/limitations_register.md",
+      "artifact_class": "generated",
+      "generator_command": "make limitations-register",
+      "inputs": [
+        "scripts/build_limitations_register.py",
+        "artifact_registry.json",
+        "METHODOLOGY.md",
+        "FINANCEIQ_MODEL_VALIDITY_AUDIT.md",
+        "data/trusted_clean/free_valuation_history_report.json",
+        "experiments/results/calibration_report.json",
+        "experiments/results/friction_report.json",
+        "experiments/results/significance_report.json",
+        "experiments/results_disagreement/disagreement_report.json",
+        "experiments/results_excess/significance_report.json",
+        "experiments/results_influence/influence_report.json",
+        "experiments/results_missingness/missingness_report.json",
+        "experiments/results_placebo/placebo_report.json",
+        "experiments/results_rank_stability/rank_stability_report.json",
+        "experiments/results_real_terms/real_try/significance_report.json",
+        "experiments/results_real_terms/usd/significance_report.json",
+        "experiments/results_regime/regime_context_report.json",
+        "experiments/results_serving_eval/serving_eval_report.json"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Written by scripts/build_limitations_register.py, which holds the reviewed curated seed quotations as source-bound constants (hence the script is a declared input). Resolves only registered JSON paths and globs — never a filesystem scan — and emits every top-level limitations[] entry verbatim. The listed report inputs are the registered JSON artifacts that currently carry a top-level limitations list; a newly registered report carrying one also becomes an input and must be added here."
+    },
+    {
       "path_or_glob": "data/trusted_clean/bist100_expansion_report.md",
       "artifact_class": "human_document",
       "generator_command": null,
