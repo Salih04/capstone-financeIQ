@@ -181,8 +181,24 @@ FROZEN_BOUNDARY_EXTRA_FILES = (
 # string list while preserving the scalar text byte-for-byte.  No exemption was
 # added: the report remains a protected member and any further change still fails
 # closed here.
+#
+# Deliberate re-pin (2026-08-02, R3-MEMO-01 cross-task compatibility repair):
+# ``e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f`` ->
+# ``03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd``.  The
+# claim-aware research memo compiler required the Model Confidence Contract minor
+# bump v1.9.0 -> v1.10.0 (new ``scan.backend_response_files`` entry and one exact
+# allowlist line for the authoritative primary disclaimer), and
+# ``model_confidence_contract.json`` is a member of this boundary by design.  The
+# member set is unchanged (351 members) and exactly one member's content moved:
+# ``model_confidence_contract.json``
+# (1797ee7873b8ba0d1a4ecabf805f6de305c2dedcff2dbfa6a10a7efa87e413de ->
+# 59e0fae3be8972e258891e723fd49cf13e36a7d16e918722a5a18b690c55d8f7).  Every other
+# member was compared against ``main`` and is byte-identical; no curated data, no
+# other generated artifact, and no excess statistical result changed.  The MCC is
+# NOT exempted, removed, or special-cased: it stays a member and any further
+# change to it still fails closed here.
 FROZEN_PROTECTED_BOUNDARY_SHA256 = (
-    "e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f"
+    "03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd"
 )
 
 # ---------------------------------------------------------------------------

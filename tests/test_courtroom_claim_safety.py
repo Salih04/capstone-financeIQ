@@ -16,7 +16,7 @@ def test_courtroom_surface_is_registered_and_pins_no_adjudication_structure():
     service = SERVICE_PATH.read_text(encoding="utf-8")
     contract = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
 
-    assert contract["version"] == "1.9.0"
+    assert contract["version"] == "1.10.0"
     assert "frontend/src/pages/CourtroomPage.jsx" in contract["required_disclaimer"]["pages"]
     assert "backend/app/services/courtroom_service.py" in contract["scan"]["backend_response_files"]
     assert 'PERSONA_ORDER = ("bull", "bear", "skeptic", "risk")' in service
