@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 from app.core.dependencies import require_access
 from app.models.user import User
-from app.services import courtroom_service, skeptic_service
+from app.services import courtroom_service, memo_service, skeptic_service
 from app.services.research import (
     benchmark,
     calibration,
@@ -161,3 +161,21 @@ def courtroom_report(body: CourtroomBody, _: User | None = Depends(require_acces
         return courtroom_service.courtroom_report(body.ticker, body.year)
     except ValueError as exc:
         raise HTTPException(422, str(exc))
+
+
+@router.post("/memo/{ticker}")
+def memo_report(ticker: str, _: User | None = Depends(require_access)):
+    """Compose a citation-complete evidence memo; never a recommendation.
+
+    Takes no body, no prompt, and no source path: the memo is built only from
+    committed artifacts. Missing or contradictory global evidence fails closed
+    with 503 rather than returning a plausible partial memo.
+    """
+    try:
+        return memo_service.memo_report(ticker)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
+    except memo_service.MemoCompanyUnknown as exc:
+        raise HTTPException(404, str(exc))
+    except memo_service.MemoEvidenceUnavailable as exc:
+        raise HTTPException(503, str(exc))

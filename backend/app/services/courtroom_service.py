@@ -7,15 +7,13 @@ and never creates an argument when required evidence is absent or malformed.
 
 from __future__ import annotations
 
-import json
 import math
 import re
-from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 from app.core.paths import resolve_repo_root
-from app.services import skeptic_service
+from app.services import citations, skeptic_service
 
 
 REPO_ROOT = resolve_repo_root()
@@ -90,23 +88,9 @@ def _insufficient(
     }
 
 
-@lru_cache(maxsize=8)
-def _load_json_cached(path: str, mtime: float) -> dict[str, Any]:
-    del mtime
-    with Path(path).open(encoding="utf-8") as handle:
-        value = json.load(handle)
-    if not isinstance(value, dict):
-        raise ValueError("expected a JSON object")
-    return value
-
-
 def _load_json(path: Path) -> tuple[dict[str, Any] | None, str | None]:
-    if not path.is_file():
-        return None, "artifact is missing"
-    try:
-        return _load_json_cached(str(path), path.stat().st_mtime), None
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        return None, f"artifact is malformed ({type(exc).__name__})"
+    """Delegate to the shared loader; wording and failure modes are unchanged."""
+    return citations.load_json_document(path)
 
 
 def _context_path(ticker: str, year: int | None) -> Path | None:
@@ -124,10 +108,8 @@ def _context_path(ticker: str, year: int | None) -> Path | None:
 
 
 def _source(path: Path) -> str:
-    try:
-        return path.relative_to(REPO_ROOT).as_posix()
-    except ValueError:
-        return path.name
+    """Delegate to the shared path helper; the filename fallback is unchanged."""
+    return citations.relative_to_repo(path)
 
 
 def _passport_index(artifact: dict[str, Any]) -> dict[str, dict[str, Any]] | None:

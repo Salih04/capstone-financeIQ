@@ -667,3 +667,70 @@ KAP cross-check recommended before claiming any result.
 | Docs / claims lint | `PASSED — MCC v1.9.0` |
 | Final state | `MERGED / VERIFIED / CLOSED` |
 
+### R3-MEMO-01 implementation authorization (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Task | `R3-MEMO-01` |
+| Implementation model | `OPUS 5 — HIGH` |
+| Mandatory review | `FABLE 5 — MEDIUM` |
+| Current MCC | `v1.9.0` |
+| MCC boundary membership | `RETAINED` |
+| Current protected members | `351` |
+| Current boundary digest | `e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f` |
+| Boundary exemption | `FORBIDDEN` |
+| Scientific-result changes | `FORBIDDEN` |
+| Current state | `AUTHORIZED / NOT COMMIT READY` |
+
+### R3-MEMO-01 implementation evidence (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Task | `R3-MEMO-01 — claim-aware research memo compiler` |
+| Route | `POST /research/memo/{ticker}` (require_access; no body, no prompt, no source path) |
+| Service | `backend/app/services/memo_service.py` (deterministic, LLM-off) |
+| Shared citation contract | `backend/app/services/citations.py` (Courtroom + memo) |
+| Courtroom preservation | `RESPONSE BYTES AND SCHEMA UNCHANGED — 20 cases compared against HEAD` |
+| Section order | `identity_and_coverage → evidence_quality → skeptic_challenge → significance_and_power → limitations → provenance_stamp` |
+| Citation completeness | `EVERY EVIDENCE SENTENCE ≥ 1 VALUE-RESOLVED CITATION` |
+| Forbidden keys (recommendation/verdict/rating/target/outlook) | `ABSENT AT EVERY DEPTH` |
+| Raw/adjusted p-value pairing | `STRUCTURALLY INSEPARABLE — 6 ML models + 1 labelled serving test` |
+| Recorded fixtures | `ASELS (dense, 40/40) and DSTKF (sparse, 37/40, unique minimum)` |
+| MCC | `v1.9.0 → v1.10.0` (one scan entry, one exact allowlist line, five pins) |
+| Protected members compared vs `main` | `351 — exactly one differs: model_confidence_contract.json` |
+| Boundary digest | `e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f → 03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd` |
+| Boundary exemption | `NONE ADDED` |
+| Excess regeneration | `2 FILES / 9 JSON LEAVES — boundary digest, generator source, dependent hash only` |
+| Scientific leaves | `UNCHANGED — survivors remain 0/6 primary, sensitivity and either` |
+| Leaderboard and prediction dumps | `BYTE-IDENTICAL` |
+| `significance_report.md` | `BYTE-IDENTICAL` |
+| Memo tests | `42 PASSED / 0 FAILED` |
+| Backend suite | `537 PASSED / 0 FAILED` |
+| Root suite (independent staged clone) | `927 PASSED / 0 FAILED` |
+| Docs / claims lint | `PASSED — MCC v1.10.0` |
+| Data validation | `VALID — unchanged` |
+| Current state | `IMPLEMENTATION COMPLETE / FABLE REVIEW REQUIRED / NOT COMMIT READY` |
+
+### R3-MEMO-01 independent Fable approval (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Mandatory reviewer | `FABLE 5 — APPROVED` |
+| Changed paths | `17 AUTHORIZED PATHS` |
+| ASELS response hash | `b7c5ff54a43b8242c95a0624d3e74c3c55e3b22883b291400eecbd238f3a207d` |
+| DSTKF response hash | `bb4311848b5176ee91d464f1b4fa168d241f5020ed3329ef426f13561a4d8dd5` |
+| Citation resolution | `242 / 242 PASSED` |
+| Adversarial citation checks | `11 / 11 FAILED CLOSED` |
+| Courtroom preservation | `20 / 20 BYTE-IDENTICAL` |
+| Memo tests | `42 PASSED / 0 FAILED` |
+| Focused Courtroom/Skeptic/MCC | `60 PASSED / 0 FAILED` |
+| Backend suite | `537 PASSED / 0 FAILED` |
+| Staged-clone root suite | `927 PASSED / 0 FAILED` |
+| MCC | `v1.9.0 → v1.10.0` |
+| Protected members | `351` |
+| Old boundary digest | `e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f` |
+| New boundary digest | `03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd` |
+| Changed protected members | `1 — model_confidence_contract.json` |
+| Scientific findings | `UNCHANGED — 0/6 PRIMARY, SENSITIVITY, EITHER` |
+| Current state | `INDEPENDENTLY APPROVED / COMMIT READY` |
+
