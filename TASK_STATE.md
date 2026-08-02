@@ -649,3 +649,21 @@ KAP cross-check recommended before claiming any result.
 | Review state | `FRESH INDEPENDENT REVIEW REQUIRED` |
 | Current state | `NOT COMMIT READY` |
 
+### R3-LIMITS-01 closure (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Pull request | `#8 MERGED` |
+| Implementation commit | `1c040640` |
+| Merge commit | `b56b573b` |
+| Registered JSON artifacts | `14` |
+| Auto-extracted limitations | `101 VERBATIM ENTRIES` |
+| Curated limitations | `6 POSITIONALLY VALIDATED` |
+| Generated document hash | `022335f7e6335d60e0e5ebd68773363f487d547042a5de4fb72176717bb90904` |
+| Deterministic double-generation | `PASSED` |
+| Limitations-register tests | `32 PASSED / 0 FAILED` |
+| Artifact-registry tests | `16 PASSED / 0 FAILED` |
+| Root suite | `927 PASSED / 0 FAILED` |
+| Docs / claims lint | `PASSED — MCC v1.9.0` |
+| Final state | `MERGED / VERIFIED / CLOSED` |
+

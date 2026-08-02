@@ -1106,6 +1106,17 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 - **Failure modes:** paraphrasing entries (forbidden — verbatim); the curated list drifting from its cited sources (each entry carries its citation; reviewer spot-checks). **Rollback:** delete files + hunk. **Stop:** a report's limitations key has an unexpected non-list shape.
 - **Commit scope:** script + generated doc + test + Makefile. **Theme:** "Generate the aggregated limitations register". Manual commit: yes. **/clear:** yes.
 
+- **R3-LIMITS-01 post-merge closure (2026-08-02; append-only):** PR `#8` merged into `main` through merge commit `b56b573b`. Implementation commit: `1c040640`. The deterministic limitations register is generated from the authoritative artifact registry and contains `101` verbatim machine-readable limitations from `14` registered JSON artifacts plus `6` positionally validated curated document quotations.
+
+- **Generated artifact (2026-08-02; append-only):** `docs/limitations_register.md` is owned by `make limitations-register`, registered as generated and hand-edit-forbidden, and hashes to `022335f7e6335d60e0e5ebd68773363f487d547042a5de4fb72176717bb90904` across consecutive post-merge generations.
+
+- **Safety and provenance (2026-08-02; append-only):** registry resolution is deterministic, normalized and deduplicated; malformed JSON, invalid or empty limitation arrays, non-string entries, unsafe paths, source drift, false locators and quotation-outside-section conditions fail closed. No scientific report, source limitation or model result was modified.
+
+- **Verification (2026-08-02; append-only):** limitations-register tests passed `32/32`, artifact-registry tests passed `16/16`, and the full root suite passed `927/927`. Documentation lint, claims lint under MCC `v1.9.0`, deterministic double-generation and `git diff --check` passed.
+
+- **Final state (2026-08-02; append-only):** `MERGED / POST-MERGE VERIFIED / CLOSED`.
+
+
 ### R3-MEMO-01 — Claim-aware research memo compiler
 - **Priority:** P1. **Wave:** 3D (after UI-01; the queue's flagship product task). **Owner role:** Backend/Agent. **Risk:** **high — a composed memo is the closest this product ever comes to looking like advice.** **Model/effort:** **Opus, high.** Independent review: **Fable, medium (mandatory before merge).**
 - **Verified current state:** citation-complete building blocks all exist — courtroom lenses (`courtroom_service.py`, per-sentence citation chips, no-verdict schema), skeptic checks, feature passports, significance/calibration/regime passthroughs, company contexts; no composed per-ticker memo exists; ad-hoc prose exports are invisible to claims-lint today.
