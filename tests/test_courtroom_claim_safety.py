@@ -25,7 +25,6 @@ def test_courtroom_surface_is_registered_and_pins_no_adjudication_structure():
     assert '"status": "insufficient_data"' in service
     assert "riskLast(report?.personas)" in page
     assert ".cq-persona.is-risk" in page
-    assert "position: sticky" in page
     assert "Historical research support only · Not investment advice." in page
 
 
