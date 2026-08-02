@@ -734,3 +734,26 @@ KAP cross-check recommended before claiming any result.
 | Scientific findings | `UNCHANGED — 0/6 PRIMARY, SENSITIVITY, EITHER` |
 | Current state | `INDEPENDENTLY APPROVED / COMMIT READY` |
 
+### R3-MEMO-01 post-merge closure (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Pull request | `#9 MERGED` |
+| Implementation commit | `8a2bc7b4` |
+| Merge commit | `5fb7d7ad932067ebbfe7ec83aba051c0022d145e` |
+| Mandatory review | `FABLE 5 — APPROVED` |
+| Response sections | `6 FIXED SECTIONS` |
+| Citation review | `242 / 242 RESOLVED` |
+| Adversarial citation checks | `11 / 11 FAILED CLOSED` |
+| Courtroom preservation | `20 / 20 BYTE-IDENTICAL` |
+| MCC | `v1.10.0` |
+| Protected members | `351` |
+| Protected-boundary digest | `03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd` |
+| Memo tests | `42 PASSED / 0 FAILED` |
+| Focused tests | `60 PASSED / 0 FAILED` |
+| Backend suite | `537 PASSED / 0 FAILED` |
+| Root suite | `927 PASSED / 0 FAILED` |
+| Data / docs / claims validation | `PASSED — MCC v1.10.0` |
+| Scientific findings | `UNCHANGED — 0/6 PRIMARY, SENSITIVITY, EITHER` |
+| Final state | `MERGED / POST-MERGE VERIFIED / CLOSED` |
+

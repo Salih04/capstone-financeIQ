@@ -1179,6 +1179,20 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 
 - **Final review state (2026-08-02; append-only):** `INDEPENDENT_FABLE_APPROVED / COMMIT_READY / OWNER_MANUAL_COMMIT_PENDING`.
 
+- **R3-MEMO-01 post-merge closure (2026-08-02; append-only):** PR `#9` merged into `main` through merge commit `5fb7d7ad932067ebbfe7ec83aba051c0022d145e`. Implementation commit: `8a2bc7b4`. The authenticated `POST /research/memo/{ticker}` endpoint now provides deterministic, claim-aware, citation-complete research memos with the fixed six-section structure and section-level `insufficient_data` behavior.
+
+- **Claim-safety closure (2026-08-02; append-only):** every available evidence sentence carries value-resolving citations; the response recursively exposes no recommendation, verdict, rating, target, outlook, price-target, direction-forecast, or combined-score field. The exact primary disclaimer and mandatory closing sentence remain non-optional and source-cited. The conclusion remains that no reliable predictive edge has been established.
+
+- **Independent review evidence (2026-08-02; append-only):** mandatory independent Fable 5 review returned `APPROVED`. The complete fixed-clock ASELS and DSTKF memos were independently rendered and read; `242/242` citations resolved, `11/11` adversarial citation cases failed closed, and Courtroom behavior remained byte-identical across `20/20` comparison cases.
+
+- **MCC and protected-boundary closure (2026-08-02; append-only):** the Model Confidence Contract is `v1.10.0`. The protected boundary retains `351` members with digest `03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd`. The compatibility update changed exactly one protected member, `model_confidence_contract.json`, with no exemption or special case.
+
+- **Scientific preservation (2026-08-02; append-only):** no IC, raw p-value, adjusted p-value, interval, count, estimand, rank audit, family conclusion, or claim-safety conclusion changed. Primary, sensitivity, and either-basis survivors remain `0/6`; the governed leaderboard, significance Markdown, and prediction dumps remain preserved.
+
+- **Post-merge verification (2026-08-02; append-only):** memo tests passed `42/42`, focused Courtroom/Skeptic/MCC tests passed `60/60`, the backend suite passed `537/537`, and the root suite passed `927/927`. Data validation, documentation lint, claims lint under MCC `v1.10.0`, and `git diff --check` passed.
+
+- **Final state (2026-08-02; append-only):** `MERGED / POST_MERGE_VERIFIED / R3_MEMO_01_CLOSED`.
+
 
 ### R3-SPIKE-01 — Point-in-time universe history sourcing spike (memo only)
 - **Priority:** P2. **Wave:** 3C. **Owner role:** Research/Data. **Risk:** low (no data, no code). **Model/effort:** **Opus, medium.** Review: Fable low.
