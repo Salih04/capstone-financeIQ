@@ -121,6 +121,8 @@
   "feature_count_before": 27,
   "feature_count_after_if_accepted": 32,
   "candidate_csv": "data/trusted_raw/financials/free_valuation_history_candidate.csv",
-  "limitations": "Shares outstanding is the binding gap: without a real per-ticker-year share count (KAP/company reports), market_cap cannot be computed and all derived ratios stay null. Yahoo provides only year-end PRICE freely, not historical shares. 2024 equity/net_debt are misaligned and were rejected, not imputed.",
+  "limitations": [
+    "Shares outstanding is the binding gap: without a real per-ticker-year share count (KAP/company reports), market_cap cannot be computed and all derived ratios stay null. Yahoo provides only year-end PRICE freely, not historical shares. 2024 equity/net_debt are misaligned and were rejected, not imputed."
+  ],
   "not_investment_advice": true
 }

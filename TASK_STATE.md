@@ -613,3 +613,39 @@ KAP cross-check recommended before claiming any result.
 | Manual production verification | `PASSED` |
 | Final state | `MERGED / VERIFIED / CLOSED` |
 
+### R3-LIMITS-01 valuation schema prerequisite authorization (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Producer schema defect | `CONFIRMED — SCALAR limitations` |
+| Corrected schema | `NON-EMPTY list[str]` |
+| Limitation wording | `BYTE-VERBATIM PRESERVED` |
+| Protected-boundary membership | `RETAINED` |
+| Boundary exemption | `REJECTED` |
+| Digest re-pin | `AUTHORIZED` |
+| Governed excess regeneration | `AUTHORIZED` |
+| Scientific-result changes | `FORBIDDEN` |
+| Review state | `FRESH INDEPENDENT REVIEW REQUIRED` |
+| Current state | `NOT COMMIT READY` |
+
+### R3-LIMITS-01 valuation prerequisite compatibility completion (2026-08-02; append-only)
+
+| State item | Status |
+|---|---|
+| Valuation limitations schema | `NON-EMPTY list[str]` |
+| Limitation wording | `BYTE-VERBATIM PRESERVED` |
+| Valuation Markdown | `BYTE-IDENTICAL` |
+| Protected-boundary members | `351 / UNCHANGED` |
+| Changed protected member | `free_valuation_history_report.json ONLY` |
+| Old boundary digest | `0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba` |
+| New boundary digest | `e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f` |
+| Boundary exemption | `NONE` |
+| Governed excess regeneration | `COMPLETE` |
+| Scientific findings | `UNCHANGED — 0/6` |
+| Valuation tests | `9 PASSED / 0 FAILED` |
+| Excess-basis tests | `335 PASSED / 0 FAILED` |
+| Root suite | `895 PASSED / 0 FAILED` |
+| Data / docs / claims validation | `PASSED` |
+| Review state | `FRESH INDEPENDENT REVIEW REQUIRED` |
+| Current state | `NOT COMMIT READY` |
+

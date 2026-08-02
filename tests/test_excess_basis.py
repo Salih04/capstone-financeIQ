@@ -3126,14 +3126,14 @@ def test_accepted_subset_contract_is_documented():
 
 
 # The three independently hard-coded boundary-digest literals below were re-pinned
-# on 2026-07-30 from ``634d7151...0137dd9`` to ``0b0083a4...cf6d76ba`` as the
-# R3-UI-03 cross-task compatibility repair: that task's mandatory Model Confidence
-# Contract bump (v1.8.0 -> v1.9.0) changes ``model_confidence_contract.json``,
-# which remains a frozen-boundary member on purpose.  The member set is still 351
-# and exactly that one member's content moved; see the re-pin note in
-# ``experiments/run_excess_basis.py``.  The literals stay hard-coded (never derived
-# from ``excess.FROZEN_PROTECTED_BOUNDARY_SHA256``) so the pin remains an
-# independent authority rather than a self-confirming echo of the source constant.
+# on 2026-08-02 from ``0b0083a4...cf6d76ba`` to ``e55c62bf...ba14c2f`` for the
+# R3-LIMITS-01 valuation-schema prerequisite.  The member set remains 351 and the
+# sole changed member is ``data/trusted_clean/free_valuation_history_report.json``;
+# its registered producer normalized ``limitations`` from the original scalar to
+# a one-item string list while preserving the scalar text byte-for-byte.  No
+# exemption was added: the report remains protected.  The literals stay hard-coded
+# (never derived from ``excess.FROZEN_PROTECTED_BOUNDARY_SHA256``) so the pin remains
+# an independent authority rather than a self-confirming echo of the source constant.
 
 
 def _fake_repo(tmp_path: Path, name: str) -> Path:
@@ -3154,7 +3154,7 @@ def test_genuine_base_repository_reconstructs_351_members_with_pinned_digest():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba"
+        == "e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f"
     )
     assert (
         excess._frozen_boundary_digest(members)
@@ -3394,7 +3394,7 @@ def test_genuine_boundary_survives_the_descriptor_anchoring():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba"
+        == "e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f"
     )
 
 
@@ -3927,7 +3927,7 @@ def test_historical_boundary_authority_is_unchanged_after_the_repair():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba"
+        == "e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f"
     )
 
 

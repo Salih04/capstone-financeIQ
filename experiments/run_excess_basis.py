@@ -171,8 +171,18 @@ FROZEN_BOUNDARY_EXTRA_FILES = (
 # data and no other generated artifact changed, and no excess statistical result
 # changed.  The MCC is NOT exempted, removed, or special-cased: it stays a member
 # and any further change to it still fails closed here.
+#
+# Deliberate re-pin (2026-08-02, R3-LIMITS-01 valuation-schema prerequisite):
+# ``0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba`` ->
+# ``e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f``.
+# The sole changed boundary member is
+# ``data/trusted_clean/free_valuation_history_report.json``: its registered
+# producer normalized ``limitations`` from the original scalar to a one-item
+# string list while preserving the scalar text byte-for-byte.  No exemption was
+# added: the report remains a protected member and any further change still fails
+# closed here.
 FROZEN_PROTECTED_BOUNDARY_SHA256 = (
-    "0b0083a458ff24e9414ed23c12fb58f40ebe22c94539e6979b0c7affcf6d76ba"
+    "e55c62bfb729ce73dc008e90a2875fa252c3c399bf1f29112eafea16eba14c2f"
 )
 
 # ---------------------------------------------------------------------------

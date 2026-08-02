@@ -2,16 +2,23 @@
 
 from __future__ import annotations
 
-import sys
+import json
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "backend"))
 
 from scripts.data_collection import build_free_valuation_history as V  # noqa: E402
+
+
+EXPECTED_LIMITATION_TEXT = (
+    "Shares outstanding is the binding gap: without a real per-ticker-year share count "
+    "(KAP/company reports), market_cap cannot be computed and all derived ratios stay null. "
+    "Yahoo provides only year-end PRICE freely, not historical shares. 2024 equity/net_debt are "
+    "misaligned and were rejected, not imputed."
+)
 
 
 def test_yahoo_symbol_mapping():
@@ -97,6 +104,39 @@ def test_missing_shares_rejects_market_cap(monkeypatch, tmp_path):
     assert rep["target_column_status"]["market_cap"] == "missing"
     assert rep["columns_entering_candidate"] == []
     assert rep["shares_status"] == "missing"
+
+
+def test_committed_report_limitations_are_non_empty_strings():
+    report = json.loads(V.REPORT_JSON.read_text(encoding="utf-8"))
+    limitations = report["limitations"]
+
+    assert isinstance(limitations, list)
+    assert limitations
+    assert all(isinstance(item, str) and item.strip() for item in limitations)
+    assert limitations == [EXPECTED_LIMITATION_TEXT]
+
+
+def test_regeneration_produces_committed_report_json(monkeypatch, tmp_path):
+    committed_json = V.REPORT_JSON.read_bytes()
+    cached_prices = pd.read_csv(V.PRICES_CACHE)
+    cached_prices["ticker"] = cached_prices["ticker"].astype(str).str.upper()
+    price_columns = ["ticker", "year", "year_end_close", "source"]
+    cached_prices = cached_prices[price_columns]
+
+    monkeypatch.setattr(
+        V,
+        "collect_year_end_prices",
+        lambda tickers, **kwargs: (
+            cached_prices,
+            {"attempted": 0, "yahoo_ok": 0, "from_cache": 81, "from_manual": 0, "failed": []},
+        ),
+    )
+    monkeypatch.setattr(V, "REPORT_JSON", tmp_path / "free_valuation_history_report.json")
+    monkeypatch.setattr(V, "REPORT_MD", tmp_path / "free_valuation_history_report.md")
+
+    V.build(log=lambda *args: None)
+
+    assert V.REPORT_JSON.read_bytes() == committed_json
 
 
 def test_2024_balance_block_rejected(monkeypatch, tmp_path):
