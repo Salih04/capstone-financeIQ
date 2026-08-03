@@ -832,3 +832,26 @@ KAP cross-check recommended before claiming any result.
 | Remaining limitation | `MINOR NON-BLOCKING TEST-COVERAGE GAP` |
 | Final state | `INTEGRATED / REVIEW APPROVED / DETERMINISTIC / CLOSED` |
 
+### R3-INF-01 independent current-main review closure (2026-08-03; append-only)
+
+| State item | Status |
+|---|---|
+| Implementation commit | `ea2a5f5565b634d13c99c8186cda7ed3c9ef7523` |
+| Reviewed current-main HEAD | `469159638999fc0b28ef707fef0905a4f9a148f2` |
+| Integration relationship | `FIRST-PARENT ANCESTOR OF MAIN` |
+| Historical awaiting-commit status | `STALE — SUPERSEDED APPEND-ONLY` |
+| Independent Fable review | `APPROVED` |
+| Task-owned files | `5 / 5 BYTE-IDENTICAL` |
+| Independently reproduced deltas | `2,160 / 2,160` |
+| Independently reproduced concentrations | `9 / 9` |
+| Significance parity | `9 / 9 MODELS` |
+| Pooled-IC convention | `EQUAL-WEIGHTED WITHIN-YEAR SPEARMAN` |
+| Regeneration | `COMMITTED = RUN 1 = RUN 2` |
+| Protected artifacts | `11 / 11 BYTE-IDENTICAL` |
+| Focused tests | `32 PASSED / 0 FAILED` |
+| Complete root suite | `927 PASSED / 0 FAILED / 0 ERRORS / 0 SKIPS` |
+| Documentation lint | `PASSED` |
+| Claims lint | `PASSED — MCC v1.10.0` |
+| Remaining limitation | `DIRECT CONCENTRATION UNIT ORACLE ABSENT — NON-BLOCKING` |
+| Final state | `INTEGRATED / REVIEW APPROVED / DETERMINISTIC / CLOSED` |
+

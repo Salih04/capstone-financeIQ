@@ -463,6 +463,23 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 - **Failure modes:** recomputing pooled IC with a different convention than `significance.py` (numbers would silently disagree — reuse its function or pin equality in a test); narrating influential names as stories. **Rollback:** delete new files + hunk. **Stop:** convention mismatch you cannot resolve by import/reuse.
 - **Commit scope:** module + outputs + test + Makefile. **Theme:** "Add leave-one-out influence diagnostics". Manual commit: yes. **/clear:** yes.
 
+- **R3-INF-01 independent current-main review closure (2026-08-03; append-only):** implementation commit `ea2a5f5565b634d13c99c8186cda7ed3c9ef7523` is already on the first-parent history of reviewed `main` HEAD `469159638999fc0b28ef707fef0905a4f9a148f2`. The historical `DONE (awaiting owner commit)` status was accurate when written but is now stale and is superseded by this append-only closure.
+
+- **Independent review result (2026-08-03; append-only):** fresh read-only Fable 5 current-main review returned `APPROVED`. All five task-owned files remain byte-identical to the implementation commit, and no later commit modified them. The current `research-influence` Makefile target, three exact artifact-registry ownership entries, and limitations-register integration remain intact.
+
+- **Independent statistical verification (2026-08-03; append-only):** all `2,160 / 2,160` persisted leave-one-out deltas were independently reproduced; all nine per-model top-five absolute-influence concentrations were reproduced; and all `9 / 9` full pooled-IC values matched the current significance convention. Pooled IC remains the equal-weighted mean of the three within-year Spearman IC values, with no sample-size weighting or cross-year pooling.
+
+- **Design and claim safety (2026-08-03; append-only):** the implementation remains seedless and deterministic, recomputes only the affected year on observation removal, retains both delta signs, and preserves explicit insufficient-data states. It performs no retraining, reranking, service mutation, production-ranking change, or new significance test. The mandatory estimator-sensitivity sentence remains exact in JSON and Markdown, and ticker names are presented only as sensitivity evidence—not as opportunities, recommendations, mispricing, inverse alpha, or predictive validity.
+
+- **Reproducibility and preservation (2026-08-03; append-only):** disposable-clone regeneration produced `committed outputs = run 1 = run 2` byte-for-byte. All `11 / 11` protected artifacts remained byte-identical. The two known APFS Unicode-normalization XLSX aliases were unrelated, unchanged, untracked filesystem aliases and were never staged or treated as task evidence.
+
+- **Validation (2026-08-03; append-only):** focused influence-map and artifact-registry tests passed `32 / 32`; the complete root suite passed `927 / 927` with zero failures, errors, or skips; documentation lint passed; claims lint passed under MCC `v1.10.0`; and `git diff --check` passed.
+
+- **Remaining limitation (2026-08-03; append-only):** the absence of a dedicated direct numeric unit oracle for the top-five concentration formula is a non-blocking test-quality gap. The formula and null branch are covered structurally, and all nine committed values were independently reproduced during review.
+
+- **Final state (2026-08-03; append-only):** `INTEGRATED / INDEPENDENT_FABLE_REVIEW_APPROVED / ARITHMETICALLY_REPRODUCED / DETERMINISTIC / CLAIM_SAFE / R3_INF_01_CLOSED`.
+
+
 ### R3-STAT-01 — Ranking & cohort stability under resampling
 - **Priority:** P1. **Wave:** 3B. **Owner role:** Research/Statistics. **Risk:** medium (claim surface). **Model/effort:** **Opus, high.** Independent review: **Fable, medium** (design + wording).
 - **Verified current state:** dumps committed; nothing measures how fragile per-ticker ranks or the pooled IC are under cohort perturbation; the public-40 subset of the 80-row dumps has never been evaluated separately (universe configs at `data/config/universe_public_40.csv` identify the subset).
