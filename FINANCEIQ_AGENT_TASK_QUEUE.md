@@ -690,11 +690,19 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 
 - **Freeze-once adjudication (2026-08-03; append-only):** running `make freeze-forward-2026` from a disposable clone of current `main` intentionally returned exit `2` with `status=freeze_refused`, `reason_code=freeze_git_sha_drift`, and `artifacts_unchanged=true`. This is the approved fail-closed behavior: later repository development must not silently re-author or overwrite the canonical 2026 freeze.
 
-- **Outcome-gate verification (2026-08-03; append-only):** neither `data/trusted_raw/realized_2026_returns.csv` nor `data/trusted_raw/partial_2026_ytd_returns.csv` exists. `make evaluate-forward-2026` returned exit `0`, `status=outcome_data_absent`, `metric_computed=false`, frozen cohort size `40`, usable cohort size `0`, and no statistical function was called.
+- **Outcome-gate verification (2026-08-03; append-only):** neither the canonical realized-2026 outcome input nor the optional partial-2026 YTD outcome input exists. `make evaluate-forward-2026` returned exit `0`, `status=outcome_data_absent`, `metric_computed=false`, frozen cohort size `40`, usable cohort size `0`, and no statistical function was called.
 
 - **Current-main validation (2026-08-03; append-only):** the focused PREREG and artifact-registry suite passed `86/86`; documentation lint passed; claims lint passed under MCC `v1.10.0`; the task files and frozen hashes remained unchanged. The two known APFS Unicode-normalization XLSX aliases appeared only as unchanged clone-local aliases and did not modify the tracked tree.
 
 - **Final state (2026-08-03; append-only):** `INTEGRATED / CURRENT_MAIN_VERIFIED / FROZEN / OUTCOME_DATA_ABSENT / R3_PREREG_01_CLOSED`.
+
+- **R3-PREREG-01 docs-lint correction (2026-08-03; append-only):** closure commit `a9a8fb9c` was created after documentation lint had reported two violations. The shell command sequence did not use fail-fast execution, so the subsequent stage, commit, and push commands continued despite that failed check.
+
+- **Cause and correction (2026-08-03; append-only):** the violations were caused solely by formatting two intentionally absent outcome inputs as repository-path citations. No outcome file was created, no protocol or frozen artifact was changed, and the documentation linter was not weakened. The closure wording was corrected to describe the absent inputs without presenting them as existing repository paths.
+
+- **Corrected validation (2026-08-03; append-only):** after the wording correction, documentation lint, claims lint under MCC `v1.10.0`, and `git diff --check` passed.
+
+- **Corrected final state (2026-08-03; append-only):** `INTEGRATED / CURRENT_MAIN_VERIFIED / FROZEN / OUTCOME_DATA_ABSENT / DOCS_LINT_CORRECTED / R3_PREREG_01_CLOSED`.
 
 
 ### R3-MISS-01 — Serving-heuristic missingness sensitivity

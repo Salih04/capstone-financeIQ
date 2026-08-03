@@ -795,3 +795,18 @@ KAP cross-check recommended before claiming any result.
 | Claims lint | `PASSED — MCC v1.10.0` |
 | Final state | `INTEGRATED / CURRENT-MAIN VERIFIED / FROZEN / CLOSED` |
 
+### R3-PREREG-01 docs-lint correction (2026-08-03; append-only)
+
+| State item | Status |
+|---|---|
+| Initial closure commit | `a9a8fb9c` |
+| Initial docs-lint result | `FAILED — 2 ABSENT-PATH REFERENCES` |
+| Protocol or artifact impact | `NONE` |
+| Outcome files created | `NONE` |
+| Linter weakening | `NONE` |
+| Correction | `ABSENT INPUTS REWORDED AS DESCRIPTIVE TEXT` |
+| Corrected documentation lint | `PASSED` |
+| Corrected claims lint | `PASSED — MCC v1.10.0` |
+| Corrected diff validation | `PASSED` |
+| Final state | `INTEGRATED / CURRENT-MAIN VERIFIED / FROZEN / CLOSED` |
+
