@@ -775,3 +775,23 @@ KAP cross-check recommended before claiming any result.
 | Diff validation | `PASSED` |
 | Corrected final state | `MERGED / ACTUAL POST-MERGE VERIFIED / CLOSED` |
 
+### R3-PREREG-01 current-main integration closure (2026-08-03; append-only)
+
+| State item | Status |
+|---|---|
+| Integration commit | `68d2681a64a917cfb87a0e30f7e03c3b61b406b1` |
+| Integration relationship | `ANCESTOR OF CURRENT MAIN` |
+| Approved task files | `7 / 7 BYTE-IDENTICAL` |
+| Frozen ranking SHA-256 | `a8a8c39cb8956b13c388d6d0be83470678a1b5c2395476d87d849b05b5b5518f` |
+| Freeze manifest SHA-256 | `6a96408c55789646ce8f5b66fa8be243ac6ac8a2292e1783ecb60c88b87f54ea` |
+| Freeze-once current-main result | `EXPECTED REFUSAL — freeze_git_sha_drift` |
+| Frozen artifacts after refusal | `UNCHANGED` |
+| 2026 outcome files | `ABSENT` |
+| Evaluator state | `outcome_data_absent / metric_computed=false` |
+| Frozen cohort | `40` |
+| Usable outcome cohort | `0` |
+| Focused PREREG + registry tests | `86 PASSED / 0 FAILED` |
+| Documentation lint | `PASSED` |
+| Claims lint | `PASSED — MCC v1.10.0` |
+| Final state | `INTEGRATED / CURRENT-MAIN VERIFIED / FROZEN / CLOSED` |
+
