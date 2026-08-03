@@ -856,3 +856,14 @@ KAP cross-check recommended before claiming any result.
 | Remaining limitation | `DIRECT CONCENTRATION UNIT ORACLE ABSENT — NON-BLOCKING` |
 | Final state | `INTEGRATED / REVIEW APPROVED / DETERMINISTIC / CLOSED` |
 
+## R3-NULL-01 — CLOSED (2026-08-04)
+
+- **Task:** Negative-control / placebo laboratory.
+- **Implementation commit:** `bcb5664e322033fbf966866fde6c931c08716cd5`.
+- **Reviewed current-main HEAD:** `c78690d03a5c3b46710d7bc19aa92841ef819933`; implementation commit is an ancestor and first-parent ancestor of the reviewed HEAD.
+- **Independent review:** Fable 5, high effort, single agent — **PASS WITH NON-BLOCKING NOTES**; `CLOSURE_RECOMMENDATION: READY_FOR_APPEND_ONLY_GOVERNANCE_CLOSURE`.
+- **Verification:** focused suite **44 passed**; authoritative root suite **1464 passed, 27 warnings**; claims lint passed; docs lint passed; independent discrete-permutation/Bonferroni oracle reported `mismatch_count=0`; two disposable regeneration runs under `PYTHONHASHSEED=0` and `PYTHONHASHSEED=1` were byte-identical to the committed JSON and Markdown reports; all **981 protected tracked files** remained byte-identical.
+- **Evidence integrity:** authoritative read-only V3 evidence bundle `r3-null-01-final-review-bundle-v3.V5Lecb` verified **38/38** SHA256 manifest entries with payload/manifest count parity during independent review.
+- **Bounded statistical result:** **0/25** family-wise placebo rejections; `alpha × R = 1.25` is an upper reference under conservative Bonferroni control; the exact two-sided 95% zero-event Clopper-Pearson upper bound is `0.1371851715`. This remains a low-resolution negative-control smoke test and does not certify exact calibration or precisely estimate the Type-I error rate.
+- **Closure disposition:** no implementation, statistical, reproducibility, isolation, claim-safety, integration, or evidence-integrity blocker remains for the bounded R3-NULL-01 repository task. No code, test, generated-report, Makefile, or artifact-registry change is required for closure.
+- **What CLOSED means here:** only the authorized repository task and its internal verification obligations are complete. Nothing establishes alpha, a market signal, predictive validity, reliable predictive edge, profitability, investment value, tradability, production validity, or deployment validity. This AI repository review is not qualified-human statistical approval, external validation, or independent human attestation.
