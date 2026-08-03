@@ -810,3 +810,25 @@ KAP cross-check recommended before claiming any result.
 | Corrected diff validation | `PASSED` |
 | Final state | `INTEGRATED / CURRENT-MAIN VERIFIED / FROZEN / CLOSED` |
 
+### R3-STAT-02 current-main review closure (2026-08-03; append-only)
+
+| State item | Status |
+|---|---|
+| Implementation commit | `2e834b85a393135bbe25b0bc782c0fc59b75851c` |
+| Reviewed current-main HEAD | `d7f151dbcaf85c840c792779511bb714fa396a5f` |
+| Integration relationship | `IMPLEMENTATION IS ANCESTOR OF MAIN` |
+| Historical awaiting-commit status | `STALE — SUPERSEDED APPEND-ONLY` |
+| Independent current-main review | `APPROVED` |
+| Task-owned files | `5 / 5 BYTE-IDENTICAL` |
+| Rank design | `WITHIN-YEAR / WITHIN-MODEL ONLY` |
+| Raw cross-model score comparison | `NONE` |
+| Retraining or production mutation | `NONE` |
+| Deterministic regeneration | `COMMITTED = RUN 1 = RUN 2` |
+| Protected scientific artifacts | `BYTE-IDENTICAL` |
+| Focused tests | `27 PASSED / 0 FAILED` |
+| Complete root suite | `927 PASSED / 0 FAILED` |
+| Documentation lint | `PASSED` |
+| Claims lint | `PASSED — MCC v1.10.0` |
+| Remaining limitation | `MINOR NON-BLOCKING TEST-COVERAGE GAP` |
+| Final state | `INTEGRATED / REVIEW APPROVED / DETERMINISTIC / CLOSED` |
+

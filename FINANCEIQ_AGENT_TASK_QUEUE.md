@@ -438,6 +438,19 @@ Planning provenance: candidate analysis, adversarial-review dispositions, depend
 - **Failure modes / misleading success:** comparing y_pred magnitudes across models (the documented scale trap); reading "models agree" as robustness (the verbatim sentence is the guard). **Rollback:** delete new files + Makefile hunk. **Stop:** dumps missing/columns differ from spec.
 - **Commit scope:** module + outputs + test + Makefile. **Theme:** "Add model disagreement atlas". Manual commit: yes. **/clear:** yes.
 
+- **R3-STAT-02 current-main review closure (2026-08-03; append-only):** implementation commit `2e834b85a393135bbe25b0bc782c0fc59b75851c` is already an ancestor of reviewed `main` HEAD `d7f151dbcaf85c840c792779511bb714fa396a5f`. The historical `DONE (awaiting owner commit)` status is stale and is superseded by this closure; its substantive task description remains historical evidence.
+
+- **Independent review result (2026-08-03; append-only):** fresh read-only current-main review returned `APPROVED`. All five task-owned blobs remain byte-identical to the integration commit: `experiments/disagreement_atlas.py`, the three generated artifacts under `experiments/results_disagreement/`, and `tests/test_disagreement_atlas.py`. The current Makefile target and exact artifact-registry ownership entries remain intact.
+
+- **Scientific and claim-safety verification (2026-08-03; append-only):** the implementation uses only within-year, within-model ranks; never compares raw prediction magnitudes across models; produces complete per-year 9×9 Spearman matrices and per-ticker-year spread/IQR evidence; performs no retraining, service mutation, significance test, or production-ranking change; and preserves explicit insufficient-data states. Independent recomputation matched selected matrix and spread/IQR values. The mandatory instability-only claim-safety sentence remains exact in both committed reports.
+
+- **Reproducibility and preservation (2026-08-03; append-only):** two disposable-clone regenerations through `make research-disagreement` were byte-identical to the committed three-output set and left the tracked tree clean. The canonical leaderboard, significance evidence, prediction dumps, Model Confidence Contract, and modeling dataset remained byte-identical.
+
+- **Validation (2026-08-03; append-only):** focused disagreement-atlas and artifact-registry tests passed `27/27`; the complete root suite passed `927/927`; documentation lint passed; claims lint passed under MCC `v1.10.0`; and `git diff --check` passed. The absence of a dedicated unit assertion for canonical-artifact non-mutation remains a minor non-blocking test-coverage limitation because the property was independently verified during regeneration and is structurally constrained by the generator.
+
+- **Final state (2026-08-03; append-only):** `INTEGRATED / INDEPENDENT_CURRENT_MAIN_REVIEW_APPROVED / DETERMINISTIC / CLAIM_SAFE / R3_STAT_02_CLOSED`.
+
+
 ### R3-INF-01 — Influence diagnostics (leave-one-out IC influence)
 - **Priority:** P2. **Wave:** 3B. **Owner role:** Research. **Risk:** low-medium. **Model/effort:** **Terra, medium.** Review: Opus low.
 - **Verified current state:** dumps permit exact leave-one-out recomputation of within-year Spearman per model; extreme TRY-era observations are a documented concern; no influence measurement exists (`coverage_impact.csv` measures feature coverage, not observation influence).
