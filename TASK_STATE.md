@@ -867,3 +867,17 @@ KAP cross-check recommended before claiming any result.
 - **Bounded statistical result:** **0/25** family-wise placebo rejections; `alpha × R = 1.25` is an upper reference under conservative Bonferroni control; the exact two-sided 95% zero-event Clopper-Pearson upper bound is `0.1371851715`. This remains a low-resolution negative-control smoke test and does not certify exact calibration or precisely estimate the Type-I error rate.
 - **Closure disposition:** no implementation, statistical, reproducibility, isolation, claim-safety, integration, or evidence-integrity blocker remains for the bounded R3-NULL-01 repository task. No code, test, generated-report, Makefile, or artifact-registry change is required for closure.
 - **What CLOSED means here:** only the authorized repository task and its internal verification obligations are complete. Nothing establishes alpha, a market signal, predictive validity, reliable predictive edge, profitability, investment value, tradability, production validity, or deployment validity. This AI repository review is not qualified-human statistical approval, external validation, or independent human attestation.
+
+## R3-SPIKE-01 — CLOSED (2026-08-04)
+
+- **Task:** Point-in-time BIST 100 universe-history sourcing spike.
+- **Implementation commit:** `926a055f8714675f4ca12c3e37b586b2660adbd0`.
+- **Authorized output:** `docs/UNIVERSE_HISTORY_SOURCING_SPIKE.md` only.
+- **Memo verdict:** `FEASIBLE_WITH_DOCUMENTED_GAPS`.
+- **Independent review:** Fable 5, low effort, single agent — **APPROVED** after one bounded Internet Archive citation correction.
+- **Verification:** exact one-file boundary; `git diff --check` passed; docs lint passed; claims lint passed under Model Confidence Contract v1.10.0.
+- **Evidence finding:** free first-party, effective-dated scheduled BIST 100 change-event evidence exists, but no required historical period reaches `CONFIRMED`; no complete historical constituent snapshot or complete extraordinary-change stream was established.
+- **Repository interpretation:** the current FinanceIQ public and training cohorts remain retrospective and are not made point-in-time valid by this memo.
+- **Closure disposition:** the authorized memo-only spike is complete. No dataset, source archive, scraper, parser, configuration, model, pipeline, backend, frontend, test, generated artifact, or current result was changed.
+- **Next-step boundary:** the memo recommends a separately authorized `R3-SPIKE-01a` evidence-completion spike before any historical collection or reconstruction task. This closure does not itself authorize that successor work.
+- **Claim boundary:** the memo does not establish predictive edge, alpha, profitability, investment value, tradability, future performance, or point-in-time validity of existing FinanceIQ results.
