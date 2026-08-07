@@ -15,7 +15,8 @@
     "experiments/results_serving_eval",
     "experiments/results_forward_2026",
     "experiments/results_missingness",
-    "data/trusted_clean"
+    "data/trusted_clean",
+    "data/provenance"
   ],
   "coverage_rule": "Every file under a governed root, excluding experiments/results/runs/**, must be matched by exactly one entry below. An unmatched file (orphan) or a file matched by more than one entry (duplicate ownership) is a governance failure enforced by tests/test_artifact_registry.py.",
   "coverage_exclusions": [
@@ -881,6 +882,54 @@
       "inputs": [],
       "hand_edit_forbidden": false,
       "notes": "OWNER DECISION SURFACED: hand-authored, dated investigation report (2026-06-10, 'Superseded' status), committed manually. No generator script writes it (verified: no writer in scripts/ or experiments/; git history is manual edits). Classified human_document rather than assigned a guessed generator. It resides inside a generated-output tree; the owner may relocate it (for example under docs/) to keep the governed roots exclusively generated."
+    },
+    {
+      "path_or_glob": "data/provenance/cell_provenance_public_2020_2025.csv",
+      "artifact_class": "generated",
+      "generator_command": "make cell-provenance",
+      "inputs": [
+        "scripts/data_collection/build_cell_provenance.py",
+        "data/trusted_clean/modeling_dataset_public_2020_2025.csv",
+        "data/trusted_clean/feature_passports.json",
+        "data/trusted_clean/company_year_returns.csv",
+        "data/trusted_raw/financials/corrected_yearly_financials_candidate.csv",
+        "data/trusted_raw/financials/candidate_from_yearly_snapshots.csv",
+        "data/trusted_raw/financials/corrected_balance_sheet_2024.csv",
+        "data/trusted_raw/financials/free_valuation_history_candidate.csv",
+        "data/trusted_raw/prices/yahoo_year_end_prices.csv",
+        "data/trusted_raw/bist100_benchmark_returns.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Per-cell provenance record store (passports v2, R4-PROV-01) written by scripts/data_collection/build_cell_provenance.py. One row per (ticker, year, column) cell of the public modeling dataset, carrying value state, source class, evidence level, source coordinates, transform id, intra-dataset lineage, and a closed-vocabulary resolution note. Records lineage only: it states where a value was copied or computed from and how strong that evidence is, and certifies neither source accuracy, point-in-time validity, data-rights clearance, nor predictive value. Created beside passports v1, which is unchanged."
+    },
+    {
+      "path_or_glob": "data/provenance/cell_provenance_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make cell-provenance",
+      "inputs": [
+        "scripts/data_collection/build_cell_provenance.py",
+        "data/trusted_clean/modeling_dataset_public_2020_2025.csv",
+        "data/trusted_clean/feature_passports.json",
+        "data/trusted_clean/company_year_returns.csv",
+        "data/trusted_raw/financials/corrected_yearly_financials_candidate.csv",
+        "data/trusted_raw/financials/candidate_from_yearly_snapshots.csv",
+        "data/trusted_raw/financials/corrected_balance_sheet_2024.csv",
+        "data/trusted_raw/financials/free_valuation_history_candidate.csv",
+        "data/trusted_raw/prices/yahoo_year_end_prices.csv",
+        "data/trusted_raw/bist100_benchmark_returns.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Schema, closed vocabularies, transform definitions, source priority, exact aggregate counts, the complete enumerated unknown-cell list, and the embedded source_artifacts checksums for the per-cell provenance record store. Carries caveats and a disclaimer rather than a top-level limitations list, matching the passports-v1 convention. Lineage record only; asserts no point-in-time, accuracy, rights, or predictive property."
+    },
+    {
+      "path_or_glob": "data/provenance/cell_provenance_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make cell-provenance",
+      "inputs": [
+        "data/provenance/cell_provenance_report.json"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Human-readable companion to cell_provenance_report.json, rendered by scripts/data_collection/build_cell_provenance.py (render_markdown) from the same computed in-memory payload. Repeats the coverage, evidence-level, source-class, transform, and unknown-cell tables plus the disclaimer verbatim, and shows the query examples for filtering the record store."
     }
   ]
 }

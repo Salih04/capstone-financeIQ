@@ -1,0 +1,443 @@
+{
+  "artifact_role": "per-cell lineage record (passports v2), beside and independent of passports v1",
+  "caveats": [
+    "cell_verified means the dataset value equals a specific upstream value under the recorded equality rule; it does not mean the upstream value is correct.",
+    "column_asserted records inherit passports-v1 column-level provenance because no upstream file carries the field at cell granularity; they are strictly weaker than cell_verified and were never upgraded by inference.",
+    "unknown records are reported, never repaired: no dataset value was changed, no tolerance was widened, and no nearest candidate was substituted.",
+    "Null cells are recorded as preserved nulls. The pipeline never imputes; for null cells source_class names the column's declared source family rather than a verified attribution, and evidence_level plus resolution_note carry the honesty.",
+    "Lineage depth is bounded at the nearest upstream artifact at which a value was verified, plus intra-dataset upstream_cells. No deeper materialized evidence exists in this repository, and none was invented.",
+    "Scope is exactly the 240-row x 61-column public modeling dataset. The full and training datasets, external markets, and experiment outputs are out of scope.",
+    "The manual-shares component of the upstream valuation inputs is not attributed at cell level by this artifact; valuation cells are recorded against the valuation candidate file they were verified against."
+  ],
+  "cell_key_format": "{ticker}|{year}|{column}",
+  "counts_by_column_evidence_level": {
+    "benchmark_same_year_return_pct": {
+      "cell_verified": 226,
+      "column_asserted": 14
+    },
+    "company_name": {
+      "column_asserted": 240
+    },
+    "current_assets": {
+      "cell_verified": 240
+    },
+    "current_ratio": {
+      "cell_verified": 240
+    },
+    "ebitda": {
+      "cell_verified": 240
+    },
+    "ebitda_growth_pct": {
+      "column_asserted": 240
+    },
+    "ebitda_margin": {
+      "cell_verified": 240
+    },
+    "enterprise_value": {
+      "cell_verified": 226,
+      "column_asserted": 14
+    },
+    "equity": {
+      "cell_verified": 240
+    },
+    "ev_ebitda": {
+      "cell_verified": 210,
+      "column_asserted": 30
+    },
+    "financial_debt_ratio": {
+      "cell_verified": 200,
+      "unknown": 40
+    },
+    "gross_margin": {
+      "cell_verified": 240
+    },
+    "gross_profit": {
+      "cell_verified": 240
+    },
+    "gross_profit_growth_pct": {
+      "column_asserted": 240
+    },
+    "has_target": {
+      "derived_chain": 240
+    },
+    "indices": {
+      "column_asserted": 240
+    },
+    "is_bist100": {
+      "column_asserted": 240
+    },
+    "is_inference_row": {
+      "derived_chain": 240
+    },
+    "is_public_universe": {
+      "column_asserted": 240
+    },
+    "is_training_universe": {
+      "column_asserted": 240
+    },
+    "leverage_ratio": {
+      "cell_verified": 240
+    },
+    "long_term_liabilities": {
+      "cell_verified": 240
+    },
+    "market_cap": {
+      "cell_verified": 226,
+      "column_asserted": 14
+    },
+    "net_debt": {
+      "cell_verified": 240
+    },
+    "net_debt_to_ebitda": {
+      "cell_verified": 240
+    },
+    "net_income": {
+      "cell_verified": 240
+    },
+    "net_income_growth_pct": {
+      "column_asserted": 240
+    },
+    "net_margin": {
+      "cell_verified": 240
+    },
+    "next_year_bist100_return_pct": {
+      "derived_chain": 240
+    },
+    "next_year_excess_return_vs_bist100": {
+      "derived_chain": 240
+    },
+    "next_year_outperform_bist100": {
+      "derived_chain": 240
+    },
+    "next_year_rank_by_return": {
+      "cell_verified": 200,
+      "column_asserted": 40
+    },
+    "next_year_return_pct": {
+      "cell_verified": 200,
+      "column_asserted": 40
+    },
+    "next_year_return_percentile": {
+      "cell_verified": 200,
+      "column_asserted": 40
+    },
+    "next_year_top_10pct_returner": {
+      "cell_verified": 200,
+      "column_asserted": 40
+    },
+    "next_year_top_20pct_returner": {
+      "cell_verified": 200,
+      "column_asserted": 40
+    },
+    "non_current_assets": {
+      "cell_verified": 240
+    },
+    "operating_income": {
+      "cell_verified": 239,
+      "unknown": 1
+    },
+    "operating_income_growth_pct": {
+      "column_asserted": 240
+    },
+    "pb_ratio": {
+      "cell_verified": 226,
+      "column_asserted": 14
+    },
+    "pe_ratio": {
+      "cell_verified": 185,
+      "column_asserted": 55
+    },
+    "price_adjclose_t": {
+      "cell_verified": 226,
+      "column_asserted": 14
+    },
+    "price_data_available": {
+      "derived_chain": 240
+    },
+    "price_drawdown_from_3y_high_pct": {
+      "derived_chain": 240
+    },
+    "price_history_years_available": {
+      "derived_chain": 240
+    },
+    "price_momentum_1y_pct": {
+      "derived_chain": 240
+    },
+    "price_momentum_2y_pct": {
+      "derived_chain": 240
+    },
+    "price_vs_bist100_1y_pct": {
+      "derived_chain": 240
+    },
+    "revenue": {
+      "cell_verified": 240
+    },
+    "revenue_growth_pct": {
+      "column_asserted": 240
+    },
+    "roa": {
+      "cell_verified": 240
+    },
+    "roe": {
+      "cell_verified": 239,
+      "unknown": 1
+    },
+    "same_year_return_pct": {
+      "cell_verified": 240
+    },
+    "sector": {
+      "column_asserted": 240
+    },
+    "short_term_liabilities": {
+      "cell_verified": 240
+    },
+    "target_year": {
+      "cell_verified": 240
+    },
+    "ticker": {
+      "column_asserted": 240
+    },
+    "total_assets": {
+      "cell_verified": 240
+    },
+    "universe_source": {
+      "column_asserted": 240
+    },
+    "working_capital": {
+      "cell_verified": 240
+    },
+    "year": {
+      "column_asserted": 240
+    }
+  },
+  "counts_by_evidence_level": {
+    "cell_verified": 8243,
+    "column_asserted": 3715,
+    "derived_chain": 2640,
+    "unknown": 42
+  },
+  "counts_by_resolution_note": {
+    "": 8243,
+    "column_asserted_no_cell_source": 3120,
+    "derived_from_dataset_cells": 2277,
+    "null_preserved": 958,
+    "value_unparseable": 42
+  },
+  "counts_by_source_artifact": {
+    "": 6397,
+    "data/trusted_clean/company_year_returns.csv": 1480,
+    "data/trusted_raw/bist100_benchmark_returns.csv": 226,
+    "data/trusted_raw/financials/candidate_from_yearly_snapshots.csv": 2406,
+    "data/trusted_raw/financials/corrected_balance_sheet_2024.csv": 434,
+    "data/trusted_raw/financials/corrected_yearly_financials_candidate.csv": 2398,
+    "data/trusted_raw/financials/free_valuation_history_candidate.csv": 1073,
+    "data/trusted_raw/prices/yahoo_year_end_prices.csv": 226
+  },
+  "counts_by_source_class": {
+    "corrected_balance_2024": 434,
+    "corrected_yearly_csv": 2398,
+    "derived": 5520,
+    "metadata": 2160,
+    "unknown": 42,
+    "vendor_xlsx": 3606,
+    "yahoo_fetch": 480
+  },
+  "counts_by_transform_id": {
+    "T_COPY": 5496,
+    "T_METADATA": 1920,
+    "T_NULL_PRESERVED": 958,
+    "T_OVERRIDE_2024": 434,
+    "T_PRICE_WINDOW": 1197,
+    "T_RANK_WITHIN_YEAR": 800,
+    "T_RATIO": 3153,
+    "T_SHIFT_T1": 640,
+    "T_UNRESOLVED": 42
+  },
+  "counts_by_value_state": {
+    "null": 958,
+    "present": 13682
+  },
+  "dataset": "data/trusted_clean/modeling_dataset_public_2020_2025.csv",
+  "disclaimer": "Lineage record only. This artifact states where each dataset value was copied or computed from and how strong that evidence is. It certifies nothing about point-in-time correctness, data-rights clearance, source accuracy, completeness, predictive validity, causal validity, statistical significance, or investment usefulness, and it is not investment advice. The project's walk-forward finding (no reliable predictive edge) is unchanged by this artifact.",
+  "evidence_level_definitions": {
+    "cell_verified": "The dataset value was compared against a specific (source_artifact, source_field, ticker, year) upstream value and matched under the recorded value-equality rule. Strongest available evidence.",
+    "column_asserted": "No cell-level upstream source file carries this field; provenance is inherited from the passports-v1 column assertion. Weaker than cell_verified and labelled as such.",
+    "derived_chain": "The value is a deterministic function of the named upstream_cells of this same dataset. Provenance is the chain, not a copied source value.",
+    "unknown": "No source could be verified and no chain asserted. Always carries a resolution_note."
+  },
+  "lineage_scope": "source_artifact records the nearest upstream artifact at which the value was verified; upstream_cells records intra-dataset dependencies only. No deeper lineage is materialized anywhere in this repository and none was invented.",
+  "multi_candidate_cells": [],
+  "multi_candidate_count": 0,
+  "provenance_schema_version": "2.0.0",
+  "record_ordering": "Records are sorted by (ticker, year, dataset column index) ascending, where the column index is the positional index of the column in the dataset header, not its lexicographic rank.",
+  "record_schema": [
+    "cell_id",
+    "ticker",
+    "year",
+    "column",
+    "value_state",
+    "source_class",
+    "evidence_level",
+    "source_artifact",
+    "source_field",
+    "source_effective_year",
+    "source_retrieved_at",
+    "transform_id",
+    "upstream_cells",
+    "resolution_note"
+  ],
+  "records_csv": "data/provenance/cell_provenance_public_2020_2025.csv",
+  "resolution_note_definitions": {
+    "column_asserted_no_cell_source": "No upstream file carries this field at cell granularity.",
+    "derived_from_dataset_cells": "Value is computed from the named upstream_cells.",
+    "multi_candidate_priority_applied": "More than one candidate source verified the value; the frozen source priority chose one.",
+    "no_upstream_row": "The candidate upstream file(s) have no row at this (ticker, year).",
+    "null_preserved": "Cell is null; no value was ever filled.",
+    "value_mismatch_all_candidates": "Upstream row(s) exist but no candidate value matched under the value-equality rule.",
+    "value_unparseable": "The dataset or upstream value could not be parsed for comparison (includes empty upstream fields)."
+  },
+  "source_artifacts": [
+    {
+      "path": "scripts/data_collection/build_cell_provenance.py",
+      "sha256": "51053f267f0c9a1e5b1186f8f6ad73e72bab5c6ef59a1230bd12ee06a118b5f7"
+    },
+    {
+      "path": "data/trusted_clean/modeling_dataset_public_2020_2025.csv",
+      "sha256": "891d662f110518508b1474be032e5f4b2274d5c2328f16f56240b4a312914b44"
+    },
+    {
+      "path": "data/trusted_clean/feature_passports.json",
+      "sha256": "c1ba7c65ad33f926a2c43e857354143820f54d3506a0f378825af312626c574b"
+    },
+    {
+      "path": "data/trusted_clean/company_year_returns.csv",
+      "sha256": "048af7100db6ddceab5e93a21e6e44968de3ca4044e96c96a4c493b069e5bd7b"
+    },
+    {
+      "path": "data/trusted_raw/financials/corrected_yearly_financials_candidate.csv",
+      "sha256": "c3996eb1d528b2222d0d936584929d7fedaa6e23b1f5e1ff0cdb92ec687b342c"
+    },
+    {
+      "path": "data/trusted_raw/financials/candidate_from_yearly_snapshots.csv",
+      "sha256": "304ca2dd46e8b1108897d485aa7377f4d24adb6fcf5bbe3bffce78c47b98eebd"
+    },
+    {
+      "path": "data/trusted_raw/financials/corrected_balance_sheet_2024.csv",
+      "sha256": "ddbf692c00de98bed93395b2636d6bf1f123f74953cf30c20c62028fd3770a39"
+    },
+    {
+      "path": "data/trusted_raw/financials/free_valuation_history_candidate.csv",
+      "sha256": "e7f6422ee0435b3bbf12ffe3b5d81563165bebcc3bef43040fb795ab9f663a60"
+    },
+    {
+      "path": "data/trusted_raw/prices/yahoo_year_end_prices.csv",
+      "sha256": "225a5e48ed185ae11ad9f9f14ce25a5dc997e635c7c41ecb056973e0144e86b0"
+    },
+    {
+      "path": "data/trusted_raw/bist100_benchmark_returns.csv",
+      "sha256": "ccfa2bbc5a654245b39ff97dc535f59c31c08c9b9216f93dfb84c2df2a323a6b"
+    }
+  ],
+  "source_class_definitions": {
+    "corrected_balance_2024": "Reviewed 2024 balance-sheet override input (new in provenance schema 2.0.0; not part of passports v1).",
+    "corrected_yearly_csv": "Reviewed corrected yearly financials candidate lineage.",
+    "derived": "Computed inside the pipeline from other recorded inputs or dataset cells.",
+    "manual_shares": "Manually curated shares-outstanding lineage (v1 vocabulary value; not attributed at cell level by this artifact).",
+    "metadata": "Identifier, cohort, or row-state assignment.",
+    "unknown": "No upstream source could be verified and no chain could be asserted.",
+    "vendor_xlsx": "Vendor yearly-snapshot workbook lineage (candidate_from_yearly_snapshots.csv family).",
+    "yahoo_fetch": "Cached Yahoo year-end price / benchmark lineage."
+  },
+  "source_priority": [
+    {
+      "columns": [
+        "total_assets",
+        "current_assets",
+        "non_current_assets",
+        "short_term_liabilities",
+        "long_term_liabilities",
+        "working_capital",
+        "net_debt",
+        "current_ratio",
+        "leverage_ratio",
+        "financial_debt_ratio",
+        "net_debt_to_ebitda",
+        "equity"
+      ],
+      "note": "The reviewed 2024 balance-sheet override outranks the vendor snapshot at year 2024.",
+      "order": [
+        "data/trusted_raw/financials/corrected_balance_sheet_2024.csv (year 2024 only)",
+        "data/trusted_raw/financials/candidate_from_yearly_snapshots.csv"
+      ]
+    }
+  ],
+  "task": "R4-PROV-01",
+  "totals": {
+    "cells": 14640,
+    "columns": 61,
+    "rows": 240,
+    "value_null": 958,
+    "value_present": 13682
+  },
+  "transform_definitions": {
+    "T_COPY": "Value copied unchanged from source_artifact.source_field at the same (ticker, year).",
+    "T_METADATA": "Identifier, cohort, or row-state metadata assignment.",
+    "T_NULL_PRESERVED": "The cell is null and was never filled; the pipeline's no-imputation contract is the provenance.",
+    "T_OVERRIDE_2024": "Value taken from the reviewed 2024 balance-sheet override in preference to the vendor snapshot.",
+    "T_PRICE_WINDOW": "Price momentum, drawdown, or history count computed over a T-bounded price window.",
+    "T_RANK_WITHIN_YEAR": "Rank, percentile, or flag computed within the target year.",
+    "T_RATIO": "Deterministic arithmetic on named upstream cells (valuation ratios, margins, excess return).",
+    "T_SHIFT_T1": "Outcome from year T+1 shifted back onto feature year T.",
+    "T_UNRESOLVED": "No transformation could be established."
+  },
+  "unknown_cells": [
+    "AEFES|2024|financial_debt_ratio",
+    "ARCLK|2024|financial_debt_ratio",
+    "ASELS|2024|financial_debt_ratio",
+    "ASTOR|2024|financial_debt_ratio",
+    "BIMAS|2024|financial_debt_ratio",
+    "BRSAN|2024|financial_debt_ratio",
+    "BTCIM|2024|financial_debt_ratio",
+    "CANTE|2024|financial_debt_ratio",
+    "CCOLA|2024|financial_debt_ratio",
+    "CIMSA|2024|financial_debt_ratio",
+    "DOAS|2024|financial_debt_ratio",
+    "DSTKF|2024|financial_debt_ratio",
+    "ENKAI|2024|financial_debt_ratio",
+    "EREGL|2024|financial_debt_ratio",
+    "FROTO|2024|financial_debt_ratio",
+    "GUBRF|2024|financial_debt_ratio",
+    "HEKTS|2024|financial_debt_ratio",
+    "KONTR|2024|financial_debt_ratio",
+    "KRDMD|2024|financial_debt_ratio",
+    "KUYAS|2024|financial_debt_ratio",
+    "MAVI|2024|financial_debt_ratio",
+    "MGROS|2020|roe",
+    "MGROS|2024|financial_debt_ratio",
+    "MIATK|2024|financial_debt_ratio",
+    "OYAKC|2024|financial_debt_ratio",
+    "PASEU|2024|financial_debt_ratio",
+    "PETKM|2024|financial_debt_ratio",
+    "PGSUS|2024|financial_debt_ratio",
+    "SASA|2024|financial_debt_ratio",
+    "SISE|2024|financial_debt_ratio",
+    "TAVHL|2024|financial_debt_ratio",
+    "TCELL|2024|financial_debt_ratio",
+    "THYAO|2024|financial_debt_ratio",
+    "TOASO|2024|financial_debt_ratio",
+    "TRALT|2024|financial_debt_ratio",
+    "TRALT|2024|operating_income",
+    "TRMET|2024|financial_debt_ratio",
+    "TSKB|2024|financial_debt_ratio",
+    "TTKOM|2024|financial_debt_ratio",
+    "TUPRS|2024|financial_debt_ratio",
+    "TURSG|2024|financial_debt_ratio",
+    "ULKER|2024|financial_debt_ratio"
+  ],
+  "unknown_count": 42,
+  "value_equality_rule": "Numeric columns match when abs(a - b) <= 1e-9 * max(1.0, abs(a)); non-numeric columns match on exact string equality of the verbatim CSV text. A parse failure is never a match.",
+  "value_state_vocabulary": [
+    "present",
+    "null"
+  ]
+}
