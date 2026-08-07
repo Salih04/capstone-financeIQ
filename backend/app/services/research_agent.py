@@ -13,16 +13,21 @@ Components are always returned separately and never hidden.
 
 from __future__ import annotations
 
+import copy
 import json
 import os
 import re
+import unicodedata
 import urllib.request
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 import pandas as pd
 
 from app.core.paths import resolve_repo_root
+from app.services import citations, skeptic_service
+from app.services.research import calibration as calibration_service
+from app.services.research import significance as significance_service
 
 REPO_ROOT = resolve_repo_root()
 CLEAN = REPO_ROOT / "data" / "trusted_clean"
@@ -1291,9 +1296,9 @@ def classify_intent(question: str) -> str:
                             "shares outstanding", "shares", "free float", "free-float", "fiili", "dolas",
                             "issued capital", "paid-in", "paid in capital", "fill shares")):
         return "valuation"
-    if any(k in q for k in ("why", "weak", "signal", "reliable", "edge", "backtest", "diagnostic",
+    if re.search(r"\bic\b", q) or any(k in q for k in ("why", "weak", "signal", "reliable", "edge", "backtest", "diagnostic",
                             "walk-forward", "walk forward", "spearman", "information coefficient",
-                            " ic ", " ic?", "ic ", "fold", "baseline", "out-of-sample", "out of sample",
+                            "fold", "baseline", "out-of-sample", "out of sample",
                             "model validation", "predictive performance", "predictive power")):
         return "diagnostics"
     if any(k in q for k in ("accept", "reject", "feature", "column", "frozen", "valuation",
@@ -1336,16 +1341,343 @@ def _known_tickers(state: dict) -> set[str]:
 
 
 def _extract_tickers(question: str, state: dict) -> list[str]:
-    """Tickers named in the question, validated against the universe. Ordered, deduped."""
+    """Extract known tickers plus raw Skeptic candidates, ordered and deduped.
+
+    Known-ticker extraction remains the compatibility path for company and
+    legacy intents.  Skeptic query candidates use the service's full syntax
+    contract and are intentionally not filtered through the current registry;
+    the Skeptic service owns whether evidence exists for an unknown candidate.
+    """
     known = _known_tickers(state)
-    if not known:
-        return []
     out: list[str] = []
     for tok in re.findall(r"[A-Za-z]{3,6}", question or ""):
         up = tok.upper()
         if up in known and up not in out:
             out.append(up)
+
+    # Query-side Skeptic candidates must honor the same syntax accepted by
+    # skeptic_service.  Keep raw uppercase syntax here so ordinary lowercase
+    # prose cannot become a ticker candidate merely through normalization.
+    skeptic_spans = [
+        match.span()
+        for match in re.finditer(
+            r"\b(?:skeptic|skeptical)(?:\s+report)?\b",
+            question or "",
+            flags=re.IGNORECASE,
+        )
+    ]
+    if skeptic_spans:
+        for match in re.finditer(
+            r"(?<![A-Za-z0-9.])[A-Z0-9.]{1,16}(?![A-Za-z0-9.])",
+            question or "",
+        ):
+            if any(
+                start <= match.start() and match.end() <= end
+                for start, end in skeptic_spans
+            ):
+                continue
+            up = match.group().upper()
+            if up not in out:
+                out.append(up)
     return out
+
+
+# --------------------------------------------------------------------------- #
+# R3-AGENT-01 grounded artifact routing and citation mechanics
+# --------------------------------------------------------------------------- #
+_SIGNIFICANCE_SOURCE = "experiments/results/significance_report.json"
+_SKEPTIC_SERVICE_SOURCE = "backend/app/services/skeptic_service.py"
+_CALIBRATION_SOURCE = "experiments/results/calibration_report.json"
+_FRICTION_SOURCE = "experiments/results/friction_report.json"
+_FRICTION_MARKDOWN_SOURCE = "experiments/results/friction_report.md"
+_FRICTION_MARKDOWN_LOCATOR = "# Friction sensitivity report (R2-FRICTION-01)"
+_TICKER_CONTRACT = re.compile(r"[A-Z0-9.]{1,16}")
+_NEW_GROUNDED_INTENTS = frozenset(
+    {"significance_headline", "skeptic_report", "calibration_finding", "friction_stamp"}
+)
+_LEGACY_NON_GENERAL_INTENTS = frozenset(
+    {
+        "benchmark_outperformers",
+        "benchmark_status",
+        "top_ranked",
+        "diagnostics",
+        "data_quality",
+        "valuation",
+    }
+)
+
+
+def _assert_citable_source(relative: str) -> None:
+    """Require a contained, non-symlinked repository source before citation use."""
+    citations.assert_repo_relative(relative)
+    root = citations.REPO_ROOT.resolve()
+    current = root
+    for part in PurePosixPath(relative).parts:
+        current /= part
+        if current.is_symlink():
+            raise citations.CitationError(f"source is symlinked: {relative}")
+    citations.repo_path(relative)
+
+
+class _AskCitationRegistry:
+    """Small public-response registry matching the memo citation object contract."""
+
+    def __init__(self) -> None:
+        self._citations: list[dict[str, Any]] = []
+        self._by_key: dict[tuple[Any, ...], str] = {}
+        self._sha_cache: dict[str, str] = {}
+
+    def _sha(self, relative: str) -> str:
+        if relative not in self._sha_cache:
+            _assert_citable_source(relative)
+            self._sha_cache[relative] = citations.sha256_of(relative)
+        return self._sha_cache[relative]
+
+    def _register(self, key: tuple[Any, ...], builder) -> str:
+        existing = self._by_key.get(key)
+        if existing is not None:
+            return existing
+        citation_id = f"C{len(self._citations) + 1:03d}"
+        self._citations.append(builder(citation_id))
+        self._by_key[key] = citation_id
+        return citation_id
+
+    def json_field(
+        self,
+        *,
+        family: str,
+        relative: str,
+        field_path: str,
+        value: Any,
+        derivation: str = "identity",
+    ) -> str:
+        if derivation not in {"identity", "count"}:
+            raise citations.CitationError(f"unsupported citation derivation: {derivation}")
+        _assert_citable_source(relative)
+        citations.verify_json_field(relative, field_path, value)
+        if derivation == "count" and type(value) is not list:
+            raise citations.CitationError("count citations require a list value")
+        key = ("json_field", relative, field_path, derivation)
+        return self._register(
+            key,
+            lambda citation_id: {
+                "citation_id": citation_id,
+                "citation_kind": "json_field",
+                "evidence_family": family,
+                "source_artifact": relative,
+                "sha256": self._sha(relative),
+                "scope": field_path,
+                "field_path": field_path,
+                "value": copy.deepcopy(value),
+                "derivation": derivation,
+                "locator": None,
+                "quoted_text": None,
+                "label": field_path,
+            },
+        )
+
+    def text_span(
+        self,
+        *,
+        family: str,
+        relative: str,
+        locator: str,
+        quoted_text: str,
+    ) -> str:
+        _assert_citable_source(relative)
+        citations.verify_text_span(relative, locator, quoted_text)
+        key = ("text_span", relative, locator, quoted_text)
+        return self._register(
+            key,
+            lambda citation_id: {
+                "citation_id": citation_id,
+                "citation_kind": "text_span",
+                "evidence_family": family,
+                "source_artifact": relative,
+                "sha256": self._sha(relative),
+                "scope": locator,
+                "field_path": None,
+                "value": None,
+                "derivation": "exact_quotation",
+                "locator": locator,
+                "quoted_text": quoted_text,
+                "label": locator,
+            },
+        )
+
+    def service_evidence(self, *, report: dict[str, Any], field_path: str, value: Any) -> str:
+        _assert_citable_source(_SKEPTIC_SERVICE_SOURCE)
+        actual = citations.resolve_field(report, field_path, source=_SKEPTIC_SERVICE_SOURCE)
+        if actual != value or type(actual) is not type(value):
+            raise citations.CitationError(
+                f"service evidence does not match at {field_path}"
+            )
+        key = ("service_evidence", _SKEPTIC_SERVICE_SOURCE, field_path)
+        return self._register(
+            key,
+            lambda citation_id: {
+                "citation_id": citation_id,
+                "citation_kind": "service_evidence",
+                "evidence_family": "skeptic",
+                "source_artifact": _SKEPTIC_SERVICE_SOURCE,
+                "sha256": self._sha(_SKEPTIC_SERVICE_SOURCE),
+                "scope": field_path,
+                "field_path": field_path,
+                "value": copy.deepcopy(value),
+                "derivation": "identity",
+                "locator": None,
+                "quoted_text": None,
+                "label": field_path,
+            },
+        )
+
+    def emitted(self) -> list[dict[str, Any]]:
+        return copy.deepcopy(self._citations)
+
+
+def _normalized_question(question: str) -> str:
+    normalized = unicodedata.normalize("NFKC", question or "").casefold()
+    return " ".join(
+        "".join(char if char.isalnum() else " " for char in normalized).split()
+    )
+
+
+def _normalized_tokens(question: str) -> list[str]:
+    normalized = _normalized_question(question)
+    return normalized.split() if normalized else []
+
+
+def _has_phrase(tokens: list[str], *phrase: str) -> bool:
+    size = len(phrase)
+    return any(tokens[index : index + size] == list(phrase) for index in range(len(tokens)))
+
+
+def _has_any_token(tokens: list[str], values: set[str]) -> bool:
+    return any(token in values for token in tokens)
+
+
+def _significance_match(tokens: list[str]) -> bool:
+    if "serving" in tokens:
+        return False
+    if _has_phrase(tokens, "raw", "and", "adjusted", "p", "value") or _has_phrase(
+        tokens, "raw", "and", "adjusted", "p", "values"
+    ):
+        return True
+    context = _has_any_token(
+        tokens,
+        {
+            "significance",
+            "statistical",
+            "multiplicity",
+            "bonferroni",
+            "fwer",
+            "permutation",
+            "p",
+            "value",
+            "values",
+        },
+    )
+    if not context:
+        return False
+    if _has_phrase(tokens, "significance", "headline"):
+        return True
+    if _has_phrase(tokens, "multiple", "testing", "significance"):
+        return True
+    if "corrected" in tokens and "significance" in tokens and _has_any_token(
+        tokens, {"result", "finding", "headline", "p", "value", "values"}
+    ):
+        return True
+    return "significance" in tokens and _has_any_token(
+        tokens, {"headline", "result", "finding", "multiplicity", "bonferroni", "fwer"}
+    )
+
+
+def _significance_contaminated(tokens: list[str]) -> bool:
+    return "serving" in tokens and _has_any_token(
+        tokens,
+        {
+            "significance",
+            "statistical",
+            "multiplicity",
+            "bonferroni",
+            "fwer",
+            "permutation",
+            "p",
+            "value",
+            "values",
+        },
+    )
+
+
+def _calibration_match(tokens: list[str]) -> bool:
+    context = _has_any_token(tokens, {"calibration", "calibrated", "confidence"})
+    if not context:
+        return False
+    return _has_any_token(tokens, {"finding", "result", "constant", "validated"}) or _has_phrase(
+        tokens, "not", "estimable"
+    ) or _has_phrase(tokens, "validated", "confidence")
+
+
+def _friction_match(tokens: list[str]) -> bool:
+    context = "friction" in tokens or (
+        "cost" in tokens
+        and _has_any_token(tokens, {"sensitivity", "stamp", "assumption", "illustration", "implementability", "implementable"})
+    )
+    if not context:
+        return False
+    return _has_any_token(
+        tokens,
+        {"sensitivity", "stamp", "assumption", "illustration", "implementability", "implementable"},
+    )
+
+
+def _valid_ticker_value(value: str | None) -> str | None:
+    if value is None:
+        return None
+    normalized = unicodedata.normalize("NFKC", str(value)).strip().upper()
+    return normalized if _TICKER_CONTRACT.fullmatch(normalized) else None
+
+
+def _resolve_skeptic_ticker(
+    body_ticker: str | None, query_tickers: list[str]
+) -> str | None:
+    body_present = body_ticker is not None
+    body = _valid_ticker_value(body_ticker)
+    if body_present and body is None:
+        return None
+    if len(query_tickers) > 1:
+        return None
+    query = query_tickers[0] if query_tickers else None
+    if body and query and body != query:
+        return None
+    return body or query
+
+
+def _select_new_grounded_intent(
+    question: str, body_ticker: str | None, query_tickers: list[str]
+) -> tuple[str | None, str | None]:
+    """Apply the one post-legacy deterministic new-family decision table."""
+    tokens = _normalized_tokens(question)
+    if _significance_contaminated(tokens):
+        return None, None
+
+    skeptic_semantics = _has_any_token(tokens, {"skeptic", "skeptical"})
+    skeptic_ticker = _resolve_skeptic_ticker(body_ticker, query_tickers)
+    if skeptic_semantics and skeptic_ticker is None:
+        return None, None
+
+    matches: list[tuple[str, str | None]] = []
+    if _significance_match(tokens):
+        matches.append(("significance_headline", None))
+    if skeptic_semantics:
+        matches.append(("skeptic_report", skeptic_ticker))
+    if _calibration_match(tokens):
+        matches.append(("calibration_finding", None))
+    if _friction_match(tokens):
+        matches.append(("friction_stamp", None))
+    if len(matches) != 1:
+        return None, None
+    return matches[0]
 
 
 def company_performance_payload(ticker: str, year: int | None, state: dict) -> dict:
@@ -1588,15 +1920,658 @@ def _intent_answer(intent: str, question: str, state: dict, ticker: str | None) 
     return None
 
 
+def _ask_mapping(value: Any, label: str) -> dict[str, Any]:
+    if type(value) is not dict:
+        raise ValueError(f"{label} must be an object")
+    return value
+
+
+def _ask_string(value: Any, label: str) -> str:
+    if type(value) is not str or not value.strip():
+        raise ValueError(f"{label} must be a non-empty string")
+    return value
+
+
+def _ask_boolean(value: Any, label: str) -> bool:
+    if type(value) is not bool:
+        raise ValueError(f"{label} must be a boolean")
+    return value
+
+
+def _ask_nonnegative_integer(value: Any, label: str) -> int:
+    if type(value) is not int or value < 0:
+        raise ValueError(f"{label} must be a non-negative integer")
+    return value
+
+
+def _ask_positive_integer(value: Any, label: str) -> int:
+    result = _ask_nonnegative_integer(value, label)
+    if result <= 0:
+        raise ValueError(f"{label} must be positive")
+    return result
+
+
+def _ask_string_list(value: Any, label: str, *, allow_empty: bool = False) -> list[str]:
+    if type(value) is not list or (not allow_empty and not value):
+        raise ValueError(f"{label} must be a string list")
+    if any(type(item) is not str or not item for item in value):
+        raise ValueError(f"{label} contains a non-string item")
+    return list(value)
+
+
+def _bounded_calibration_evidence() -> dict[str, Any]:
+    """Select only producer-validated calibration fields for the ask response."""
+    source = calibration_service.payload()
+    if type(source) is not dict or source.get("source_artifact") != _CALIBRATION_SOURCE:
+        raise ValueError("calibration source binding is invalid")
+
+    panel_copy = _ask_string(source.get("panel_copy"), "calibration.panel_copy")
+    if panel_copy != calibration_service.PANEL_COPY:
+        raise ValueError("calibration panel copy is not producer-owned")
+    calibration = _ask_mapping(source.get("calibration"), "calibration")
+    monotonicity = _ask_mapping(calibration.get("monotonicity"), "calibration.monotonicity")
+    confidence_quantity = _ask_mapping(source.get("confidence_quantity"), "confidence_quantity")
+    sample = _ask_mapping(source.get("sample"), "sample")
+    replay = _ask_mapping(source.get("replay_provenance"), "replay_provenance")
+    claim_safety = _ask_mapping(source.get("claim_safety"), "claim_safety")
+
+    status = _ask_string(calibration.get("status"), "calibration.status")
+    verdict = _ask_string(calibration.get("verdict"), "calibration.verdict")
+    monotonicity_status = _ask_string(monotonicity.get("status"), "calibration.monotonicity.status")
+    monotonicity_reason = _ask_string(monotonicity.get("reason"), "calibration.monotonicity.reason")
+    confidence_values = calibration.get("confidence_values")
+    if type(confidence_values) is not list or any(
+        type(value) not in (int, float) or isinstance(value, bool) for value in confidence_values
+    ):
+        raise ValueError("calibration.confidence_values has an invalid type")
+    unique_values = _ask_nonnegative_integer(
+        calibration.get("confidence_unique_values"), "calibration.confidence_unique_values"
+    )
+    confidence_score = confidence_quantity.get("confidence_score")
+    if type(confidence_score) not in (int, float) or isinstance(confidence_score, bool):
+        raise ValueError("confidence_quantity.confidence_score has an invalid type")
+    if confidence_score != calibration_service._EXPECTED_CONSTANT_CONFIDENCE:
+        raise ValueError("calibration confidence score is inconsistent")
+    if status != calibration_service._EXPECTED_NOT_ESTIMABLE or monotonicity_status != calibration_service._EXPECTED_NOT_ESTIMABLE:
+        raise ValueError("calibration is not in the governed not-estimable state")
+    if verdict != calibration_service._EXPECTED_VERDICT:
+        raise ValueError("calibration verdict is not producer-owned")
+    if unique_values != calibration_service._EXPECTED_UNIQUE_CONFIDENCE_VALUES:
+        raise ValueError("calibration confidence uniqueness is inconsistent")
+    if confidence_values != [calibration_service._EXPECTED_CONSTANT_CONFIDENCE]:
+        raise ValueError("calibration confidence values are inconsistent")
+
+    quantity = _ask_string(confidence_quantity.get("quantity"), "confidence_quantity.quantity")
+    scope = _ask_string(confidence_quantity.get("scope"), "confidence_quantity.scope")
+    confidence_level = _ask_string(
+        confidence_quantity.get("confidence_level"), "confidence_quantity.confidence_level"
+    )
+    confidence_reasons = _ask_string_list(
+        confidence_quantity.get("confidence_reasons"), "confidence_quantity.confidence_reasons"
+    )
+    hybrid_weight = confidence_quantity.get("hybrid_weight")
+    if type(hybrid_weight) not in (int, float) or isinstance(hybrid_weight, bool):
+        raise ValueError("confidence_quantity.hybrid_weight has an invalid type")
+    if quantity != calibration_service._EXPECTED_CONFIDENCE_QUANTITY:
+        raise ValueError("calibration confidence quantity is inconsistent")
+
+    outcomes = _ask_positive_integer(
+        sample.get("independent_ticker_year_outcomes"), "sample.independent_ticker_year_outcomes"
+    )
+    if outcomes != calibration_service._EXPECTED_AUDITED_OUTCOMES:
+        raise ValueError("calibration audited outcome count is inconsistent")
+    models = _ask_positive_integer(sample.get("models"), "sample.models")
+    prediction_rows = _ask_positive_integer(
+        sample.get("prediction_model_rows"), "sample.prediction_model_rows"
+    )
+    rows_per_model_year = sample.get("rows_per_model_year")
+    if type(rows_per_model_year) is not list or any(
+        type(value) is not int or value <= 0 for value in rows_per_model_year
+    ):
+        raise ValueError("sample.rows_per_model_year has an invalid type")
+    target_years = sample.get("target_years")
+    if type(target_years) is not list or any(type(value) is not int for value in target_years):
+        raise ValueError("sample.target_years has an invalid type")
+    universe = _ask_string(sample.get("universe"), "sample.universe")
+
+    git_sha = _ask_string(replay.get("git_sha"), "replay_provenance.git_sha")
+    dirty = _ask_boolean(replay.get("git_worktree_dirty"), "replay_provenance.git_worktree_dirty")
+    replay_date = _ask_string(replay.get("replay_date"), "replay_provenance.replay_date")
+    random_seed = _ask_nonnegative_integer(replay.get("random_seed"), "replay_provenance.random_seed")
+
+    required_claim_flags = (
+        "confidence_is_probability_of_return_profit_or_success",
+        "confidence_is_recommendation_strength",
+        "core_ranking_or_model_computation_changed",
+        "validated_predictive_reliability_established",
+    )
+    bounded_claim_safety: dict[str, Any] = {}
+    for key in required_claim_flags:
+        if _ask_boolean(claim_safety.get(key), f"claim_safety.{key}") is not False:
+            raise ValueError(f"calibration claim-safety flag is inconsistent: {key}")
+        bounded_claim_safety[key] = False
+    contract_conclusion = _ask_string(
+        claim_safety.get("contract_conclusion"), "claim_safety.contract_conclusion"
+    )
+    contract_version = _ask_string(claim_safety.get("contract_version"), "claim_safety.contract_version")
+    statement = _ask_string(claim_safety.get("statement"), "claim_safety.statement")
+    if contract_conclusion != calibration_service._EXPECTED_CONTRACT_CONCLUSION:
+        raise ValueError("calibration contract conclusion is inconsistent")
+    if statement != calibration_service._EXPECTED_CLAIM_SAFETY_STATEMENT:
+        raise ValueError("calibration claim-safety statement is not producer-owned")
+    bounded_claim_safety.update(
+        {
+            "contract_conclusion": contract_conclusion,
+            "contract_version": contract_version,
+            "statement": statement,
+        }
+    )
+
+    limitations = _ask_string_list(source.get("limitations"), "calibration.limitations")
+    bounded = {
+        "panel_copy": panel_copy,
+        "calibration": {
+            "status": status,
+            "verdict": verdict,
+            "confidence_unique_values": unique_values,
+            "confidence_values": list(confidence_values),
+            "monotonicity": {
+                "status": monotonicity_status,
+                "reason": monotonicity_reason,
+            },
+        },
+        "confidence_quantity": {
+            "quantity": quantity,
+            "scope": scope,
+            "confidence_score": confidence_score,
+            "confidence_level": confidence_level,
+            "confidence_reasons": list(confidence_reasons),
+            "hybrid_weight": hybrid_weight,
+        },
+        "sample": {
+            "independent_ticker_year_outcomes": outcomes,
+            "models": models,
+            "prediction_model_rows": prediction_rows,
+            "rows_per_model_year": list(rows_per_model_year),
+            "target_years": list(target_years),
+            "universe": universe,
+        },
+        "replay_provenance": {
+            "git_sha": git_sha,
+            "git_worktree_dirty": dirty,
+            "replay_date": replay_date,
+            "random_seed": random_seed,
+        },
+        "claim_safety": bounded_claim_safety,
+        "limitations": list(limitations),
+    }
+    bounded["answer"] = " ".join((panel_copy, verdict, statement))
+    return bounded
+
+
+def _bounded_skeptic_report(ticker: str) -> dict[str, Any]:
+    """Return the existing Skeptic service report without interpretation."""
+    report = skeptic_service.skeptic_report(ticker)
+    if type(report) is not dict or set(report) != {"ticker", "checks", "footer"}:
+        raise ValueError("skeptic report has an unsupported shape")
+    if report.get("ticker") != ticker:
+        raise ValueError("skeptic report ticker does not match the request")
+    if report.get("footer") != skeptic_service.FOOTER:
+        raise ValueError("skeptic footer is not producer-owned")
+    checks = report.get("checks")
+    expected_check_ids = (
+        "staleness_frozen_probe",
+        "missingness_attack",
+        "instability_probe",
+        "cohort_integrity_challenge",
+        "universe_scale_reminder",
+        "backtest_reminder",
+    )
+    if type(checks) is not list or len(checks) != len(expected_check_ids):
+        raise ValueError("skeptic check count is inconsistent")
+    bounded_checks: list[dict[str, Any]] = []
+    for check, expected_id in zip(checks, expected_check_ids):
+        if type(check) is not dict or set(check) != {"check_id", "verdict", "evidence", "severity"}:
+            raise ValueError("skeptic check has an unsupported shape")
+        if check.get("check_id") != expected_id:
+            raise ValueError("skeptic check order is inconsistent")
+        check_id = _ask_string(check.get("check_id"), "skeptic.check_id")
+        verdict = _ask_string(check.get("verdict"), "skeptic.verdict")
+        severity = _ask_string(check.get("severity"), "skeptic.severity")
+        evidence = check.get("evidence")
+        if type(evidence) is not list or not evidence:
+            raise ValueError("skeptic evidence is empty")
+        bounded_evidence: list[dict[str, str]] = []
+        for item in evidence:
+            if type(item) is not dict or set(item) != {"fact", "source_file"}:
+                raise ValueError("skeptic evidence has an unsupported shape")
+            bounded_evidence.append(
+                {
+                    "fact": _ask_string(item.get("fact"), "skeptic.evidence.fact"),
+                    "source_file": _ask_string(item.get("source_file"), "skeptic.evidence.source_file"),
+                }
+            )
+        bounded_checks.append(
+            {
+                "check_id": check_id,
+                "verdict": verdict,
+                "evidence": bounded_evidence,
+                "severity": severity,
+            }
+        )
+    return {
+        "ticker": ticker,
+        "checks": bounded_checks,
+        "footer": _ask_string(report.get("footer"), "skeptic.footer"),
+    }
+
+
+def _cite_json_paths(
+    registry: _AskCitationRegistry,
+    *,
+    family: str,
+    relative: str,
+    evidence: dict[str, Any],
+    paths: list[str],
+) -> None:
+    for field_path in paths:
+        value = citations.resolve_field(evidence, field_path, source=relative)
+        registry.json_field(
+            family=family,
+            relative=relative,
+            field_path=field_path,
+            value=value,
+        )
+
+
+def _significance_citations(
+    registry: _AskCitationRegistry, evidence: dict[str, Any]
+) -> None:
+    paths = [
+        "headline.model",
+        "headline.observed_ic",
+        "headline.permutation_p_value_two_sided",
+        "headline.bonferroni_adjusted_p_value",
+        "headline.significant_fwer_0_05",
+        "headline.conclusion",
+        "headline.selection",
+        "analysis.multiplicity.family",
+        "analysis.multiplicity.family_size",
+        "analysis.multiplicity.family_wise_alpha",
+        "analysis.multiplicity.method",
+        "analysis.evaluated_tickers_per_model_split",
+        "analysis.permutation",
+        "analysis.bootstrap",
+        "analysis.statistic",
+        "analysis.seed",
+    ]
+    for optional in ("headline.bootstrap_ci_95", "headline.observed_null_percentile"):
+        try:
+            citations.resolve_field(evidence, optional, source=_SIGNIFICANCE_SOURCE)
+        except citations.CitationError:
+            continue
+        paths.append(optional)
+    if "limitations" in evidence:
+        paths.append("limitations")
+    _cite_json_paths(
+        registry,
+        family="significance",
+        relative=_SIGNIFICANCE_SOURCE,
+        evidence=evidence,
+        paths=paths,
+    )
+
+
+def _calibration_citations(
+    registry: _AskCitationRegistry, evidence: dict[str, Any]
+) -> None:
+    paths = [
+        "calibration.status",
+        "calibration.verdict",
+        "calibration.confidence_unique_values",
+        "calibration.confidence_values",
+        "calibration.monotonicity.status",
+        "calibration.monotonicity.reason",
+        "confidence_quantity.quantity",
+        "confidence_quantity.scope",
+        "confidence_quantity.confidence_score",
+        "confidence_quantity.confidence_level",
+        "confidence_quantity.confidence_reasons",
+        "confidence_quantity.hybrid_weight",
+        "sample.independent_ticker_year_outcomes",
+        "sample.models",
+        "sample.prediction_model_rows",
+        "sample.rows_per_model_year",
+        "sample.target_years",
+        "sample.universe",
+        "replay_provenance.git_sha",
+        "replay_provenance.git_worktree_dirty",
+        "replay_provenance.replay_date",
+        "replay_provenance.random_seed",
+        "claim_safety.confidence_is_probability_of_return_profit_or_success",
+        "claim_safety.confidence_is_recommendation_strength",
+        "claim_safety.core_ranking_or_model_computation_changed",
+        "claim_safety.validated_predictive_reliability_established",
+        "claim_safety.contract_conclusion",
+        "claim_safety.contract_version",
+        "claim_safety.statement",
+        "limitations",
+    ]
+    _cite_json_paths(
+        registry,
+        family="calibration",
+        relative=_CALIBRATION_SOURCE,
+        evidence=evidence,
+        paths=paths,
+    )
+
+
+def _friction_citations(
+    registry: _AskCitationRegistry, evidence: dict[str, Any]
+) -> None:
+    paths = [
+        "task",
+        "chart_stamp",
+        "limitations[0]",
+        "claim_safety.bid_ask_spread_or_market_impact_inferred",
+        "claim_safety.core_model_or_ranking_computation_changed",
+        "claim_safety.descriptive_sensitivity_only",
+        "claim_safety.implementable_returns_established",
+        "claim_safety.investment_value_established",
+        "claim_safety.liquidity_or_tradeability_estimated",
+        "claim_safety.reliable_predictive_edge_established",
+    ]
+    _cite_json_paths(
+        registry,
+        family="friction",
+        relative=_FRICTION_SOURCE,
+        evidence=evidence,
+        paths=paths,
+    )
+    registry.text_span(
+        family="friction",
+        relative=_FRICTION_MARKDOWN_SOURCE,
+        locator=_FRICTION_MARKDOWN_LOCATOR,
+        quoted_text=evidence["chart_stamp"],
+    )
+
+
+def _skeptic_citations(
+    registry: _AskCitationRegistry, report: dict[str, Any]
+) -> None:
+    registry.service_evidence(report=report, field_path="ticker", value=report["ticker"])
+    for index, check in enumerate(report["checks"]):
+        prefix = f"checks[{index}]"
+        for field in ("check_id", "verdict", "severity"):
+            registry.service_evidence(
+                report=report,
+                field_path=f"{prefix}.{field}",
+                value=check[field],
+            )
+        for evidence_index, item in enumerate(check["evidence"]):
+            evidence_prefix = f"{prefix}.evidence[{evidence_index}]"
+            for field in ("fact", "source_file"):
+                registry.service_evidence(
+                    report=report,
+                    field_path=f"{evidence_prefix}.{field}",
+                    value=item[field],
+                )
+    registry.service_evidence(report=report, field_path="footer", value=report["footer"])
+
+
+def _grounded_success_response(
+    *,
+    intent: str,
+    question: str,
+    ticker: str | None,
+    tickers: list[str],
+    state: dict,
+    cfg: dict,
+    answer: str,
+    evidence: dict[str, Any],
+    registry: _AskCitationRegistry,
+    data_used: dict[str, Any],
+    limitations: list[str],
+) -> dict[str, Any]:
+    del question, state
+    return {
+        "answer": answer,
+        "grounded_answer": answer,
+        "intent": intent,
+        "visualization": {"type": "general_answer"},
+        "tickers_detected": list(tickers) if tickers else ([ticker] if ticker else []),
+        "mode": "fallback",
+        "llm_used": False,
+        "model": None,
+        "data_used": data_used,
+        "llm_result": None,
+        "context_used_summary": ["grounded_evidence"],
+        "warnings": [],
+        "limitations": list(limitations),
+        "provider_used": cfg["provider"],
+        "fallback_used": True,
+        "llm_error": None,
+        "diagnostics": provider_diagnostics(cfg, cfg["provider"], True, None),
+        "disclaimer": NOT_ADVICE,
+        "grounded_evidence": copy.deepcopy(evidence),
+        "citations": registry.emitted(),
+    }
+
+
+def _grounded_failure_response(
+    *,
+    intent: str,
+    tickers: list[str],
+    state: dict,
+    cfg: dict,
+    error: Exception,
+) -> dict[str, Any]:
+    """Use the existing deterministic normal-question fallback without an LLM."""
+    context: dict[str, Any] = {}
+    try:
+        context = {
+            "summary": build_summary_context(state),
+            "diagnostics": build_model_diagnostics_context(state),
+            "corrected_yearly_status": get_corrected_yearly_status(state),
+        }
+        summary = _general_summary(context["summary"])
+    except Exception:
+        summary = ""
+    try:
+        warnings = _company_warnings(state)
+    except Exception:
+        warnings = []
+    try:
+        limitations = _limitations(warnings)
+    except Exception:
+        limitations = []
+    llm_result = _coerce_llm_result(
+        {
+            "llm_research_score": None,
+            "llm_confidence": "low",
+            "summary": summary,
+            "reasoning": "Generated from validated project reports (AI assistant not used for this answer).",
+            "warnings": warnings,
+            "limitations": limitations,
+        }
+    )
+    return {
+        "answer": _human_answer(llm_result),
+        "grounded_answer": None,
+        "intent": intent,
+        "visualization": {"type": "general_answer"},
+        "tickers_detected": list(tickers),
+        "mode": "fallback",
+        "llm_used": False,
+        "model": None,
+        "data_used": {"source": "none", "year": None, "rows_used": 0, "fields_used": []},
+        "llm_result": llm_result,
+        "context_used_summary": sorted(context.keys()),
+        "warnings": warnings,
+        "limitations": limitations,
+        "provider_used": cfg["provider"],
+        "fallback_used": True,
+        "llm_error": f"grounded evidence unavailable: {type(error).__name__}",
+        "diagnostics": provider_diagnostics(
+            cfg, cfg["provider"], True, f"grounded evidence unavailable: {type(error).__name__}"
+        ),
+        "disclaimer": NOT_ADVICE,
+        "grounded_evidence": None,
+        "citations": [],
+    }
+
+
+def _dispatch_new_grounded_intent(
+    *,
+    intent: str,
+    question: str,
+    ticker: str | None,
+    tickers: list[str],
+    state: dict,
+    cfg: dict,
+) -> dict[str, Any]:
+    try:
+        registry = _AskCitationRegistry()
+        if intent == "significance_headline":
+            evidence = significance_service.significance_headline_payload()
+            _significance_citations(registry, evidence)
+            return _grounded_success_response(
+                intent=intent,
+                question=question,
+                ticker=ticker,
+                tickers=tickers,
+                state=state,
+                cfg=cfg,
+                answer=evidence["answer"],
+                evidence=evidence,
+                registry=registry,
+                data_used={
+                    "source": _SIGNIFICANCE_SOURCE,
+                    "year": None,
+                    "rows_used": 0,
+                    "fields_used": [
+                        "headline.model",
+                        "headline.permutation_p_value_two_sided",
+                        "headline.bonferroni_adjusted_p_value",
+                        "analysis.multiplicity.family",
+                    ],
+                },
+                limitations=evidence.get("limitations", []),
+            )
+        if intent == "skeptic_report":
+            if not ticker:
+                raise ValueError("skeptic report requires one ticker")
+            evidence = _bounded_skeptic_report(ticker)
+            _skeptic_citations(registry, evidence)
+            answer = evidence["footer"]
+            for check in evidence["checks"]:
+                if check["verdict"] == "insufficient_data":
+                    answer = check["evidence"][0]["fact"]
+                    break
+            return _grounded_success_response(
+                intent=intent,
+                question=question,
+                ticker=ticker,
+                tickers=tickers,
+                state=state,
+                cfg=cfg,
+                answer=answer,
+                evidence=evidence,
+                registry=registry,
+                data_used={
+                    "source": _SKEPTIC_SERVICE_SOURCE,
+                    "year": None,
+                    "rows_used": len(evidence["checks"]),
+                    "fields_used": ["ticker", "checks", "footer"],
+                },
+                limitations=[],
+            )
+        if intent == "calibration_finding":
+            evidence = _bounded_calibration_evidence()
+            _calibration_citations(registry, evidence)
+            return _grounded_success_response(
+                intent=intent,
+                question=question,
+                ticker=ticker,
+                tickers=tickers,
+                state=state,
+                cfg=cfg,
+                answer=evidence["answer"],
+                evidence=evidence,
+                registry=registry,
+                data_used={
+                    "source": _CALIBRATION_SOURCE,
+                    "year": None,
+                    "rows_used": evidence["sample"]["independent_ticker_year_outcomes"],
+                    "fields_used": [
+                        "panel_copy",
+                        "calibration.verdict",
+                        "confidence_quantity.confidence_score",
+                        "sample.independent_ticker_year_outcomes",
+                        "claim_safety.statement",
+                    ],
+                },
+                limitations=evidence["limitations"],
+            )
+        if intent == "friction_stamp":
+            evidence = significance_service.friction_stamp_payload()
+            _friction_citations(registry, evidence)
+            return _grounded_success_response(
+                intent=intent,
+                question=question,
+                ticker=ticker,
+                tickers=tickers,
+                state=state,
+                cfg=cfg,
+                answer=evidence["answer"],
+                evidence=evidence,
+                registry=registry,
+                data_used={
+                    "source": _FRICTION_SOURCE,
+                    "year": None,
+                    "rows_used": 0,
+                    "fields_used": ["task", "chart_stamp", "limitations[0]", "claim_safety"],
+                },
+                limitations=evidence["limitations"],
+            )
+        raise ValueError("unsupported grounded intent")
+    except Exception as exc:
+        return _grounded_failure_response(
+            intent=intent,
+            tickers=tickers,
+            state=state,
+            cfg=cfg,
+            error=exc,
+        )
+
+
 def answer_research_question(question: str, ticker: str | None = None,
                             max_context_tokens: int | None = None, state: dict | None = None) -> dict:
     state = state or load_research_state()
     cfg = get_config()
     intent = classify_intent(question)
     tickers = _extract_tickers(question, state)
+    body_ticker = ticker
     if not ticker and tickers:
         ticker = tickers[0]
     ql = (question or "").lower()
+    # Legacy classification remains first. New families are considered only
+    # after the live classifier returns general, and the complete Skeptic
+    # match is selected before the existing general -> company promotion.
+    if intent == "general":
+        new_intent, new_ticker = _select_new_grounded_intent(question, body_ticker, tickers)
+        if new_intent is not None:
+            grounded_tickers = list(tickers)
+            if new_ticker and new_ticker not in grounded_tickers:
+                grounded_tickers.append(new_ticker)
+            return _dispatch_new_grounded_intent(
+                intent=new_intent,
+                question=question,
+                ticker=new_ticker or ticker,
+                tickers=grounded_tickers,
+                state=state,
+                cfg=cfg,
+            )
     # A named company with no ranking ask → answer about THAT company, not the
     # generic ranking. (Don't override an explicit ranking/valuation/etc. ask.)
     if intent == "general" and ticker and not any(k in ql for k in _RANKING_KEYWORDS):

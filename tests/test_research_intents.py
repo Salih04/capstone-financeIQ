@@ -129,3 +129,107 @@ def test_diagnostics_has_business_interpretation(state):
     diag = RA.build_model_diagnostics_context(state)
     assert "17" in diag["interpretation_business"]
     assert diag["weak_backtest"] is True
+
+
+@pytest.mark.parametrize(
+    ("question", "expected"),
+    [
+        ("Which stocks beat BIST100?", "benchmark_outperformers"),
+        ("Is the benchmark available?", "benchmark_status"),
+        ("Which stocks are ranked highest?", "top_ranked"),
+        ("Why is the model signal weak?", "diagnostics"),
+        ("Which columns were rejected?", "data_quality"),
+        ("Is the IC near zero?", "diagnostics"),
+        ("IC by fold?", "diagnostics"),
+        ("What about the model's IC?", "diagnostics"),
+        ("What is the information coefficient?", "diagnostics"),
+        ("skeptic report for THYAO", "general"),
+        ("Is the strategy systematic here?", "general"),
+        ("skeptic report for THYAO backtest", "diagnostics"),
+        ("skeptic report", "general"),
+    ],
+)
+def test_r3_agent_01_exact_frozen_regressions(question, expected):
+    assert RA.classify_intent(question) == expected
+
+
+def test_r3_agent_01_clean_skeptic_routes_before_company(state):
+    response = RA.answer_research_question("skeptic report for THYAO", state=state)
+    assert response["intent"] == "skeptic_report"
+    assert response["grounded_evidence"]["ticker"] == "THYAO"
+    assert response["answer"] == response["grounded_answer"]
+    assert response["citations"]
+
+
+def test_r3_agent_01_skeptic_diagnostics_precedence(state):
+    response = RA.answer_research_question(
+        "skeptic report for THYAO backtest", state=state
+    )
+    assert response["intent"] == "diagnostics"
+    assert response.get("grounded_evidence") is None
+
+
+def test_r3_agent_01_tickerless_skeptic_keeps_fallback(state):
+    response = RA.answer_research_question("skeptic report", state=state)
+    assert response["intent"] == "general"
+    assert response.get("grounded_evidence") is None
+    assert response.get("citations", []) == []
+
+
+@pytest.mark.parametrize(
+    ("question", "expected"),
+    [
+        ("significance headline", "significance_headline"),
+        ("RAW and adjusted p-value", "significance_headline"),
+        ("multiple-testing significance", "significance_headline"),
+        ("what is the corrected significance result", "significance_headline"),
+        ("calibration finding", "calibration_finding"),
+        ("constant confidence calibration", "calibration_finding"),
+        ("friction sensitivity stamp", "friction_stamp"),
+        ("cost assumption illustration", "friction_stamp"),
+    ],
+)
+def test_r3_agent_01_new_intent_matching(question, expected):
+    assert RA._select_new_grounded_intent(question, None, []) == (expected, None)
+
+
+def test_r3_agent_01_new_intent_collisions_and_legacy_first():
+    assert RA._select_new_grounded_intent("serving significance headline", None, []) == (None, None)
+    assert RA._select_new_grounded_intent("calibration finding and friction stamp", None, []) == (None, None)
+    assert RA._select_new_grounded_intent("skeptic report for THYAO", None, ["THYAO"]) == (
+        "skeptic_report",
+        "THYAO",
+    )
+
+
+@pytest.mark.parametrize("ticker", ["ZZZZ", "A1B2", "XYZ.DE"])
+def test_r3_agent_01_skeptic_query_accepts_full_ticker_contract(state, ticker):
+    response = RA.answer_research_question(
+        f"skeptic report for {ticker}", state=state
+    )
+    assert response["intent"] == "skeptic_report"
+    assert response["grounded_evidence"]["ticker"] == ticker
+
+
+def test_r3_agent_01_skeptic_query_rejects_multiple_candidates_and_disagreement(state):
+    multiple = RA.answer_research_question(
+        "skeptic report for THYAO and ZZZZ", state=state
+    )
+    assert multiple["intent"] != "skeptic_report"
+    assert multiple.get("grounded_evidence") is None
+
+    disagreement = RA.answer_research_question(
+        "skeptic report for ZZZZ", ticker="THYAO", state=state
+    )
+    assert disagreement["intent"] != "skeptic_report"
+    assert disagreement.get("grounded_evidence") is None
+
+
+def test_r3_agent_01_ticker_like_syntax_does_not_route_unrelated_wording_to_skeptic(state):
+    response = RA.answer_research_question("Tell me about ZZZZ", state=state)
+    assert response["intent"] != "skeptic_report"
+
+
+def test_r3_agent_01_generic_known_ticker_keeps_company_behavior(state):
+    response = RA.answer_research_question("Tell me about THYAO", state=state)
+    assert response["intent"] == "company"
