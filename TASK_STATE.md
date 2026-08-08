@@ -881,3 +881,30 @@ KAP cross-check recommended before claiming any result.
 - **Closure disposition:** the authorized memo-only spike is complete. No dataset, source archive, scraper, parser, configuration, model, pipeline, backend, frontend, test, generated artifact, or current result was changed.
 - **Next-step boundary:** the memo recommends a separately authorized `R3-SPIKE-01a` evidence-completion spike before any historical collection or reconstruction task. This closure does not itself authorize that successor work.
 - **Claim boundary:** the memo does not establish predictive edge, alpha, profitability, investment value, tradability, future performance, or point-in-time validity of existing FinanceIQ results.
+
+## R3-AGENT-01 current-main closure (2026-08-08; append-only)
+
+| State item | Status |
+|---|---|
+| Implementation commit | `17c3e87d93d774951e405d2f6419e773d2fed228` — ancestor of current `main` `82efd199457541631fd1448107979799465d2a3c` |
+| Independent implementation rereview | `R3_AGENT_01_FINAL_IMPLEMENTATION_REVIEW: APPROVED`; binding-audit SHA-256 `7691d33016adffcde506b76e7476f379ce98f79171dedd4d48037764f4089f02` |
+| Grounded intents | `4` deterministic additions; `5` canonical intents preserved; compatibility and fail-closed ticker contracts preserved |
+| MCC / scientific boundary | `v1.10.0`; no MCC scan change, scientific artifact change, frontend change, predictive-edge, alpha, profitability, investment-value, external-validation, or production-validation claim |
+| Verification | Frozen routing `13/13`; focused intents `44 passed`; grounded/API `31 passed`; current-main root `1027/1027`; backend `552/552`; claims lint, docs lint, `git diff --check` passed |
+| Remaining follow-up | Authenticated E2E implementation remains separate, incomplete, and unauthorized by this closure; Phase 3E not complete |
+| Scientific conclusion | No reliable predictive edge has been established |
+| Final state | `INTEGRATED / INDEPENDENT_REVIEW_APPROVED / CURRENT_MAIN_VERIFIED / R3_AGENT_01_CLOSED` |
+
+## R4-PROV-01 current-main closure (2026-08-08; append-only)
+
+| State item | Status |
+|---|---|
+| Implementation and integration | Reviewed old-base commit `80a96f2db2c9863607a989e2586e8f2c47d7131f`; byte-equivalent current-main integration `82efd199457541631fd1448107979799465d2a3c` |
+| Independent reviews | Packet `R4_PROV_01_PACKET_REVIEW: APPROVED`; implementation `R4_PROV_01_IMPLEMENTATION_REVIEW: APPROVED`; binding-audit SHA-256s `8149715737983b8fab24dbb7ae5c4c33c6ae27cf0a5e08d39e692f45a957fbb0` and `8f2f9c41628cc37d240be7e8e6edc4ba822e9d8059db409a7503d8f44b132161` |
+| Provenance scope | Public modeling dataset only; `240 × 61 = 14,640` cells; `13,682` present; `958` null; `8,243` cell_verified; `3,715` column_asserted; `2,640` derived_chain; `42` unknown; `multi_candidate_count = 0` |
+| Generated artifacts | Three `data/provenance/` artifacts present with committed SHA-256s: CSV `62a4102fb3df84774fd6f6e1a9d96412a42b9fb0df1947bf7290c54925a727eb`; JSON `441d500eedd270c47460f7c645e5de5c9864d12ba159d145ad90ae314280474a`; Markdown `b61456012d9887bb5e95e9cf2b55ad398c117f6360c9228aec14f36266289d7b` |
+| Preservation / registry | Additive outside historical 351-member boundary; boundary not re-pinned or weakened; scientific values, feature-passports v1, limitations register unchanged; MCC `v1.10.0`; registry `13 governed roots / 88 entries`, schema `1.0.0`, task `R3-REL-01` |
+| Verification | Focused R4 `656/656`; root `1027/1027`; backend `552/552`; data validation `VALID`; deterministic regeneration exact; claims lint, docs lint, `git diff --check` passed; repository clean; main/origin/live remote equal |
+| Remaining tasks | R4-DIM-01 and R4-ROBUST-01 remain separate outstanding tasks; neither authorized or completed by this closure; Wave 4A not complete |
+| Claim boundary | No point-in-time correctness, rights clearance, predictive validity, alpha, profitability, investment value, or production validity established; no reliable predictive edge established |
+| Final state | `INTEGRATED / INDEPENDENT_REVIEW_APPROVED / DETERMINISTIC / CURRENT_MAIN_VERIFIED / R4_PROV_01_CLOSED` |
