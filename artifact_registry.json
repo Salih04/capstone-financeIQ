@@ -15,6 +15,7 @@
     "experiments/results_serving_eval",
     "experiments/results_forward_2026",
     "experiments/results_missingness",
+    "experiments/results_dimensionality",
     "data/trusted_clean",
     "data/provenance"
   ],
@@ -870,10 +871,56 @@
         "experiments/results_real_terms/real_try/significance_report.json",
         "experiments/results_real_terms/usd/significance_report.json",
         "experiments/results_regime/regime_context_report.json",
-        "experiments/results_serving_eval/serving_eval_report.json"
+        "experiments/results_serving_eval/serving_eval_report.json",
+        "experiments/results_dimensionality/dimensionality_report.json"
       ],
       "hand_edit_forbidden": true,
       "notes": "Written by scripts/build_limitations_register.py, which holds the reviewed curated seed quotations as source-bound constants (hence the script is a declared input). Resolves only registered JSON paths and globs — never a filesystem scan — and emits every top-level limitations[] entry verbatim. The listed report inputs are the registered JSON artifacts that currently carry a top-level limitations list; a newly registered report carrying one also becomes an input and must be added here."
+    },
+    {
+      "path_or_glob": "experiments/results_dimensionality/dimensionality_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make research-dimensionality",
+      "inputs": [
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "data/trusted_clean/feature_engineering_report.json",
+        "data/trusted_clean/data_dictionary.md",
+        "experiments/feature_dimensionality.py"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "R4-DIM-01 deterministic descriptive feature-geometry summary. Written by experiments/feature_dimensionality.py; ownership metadata does not certify methodology, predictive value, or investment merit."
+    },
+    {
+      "path_or_glob": "experiments/results_dimensionality/dimensionality_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make research-dimensionality",
+      "inputs": ["experiments/results_dimensionality/dimensionality_report.json"],
+      "hand_edit_forbidden": true,
+      "notes": "R4-DIM-01 Markdown companion rendered by experiments/feature_dimensionality.py from the same in-memory payload."
+    },
+    {
+      "path_or_glob": "experiments/results_dimensionality/correlation_matrix.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-dimensionality",
+      "inputs": ["experiments/results_dimensionality/dimensionality_report.json"],
+      "hand_edit_forbidden": true,
+      "notes": "R4-DIM-01 complete long-form Pearson correlation evidence; generated output only."
+    },
+    {
+      "path_or_glob": "experiments/results_dimensionality/pair_overlap.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-dimensionality",
+      "inputs": ["experiments/results_dimensionality/dimensionality_report.json"],
+      "hand_edit_forbidden": true,
+      "notes": "R4-DIM-01 complete pre-imputation n_AB evidence; generated output only."
+    },
+    {
+      "path_or_glob": "experiments/results_dimensionality/feature_missingness.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-dimensionality",
+      "inputs": ["experiments/results_dimensionality/dimensionality_report.json"],
+      "hand_edit_forbidden": true,
+      "notes": "R4-DIM-01 complete pre-imputation feature missingness evidence; generated output only."
     },
     {
       "path_or_glob": "data/trusted_clean/bist100_expansion_report.md",

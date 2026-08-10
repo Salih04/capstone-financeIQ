@@ -45,6 +45,21 @@ Registered through: `experiments/results/significance_report.json`
 - Nominal TRY returns cover one unusual macro regime, so absence of detected signal is not a general market-efficiency claim.
 - Research support only; not investment advice.
 
+### experiments/results_dimensionality/dimensionality_report.json
+
+Registered through: `experiments/results_dimensionality/dimensionality_report.json`
+
+- Descriptive feature-geometry analysis only; no model, target, or serving input is changed.
+- Exact neutral-rank fill is analysis-only and is not model imputation, including for the n_obs = 0 and n_obs = 1 branches.
+- Under heterogeneous missingness, no direction is guaranteed for spectral or participation-ratio effects.
+- Windows differ in row universes and missingness, so cross-window metrics are not temporal evolution.
+- PRIMARY-matrix exclusion does not imply feature uselessness, lack of predictive value, modeling redundancy, lack of temporal information, lack of market-context information, or feature-selection benefit.
+- Support-based exclusions may remove redundancy-contributing geometry; exclusion is a construction/support limitation, not a finding about the excluded feature.
+- D_eff is not claimed to be an upper or lower bound of any quantity over a larger or different feature set.
+- Retrospective cohort, limited historical windows, sparse or mixed-quality source coverage, and environment-qualified reproduction remain limitations.
+- No reliable predictive edge, alpha, profitability, investment value, tradable strategy, feature-selection benefit, model improvement, causal diagnosis, production validity, or deployment validity is established.
+- Research support only; not investment advice.
+
 ### experiments/results_disagreement/disagreement_report.json
 
 Registered through: `experiments/results_disagreement/disagreement_report.json`

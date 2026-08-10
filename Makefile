@@ -6,7 +6,7 @@
 	research-agent-dataset-1k research-agent-dataset-5k research-agent-dataset-20k \
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration limitations-register \
-	fetch-usdtry alternative-targets research-real-terms research-excess research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo research-serving-eval \
+	fetch-usdtry alternative-targets research-real-terms research-excess research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo research-serving-eval research-dimensionality \
 	freeze-forward-2026 evaluate-forward-2026 research-missingness claims-lint docs-lint cell-provenance
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
@@ -195,6 +195,10 @@ data-benchmark:
 # Run the walk-forward experiment loop.
 research:
 	PYTHONPATH=. python experiments/run_experiments.py
+
+# Build the frozen, descriptive R4-DIM-01 feature-geometry artifact family.
+research-dimensionality:
+	PYTHONPATH=. python experiments/feature_dimensionality.py
 
 # Reproduce the latest registered experiment run, or pass RESEARCH_MANIFEST=path.
 research-verify-run:
