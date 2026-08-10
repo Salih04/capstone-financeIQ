@@ -1,0 +1,129 @@
+{
+  "artifacts": [
+    {
+      "path": "experiments/results_contamination/contamination_cells.csv",
+      "sha256": "f256c45d6d584aa759b2a481c5ba34052760d1105ed7cd765be133f44ba9fd46",
+      "size_bytes": 42716
+    },
+    {
+      "path": "experiments/results_contamination/contamination_metrics.csv",
+      "sha256": "1f1d3e9287df1f82a1340b02f5616f635f9e85f6e14505891e547fa7929c34ef",
+      "size_bytes": 56155
+    },
+    {
+      "path": "experiments/results_contamination/contamination_predictions.csv",
+      "sha256": "19051898d081870b05e2a65136d2c24d363175a33001536d9b4a209aef622b7c",
+      "size_bytes": 2102088
+    },
+    {
+      "path": "experiments/results_contamination/contamination_report.json",
+      "sha256": "c2305e68f4967dfb478c1ebaf31a9f513fa1d844907445332f2c783bcd6f40a2",
+      "size_bytes": 664652
+    },
+    {
+      "path": "experiments/results_contamination/contamination_report.md",
+      "sha256": "58fc4f88c47ec08324f3944a833de5d8a3417b68f9d720671a8056e7f3abc6f1",
+      "size_bytes": 522669
+    }
+  ],
+  "claim_safety": {
+    "alpha_established": false,
+    "bad_cells_detected": false,
+    "causal_validity_established": false,
+    "contamination_removed": false,
+    "corruption_detected": false,
+    "investment_value_established": false,
+    "predictive_edge_established": false,
+    "production_validity_established": false,
+    "profitability_established": false,
+    "research_support_only": true
+  },
+  "determinism": {
+    "canonical_ab": {
+      "artifact_count": 16,
+      "comparison": "byte_identity_with_source_path_exception",
+      "status": "READY"
+    },
+    "pre_result_manifest_sha256": "c27624ce52c02169e27a12726906a90d85cfe061f9fd8ed47b49cedce31f7ce5",
+    "robust_identity": {
+      "prediction_files": 3,
+      "source_path_exception": true,
+      "status": "HARNESS_PARITY_READY"
+    }
+  },
+  "generator_command": "make research-contamination",
+  "input_artifacts": [
+    {
+      "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "role": "canonical ROBUST input",
+      "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+    },
+    {
+      "path": "data/trusted_clean/data_quality_report.json",
+      "role": "canonical data-quality report",
+      "sha256": "ec93ab788b453cf7d24850410f10435aab5fe9e17ca776409ec0149f2668f6f1"
+    },
+    {
+      "path": "experiments/results/predictions_test_2023.csv",
+      "role": "protected baseline prediction source",
+      "sha256": "c954822ec52c4bdc7704cc0c7d9ac26c58817b2a75ec92c842915603eb5b72c8"
+    },
+    {
+      "path": "experiments/results/predictions_test_2024.csv",
+      "role": "protected baseline prediction source",
+      "sha256": "cf88016a3f310811baaf3fed677230ffd98db4db0ea1417393c9afe87bb4c457"
+    },
+    {
+      "path": "experiments/results/predictions_test_2025.csv",
+      "role": "protected baseline prediction source",
+      "sha256": "295dac3a1b056aa20b9320ff0844ec3cd6aca61fd602f195258a4bc7182cafb1"
+    },
+    {
+      "path": "experiments/run_experiments.py",
+      "role": "read-only canonical harness",
+      "sha256": "265f58678d522eea0c48fbccba415ed30b3e20abc6bb7ae0a8e33857c5feb543"
+    },
+    {
+      "path": "experiments/significance.py",
+      "role": "read-only significance machinery",
+      "sha256": "5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6"
+    },
+    {
+      "path": "backend/app/services/research/feature_registry.py",
+      "role": "canonical feature registry",
+      "sha256": "889c22e757c89cc8efbfa89b930d366cd4792c0b314f842d5d9b498376b073fb"
+    },
+    {
+      "path": "Makefile",
+      "role": "generator command source",
+      "sha256": "04a75ff9afe6bf6d561732f73d2865b09f7477d128201c4ac125b868b832b715"
+    },
+    {
+      "path": "model_confidence_contract.json",
+      "role": "claim boundary contract",
+      "sha256": "59e0fae3be8972e258891e723fd49cf13e36a7d16e918722a5a18b690c55d8f7"
+    },
+    {
+      "path": "/tmp/r4-robust-01-canonical-implementation-packet-v3.md",
+      "role": "approved implementation packet",
+      "sha256": "f7f820efec50f84033de0e9567f848e9c8188d5038716fdc878d15387d8639fa"
+    },
+    {
+      "path": "/tmp/r4-robust-01-discovery-report.md",
+      "role": "discovery evidence",
+      "sha256": "71689d6c07605b4241c211998037657e0a286eef877ecd096736a71af2f8fd21"
+    },
+    {
+      "path": "/tmp/r4-robust-01-final-prepacket-evidence.md",
+      "role": "pre-packet evidence",
+      "sha256": "344e6bcdbf12347949c9b9ee082df741e3bb5719497a6ba02bafe48b0fe4f837"
+    },
+    {
+      "path": "<sealed-pre-result-manifest>",
+      "role": "sealed pre-result manifest",
+      "sha256": "c27624ce52c02169e27a12726906a90d85cfe061f9fd8ed47b49cedce31f7ce5"
+    }
+  ],
+  "schema_version": "1.0.0",
+  "task": "R4-ROBUST-01"
+}

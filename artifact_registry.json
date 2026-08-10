@@ -5,6 +5,7 @@
   "curation": "Hand-curated and reviewed input, like model_confidence_contract.json. NOT a generated file. Every generator_command below cites an existing Makefile target confirmed against the writer in scripts/ or experiments/ (writers were read, not inferred from filenames). Regenerate artifacts only through their owning command; never hand-edit a generated file.",
   "governed_roots": [
     "experiments/results",
+    "experiments/results_contamination",
     "experiments/results_disagreement",
     "experiments/results_excess",
     "experiments/results_influence",
@@ -43,7 +44,8 @@
       "experiments/results_real_terms/real_try/significance_report.json",
       "experiments/results_real_terms/usd/significance_report.json",
       "experiments/results_regime/regime_context_report.json",
-      "experiments/results_missingness/missingness_report.json"
+      "experiments/results_missingness/missingness_report.json",
+      "experiments/results_contamination/contamination_report.json"
     ]
   },
   "reproducibility_note": "Regeneration reproduces content in an environment-qualified sense only: byte identity requires matching Python, platform, and numerical-package versions (see METHODOLOGY 'Reproducibility and run provenance'). This registry does not claim universal byte reproducibility.",
@@ -367,6 +369,78 @@
       ],
       "hand_edit_forbidden": true,
       "notes": "Written by experiments/placebo_lab.py (MARKDOWN_OUTPUT). Human-readable companion to placebo_report.json; deterministic and byte-identical across seeded reruns."
+    },
+    {
+      "path_or_glob": "experiments/results_contamination/artifact_manifest.json",
+      "artifact_class": "generated",
+      "generator_command": "make research-contamination",
+      "inputs": [
+        "experiments/contamination_lab.py",
+        "experiments/results_contamination/contamination_report.json",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Deterministic provenance manifest for the isolated tail-handling sensitivity family; records ownership and inputs without certifying statistical validity or predictive value."
+    },
+    {
+      "path_or_glob": "experiments/results_contamination/contamination_cells.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-contamination",
+      "inputs": [
+        "experiments/contamination_lab.py",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Per-feature audit of frozen tail-handling thresholds, support, missingness, and affected cells; it is not a data-quality certificate."
+    },
+    {
+      "path_or_glob": "experiments/results_contamination/contamination_metrics.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-contamination",
+      "inputs": [
+        "experiments/contamination_lab.py",
+        "experiments/results/significance_report.json",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Long-form descriptive significance audit with only deterministic observed-IC, n, and split-count deltas; no new inferential family is asserted."
+    },
+    {
+      "path_or_glob": "experiments/results_contamination/contamination_predictions.csv",
+      "artifact_class": "generated",
+      "generator_command": "make research-contamination",
+      "inputs": [
+        "experiments/contamination_lab.py",
+        "experiments/results/predictions_test_2023.csv",
+        "experiments/results/predictions_test_2024.csv",
+        "experiments/results/predictions_test_2025.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Prediction records for independent isolated tail-handling conditions; canonical targets and prediction fields remain auditable."
+    },
+    {
+      "path_or_glob": "experiments/results_contamination/contamination_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make research-contamination",
+      "inputs": [
+        "experiments/contamination_lab.py",
+        "experiments/results/significance_report.json",
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "model_confidence_contract.json"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Structured descriptive tail-handling sensitivity report with the frozen research-support-only boundary and canonical provenance."
+    },
+    {
+      "path_or_glob": "experiments/results_contamination/contamination_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make research-contamination",
+      "inputs": [
+        "experiments/results_contamination/contamination_report.json",
+        "experiments/contamination_lab.py"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Generated Markdown rendering of contamination_report.json; never hand-edited and retains the descriptive research-support-only boundary."
     },
     {
       "path_or_glob": "experiments/results_rank_stability/rank_stability_report.json",
@@ -872,7 +946,8 @@
         "experiments/results_real_terms/usd/significance_report.json",
         "experiments/results_regime/regime_context_report.json",
         "experiments/results_serving_eval/serving_eval_report.json",
-        "experiments/results_dimensionality/dimensionality_report.json"
+        "experiments/results_dimensionality/dimensionality_report.json",
+        "experiments/results_contamination/contamination_report.json"
       ],
       "hand_edit_forbidden": true,
       "notes": "Written by scripts/build_limitations_register.py, which holds the reviewed curated seed quotations as source-bound constants (hence the script is a declared input). Resolves only registered JSON paths and globs — never a filesystem scan — and emits every top-level limitations[] entry verbatim. The listed report inputs are the registered JSON artifacts that currently carry a top-level limitations list; a newly registered report carrying one also becomes an input and must be added here."

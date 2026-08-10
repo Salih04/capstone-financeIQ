@@ -7,7 +7,7 @@
 	research-agent-dataset-validate research-agent-eval-local research-agent-collect-failures \
 	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration limitations-register \
 	fetch-usdtry alternative-targets research-real-terms research-excess research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo research-serving-eval research-dimensionality \
-	freeze-forward-2026 evaluate-forward-2026 research-missingness claims-lint docs-lint cell-provenance
+	freeze-forward-2026 evaluate-forward-2026 research-missingness claims-lint docs-lint cell-provenance research-contamination
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -208,6 +208,11 @@ research-verify-run:
 # Analyze persisted per-split predictions without retraining models.
 research-significance:
 	PYTHONPATH=. python experiments/significance.py
+
+# R4-ROBUST-01: isolated descriptive extreme-tail / tail-handling sensitivity.
+# Writes exactly experiments/results_contamination/ after scratch validation.
+research-contamination:
+	PYTHONPATH=. python experiments/contamination_lab.py
 
 # Audit the hybrid research score's confidence component against persisted rank errors.
 # Reads existing prediction dumps; never retrains or changes service/model computation.

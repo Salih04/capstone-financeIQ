@@ -45,6 +45,21 @@ Registered through: `experiments/results/significance_report.json`
 - Nominal TRY returns cover one unusual macro regime, so absence of detected signal is not a general market-efficiency claim.
 - Research support only; not investment advice.
 
+### experiments/results_contamination/contamination_report.json
+
+Registered through: `experiments/results_contamination/contamination_report.json`
+
+- This is a descriptive tail-handling sensitivity laboratory for eligible growth-percentage input cells; it does not detect corrupted data or establish that any cell is bad.
+- Thresholds are per-feature, per-window quantiles estimated only from permitted training feature years; they are not a data-quality validation rule and do not establish causal validity.
+- Winsorization and trim-to-null are applied only to fresh isolated copies; canonical/trusted datasets, targets, identifiers, provenance, flags, benchmark/context variables, and committed baseline artifacts are not perturbed.
+- The frozen q grid is q={0.025,0.05,0.10} per side; hard support (n-1)q>=1 gates eligibility, while nq>=3 is diagnostic only.
+- Existing within-year permutation/bootstrap and six-model Bonferroni arithmetic are reused descriptively; no new delta-IC significance family, bootstrap, or multiplicity correction is created.
+- A nominally significant perturbed condition, if any, is a sensitivity finding requiring investigation, not evidence of predictive edge, alpha, profitability, causal validity, or production validity.
+- Results are numerical-environment-qualified; byte identity is required within the same numerical environment and is not claimed across different environments.
+- The internal significance scope is 80 evaluated tickers per model and split; public-40 framing is distinct and must not be combined with it.
+- The canonical evaluation universe remains unchanged; only authoritative non-null cells in the frozen five-feature growth block are perturbable. Rows without growth support remain in canonical evaluation, unperturbed and neither dropped, synthesized, nor relabeled as contaminated. Coverage is reported per window; R4-ROBUST tests tail-handling sensitivity of the growth-supported portion of the canonical analysis, not universal contamination of every evaluated row.
+- The conclusion remains: no reliable predictive edge. Research support only; not investment advice.
+
 ### experiments/results_dimensionality/dimensionality_report.json
 
 Registered through: `experiments/results_dimensionality/dimensionality_report.json`
