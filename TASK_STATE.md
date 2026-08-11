@@ -908,3 +908,16 @@ KAP cross-check recommended before claiming any result.
 | Remaining tasks | R4-DIM-01 and R4-ROBUST-01 remain separate outstanding tasks; neither authorized or completed by this closure; Wave 4A not complete |
 | Claim boundary | No point-in-time correctness, rights clearance, predictive validity, alpha, profitability, investment value, or production validity established; no reliable predictive edge established |
 | Final state | `INTEGRATED / INDEPENDENT_REVIEW_APPROVED / DETERMINISTIC / CURRENT_MAIN_VERIFIED / R4_PROV_01_CLOSED` |
+
+## CI-BOOTSTRAP-01 verification CI (2026-08-11; append-only)
+
+| State item | Status |
+|---|---|
+| Scope | Pinned root verification environment (`requirements-root.txt`), GitHub Actions workflow (`.github/workflows/verify.yml`), verification-baseline truth refresh, coverage staging. No product, pipeline, model, data, or claim-surface change |
+| Environment of record | CPython 3.12.3 (conda-forge), macOS 26.6 arm64; `numpy 1.26.4`, `pandas 2.2.2`, `scipy 1.13.1`, `scikit-learn 1.5.1`, `pytest 8.3.3`; local `pydantic 2.9.0`, `pydantic-settings 2.5.0`, `bcrypt 4.2.0` run ahead of the `backend/requirements.txt` pins and the delta is recorded in `docs/VERIFICATION_BASELINE.md` |
+| Baseline refresh | Previous baseline dated 2026-07-18 at `18514ac5`, 51 commits stale; backend count corrected `99` → `552`; root `1081` unchanged; MCC `v1.8.0` → `v1.10.0`; `make docs-lint` row added |
+| Docs lint | Was red at `18514ac5` on a dated review-closure count; four dated R3 review/packet documents added to `TRUTH_DRIFT_EXCLUSIONS`; historical counts preserved, not rewritten. Stale-fixture self-test generalized to materialize cited paths and still rejects deliberate drift |
+| Coverage | `pytest-cov 5.0.0` reporting only; XML archived as a build artifact; Codecov upload staged but commented out pending a `CODECOV_TOKEN` secret; no threshold gates a run; coverage output gitignored so the contamination worktree guard stays exact |
+| Verification | Clean-clone (no `.env`, no untracked files) run of the full CI sequence: root `1081/1081`, backend `552/552`, data validation `VALID`, claims lint `v1.10.0` PASSED, docs lint PASSED, docs-lint self-test PASSED; root suite also `1081/1081` under coverage instrumentation; Linux/cp312 wheel resolution of `requirements-root.txt` verified (76 wheels, transitive) |
+| Not established | The workflow has not yet run on GitHub Actions; "CI green" is a local clean-clone simulation until the first remote run |
+| Claim boundary | No scientific artifact, MCC scan, or user-facing copy changed; no predictive-edge, alpha, profitability, or production-validity claim; no reliable predictive edge established |

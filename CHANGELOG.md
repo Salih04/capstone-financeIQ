@@ -5,6 +5,17 @@ All notable changes to FinanceIQ, most recent first.
 ## Unreleased
 
 ### Added
+- **Verification CI** — `.github/workflows/verify.yml` runs the five documented
+  verification commands (root suite, backend suite, `make data-validate`,
+  `make claims-lint`, `make docs-lint`) plus the docs-lint stale-fixture self-test
+  on every push to `main`, every pull request, and manual dispatch. No Postgres
+  service and no secrets: the backend suite runs on sqlite with `app/config.py`
+  defaults. Data validation is validate-only and `make research` never runs, so CI
+  cannot overwrite a committed experiment artifact. `requirements-root.txt` pins the
+  verification environment (includes `backend/requirements.txt`, adds exact `numpy`,
+  `scikit-learn`, `scipy`, `pytest` pins). Coverage is reported via `pytest-cov` and
+  archived as a build artifact; the Codecov upload step is staged but commented out
+  pending a `CODECOV_TOKEN` secret, and no coverage threshold gates a run.
 - **Private production access mode** — env-gated `require_access` dependency on all
   research/forecasting-CSV endpoints. `PUBLIC_DEMO_MODE=true` (default) keeps the
   open read-only demo; `PUBLIC_DEMO_MODE=false` requires a verified user (401 anon,

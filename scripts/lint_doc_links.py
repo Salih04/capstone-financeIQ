@@ -40,6 +40,10 @@ TRUTH_DRIFT_EXCLUSIONS = {
     "TASK_STATE.md": "append-only completion ledger",
     "docs/FRESH_DATABASE_BOOTSTRAP_VERIFICATION.md": "dated verification evidence",
     "docs/R2_LOOP_01_MIGRATION_VERIFICATION.md": "dated verification evidence",
+    "docs/R3_MEMO_01_FABLE5_IMPLEMENTATION_PACKET.md": "dated implementation packet",
+    "docs/R3_PREREG_01_FABLE5_REVIEW_HANDOFF.md": "dated review-closure evidence",
+    "docs/R3_SERV_01_FABLE5_REVIEW_HANDOFF.md": "dated review-closure evidence",
+    "docs/R3_UI_02_FABLE5_REVIEW_HANDOFF.md": "dated review-closure evidence",
     BASELINE_PATH: "the machine-read current baseline itself",
 }
 
@@ -388,6 +392,34 @@ def lint_repository(root: Path) -> list[str]:
     return sorted(set(errors))
 
 
+_MISSING_PATH_MARKER = "missing cited repository path: "
+
+
+def _materialize_cited_paths(fixture_root: Path, max_rounds: int = 5) -> None:
+    """Create empty stand-ins for repository paths the fixture's docs cite.
+
+    The fixture root holds only the files the truth check needs, so any path the
+    copied baseline cites would otherwise raise DOC-PATH noise and mask the one
+    DOC-TRUTH diagnostic this self-test exists to prove.
+    """
+    for _ in range(max_rounds):
+        missing = [
+            error.split(_MISSING_PATH_MARKER, 1)[1]
+            for error in lint_repository(fixture_root)
+            if _MISSING_PATH_MARKER in error
+        ]
+        if not missing:
+            return
+        for cited in missing:
+            cleaned = re.sub(r":\d+$", "", cited)
+            target = fixture_root / cleaned
+            if cleaned.endswith("/"):
+                target.mkdir(parents=True, exist_ok=True)
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text("", encoding="utf-8")
+
+
 def run_stale_fixture(root: Path) -> int:
     """Prove that a temporary stale active assertion produces a diagnostic."""
     root = root.resolve()
@@ -415,6 +447,7 @@ def run_stale_fixture(root: Path) -> int:
             f"Current: `backend/tests/` has {stale_count} backend tests.\n",
             encoding="utf-8",
         )
+        _materialize_cited_paths(fixture_root)
         errors = lint_repository(fixture_root)
 
     truth_errors = [error for error in errors if "[DOC-TRUTH]" in error]

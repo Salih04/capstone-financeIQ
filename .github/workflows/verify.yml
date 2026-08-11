@@ -1,0 +1,88 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: pipeline + backend verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements-root.txt
+            backend/requirements.txt
+
+      - name: Install verification environment
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-root.txt
+
+      - name: Record environment
+        run: |
+          python --version
+          pip freeze
+
+      # No Postgres service: the backend suite runs on sqlite and no committed
+      # .env exists in CI, so app/config.py defaults apply.
+      # The two test steps are the documented baseline commands plus coverage
+      # reporting flags. Coverage is measured and archived, never enforced:
+      # no threshold gates a run.
+      - name: Root pipeline tests
+        run: >
+          PYTHONPATH=. python -m pytest tests/ -q
+          --cov=scripts --cov=experiments --cov=research_agent_training
+          --cov-report=xml:coverage-root.xml
+
+      - name: Backend tests
+        run: >
+          PYTHONPATH=backend python -m pytest backend/tests -q
+          --cov=backend/app --cov-report=xml:coverage-backend.xml
+
+      - name: Data validation (validate-only, never regenerates)
+        run: make data-validate
+
+      - name: Claims lint (Model Confidence Contract)
+        run: make claims-lint
+
+      - name: Docs lint (links, cited paths, baseline truth)
+        run: make docs-lint
+
+      - name: Docs lint self-test (proves drift is actually rejected)
+        run: python scripts/lint_doc_links.py --self-test-stale
+
+      - name: Archive coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            coverage-root.xml
+            coverage-backend.xml
+          if-no-files-found: warn
+
+      # Codecov upload — staged, deliberately not enabled.
+      # To turn on: create the repository entry at codecov.io, add CODECOV_TOKEN
+      # as a GitHub Actions secret, then uncomment. Keep `fail_ci_if_error: false`
+      # so a Codecov outage can never turn a genuinely green verification red.
+      #
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v4
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     files: coverage-root.xml,coverage-backend.xml
+      #     fail_ci_if_error: false
