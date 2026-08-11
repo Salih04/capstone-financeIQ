@@ -20,6 +20,7 @@ Intended categories:
 - `strategy/`
 - `verification/`
 
+- `docs/archive/investigations/SMRTG_NOT_FOUND_INVESTIGATION.md` — completed historical SMRTG investigation record.
 - `spikes/E2E_AUTH_SPIKE.md` — completed authenticated-E2E feasibility record.
 
 No historical document is moved by the initial scaffold.

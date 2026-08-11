@@ -35,7 +35,7 @@ TRUTH_DRIFT_EXCLUSIONS = {
     "FINANCEIQ_MOONSHOT_ROADMAP.md": "strategic planning record",
     "FINANCEIQ_PHASE3_4_FRONTIER_PLAN.md": "dated planning and candidate record",
     "OPERATING_LAYER_VALIDATION.md": "completed validation evidence",
-    "SMRTG_NOT_FOUND_INVESTIGATION.md": "dated investigation evidence",
+    "docs/archive/investigations/SMRTG_NOT_FOUND_INVESTIGATION.md": "dated investigation evidence",
     "TASK.md": "completed task packet and its historical verification transcript",
     "TASK_STATE.md": "append-only completion ledger",
     "docs/FRESH_DATABASE_BOOTSTRAP_VERIFICATION.md": "dated verification evidence",
