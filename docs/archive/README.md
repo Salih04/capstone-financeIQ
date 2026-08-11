@@ -22,5 +22,7 @@ Intended categories:
 
 - `docs/archive/investigations/SMRTG_NOT_FOUND_INVESTIGATION.md` — completed historical SMRTG investigation record.
 - `spikes/E2E_AUTH_SPIKE.md` — completed authenticated-E2E feasibility record.
+- `docs/archive/context/PROJECT_CONTEXT.md` — historical project-context snapshot.
+- `docs/archive/verification/TASK-2026-07-08-operating-layer-validation.md` — 2026-07-08 operating-layer task/validation record.
 
 No historical document is moved by the initial scaffold.

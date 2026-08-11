@@ -17,6 +17,7 @@ Three layers sharing one repo: (1) a Python data/experiment pipeline run from th
 | `backend/airflow/` | Single dormant DAG (`dags/forecasting_retrain_dag.py`). `airflow` is not in `requirements.txt` or any deploy file — nothing runs it |
 | `frontend/src/pages/` | One JSX file per route, all `*Page.jsx` (`DashboardPage.jsx`, `ResearchAgentPage.jsx`, `ExperimentsPage.jsx`, `BenchmarkPage.jsx`, `ForecastingPage.jsx`, …) |
 | `frontend/src/api/` | `client.js`, `researchApi.js`, `cache.js` (sessionStorage SWR cache), `useCachedResource.js` |
+- `frontend/src/api/cache.js` owns the sessionStorage-backed stale-while-revalidate cache, with in-flight deduplication and SHORT/MEDIUM/LONG TTLs; auth/session/token endpoints, `POST /research/ask`, and failed responses are never cached, and hard refresh fetches normally.
 | `scripts/data_collection/` | Pipeline stages: `build_all.py`, `validate.py` (leakage guards), ingest/valuation/benchmark/integration modules |
 | `scripts/` (root) | `build_company_contexts.py` (RAG contexts), `fetch_yahoo_chart_prices.py`, `validate_trusted_data.py` |
 | `experiments/` | `run_experiments.py` (walk-forward loop), `results/`, `reports/summary.md`, `leaderboard.csv` |
