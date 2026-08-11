@@ -20,4 +20,6 @@ Intended categories:
 - `strategy/`
 - `verification/`
 
+- `spikes/E2E_AUTH_SPIKE.md` — completed authenticated-E2E feasibility record.
+
 No historical document is moved by the initial scaffold.

@@ -183,7 +183,7 @@ Evidence: `/research/ask` has five grounded intents predating Phase 2; significa
 
 #### C-31 · R3-E2E-01 — Authenticated E2E/visual verification spike
 3A · P1 · Ops/Frontend · Difficulty M · **SPIKE**
-Evidence: §1.5 fourth bullet — four task reports blocked on the same missing approved-session path; the one existing spec assumes an auth flow that no longer matches reality. Creates: memo `docs/E2E_AUTH_SPIKE.md` (proposed) evaluating, without weakening auth: Playwright `storageState` reuse after a documented manual login; a local-only Supabase test project with a seeded approved user; the backend's existing HS256 legacy-fallback path for API-level assertions. Recommends one approach + a follow-up implementation task. Research L / Demo M / CV M (unblocks *verification* for everything visual). Claim risk L; tech risk M. Impl **Opus medium**; review Terra low.
+Evidence: §1.5 fourth bullet — four task reports blocked on the same missing approved-session path; the one existing spec assumes an auth flow that no longer matches reality. Creates: memo `docs/archive/spikes/E2E_AUTH_SPIKE.md` (proposed) evaluating, without weakening auth: Playwright `storageState` reuse after a documented manual login; a local-only Supabase test project with a seeded approved user; the backend's existing HS256 legacy-fallback path for API-level assertions. Recommends one approach + a follow-up implementation task. Research L / Demo M / CV M (unblocks *verification* for everything visual). Claim risk L; tech risk M. Impl **Opus medium**; review Terra low.
 
 #### C-32 · R3-LINT-01 — Docs link & path lint
 3A · P2 · Ops/Docs · Difficulty L · **ACCEPT-P**
