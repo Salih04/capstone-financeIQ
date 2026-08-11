@@ -1,0 +1,30 @@
+# Root pipeline + verification environment.
+#
+# The root suite (`PYTHONPATH=. python -m pytest tests/`) imports the backend
+# package (`from app.services import research_agent`, `experiments/run_experiments.py`),
+# so the backend runtime pins are included rather than duplicated here.
+#
+# Versions below are pinned to the environment recorded in
+# docs/VERIFICATION_BASELINE.md; loose backend pins that the root pipeline
+# depends on numerically are re-pinned exactly so a verification run is
+# reproducible. backend/requirements.txt is unchanged (it is what the Docker
+# image builds from).
+#
+# Optional at runtime, deliberately absent: yfinance (lazily imported by
+# scripts/data_collection/collect_bist100_*; collection is a manual, networked
+# step and is never exercised by the test suites).
+
+-r backend/requirements.txt
+
+# Exact pins for the numerical stack backend/requirements.txt leaves open.
+numpy==1.26.4
+scikit-learn==1.5.1
+
+# Root-only dependencies (not needed by the backend service image).
+scipy==1.13.1
+pytest==8.3.3
+
+# Coverage instrumentation for CI. Reporting only: no test asserts on coverage,
+# and no threshold gates a run. Codecov upload itself is staged but not enabled
+# (see .github/workflows/verify.yml).
+pytest-cov==5.0.0

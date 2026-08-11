@@ -1,0 +1,43 @@
+# Root-suite tests deselected in GitHub Actions — environment-qualified, not skipped work.
+#
+# Every id below passes on the machine of record (macOS arm64, conda CPython 3.12.3;
+# see docs/VERIFICATION_BASELINE.md) and fails on ubuntu-latest for reasons the
+# repository already documents. They are deselected in CI only. The full suite,
+# including every id here, remains the native-machine gate and must pass before any
+# baseline refresh. Nothing here may be deleted from the test files.
+#
+# Adding an id to this file is a governance decision: it needs a stated
+# environment reason below, not a convenience.
+#
+# --- Class 1: numerical environment -------------------------------------------
+# Committed experiment artifacts were generated on macOS arm64. Linux x86_64
+# reproduces them to ~11 significant digits, not byte-for-byte (observed
+# 2026-08-11, run 31514453938: "At index 16915 diff: b'8' != b'9'";
+# -0.11801481326038339 vs -0.1170141878695141 at 1e-12 tolerance).
+# experiments/contamination_lab.py LIMITATIONS already states byte identity is
+# "required within the same numerical environment and is not claimed across
+# different environments"; .agent/memory/02-environment-qualified-experiment-reruns.md
+# records the same trap. These tests enforce that guarantee, so they are correct to
+# fail off-environment.
+tests/test_contamination_lab.py::test_baseline_determinism_gate_is_byte_identity
+tests/test_contamination_lab.py::test_robust_identity_control_matches_canonical_harness
+tests/test_excess_basis.py::test_corrections_changed_only_report_and_manifest_bytes
+tests/test_excess_basis.py::test_isolated_run_reproduces_the_committed_statistics
+tests/test_excess_basis.py::test_leaderboard_keeps_twenty_seven_canonical_rows
+tests/test_excess_basis.py::test_prediction_dumps_and_leaderboard_are_byte_identical_to_the_committed_bytes[leaderboard.csv]
+tests/test_excess_basis.py::test_prediction_dumps_and_leaderboard_are_byte_identical_to_the_committed_bytes[predictions_test_2023.csv]
+tests/test_excess_basis.py::test_prediction_dumps_and_leaderboard_are_byte_identical_to_the_committed_bytes[predictions_test_2024.csv]
+tests/test_excess_basis.py::test_prediction_dumps_and_leaderboard_are_byte_identical_to_the_committed_bytes[predictions_test_2025.csv]
+#
+# --- Class 2: filesystem semantics --------------------------------------------
+# These exercise output-authority fail-closed behavior by forcing directory
+# identity changes, and their fixtures assert on inode recycling. APFS and ext4
+# differ here: CI reports both "fixture did not recycle" and "fixture recycled the
+# inode" for the same fixtures. The guards under test are filesystem-independent;
+# only the fixtures that provoke them are not.
+tests/test_missingness_sensitivity.py::test_final_directory_real_replacement_deletion_rename_recreation_all_apis[legacy-preresolved]
+tests/test_missingness_sensitivity.py::test_final_directory_real_replacement_deletion_rename_recreation_all_apis[legacy]
+tests/test_missingness_sensitivity.py::test_final_directory_real_replacement_deletion_rename_recreation_all_apis[structured]
+tests/test_missingness_sensitivity.py::test_final_directory_recreated_with_a_different_identity_fails_closed[legacy]
+tests/test_missingness_sensitivity.py::test_final_directory_recreated_with_a_different_identity_fails_closed[structured]
+tests/test_missingness_sensitivity.py::test_no_attack_variant_writes_any_artifact_anywhere
