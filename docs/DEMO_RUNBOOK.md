@@ -171,6 +171,45 @@ and corrected significance, state the detectable-IC values as design limits,
 and finish with the stamped gross-versus-assumed-cost friction panel. If live
 artifact mode is absent, use the backend-unavailable branch instead.
 
+## Fresh-database bootstrap (scratch DB only)
+
+To validate the bootstrap order on a clean database, use an isolated scratch
+Postgres instance — never point this at an existing local or shared database.
+Give the scratch stack its own Compose project name so it gets its own
+volume and network, and drop the host port mapping if `5432` is already in
+use locally:
+
+```bash
+printf 'services:\n  db:\n    ports: !reset []\n' | \
+  docker compose -p financeiq-scratch -f docker-compose.yml -f - up -d db
+
+docker compose -p financeiq-scratch build backend
+```
+
+Required bootstrap sequence, in order (see [`README.md`](../README.md) for
+the standard non-scratch equivalents of these commands):
+
+```bash
+docker compose -p financeiq-scratch run --rm --no-deps backend \
+  sh -lc 'alembic upgrade head && python -m scripts.load_trusted_yearly'
+
+docker compose -p financeiq-scratch run --rm --no-deps backend \
+  sh scripts/start_backend.sh
+```
+
+Confirm `alembic_version`, `yearly_stocks`, and `users` exist, and that
+`/health` returns HTTP 200, using `docker compose exec` against the scratch
+`db` service. Tear the scratch stack down afterward, including its volume:
+
+```bash
+docker compose -p financeiq-scratch down -v
+```
+
+This procedure is unverified until re-run against the current migration
+head; see [`VERIFICATION_BASELINE.md`](VERIFICATION_BASELINE.md) for current
+state and the [archived 2026-07-12 record](archive/verification/FRESH_DATABASE_BOOTSTRAP_VERIFICATION-2026-07-12.md)
+for the last dated pass.
+
 ## Shutdown check
 
 From the repository root:

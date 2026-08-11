@@ -24,5 +24,6 @@ Intended categories:
 - `spikes/E2E_AUTH_SPIKE.md` — completed authenticated-E2E feasibility record.
 - `docs/archive/context/PROJECT_CONTEXT.md` — historical project-context snapshot.
 - `docs/archive/verification/TASK-2026-07-08-operating-layer-validation.md` — 2026-07-08 operating-layer task/validation record.
+- `docs/archive/verification/FRESH_DATABASE_BOOTSTRAP_VERIFICATION-2026-07-12.md` — 2026-07-12 fresh-database bootstrap verification record; reusable procedure now lives in `docs/DEMO_RUNBOOK.md`.
 
 No historical document is moved by the initial scaffold.
