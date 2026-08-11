@@ -33,6 +33,8 @@ Three layers sharing one repo: (1) a Python data/experiment pipeline run from th
 - `data/trusted_clean/modeling_dataset_2020_2025.csv` — the modeling dataset (+ `_public_`/`_training_` splits).
 - `data/trusted_raw/shares_outstanding_events.csv` — manual shares input for valuation.
 - `TASK_STATE.md` — detailed status ledger; `CHANGELOG.md` — history.
+- `docs/CONSOLIDATION.md` — durable cross-cutting context and resumption guide; it supplements, but does not replace, `PRD.md`, `METHODOLOGY.md`, `TASK_STATE.md`, the task queue, or generated reports.
+- `docs/archive/` — historical documentation outside the active operating surface; this task creates only its entry point and moves no existing files.
 - `docker-compose.yml`, `render.yaml`, root `vercel.json` — deployment definitions. Note there is a **second** `frontend/vercel.json` containing only SPA rewrites; the root one carries the build config.
 
 ## Entry Points
@@ -89,4 +91,4 @@ LLM (optional): OpenRouter / LM Studio / Ollama, explanation-only, deterministic
 - `backend/alembic/versions/` (append migrations; never edit shipped ones).
 - Weak-signal caveat copy in frontend pages (e.g. `DashboardPage.jsx:445` — "A weak signal, reported *honestly*.").
 - `backend/airflow/dags/forecasting_retrain_dag.py` — dormant (airflow is not a declared dependency); leave it alone rather than "fixing" or deleting it without a decision.
-- `unnecessary/` quarantine: **does not exist** in the repo and is untracked by git. `README.md:396` links to it anyway — a dead link. Do not recreate the directory to satisfy the link.
+- `unnecessary/` quarantine: **does not exist** in the repo and is untracked by git. The former README reference was removed; do not recreate the directory to satisfy that historical link.

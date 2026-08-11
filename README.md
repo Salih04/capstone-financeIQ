@@ -17,6 +17,8 @@ valuation reconstruction, an explainable hybrid research agent, and the Fable 5
 > That is a defensible negative result,
 > not a bug. See `TASK_STATE.md`.
 
+**Project resumption:** [Research Consolidation](docs/CONSOLIDATION.md) is the best entry point for the current scientific state, established and unestablished claims, DIM/ROBUST context, open methodological questions, and returning after an interruption.
+
 **Validated features: 40** balance-sheet + growth (reference), real per-year
 income/profitability (corrected yearly: revenue, margins, ROE, ROA, …), and
 free-derived valuation (market_cap, enterprise_value, pe_ratio, pb_ratio,
