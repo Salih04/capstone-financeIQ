@@ -931,3 +931,12 @@ KAP cross-check recommended before claiming any result.
 | Failure class 2 | Six output-authority fixtures (`test_missingness_sensitivity.py`) that assert on inode recycling; APFS and ext4 disagree |
 | Resolution | `.github/ci-deselect.txt` lists the 15 ids with stated environment reasons; CI runs 1066/1081 and fails the build if any listed id stops resolving. No test skipped, weakened, or removed; the full suite remains the machine-of-record gate |
 | Claim boundary | Deselection is environmental, not evidential: no guard was relaxed and no scientific artifact, threshold, or claim surface changed |
+
+## CI-BOOTSTRAP-01 green (2026-08-11; append-only)
+
+| State item | Status |
+|---|---|
+| Green run | GitHub Actions `31534431511` on `ci/verify-workflow` (PR #10), ubuntu-latest: root `1066 passed / 15 deselected` (5:17), backend `552 passed`, data `VALID`, claims lint `v1.10.0`, docs lint and stale-fixture self-test PASSED |
+| Machine of record | Full root suite `1081/1081` on macOS arm64 conda CPython 3.12.3; the 15 CI-deselected ids pass there and remain the local gate |
+| Coverage | Reported and archived as a build artifact; Codecov upload staged but commented out pending a `CODECOV_TOKEN` secret; no threshold gates a run |
+| Remaining | Merge of PR #10 is the owner's decision; enabling Codecov requires the owner to create the repository entry and add the secret |
