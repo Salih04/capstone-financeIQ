@@ -1,6 +1,6 @@
 # Verification Baseline
 
-Observed 2026-08-11 at git `79fae27090ad327acf0a62dc25362d4edd7bff55` for the CI-bootstrap truth refresh. The tracked tree was clean except for the changes this refresh introduces (`requirements-root.txt`, `.github/workflows/verify.yml`, one `scripts/lint_doc_links.py` exclusion). The previous baseline was dated 2026-07-18 at `18514ac5`; 51 commits landed between it and this observation, which is why the backend count below moved.
+Observed 2026-08-11 at git `79fae27090ad327acf0a62dc25362d4edd7bff55` for the CI-bootstrap truth refresh. The tracked tree was clean except for the changes this refresh introduces (`requirements-root.txt`, `.github/workflows/verify.yml`, four `scripts/lint_doc_links.py` truth-drift exclusions). The previous baseline was dated 2026-07-18 at `18514ac5`; 51 commits landed between it and this observation, which is why the backend count below moved.
 
 | Check | Observed result |
 |---|---|
@@ -54,7 +54,7 @@ CI runs the **environment-portable** part of the root suite: 1066 of 1081 tests.
 
 Coverage is measured but not enforced: both pytest steps add `pytest-cov` reporting flags, the two XML reports are archived as a build artifact, and the Codecov upload step is present but commented out until a `CODECOV_TOKEN` secret exists. No coverage threshold gates a run, and coverage output is gitignored — `tests/test_contamination_lab.py::test_changed_path_allowlist_is_exact` reads `git status`, so any generated file left untracked in the working tree fails that guard. The same guard fails locally whenever verification work is left uncommitted; that is the guard behaving as designed, not a broken test.
 
-The `make docs-lint` row was previously red at `18514ac5`: `docs/R3_SERV_01_FABLE5_REVIEW_HANDOFF.md:121` cited the then-current root count 356/356 inside a dated review-closure paragraph. That file is now in the lint's `TRUTH_DRIFT_EXCLUSIONS` as dated review evidence, matching how every other dated verification record in the repository is treated — the historical count is preserved, not rewritten.
+The `make docs-lint` row was previously red at `18514ac5`: `docs/R3_SERV_01_FABLE5_REVIEW_HANDOFF.md:121` cited the then-current root count 356/356 inside a dated review-closure paragraph, and `docs/R3_UI_02_FABLE5_REVIEW_HANDOFF.md:104` likewise carried the stale backend count. Four exact-path entries were added to the lint's `TRUTH_DRIFT_EXCLUSIONS` as one frozen historical evidence class: those two files plus `docs/R3_MEMO_01_FABLE5_IMPLEMENTATION_PACKET.md` and `docs/R3_PREREG_01_FABLE5_REVIEW_HANDOFF.md`, neither of which currently emits a truth-drift diagnostic — they are members of the same dated R3 review-evidence class, excluded for consistency rather than to silence a present failure. So only two of the four are currently load-bearing. The exclusions are exact paths, not a pattern: they suppress truth-drift checking for those four dated records only, every current-authority document remains fully linted, and the historical counts are preserved rather than rewritten — matching how every other dated verification record in the repository is treated.
 
 ## Frontend route inventory
 
