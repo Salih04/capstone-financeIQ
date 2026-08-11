@@ -42,11 +42,45 @@ jobs:
       # The two test steps are the documented baseline commands plus coverage
       # reporting flags. Coverage is measured and archived, never enforced:
       # no threshold gates a run.
+      # The deselect list is environment-qualified, not optional work: every id in
+      # it must still pass on the machine of record. This step fails if an id no
+      # longer resolves, so the list cannot rot into a silent exemption.
+      - name: Check the CI deselect list still resolves
+        env:
+          # Written outside the worktree: tests/test_contamination_lab.py reads
+          # `git status` and fails on any untracked file.
+          COLLECTED: ${{ runner.temp }}/collected-node-ids.txt
+        run: |
+          PYTHONPATH=. python -m pytest tests/ --collect-only -q > "$COLLECTED"
+          python - <<'PY'
+          import os, pathlib, sys
+
+          listed = [
+              line.strip()
+              for line in pathlib.Path(".github/ci-deselect.txt").read_text().splitlines()
+              if line.strip() and not line.lstrip().startswith("#")
+          ]
+          collected = {
+              line.strip()
+              for line in pathlib.Path(os.environ["COLLECTED"]).read_text().splitlines()
+              if "::" in line
+          }
+          missing = [node_id for node_id in listed if node_id not in collected]
+          print(f"collected {len(collected)} root tests; deselect list holds {len(listed)}")
+          if missing:
+              print("deselect list is stale; these ids no longer exist:")
+              for node_id in missing:
+                  print(f"  {node_id}")
+              sys.exit(1)
+          PY
+
       - name: Root pipeline tests
-        run: >
-          PYTHONPATH=. python -m pytest tests/ -q
-          --cov=scripts --cov=experiments --cov=research_agent_training
-          --cov-report=xml:coverage-root.xml
+        run: |
+          mapfile -t ids < <(grep -vE '^\s*(#|$)' .github/ci-deselect.txt)
+          PYTHONPATH=. python -m pytest tests/ -q \
+            "${ids[@]/#/--deselect=}" \
+            --cov=scripts --cov=experiments --cov=research_agent_training \
+            --cov-report=xml:coverage-root.xml
 
       - name: Backend tests
         run: >

@@ -921,3 +921,13 @@ KAP cross-check recommended before claiming any result.
 | Verification | Clean-clone (no `.env`, no untracked files) run of the full CI sequence: root `1081/1081`, backend `552/552`, data validation `VALID`, claims lint `v1.10.0` PASSED, docs lint PASSED, docs-lint self-test PASSED; root suite also `1081/1081` under coverage instrumentation; Linux/cp312 wheel resolution of `requirements-root.txt` verified (76 wheels, transitive) |
 | Not established | The workflow has not yet run on GitHub Actions; "CI green" is a local clean-clone simulation until the first remote run |
 | Claim boundary | No scientific artifact, MCC scan, or user-facing copy changed; no predictive-edge, alpha, profitability, or production-validity claim; no reliable predictive edge established |
+
+## CI-BOOTSTRAP-01 first remote run (2026-08-11; append-only)
+
+| State item | Status |
+|---|---|
+| First run | GitHub Actions run `31514453938` (PR #10) FAILED at the root-suite step; install, pinned resolution, and every earlier step succeeded |
+| Failure class 1 | Nine numerical byte-identity / 1e-12 parity tests (`test_contamination_lab.py`, `test_excess_basis.py`) — Linux x86_64 reproduces macOS arm64 artifacts to ~11 significant digits, not byte-for-byte; already documented as environment-qualified |
+| Failure class 2 | Six output-authority fixtures (`test_missingness_sensitivity.py`) that assert on inode recycling; APFS and ext4 disagree |
+| Resolution | `.github/ci-deselect.txt` lists the 15 ids with stated environment reasons; CI runs 1066/1081 and fails the build if any listed id stops resolving. No test skipped, weakened, or removed; the full suite remains the machine-of-record gate |
+| Claim boundary | Deselection is environmental, not evidential: no guard was relaxed and no scientific artifact, threshold, or claim surface changed |
