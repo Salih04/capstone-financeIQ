@@ -1,0 +1,29 @@
+# Codecov policy for FinanceIQ.
+#
+# Coverage here measures one thing only: which lines of source code were
+# executed while the test suites ran. It is software-execution evidence.
+#
+# Coverage is NOT scientific or model validation. It says nothing about
+# predictive validity, alpha, profitability, causal validity, feature
+# selection, or deployment readiness. The repository's scientific conclusion
+# is unchanged by anything on this page: no reliable predictive edge has been
+# established (walk-forward IC ~= 0).
+#
+# `root` and `backend` are two separate verification surfaces measured by two
+# separate suites over two disjoint source sets. Their combined repository
+# percentage is a mechanical average of unrelated things and is NOT an
+# authoritative quality metric. Read the flags separately or not at all.
+#
+# Every status below is informational: Codecov never blocks a merge, no
+# threshold gates CI, and no test may be modified to move these numbers.
+
+coverage:
+  status:
+    project:
+      default:
+        informational: true
+    patch:
+      default:
+        informational: true
+
+comment: false
