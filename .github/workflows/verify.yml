@@ -109,14 +109,28 @@ jobs:
             coverage-backend.xml
           if-no-files-found: warn
 
-      # Codecov upload — staged, deliberately not enabled.
-      # To turn on: create the repository entry at codecov.io, add CODECOV_TOKEN
-      # as a GitHub Actions secret, then uncomment. Keep `fail_ci_if_error: false`
-      # so a Codecov outage can never turn a genuinely green verification red.
-      #
-      # - name: Upload coverage to Codecov
-      #   uses: codecov/codecov-action@v4
-      #   with:
-      #     token: ${{ secrets.CODECOV_TOKEN }}
-      #     files: coverage-root.xml,coverage-backend.xml
-      #     fail_ci_if_error: false
+      # Codecov upload — informational only. `fail_ci_if_error: false` keeps a
+      # Codecov outage from turning a genuinely green verification red, and no
+      # `if:` condition is set so the default `success()` applies: coverage is
+      # only published once every verification step above has passed.
+      # Root and backend are uploaded as two separate reports under two separate
+      # flags. They measure different surfaces and are not one aggregate number.
+      - name: Upload root coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage-root.xml
+          flags: root
+          name: root-portable-gate
+          disable_search: true
+          fail_ci_if_error: false
+
+      - name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage-backend.xml
+          flags: backend
+          name: backend-suite
+          disable_search: true
+          fail_ci_if_error: false
