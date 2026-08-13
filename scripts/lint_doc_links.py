@@ -89,6 +89,10 @@ MARKDOWN_LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 REFERENCE_LINK_RE = re.compile(r"^\s*\[[^\]]+\]:\s*(\S+)")
 CODE_SPAN_RE = re.compile(r"`([^`\n]+)`")
 LINE_SUFFIX_RE = re.compile(r":\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*$")
+# A pytest node id names a file plus an in-file selector: `path/test_x.py::test_name`,
+# `...::test_name[param-id]`, or `...::TestClass::test_method`. Only the leading `.py`
+# component is a filesystem path.
+PYTEST_NODE_ID_RE = re.compile(r"^(?P<path>\S+\.py)::\S+$")
 GLOB_CHARS = set("*?[")
 
 
@@ -202,8 +206,20 @@ def _looks_like_repo_path(value: str) -> bool:
     return "/" in value and (first in KNOWN_TOP_LEVEL_DIRS or has_extension)
 
 
+def _strip_pytest_node_id(value: str) -> str:
+    """Reduce a pytest node id to the test file it names.
+
+    Documentation cites tests by node id, so the existence check validates the
+    `.py` component and ignores the `::` selector. Without this the whole node id
+    is treated as one filesystem path, and a parametrized `[param]` selector is
+    read as a glob character class.
+    """
+    match = PYTEST_NODE_ID_RE.match(value)
+    return match.group("path") if match else value
+
+
 def _path_exists(root: Path, value: str, *, markdown_file: Path | None) -> bool:
-    value = LINE_SUFFIX_RE.sub("", value.rstrip(".,;"))
+    value = _strip_pytest_node_id(LINE_SUFFIX_RE.sub("", value.rstrip(".,;")))
     if value in PATH_VALUE_EXCLUSIONS:
         return True
     if value.startswith(tuple(PLANNED_PATH_EXCLUSIONS)):
@@ -411,7 +427,7 @@ def _materialize_cited_paths(fixture_root: Path, max_rounds: int = 5) -> None:
         if not missing:
             return
         for cited in missing:
-            cleaned = re.sub(r":\d+$", "", cited)
+            cleaned = _strip_pytest_node_id(re.sub(r":\d+$", "", cited))
             target = fixture_root / cleaned
             if cleaned.endswith("/"):
                 target.mkdir(parents=True, exist_ok=True)
@@ -461,6 +477,67 @@ def run_stale_fixture(root: Path) -> int:
     return 0
 
 
+def run_node_id_fixture(root: Path) -> int:
+    """Prove pytest node ids are validated by their file component alone.
+
+    The fixture prose deliberately avoids every ABSENCE_CONTEXT word, so a pass
+    here means node-id handling stands on its own rather than on an unrelated
+    sentence incidentally suppressing the check.
+    """
+    root = root.resolve()
+    try:
+        baseline_text = (root / BASELINE_PATH).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        print(f"{BASELINE_PATH}:1: [DOC-BASELINE] file is missing")
+        return 1
+
+    with tempfile.TemporaryDirectory(prefix="financeiq-docs-lint-nodeid-") as directory:
+        fixture_root = Path(directory)
+        (fixture_root / "docs").mkdir()
+        (fixture_root / BASELINE_PATH).write_text(baseline_text, encoding="utf-8")
+        # Settle the copied baseline's own citations before the fixture doc exists,
+        # so the materializer cannot create the file this check needs to stay absent.
+        _materialize_cited_paths(fixture_root)
+        (fixture_root / "tests").mkdir(parents=True, exist_ok=True)
+        (fixture_root / "tests" / "test_present_case.py").write_text("", encoding="utf-8")
+        (fixture_root / "NODE_ID_FIXTURE.md").write_text(
+            "Plain node id: `tests/test_present_case.py::test_present_case_runs`.\n"
+            "Parametrized node id: "
+            "`tests/test_present_case.py::test_present_case_runs[case-1]`.\n"
+            "Class node id: "
+            "`tests/test_present_case.py::TestPresentCase::test_present_case_runs`.\n"
+            "Uncreated base file: "
+            "`tests/test_uncreated_case.py::test_uncreated_case_runs`.\n",
+            encoding="utf-8",
+        )
+        try:
+            errors = lint_repository(fixture_root)
+        except Exception as exc:  # noqa: BLE001 - a crash is itself the regression
+            print(f"Docs lint node-id check FAILED: linting raised {exc!r}.")
+            return 1
+
+    present = [error for error in errors if "test_present_case" in error]
+    uncreated = [
+        error
+        for error in errors
+        if "[DOC-PATH]" in error and "tests/test_uncreated_case.py" in error
+    ]
+    if present or len(uncreated) != 1:
+        for error in errors:
+            print(error)
+        print(
+            "Docs lint node-id check FAILED: expected no diagnostic for the existing "
+            "test file and exactly one for the uncreated one."
+        )
+        return 1
+    print(uncreated[0])
+    print(
+        "Docs lint node-id check PASSED: node ids resolve to their file component "
+        "and an unbacked one is still rejected."
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -472,11 +549,23 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--self-test-stale",
         action="store_true",
-        help="run an isolated stale-current-assertion fixture and require rejection",
+        help=(
+            "run the isolated stale-current-assertion and pytest node-id fixtures "
+            "and require both to hold"
+        ),
+    )
+    parser.add_argument(
+        "--self-test-node-ids",
+        action="store_true",
+        help="run only the pytest node-id fixture",
     )
     args = parser.parse_args(argv)
+    if args.self_test_node_ids:
+        return run_node_id_fixture(args.root)
     if args.self_test_stale:
-        return run_stale_fixture(args.root)
+        stale_status = run_stale_fixture(args.root)
+        node_id_status = run_node_id_fixture(args.root)
+        return max(stale_status, node_id_status)
     errors = lint_repository(args.root)
     if errors:
         for error in errors:
