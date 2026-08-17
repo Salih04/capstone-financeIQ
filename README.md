@@ -124,6 +124,43 @@ outstanding. Supply shares via the capital-event file
 `data/trusted_raw/financials/corrected_balance_sheet_2024.csv`. Targets are real;
 no value is fabricated or imputed.
 
+## Develop in GitHub Codespaces
+
+Codespaces gives this repository a Linux software-portability environment for
+verification and onboarding. It is not the machine of record.
+
+Dependencies install automatically from `requirements-root.txt` during
+`postCreateCommand`; no Codespaces secret or `.env` file is required.
+
+```bash
+python --version
+make test-root-portable
+PYTHONPATH=backend python -m pytest backend/tests -q
+make data-validate
+make claims-lint
+make docs-lint
+```
+
+`make test-root-portable` runs the Linux-portable root gate by deselecting the
+environment-qualified ids listed in `.github/ci-deselect.txt`. Those ids are
+deselected from the portable Linux gate only; they remain required by the native
+machine-of-record gate and are not removed or weakened.
+
+Backend tests run separately on sqlite and require no Postgres service.
+
+Verification uses tracked checkout data only. After dependency installation,
+no Yahoo fetch, ignored raw-price cache, or network data collection is required,
+and these verification commands do not regenerate committed experiment artifacts.
+
+Linux Codespaces is not the macOS arm64 machine-of-record environment. The full
+native root suite remains the reproducibility gate; see
+[docs/VERIFICATION_BASELINE.md](docs/VERIFICATION_BASELINE.md) for dated counts.
+
+Codespaces is onboarding and software-portability infrastructure only. It
+establishes no scientific, model, or deployment validity and carries no
+implication about predictive validity, alpha, profitability, causal validity, or
+feature selection. No reliable predictive edge has been established.
+
 ## Research Assistant (OpenRouter/local-LLM-assisted)
 
 A constrained research-support layer. The **structured ML pipeline stays the

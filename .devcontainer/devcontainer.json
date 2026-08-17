@@ -1,0 +1,10 @@
+{
+  "name": "FinanceIQ verification",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12-bookworm",
+  "postCreateCommand": "python -m pip install --user -r requirements-root.txt",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"]
+    }
+  }
+}
