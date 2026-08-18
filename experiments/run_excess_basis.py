@@ -271,8 +271,45 @@ FROZEN_BOUNDARY_EXTRA_FILES = (
 # unchanged (351 members) and every other member was compared against ``main``
 # and is byte-identical.  No exemption was added: the report remains a protected
 # member and any further change still fails closed here.
+#
+# Deliberate re-pin (2026-08-18, FI-DATA-PATH-02C pipeline-audit canonical
+# refresh):
+# ``b0fce8a3d96dc845efcff4d25c3d537b0bfb7bb42d088512410a874c4550c9b0`` ->
+# ``98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5``.  The two
+# changed boundary members are the pipeline audit snapshot
+# ``data/trusted_clean/pipeline_audit_report.json``
+# (598fe2717b7b9e13ce7e802472e85fe63ebd0c0e48c7521d686afa664675c82d ->
+# 9e902e44389e7b0d843e8afaa749a70b86f7f05f8edea01db8370729ede9964a) and its
+# Markdown companion ``data/trusted_clean/pipeline_audit_report.md``
+# (2589bc9c0a14afd90f2d6529cb3dfc819171923843b4412318e55228413a252c ->
+# b33f5f78c691a3f9b0aeb8852650639cdb28a0349b7945c691ff728fbec10bac).  Their
+# registered producer, ``scripts/data_collection/audit_pipeline.py``, was NOT
+# modified: it already emits its own repo-local paths relatively, and the
+# snapshot on ``main`` was simply descriptively stale.  Regenerating it with
+# ``make data-audit`` refreshed the tracked-CSV inventory from 34 to 39 files.
+# The five newly represented tracked CSVs are
+# ``data/provenance/cell_provenance_public_2020_2025.csv``,
+# ``data/trusted_clean/modeling_targets_alternative.csv``,
+# ``data/trusted_raw/macro/cpi_yearly_tr.csv``,
+# ``data/trusted_raw/macro/macro_context_yearly.csv``, and
+# ``data/trusted_raw/macro/usdtry_year_end.csv``; all five already existed as
+# tracked files and belong under the producer's current inventory semantics.
+# The two remaining absolute paths in ``universe_split.outputs`` were transitively
+# embedded from an older ``universe_split_report.json`` snapshot and are now
+# repo-relative; the regenerated reports contain no absolute checkout path.
+# A structured leaf-diff of the JSON found 97 changed leaves, every one of which
+# is descriptive: 2 path-provenance, 56 file-inventory, 21 missingness-statistic,
+# 5 row-count, 5 column-count, and 8 classification leaves, and 0 scientific,
+# model, or inference leaves.  No leaf under any pre-existing file entry moved,
+# and the ``report``, ``current_quality_summary``, ``experiment_leaderboard_rows``,
+# and ``guardrails`` sections are byte-identical.  No modeling value, target
+# value, benchmark return, prediction, coefficient, IC, p-value, confidence
+# interval, ranking, feature-selection result, or scientific conclusion changed.
+# The member set is unchanged (351 members) and every other member was compared
+# against ``main`` and is byte-identical.  No exemption was added: both reports
+# remain protected members and any further change still fails closed here.
 FROZEN_PROTECTED_BOUNDARY_SHA256 = (
-    "b0fce8a3d96dc845efcff4d25c3d537b0bfb7bb42d088512410a874c4550c9b0"
+    "98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5"
 )
 
 # ---------------------------------------------------------------------------

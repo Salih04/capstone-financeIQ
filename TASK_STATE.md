@@ -1015,3 +1015,35 @@ KAP cross-check recommended before claiming any result.
 | Docs / claims lint | `PASSED — MCC v1.10.0` |
 | Out of scope | `pipeline_audit_report.json (02C), bist100_benchmark_report.json (02D), and the artifact_registry.json yearly input-path inaccuracy — each a separate producer and task` |
 | Claim boundary | Path/provenance only: no modeling row, feature, target, or statistic changed; no reliable predictive edge established |
+
+
+## FI-DATA-PATH-02C pipeline-audit canonical refresh (2026-08-18; append-only)
+
+| State item | Status |
+|---|---|
+| Defect | `data/trusted_clean/pipeline_audit_report.{json,md}` on `main` was a descriptively stale snapshot: its tracked-CSV inventory predated five tracked CSVs, and `universe_split.outputs` still carried two absolute paths (`/Users/salihcamci/Downloads/capstone-financeIQ/...`, a location that no longer exists) |
+| Producer | `NOT MODIFIED — scripts/data_collection/audit_pipeline.py already emits its own repo-local paths relatively; the two absolute strings were transitively embedded from an older universe_split_report.json snapshot and clear on regeneration. Makefile and artifact_registry.json also unmodified` |
+| Fix | Canonical regeneration only: `make data-audit`. No generated JSON or Markdown was hand-edited |
+| Determinism | `VERIFIED — a second make data-audit produced byte-identical JSON and Markdown` |
+| Report digests | `json 598fe2717b7b9e13ce7e802472e85fe63ebd0c0e48c7521d686afa664675c82d -> 9e902e44389e7b0d843e8afaa749a70b86f7f05f8edea01db8370729ede9964a; md 2589bc9c0a14afd90f2d6529cb3dfc819171923843b4412318e55228413a252c -> b33f5f78c691a3f9b0aeb8852650639cdb28a0349b7945c691ff728fbec10bac` |
+| CSV inventory | `34 -> 39 tracked CSVs` |
+| Newly represented tracked CSVs | `5 — data/provenance/cell_provenance_public_2020_2025.csv; data/trusted_clean/modeling_targets_alternative.csv; data/trusted_raw/macro/cpi_yearly_tr.csv; data/trusted_raw/macro/macro_context_yearly.csv; data/trusted_raw/macro/usdtry_year_end.csv — all already tracked and all belonging under current producer semantics` |
+| Classification counts | `clean_generated 3 -> 4, raw 17 -> 20, other 0 -> 1; config 3, trusted_reference 8, modeling_ready 1, public_modeling_ready 1, training_modeling_ready 1 all unchanged` |
+| Stale-path hits in the regenerated reports | `2 BEFORE -> 0 AFTER for /Users/salihcamci/, /Downloads/capstone-financeIQ, /Desktop/Projects/First_Priority_Projects/FinanceIQ; universe_split.outputs.training and .public are now repo-relative` |
+| Semantic leaf diff | `97 LEAVES, ALL DESCRIPTIVE — PATH_PROVENANCE 2, FILE_INVENTORY 56, MISSINGNESS_STATISTIC 21, ROW_COUNT 5, COLUMN_COUNT 5, CLASSIFICATION 8, SCIENTIFIC_MODEL_RESULT 0, OTHER 0; 0 leaves under any pre-existing file entry moved` |
+| Sections byte-identical | `report, current_quality_summary, experiment_leaderboard_rows, guardrails` |
+| Docs citation repair | `MECHANICAL — docs/LEGACY_DB_PATH_AUDIT.md:117 pipeline_audit_report.json:274-274 -> :304-304; the cited leaf is still the fully-missing sector entry and the claim wording is unchanged` |
+| Protected members compared vs `main` | `351 — exactly two differ: data/trusted_clean/pipeline_audit_report.json and .md; membership set unchanged` |
+| Member count | `351 -> 351` |
+| Boundary digest | `b0fce8a3d96dc845efcff4d25c3d537b0bfb7bb42d088512410a874c4550c9b0 -> 98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5` |
+| Boundary exemption | `NONE ADDED` |
+| Independent pins updated | `4 — FROZEN_PROTECTED_BOUNDARY_SHA256 plus the three hard-coded test authorities, each with a truthful provenance comment; the test literals stay independent of the source constant` |
+| Excess regeneration | `2 FILES / 9 JSON LEAVES — boundary digest (x2 per file), generator source hash and size (x2 files), dependent significance_report.json hash in the manifest; 0 non-provenance leaves moved, and 310 + 883 scientific leaves are identical` |
+| Leaderboard, prediction dumps, `significance_report.md` | `BYTE-IDENTICAL` |
+| Scientific leaves | `UNCHANGED — 0/6 survive Bonferroni, primary and trajectory-preserving sensitivity` |
+| Data validation | `VALID — 403 rows, 40 features, 321 target rows, benchmark available` |
+| Root suite | `1081 PASSED / 0 FAILED` |
+| Backend suite | `552 PASSED / 0 FAILED` |
+| Docs / claims lint | `PASSED — MCC v1.10.0; both lint_doc_links self-tests PASSED` |
+| Out of scope | `bist100_benchmark_report.json + collect_bist100_benchmark.py (02D) and the artifact_registry.json yearly input-path inaccuracy — each a separate producer and task. make benchmark was NOT run and no benchmark artifact was touched` |
+| Claim boundary | Descriptive inventory/missingness refresh only: no modeling row, feature, target, prediction, coefficient, IC, p-value, interval, or ranking changed; no reliable predictive edge established |
