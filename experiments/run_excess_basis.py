@@ -214,8 +214,39 @@ FROZEN_BOUNDARY_EXTRA_FILES = (
 # members) and every other member was compared against ``main`` and is
 # byte-identical.  No exemption was added: the report remains a protected member
 # and any further change still fails closed here.
+#
+# Deliberate re-pin (2026-08-18, FI-DATA-PATH-02B yearly-snapshot provenance
+# repair):
+# ``74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03`` ->
+# ``daa9ad3d216061bda7bc00b3630919f5cfffb82c2ac3fcdc830ec631a28494d6``.  The two
+# changed boundary members are the yearly-snapshot migration reports
+# ``data/trusted_clean/yearly_snapshot_migration_report.json``
+# (b93bf9159cf3eda5682b589402b2b7bab3b119d133a5fe804221d56f5e38b584 ->
+# 288dcbb45d12058afff80a742fb758e0a6618022e55274531bc10361866635ed) and
+# ``data/trusted_clean/yearly_snapshot_migration_report.md``
+# (59940b67d4df6ee9b0a74806b11159dea951f0962a97f642b2c50de5bf3eb516 ->
+# 971a2c6433f4d3df12c4ed4ffd69d1e0c8114efd074133d9b1a737e88dd6378f).  Their
+# registered producer,
+# ``scripts/data_collection/extract_yearly_snapshots_to_manual_financials.py``,
+# serialized every discovered/selected/skipped/output path with ``str(Path)``,
+# so both reports embedded the absolute checkout location of the machine that
+# last ran them (``/Users/salihcamci/Downloads/capstone-financeIQ/...``, a
+# location that no longer exists); they now emit repo-relative POSIX paths.
+# Only path leaves moved, plus one truthful discovery-surface entry: the
+# ``data/raw`` search directory now appears in ``input_folders_searched``
+# because the c1faa3ae repository reorganization created that directory after
+# the reports were last regenerated.  It contributes no new file — the
+# discovered, skipped, and selected file sets are unchanged — and every count,
+# coverage map, column list, rejection reason, and issue in the reports is
+# unchanged.  The candidate payload the reports describe,
+# ``data/trusted_raw/financials/candidate_from_yearly_snapshots.csv``, is
+# byte-identical across the regeneration
+# (304ca2dd46e8b1108897d485aa7377f4d24adb6fcf5bbe3bffce78c47b98eebd).  The
+# member set is unchanged (351 members) and every other member was compared
+# against ``main`` and is byte-identical.  No exemption was added: both reports
+# remain protected members and any further change still fails closed here.
 FROZEN_PROTECTED_BOUNDARY_SHA256 = (
-    "74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03"
+    "daa9ad3d216061bda7bc00b3630919f5cfffb82c2ac3fcdc830ec631a28494d6"
 )
 
 # ---------------------------------------------------------------------------

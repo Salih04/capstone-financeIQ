@@ -962,3 +962,29 @@ KAP cross-check recommended before claiming any result.
 | Docs / claims lint | `PASSED — MCC v1.10.0` |
 | Residual | Stale `/Users/salihcamci/Downloads/capstone-financeIQ` strings remain in four other generated reports (`pipeline_audit_report.json`, `quarterly_snapshot_inspection.json`, `yearly_snapshot_migration_report.{json,md}`); each is a separate producer and boundary member, out of scope here |
 | Claim boundary | Path/provenance only: no modeling row, feature, target, or statistic changed; no reliable predictive edge established |
+
+## FI-DATA-PATH-02B yearly-snapshot provenance repair (2026-08-18; append-only)
+
+| State item | Status |
+|---|---|
+| Defect | `scripts/data_collection/extract_yearly_snapshots_to_manual_financials.py` serialized every discovered, selected, skipped, and output path with `str(Path)` at 10 sites, so `yearly_snapshot_migration_report.json` and its Markdown rendering embedded the absolute repository location of whichever machine last ran it (committed value: `/Users/salihcamci/Downloads/capstone-financeIQ/...`, a path that no longer exists) |
+| Fix | Local `_relative_or_absolute(path)` helper following `experiments/contamination_lab.py`: repo-local paths emit repo-relative POSIX text, paths legitimately outside the repo (`--input-dir`, tmp_path fixtures) keep an absolute representation instead of raising. Applied to all 10 sites incl. the `rows_per_file` mapping keys; the Markdown report inherits the change through the same fields |
+| Regeneration | `make extract-yearly-financials` |
+| Candidate CSV | `BYTE-IDENTICAL — data/trusted_raw/financials/candidate_from_yearly_snapshots.csv 304ca2dd46e8b1108897d485aa7377f4d24adb6fcf5bbe3bffce78c47b98eebd before and after; absent from git diff` |
+| Report change | `PATH LEAVES ONLY — output_rows 240, ticker_year_coverage, candidate_columns_written, columns_discovered/mapped/skipped, columns_rejected_misaligned, ambiguous_columns, annual_return_col_per_year, issues, next_command all unchanged` |
+| Discovery-surface note | `input_folders_searched gained data/raw — truthful: the c1faa3ae reorganization created that directory after the reports were last regenerated. It contributes no file; files_discovered, files_skipped, year_files, and selected_file_per_year are unchanged` |
+| Stale-path hits in the two reports | `35 (json) + 7 (md) BEFORE -> 0 + 0 AFTER for /Users/salihcamci/, /Downloads/capstone-financeIQ, /Desktop/Projects/First_Priority_Projects/FinanceIQ` |
+| Report digests | `json b93bf915…5e38b584 → 288dcbb4…866635ed; md 59940b67…bf3eb516 → 971a2c64…8dd6378f` |
+| Protected members compared vs `main` | `351 — exactly two differ: data/trusted_clean/yearly_snapshot_migration_report.{json,md}` |
+| Boundary digest | `74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03 → daa9ad3d216061bda7bc00b3630919f5cfffb82c2ac3fcdc830ec631a28494d6` |
+| Boundary exemption | `NONE ADDED` |
+| Independent pins updated | `4 — FROZEN_PROTECTED_BOUNDARY_SHA256 plus the three hard-coded test authorities, each with a truthful provenance comment; the test literals stay independent of the source constant` |
+| Excess regeneration | `2 FILES / 9 JSON LEAVES — boundary digest (x4), generator source hash and size (x2 files), dependent significance_report.json hash; leaf key sets identical, 0 non-provenance leaves` |
+| Leaderboard, prediction dumps, `significance_report.md` | `BYTE-IDENTICAL` |
+| Scientific leaves | `UNCHANGED — 0/6 survive Bonferroni, primary and trajectory-preserving sensitivity` |
+| Data validation | `VALID` |
+| Root suite | `1081 PASSED / 0 FAILED` |
+| Backend suite | `552 PASSED / 0 FAILED` |
+| Docs / claims lint | `PASSED` |
+| Out of scope | `quarterly_snapshot_inspection.json + inspect_quarterly_snapshots.py (02A), pipeline_audit_report.json (02C), bist100_benchmark_report.json (02D), and the artifact_registry.json yearly input-path inaccuracy — each a separate producer and task` |
+| Claim boundary | Path/provenance only: no modeling row, feature, target, or statistic changed; no reliable predictive edge established |
