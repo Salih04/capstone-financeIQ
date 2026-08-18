@@ -386,8 +386,8 @@
       "experiments/results_serving_eval": 5,
       "model_confidence_contract.json": 1
     },
-    "members_pinned_authority_sha256": "b0fce8a3d96dc845efcff4d25c3d537b0bfb7bb42d088512410a874c4550c9b0",
-    "members_sha256": "b0fce8a3d96dc845efcff4d25c3d537b0bfb7bb42d088512410a874c4550c9b0",
+    "members_pinned_authority_sha256": "98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5",
+    "members_sha256": "98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5",
     "members_sha256_definition": "sha256 of the newline-joined '<repo-relative-posix-path>:<sha256>' records for every boundary member, sorted by path. A content digest, not a file count: it detects modification or removal of an original member and is unchanged by later, unrelated namespace additions.",
     "policy": "Curated data and the generated namespaces that already existed when R3-TGT-01 was frozen, which this excess regeneration must never mutate. Explicit historical allow-list: namespaces added by later, unrelated governed tasks are not members and are protected by their own tasks, so adding one never changes this boundary."
   },
@@ -3304,8 +3304,8 @@
     {
       "path": "experiments/run_excess_basis.py",
       "role": "R3-TGT-01 generator",
-      "sha256": "4fb6090a01530df4209b11fe9586dd0f64538a38a8c50275ad476f476787cc53",
-      "size_bytes": 217353
+      "sha256": "e37bca5910aa1663be8727d02a7671385e6c4909c000852a53dafd66011a68e5",
+      "size_bytes": 219916
     },
     {
       "path": "experiments/run_experiments.py",

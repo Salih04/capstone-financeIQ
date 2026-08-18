@@ -3126,21 +3126,35 @@ def test_accepted_subset_contract_is_documented():
 
 
 # The three independently hard-coded boundary-digest literals below were re-pinned
-# on 2026-08-18 from ``daa9ad3d...1a28494d6`` to ``b0fce8a3...4550c9b0`` for the
-# FI-DATA-PATH-02A quarterly-snapshot provenance repair.  The member set remains
-# 351 and the sole changed member is
-# ``data/trusted_clean/quarterly_snapshot_inspection.json``: its producer,
-# ``scripts/data_collection/inspect_quarterly_snapshots.py``, serialized the
-# inspected quarterly directory with ``str(QDIR)`` and now emits a repo-relative
-# POSIX path.  Exactly one JSON leaf moved, ``dir``; the file list, periods,
-# rows-per-period, frozen and varying column lists, issues, and the FROZEN
-# SNAPSHOT verdict are unchanged, the Markdown companion is byte-identical, and
-# the eight read-only quarterly XLSX inputs are byte-identical.  Every other
+# on 2026-08-18 from ``b0fce8a3...4550c9b0`` to ``98195607...e800cee5`` for the
+# FI-DATA-PATH-02C pipeline-audit canonical refresh.  The member set remains 351
+# and the two changed members are the pipeline audit snapshot
+# ``data/trusted_clean/pipeline_audit_report.json`` and its Markdown companion
+# ``data/trusted_clean/pipeline_audit_report.md``.  Their producer,
+# ``scripts/data_collection/audit_pipeline.py``, was NOT modified: it already
+# emits its own repo-local paths relatively, and the snapshot on ``main`` was
+# descriptively stale.  Regenerating it with ``make data-audit`` refreshed the
+# tracked-CSV inventory from 34 to 39 files; the five newly represented tracked
+# CSVs are ``data/provenance/cell_provenance_public_2020_2025.csv``,
+# ``data/trusted_clean/modeling_targets_alternative.csv``,
+# ``data/trusted_raw/macro/cpi_yearly_tr.csv``,
+# ``data/trusted_raw/macro/macro_context_yearly.csv``, and
+# ``data/trusted_raw/macro/usdtry_year_end.csv``.  Two absolute paths under
+# ``universe_split.outputs``, transitively embedded from an older
+# ``universe_split_report.json`` snapshot, are now repo-relative.  All 97 changed
+# JSON leaves are descriptive inventory, missingness, row/column-count,
+# classification, and path-provenance leaves; no leaf under a pre-existing file
+# entry moved and no scientific, model, or inference result changed.  Every other
 # member was compared against ``main`` and is byte-identical.  No exemption was
-# added: the report remains protected.  The literals stay hard-coded (never
+# added: both reports remain protected.  The literals stay hard-coded (never
 # derived from ``excess.FROZEN_PROTECTED_BOUNDARY_SHA256``) so the pin remains an
 # independent authority rather than a self-confirming echo of the source
 # constant.
+#
+# Prior re-pin (2026-08-18, FI-DATA-PATH-02A quarterly-snapshot provenance repair):
+# ``daa9ad3d...1a28494d6`` -> ``b0fce8a3...4550c9b0``; sole changed member
+# ``data/trusted_clean/quarterly_snapshot_inspection.json`` (absolute -> repo-relative
+# ``dir`` path; Markdown companion and quarterly XLSX inputs byte-identical).
 #
 # Prior re-pin (2026-08-18, FI-DATA-PATH-02B yearly-snapshot provenance repair):
 # ``74a8ea09...8dc2eb03`` -> ``daa9ad3d...1a28494d6``; the two changed members
@@ -3179,7 +3193,7 @@ def test_genuine_base_repository_reconstructs_351_members_with_pinned_digest():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "b0fce8a3d96dc845efcff4d25c3d537b0bfb7bb42d088512410a874c4550c9b0"
+        == "98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5"
     )
     assert (
         excess._frozen_boundary_digest(members)
@@ -3419,7 +3433,7 @@ def test_genuine_boundary_survives_the_descriptor_anchoring():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "b0fce8a3d96dc845efcff4d25c3d537b0bfb7bb42d088512410a874c4550c9b0"
+        == "98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5"
     )
 
 
@@ -3952,7 +3966,7 @@ def test_historical_boundary_authority_is_unchanged_after_the_repair():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "b0fce8a3d96dc845efcff4d25c3d537b0bfb7bb42d088512410a874c4550c9b0"
+        == "98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5"
     )
 
 

@@ -1,14 +1,15 @@
 {
   "report": "FinanceIQ pipeline audit",
-  "csv_file_count": 34,
+  "csv_file_count": 39,
   "files_by_class": {
     "config": 3,
+    "other": 1,
     "trusted_reference": 8,
-    "clean_generated": 3,
+    "clean_generated": 4,
     "modeling_ready": 1,
     "public_modeling_ready": 1,
     "training_modeling_ready": 1,
-    "raw": 17
+    "raw": 20
   },
   "files": [
     {
@@ -51,6 +52,35 @@
       "duplicate_ticker_year_keys": null,
       "avg_missingness": 0.0,
       "missingness_nonzero": {},
+      "target_availability": {}
+    },
+    {
+      "path": "data/provenance/cell_provenance_public_2020_2025.csv",
+      "class": "other",
+      "rows": 14640,
+      "columns": 14,
+      "ticker_count": 40,
+      "year_min": 2020,
+      "year_max": 2025,
+      "years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "duplicate_ticker_year_keys": 14400,
+      "avg_missingness": 0.2687,
+      "missingness_nonzero": {
+        "value_state": 0.0654,
+        "source_artifact": 0.437,
+        "source_field": 0.437,
+        "source_effective_year": 0.437,
+        "source_retrieved_at": 1.0,
+        "upstream_cells": 0.8224,
+        "resolution_note": 0.563
+      },
       "target_availability": {}
     },
     {
@@ -462,6 +492,37 @@
       }
     },
     {
+      "path": "data/trusted_clean/modeling_targets_alternative.csv",
+      "class": "clean_generated",
+      "rows": 403,
+      "columns": 11,
+      "ticker_count": 81,
+      "year_min": 2020,
+      "year_max": 2025,
+      "years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "duplicate_ticker_year_keys": 0,
+      "avg_missingness": 0.0916,
+      "missingness_nonzero": {
+        "next_year_nominal_try_return_pct": 0.2035,
+        "cpi_december_yoy_pct": 0.1985,
+        "next_year_real_return_pct": 0.2035,
+        "usdtry_end_try_per_usd": 0.1985,
+        "next_year_usd_return_pct": 0.2035
+      },
+      "target_availability": {
+        "next_year_nominal_try_return_pct_nonnull": 321,
+        "next_year_real_return_pct_nonnull": 321,
+        "next_year_usd_return_pct_nonnull": 321
+      }
+    },
+    {
       "path": "data/trusted_raw/bist100_benchmark_returns.csv",
       "class": "raw",
       "rows": 6,
@@ -763,6 +824,71 @@
       "target_availability": {}
     },
     {
+      "path": "data/trusted_raw/macro/cpi_yearly_tr.csv",
+      "class": "raw",
+      "rows": 6,
+      "columns": 2,
+      "ticker_count": null,
+      "year_min": 2020,
+      "year_max": 2025,
+      "years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "duplicate_ticker_year_keys": null,
+      "avg_missingness": 0.0,
+      "missingness_nonzero": {},
+      "target_availability": {}
+    },
+    {
+      "path": "data/trusted_raw/macro/macro_context_yearly.csv",
+      "class": "raw",
+      "rows": 6,
+      "columns": 16,
+      "ticker_count": null,
+      "year_min": 2020,
+      "year_max": 2025,
+      "years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "duplicate_ticker_year_keys": null,
+      "avg_missingness": 0.0,
+      "missingness_nonzero": {},
+      "target_availability": {}
+    },
+    {
+      "path": "data/trusted_raw/macro/usdtry_year_end.csv",
+      "class": "raw",
+      "rows": 6,
+      "columns": 9,
+      "ticker_count": null,
+      "year_min": 2020,
+      "year_max": 2025,
+      "years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "duplicate_ticker_year_keys": null,
+      "avg_missingness": 0.1111,
+      "missingness_nonzero": {
+        "error": 1.0
+      },
+      "target_availability": {}
+    },
+    {
       "path": "data/trusted_raw/prices/yahoo_year_end_prices.csv",
       "class": "raw",
       "rows": 465,
@@ -888,8 +1014,8 @@
     "non_public_in_public_dataset": [],
     "validation_passed": true,
     "outputs": {
-      "training": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_clean/modeling_dataset_training_2020_2025.csv",
-      "public": "/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_clean/modeling_dataset_public_2020_2025.csv"
+      "training": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "public": "data/trusted_clean/modeling_dataset_public_2020_2025.csv"
     },
     "note": "Training universe has 41 extra tickers hidden from frontend endpoints."
   },
