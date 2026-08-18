@@ -62,6 +62,23 @@ def parse_tr_number(v) -> float | None:
         return None
 
 
+def _relative_or_absolute(path: Path) -> str:
+    """Serialize a path for the benchmark report.
+
+    Repo-local paths become repo-relative POSIX text so the committed report
+    stays relocatable and never embeds the absolute checkout location of
+    whichever machine last ran the generator. A path that legitimately lives
+    outside the repository keeps a usable absolute representation instead of
+    raising, which a bare ``relative_to(REPO_ROOT)`` would do. Mirrors the
+    convention in ``experiments/contamination_lab.py::_relative_or_absolute``.
+    """
+    resolved = path.resolve()
+    try:
+        return resolved.relative_to(REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(resolved)
+
+
 def _norm(c) -> str:
     return str(c).strip().lower().replace(" ", "_")
 
@@ -209,7 +226,7 @@ def main(argv=None) -> int:
         "source": source, "years_covered": df["year"].astype(int).tolist(),
         "returns": {int(y): float(r) for y, r in zip(df["year"], df["bist100_return_pct"])},
         "missing_years": [y for y in range(a.start_year, a.end_year + 1) if y not in set(df["year"])],
-        "excess_targets_enabled": not df.empty, "issues": issues, "log": log, "output": str(OUT_CSV),
+        "excess_targets_enabled": not df.empty, "issues": issues, "log": log, "output": _relative_or_absolute(OUT_CSV),
     }
     REPORT_JSON.write_text(json.dumps(report, indent=2, default=str))
     REPORT_MD.write_text(

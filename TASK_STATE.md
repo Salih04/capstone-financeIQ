@@ -1047,3 +1047,38 @@ KAP cross-check recommended before claiming any result.
 | Docs / claims lint | `PASSED — MCC v1.10.0; both lint_doc_links self-tests PASSED` |
 | Out of scope | `bist100_benchmark_report.json + collect_bist100_benchmark.py (02D) and the artifact_registry.json yearly input-path inaccuracy — each a separate producer and task. make benchmark was NOT run and no benchmark artifact was touched` |
 | Claim boundary | Descriptive inventory/missingness refresh only: no modeling row, feature, target, prediction, coefficient, IC, p-value, interval, or ranking changed; no reliable predictive edge established |
+
+
+## FI-DATA-PATH-02D benchmark-producer path forward-fix (2026-08-19; append-only)
+
+| State item | Status |
+|---|---|
+| Defect | `scripts/data_collection/collect_bist100_benchmark.py` serialized the report's top-level `output` field with `str(OUT_CSV)`, so every governed benchmark refresh re-embeds the absolute checkout path of whichever machine last ran it (committed value: `/Users/salihcamci/Downloads/capstone-financeIQ/data/trusted_raw/bist100_benchmark_returns.csv`, a location that no longer exists) |
+| Scope | `FORWARD SOURCE FIX ONLY — governance decision FI_DATA_PATH_02D_SOURCE_FIX_ONLY_RECOMMENDED` |
+| Fix | Local `_relative_or_absolute(path)` helper following `experiments/contamination_lab.py` and the FI-DATA-PATH-02A/02B producers: repo-local paths emit repo-relative POSIX text, a path legitimately outside the repo keeps an absolute representation instead of raising. Applied to the single `output` site; no other path handling touched |
+| Producer forward-fix | `IMPLEMENTED` |
+| Future generated `output` | `data/trusted_raw/bist100_benchmark_returns.csv — repo-relative POSIX` |
+| Current committed report | `DELIBERATELY NOT REGENERATED — data/trusted_clean/bist100_benchmark_report.json remains known-stale in its inert output leaf` |
+| Why not regenerated | Hand-editing generated artifacts is forbidden; canonical `make benchmark` performs live Yahoo acquisition, which would constitute a scientific-data refresh; `--manual-only` is unsafe because the required manual daily inputs are absent. The stale `output` leaf is inert and no consumer reads it |
+| Acquisition surface | `BYTE-UNCHANGED — fetch_yahoo, load_manual_daily, yearly_returns, validate, ensure_template, parse_tr_number, _norm all AST-extracted and SHA-256 compared old vs new; identical. main() differs by exactly 1 line (the output leaf)` |
+| Verification method | `NON-NETWORK STATIC/UNIT PROBE — module imported with socket.connect/connect_ex/create_connection/getaddrinfo hard-blocked; helper(OUT_CSV) == data/trusted_raw/bist100_benchmark_returns.csv; outside-repo path returns absolute without ValueError. main(), fetch_yahoo(), urllib, and yfinance.download() were never invoked` |
+| `make benchmark` | `NOT RUN` |
+| Yahoo / XU100.IS / yfinance / query1.finance.yahoo.com | `NOT ACCESSED` |
+| Benchmark CSV | `UNCHANGED — ccfa2bbc5a654245b39ff97dc535f59c31c08c9b9216f93dfb84c2df2a323a6b before and after; absent from git diff` |
+| Report digests | `UNCHANGED — json 2d79329ad96de30b19600412f8a4cd12d3d1e5a0ad159f58c37f373f343ace66 before and after; md 14de7c4e6aa5751c43a4cfa43e36cb4fc82b5702edbda8c71a2bf2c587c81f46 before and after` |
+| Benchmark observations | `UNCHANGED — 6 data rows, years 2020-2025, values 27.38 / 24.23 / 185.94 / 31.96 / 28.94 / 12.64` |
+| Member count | `351 -> 351` |
+| Protected membership set | `IDENTICAL — member list diffed before and after, no additions or removals` |
+| Boundary digest | `UNCHANGED — 98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5 before and after` |
+| Re-pins | `0 — FROZEN_PROTECTED_BOUNDARY_SHA256 and all three hard-coded test digest literals untouched` |
+| `experiments/results_excess` artifacts | `UNTOUCHED — make research-excess NOT RUN; no boundary authority moved` |
+| Boundary exemption | `NONE ADDED` |
+| Tracked files changed | `2 — scripts/data_collection/collect_bist100_benchmark.py, TASK_STATE.md` |
+| Data validation | `VALID — 403 rows, 40 features, 321 target rows, benchmark available` |
+| Root suite | `1081 PASSED / 0 FAILED` |
+| Backend suite | `552 PASSED / 0 FAILED` |
+| Docs / claims lint | `PASSED — MCC v1.10.0; both lint_doc_links self-tests PASSED` |
+| Future obligation | The next governed benchmark refresh must resolve the stale `output` leaf naturally, by regenerating through the fixed producer rather than by hand-editing the report |
+| PLANNING ONLY / NOT CURRENT AUTHORITY | Predicted report JSON SHA if only the `output` leaf changes: `fbfe91541099bc31938cecae49a2176f66aabc17242e34dc2e901da67702a843`. Predicted candidate boundary digest after that future governed refresh: `8640c6705939a12f31518725642d8f1765dfa24530417356e5e68e0af12ae172`. Neither value is pinned, asserted, or authoritative in this task |
+| Out of scope | `artifact_registry.json entries 74/75 input declaration mismatch; the yearly artifact_registry input-path inaccuracy; the unused --force CLI argument; a report-only benchmark architecture; any benchmark data refresh; Yahoo acquisition policy — each a separate task` |
+| Claim boundary | Producer path/provenance only: no modeling row, feature, target, benchmark observation, prediction, coefficient, IC, p-value, interval, or ranking changed; no reliable predictive edge established |
