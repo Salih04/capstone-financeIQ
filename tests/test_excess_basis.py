@@ -3126,18 +3126,28 @@ def test_accepted_subset_contract_is_documented():
 
 
 # The three independently hard-coded boundary-digest literals below were re-pinned
-# on 2026-08-17 from ``03f9a792...cadeddfd`` to ``74a8ea09...8dc2eb03`` for the
-# FI-DATA-PATH-01 provenance-path repair.  The member set remains 351 and the sole
-# changed member is ``data/trusted_clean/universe_split_report.json``: its
-# producer, ``scripts/data_collection/split_universe_datasets.py``, embedded
-# absolute output paths from the machine that last ran it and now emits
-# repo-relative POSIX paths.  Only the two ``outputs`` strings moved; every
-# numeric field in the report is unchanged and the split CSVs it describes are
-# byte-identical.  Every other member was compared against ``main`` and is
-# byte-identical.  No exemption was added: the report remains protected.  The
-# literals stay hard-coded (never derived from
+# on 2026-08-18 from ``74a8ea09...8dc2eb03`` to ``daa9ad3d...1a28494d6`` for the
+# FI-DATA-PATH-02B yearly-snapshot provenance repair.  The member set remains 351
+# and the two changed members are
+# ``data/trusted_clean/yearly_snapshot_migration_report.json`` and
+# ``data/trusted_clean/yearly_snapshot_migration_report.md``: their producer,
+# ``scripts/data_collection/extract_yearly_snapshots_to_manual_financials.py``,
+# serialized every discovered/selected/skipped/output path with ``str(Path)`` and
+# now emits repo-relative POSIX paths.  Only path leaves moved, plus the truthful
+# appearance of the ``data/raw`` search directory in ``input_folders_searched``
+# (that directory was created by the c1faa3ae reorganization after the reports
+# were last regenerated; it contributes no new file).  Every count, coverage map,
+# column list, rejection reason, and issue is unchanged, and the candidate CSV the
+# reports describe is byte-identical.  Every other member was compared against
+# ``main`` and is byte-identical.  No exemption was added: both reports remain
+# protected.  The literals stay hard-coded (never derived from
 # ``excess.FROZEN_PROTECTED_BOUNDARY_SHA256``) so the pin remains an independent
 # authority rather than a self-confirming echo of the source constant.
+#
+# Prior re-pin (2026-08-17, FI-DATA-PATH-01 provenance-path repair):
+# ``03f9a792...cadeddfd`` -> ``74a8ea09...8dc2eb03``; sole changed member
+# ``data/trusted_clean/universe_split_report.json`` (absolute -> repo-relative
+# ``outputs`` paths; split CSVs byte-identical).
 #
 # Prior re-pin (2026-08-02, R3-MEMO-01 claim-aware memo compiler):
 # ``e55c62bf...ba14c2f`` -> ``03f9a792...cadeddfd``; sole changed member
@@ -3166,7 +3176,7 @@ def test_genuine_base_repository_reconstructs_351_members_with_pinned_digest():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03"
+        == "daa9ad3d216061bda7bc00b3630919f5cfffb82c2ac3fcdc830ec631a28494d6"
     )
     assert (
         excess._frozen_boundary_digest(members)
@@ -3406,7 +3416,7 @@ def test_genuine_boundary_survives_the_descriptor_anchoring():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03"
+        == "daa9ad3d216061bda7bc00b3630919f5cfffb82c2ac3fcdc830ec631a28494d6"
     )
 
 
@@ -3939,7 +3949,7 @@ def test_historical_boundary_authority_is_unchanged_after_the_repair():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03"
+        == "daa9ad3d216061bda7bc00b3630919f5cfffb82c2ac3fcdc830ec631a28494d6"
     )
 
 
