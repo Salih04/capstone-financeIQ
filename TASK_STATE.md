@@ -940,3 +940,25 @@ KAP cross-check recommended before claiming any result.
 | Machine of record | Full root suite `1081/1081` on macOS arm64 conda CPython 3.12.3; the 15 CI-deselected ids pass there and remain the local gate |
 | Coverage | Reported and archived as a build artifact; Codecov upload staged but commented out pending a `CODECOV_TOKEN` secret; no threshold gates a run |
 | Remaining | Merge of PR #10 is the owner's decision; enabling Codecov requires the owner to create the repository entry and add the secret |
+
+## FI-DATA-PATH-01 universe-split provenance repair (2026-08-17; append-only)
+
+| State item | Status |
+|---|---|
+| Defect | `scripts/data_collection/split_universe_datasets.py` serialized `str(TRAINING_OUT)` / `str(PUBLIC_OUT)`, so `universe_split_report.json` embedded the absolute repository location of whichever machine last ran it (committed value: `/Users/salihcamci/Downloads/capstone-financeIQ/...`, a path that no longer exists) |
+| Fix | Report `outputs` entries emitted as repo-relative POSIX paths via `relative_to(REPO_ROOT).as_posix()`, matching `audit_pipeline.py` and the other `data_collection` producers |
+| Regeneration | `make split-datasets` |
+| Split CSVs | `BYTE-IDENTICAL — modeling_dataset_training_2020_2025.csv 3923888b…70eda78, modeling_dataset_public_2020_2025.csv 891d662f…4312914b44` |
+| Report change | `2 JSON LEAVES — outputs.training, outputs.public; every count, flag, and note unchanged` |
+| Protected members compared vs `main` | `351 — exactly one differs: data/trusted_clean/universe_split_report.json` |
+| Boundary digest | `03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd → 74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03` |
+| Boundary exemption | `NONE ADDED` |
+| Independent pins updated | `4 — FROZEN_PROTECTED_BOUNDARY_SHA256 plus the three hard-coded test authorities, each with a truthful provenance comment` |
+| Excess regeneration | `2 FILES / 8 JSON LEAVES — boundary digest, generator source hash and size, dependent report hash only` |
+| Leaderboard, prediction dumps, `significance_report.md` | `BYTE-IDENTICAL` |
+| Scientific leaves | `UNCHANGED — 0/6 survive Bonferroni, primary and sensitivity` |
+| Data validation | `VALID — 403 rows, 40 features, 321 target rows, benchmark available` |
+| Root suite | `1081 PASSED / 0 FAILED` |
+| Docs / claims lint | `PASSED — MCC v1.10.0` |
+| Residual | Stale `/Users/salihcamci/Downloads/capstone-financeIQ` strings remain in four other generated reports (`pipeline_audit_report.json`, `quarterly_snapshot_inspection.json`, `yearly_snapshot_migration_report.{json,md}`); each is a separate producer and boundary member, out of scope here |
+| Claim boundary | Path/provenance only: no modeling row, feature, target, or statistic changed; no reliable predictive edge established |

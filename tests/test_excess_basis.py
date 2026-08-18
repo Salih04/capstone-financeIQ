@@ -3126,16 +3126,22 @@ def test_accepted_subset_contract_is_documented():
 
 
 # The three independently hard-coded boundary-digest literals below were re-pinned
-# on 2026-08-02 from ``e55c62bf...ba14c2f`` to ``03f9a792...cadeddfd`` for the
-# R3-MEMO-01 claim-aware memo compiler.  The member set remains 351 and the sole
-# changed member is ``model_confidence_contract.json``; its minor bump
-# v1.9.0 -> v1.10.0 registered the new memo response service in
-# ``scan.backend_response_files`` and added exactly one exact allowlist line for
-# the authoritative primary disclaimer.  Every other member was compared against
-# ``main`` and is byte-identical.  No exemption was added: the contract remains
-# protected.  The literals stay hard-coded (never derived from
+# on 2026-08-17 from ``03f9a792...cadeddfd`` to ``74a8ea09...8dc2eb03`` for the
+# FI-DATA-PATH-01 provenance-path repair.  The member set remains 351 and the sole
+# changed member is ``data/trusted_clean/universe_split_report.json``: its
+# producer, ``scripts/data_collection/split_universe_datasets.py``, embedded
+# absolute output paths from the machine that last ran it and now emits
+# repo-relative POSIX paths.  Only the two ``outputs`` strings moved; every
+# numeric field in the report is unchanged and the split CSVs it describes are
+# byte-identical.  Every other member was compared against ``main`` and is
+# byte-identical.  No exemption was added: the report remains protected.  The
+# literals stay hard-coded (never derived from
 # ``excess.FROZEN_PROTECTED_BOUNDARY_SHA256``) so the pin remains an independent
 # authority rather than a self-confirming echo of the source constant.
+#
+# Prior re-pin (2026-08-02, R3-MEMO-01 claim-aware memo compiler):
+# ``e55c62bf...ba14c2f`` -> ``03f9a792...cadeddfd``; sole changed member
+# ``model_confidence_contract.json`` (minor bump v1.9.0 -> v1.10.0).
 #
 # Prior re-pin (2026-08-02, R3-LIMITS-01 valuation-schema prerequisite):
 # ``0b0083a4...cf6d76ba`` -> ``e55c62bf...ba14c2f``; sole changed member
@@ -3160,7 +3166,7 @@ def test_genuine_base_repository_reconstructs_351_members_with_pinned_digest():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd"
+        == "74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03"
     )
     assert (
         excess._frozen_boundary_digest(members)
@@ -3400,7 +3406,7 @@ def test_genuine_boundary_survives_the_descriptor_anchoring():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd"
+        == "74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03"
     )
 
 
@@ -3933,7 +3939,7 @@ def test_historical_boundary_authority_is_unchanged_after_the_repair():
     assert len(members) == 351
     assert (
         excess._frozen_boundary_digest(members)
-        == "03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd"
+        == "74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03"
     )
 
 

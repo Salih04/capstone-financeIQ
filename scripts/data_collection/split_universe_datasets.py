@@ -114,8 +114,10 @@ def main() -> int:
         "non_public_in_public_dataset": sorted(non_public_in_public),
         "validation_passed": len(non_public_in_public) == 0,
         "outputs": {
-            "training": str(TRAINING_OUT),
-            "public": str(PUBLIC_OUT),
+            # Repo-relative so the report stays relocatable and never embeds a
+            # developer-specific absolute repository path.
+            "training": TRAINING_OUT.relative_to(REPO_ROOT).as_posix(),
+            "public": PUBLIC_OUT.relative_to(REPO_ROOT).as_posix(),
         },
         "note": (
             "Training and public datasets are identical because no extra "

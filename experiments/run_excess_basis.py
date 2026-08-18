@@ -197,8 +197,25 @@ FROZEN_BOUNDARY_EXTRA_FILES = (
 # other generated artifact, and no excess statistical result changed.  The MCC is
 # NOT exempted, removed, or special-cased: it stays a member and any further
 # change to it still fails closed here.
+#
+# Deliberate re-pin (2026-08-17, FI-DATA-PATH-01 provenance-path repair):
+# ``03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd`` ->
+# ``74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03``.  The sole
+# changed boundary member is ``data/trusted_clean/universe_split_report.json``
+# (e60c386421cfd4bc2f5251db3a14531a50c59cf42f470fa1456df434d408feb4 ->
+# 8f879061e9b4d3d6d5858fe1bc0951ebb72b1248de7ae97d5f992685c90aaae2): its
+# registered producer, ``scripts/data_collection/split_universe_datasets.py``,
+# embedded absolute output paths from the machine that last ran it
+# (``/Users/salihcamci/Downloads/capstone-financeIQ/...``, a location that no
+# longer exists) and now emits repo-relative POSIX paths instead.  Only the two
+# ``outputs`` strings moved; every numeric field, row count, ticker count, and
+# validation flag in the report is unchanged, and the split CSVs it describes are
+# byte-identical across the regeneration.  The member set is unchanged (351
+# members) and every other member was compared against ``main`` and is
+# byte-identical.  No exemption was added: the report remains a protected member
+# and any further change still fails closed here.
 FROZEN_PROTECTED_BOUNDARY_SHA256 = (
-    "03f9a7923e2ff3f6aff02d4d1efe83a621a5e0e26a6ebe949b2336cccadeddfd"
+    "74a8ea09f43a260a3e4e8633ae93ff2d7c0e3c0626f5826cfba2fa1e8dc2eb03"
 )
 
 # ---------------------------------------------------------------------------
