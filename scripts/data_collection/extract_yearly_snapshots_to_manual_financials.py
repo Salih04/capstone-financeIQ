@@ -103,6 +103,24 @@ def _norm(name) -> str:
     return s.strip("_")
 
 
+def _relative_or_absolute(path: Path) -> str:
+    """Serialize a path for the migration report.
+
+    Repo-local paths become repo-relative POSIX text so the committed report
+    stays relocatable and never embeds the absolute checkout location of
+    whichever machine last ran the generator. Paths that legitimately live
+    outside the repository (``--input-dir`` pointing elsewhere, tmp_path
+    fixtures) keep a usable absolute representation instead of raising, which a
+    bare ``relative_to(REPO_ROOT)`` would do. Mirrors the convention in
+    ``experiments/contamination_lab.py::_relative_or_absolute``.
+    """
+    resolved = path.resolve()
+    try:
+        return resolved.relative_to(REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(resolved)
+
+
 def _read_table(path: Path) -> pd.DataFrame | None:
     try:
         if path.suffix.lower() == ".csv":
@@ -124,14 +142,16 @@ def _discover(search_dirs, rep) -> dict[int, list[Path]]:
     for d in search_dirs:
         if not d.is_dir():
             continue
-        rep["input_folders_searched"].append(str(d))
+        rep["input_folders_searched"].append(_relative_or_absolute(d))
         for p in sorted(d.glob("*")):
             if not p.is_file() or p in seen:
                 continue
             m = YEAR_FILE_RE.search(p.name)
             if not m:
                 if p.suffix.lower() in (".xlsx", ".csv"):
-                    rep["files_skipped"].append({"file": str(p), "reason": "name does not match 20YYstocks"})
+                    rep["files_skipped"].append(
+                        {"file": _relative_or_absolute(p), "reason": "name does not match 20YYstocks"}
+                    )
                 continue
             seen.add(p)
             by_year.setdefault(int(m.group(1)), []).append(p)
@@ -167,7 +187,7 @@ def extract(cfg) -> dict:
         "rows_per_file": {}, "ticker_coverage_per_year": {}, "columns_discovered": {},
         "columns_mapped": {}, "columns_skipped": {}, "annual_return_col_per_year": {},
         "candidate_columns_written": [], "columns_rejected_misaligned": [],
-        "ambiguous_columns": [], "output_file": str(cfg.output_file),
+        "ambiguous_columns": [], "output_file": _relative_or_absolute(cfg.output_file),
         "output_rows": 0, "ticker_year_coverage": {}, "issues": [],
     }
     by_year = _discover(cfg.search_dirs, rep)
@@ -182,21 +202,21 @@ def extract(cfg) -> dict:
         if cfg.end_year and year > cfg.end_year:
             continue
         files = by_year[year]
-        rep["year_files"][year] = [str(p) for p in files]
+        rep["year_files"][year] = [_relative_or_absolute(p) for p in files]
         for p in files:
-            rep["files_discovered"].append(str(p))
+            rep["files_discovered"].append(_relative_or_absolute(p))
         if len(files) > 1:
-            rep["duplicate_years"][year] = [str(p) for p in files]
+            rep["duplicate_years"][year] = [_relative_or_absolute(p) for p in files]
         # choose best by (rows, recognized cols)
         scored = sorted(files, key=lambda p: _score_file(p), reverse=True)
         chosen = scored[0]
-        rep["selected_file_per_year"][year] = str(chosen)
+        rep["selected_file_per_year"][year] = _relative_or_absolute(chosen)
 
         df = _read_table(chosen)
         if df is None:
-            rep["files_skipped"].append({"file": str(chosen), "reason": "unreadable/empty"})
+            rep["files_skipped"].append({"file": _relative_or_absolute(chosen), "reason": "unreadable/empty"})
             continue
-        rep["rows_per_file"][str(chosen)] = int(len(df))
+        rep["rows_per_file"][_relative_or_absolute(chosen)] = int(len(df))
 
         norm_cols = {c: _norm(c) for c in df.columns}
         rep["columns_discovered"][year] = sorted(set(norm_cols.values()))
@@ -204,7 +224,9 @@ def extract(cfg) -> dict:
         # ticker
         tcol = next((c for c, n in norm_cols.items() if n in ("company", "ticker")), None)
         if tcol is None:
-            rep["files_skipped"].append({"file": str(chosen), "reason": "no ticker/company column"})
+            rep["files_skipped"].append(
+                {"file": _relative_or_absolute(chosen), "reason": "no ticker/company column"}
+            )
             continue
         out = pd.DataFrame()
         out["ticker"] = df[tcol].astype(str).str.strip().str.upper()
