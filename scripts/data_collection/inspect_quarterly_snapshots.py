@@ -25,6 +25,23 @@ _CHECK_COLS = ["Revenue", "Net Income", "Return on Equity (ROE)", "Total Assets"
                "Price", "P/E", "Market Capitalization"]
 
 
+def _relative_or_absolute(path: Path) -> str:
+    """Serialize a path for the inspection report.
+
+    Repo-local paths become repo-relative POSIX text so the committed report
+    stays relocatable and never embeds the absolute checkout location of
+    whichever machine last ran the generator. A path that legitimately lives
+    outside the repository keeps a usable absolute representation instead of
+    raising, which a bare ``relative_to(REPO_ROOT)`` would do. Mirrors the
+    convention in ``experiments/contamination_lab.py::_relative_or_absolute``.
+    """
+    resolved = path.resolve()
+    try:
+        return resolved.relative_to(REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(resolved)
+
+
 def _read(f: Path) -> pd.DataFrame:
     df = pd.read_excel(f, header=0)
     if not any(str(c).strip().lower() in ("company", "ticker") for c in df.columns):
@@ -40,7 +57,7 @@ def _period(f: Path) -> str | None:
 
 def inspect() -> dict:
     files = sorted(p for p in QDIR.glob("*.xlsx")) if QDIR.is_dir() else []
-    rep = {"dir": str(QDIR), "files": [p.name for p in files], "periods": [],
+    rep = {"dir": _relative_or_absolute(QDIR), "files": [p.name for p in files], "periods": [],
            "rows_per_period": {}, "frozen_columns": [], "varying_columns": [],
            "verdict": "", "issues": []}
     if not files:

@@ -988,3 +988,30 @@ KAP cross-check recommended before claiming any result.
 | Docs / claims lint | `PASSED` |
 | Out of scope | `quarterly_snapshot_inspection.json + inspect_quarterly_snapshots.py (02A), pipeline_audit_report.json (02C), bist100_benchmark_report.json (02D), and the artifact_registry.json yearly input-path inaccuracy — each a separate producer and task` |
 | Claim boundary | Path/provenance only: no modeling row, feature, target, or statistic changed; no reliable predictive edge established |
+
+## FI-DATA-PATH-02A quarterly-snapshot provenance repair (2026-08-18; append-only)
+
+| State item | Status |
+|---|---|
+| Defect | `scripts/data_collection/inspect_quarterly_snapshots.py` serialized the inspected quarterly directory with `str(QDIR)`, so `quarterly_snapshot_inspection.json` embedded the absolute repository location of whichever machine last ran it (committed value: `/Users/salihcamci/Downloads/capstone-financeIQ/data/raw/quarterly_fintables`, a path that no longer exists) |
+| Fix | Local `_relative_or_absolute(path)` helper following `experiments/contamination_lab.py` and the FI-DATA-PATH-02B producer: repo-local paths emit repo-relative POSIX text, a path legitimately outside the repo keeps an absolute representation instead of raising. Applied to the single `dir` site; no other path handling touched |
+| Exact report | `data/trusted_clean/quarterly_snapshot_inspection.json` |
+| Regeneration | `make inspect-quarterly` |
+| Report change | `EXACTLY 1 JSON LEAF — dir: /Users/salihcamci/Downloads/capstone-financeIQ/data/raw/quarterly_fintables → data/raw/quarterly_fintables; files, periods, rows_per_period, frozen_columns, varying_columns, issues, and the FROZEN SNAPSHOT verdict all unchanged` |
+| Markdown companion | `BYTE-IDENTICAL — data/trusted_clean/quarterly_snapshot_inspection.md 95675c8dd2110af3d6e7eff6876112e6bb359fb34857005e7973f6fe1486d87e before and after; absent from git diff` |
+| Quarterly XLSX inputs | `READ-ONLY / BYTE-IDENTICAL — all 8 files under data/raw/quarterly_fintables unchanged before and after` |
+| Stale-path hits in the quarterly JSON | `1 BEFORE -> 0 AFTER for /Users/salihcamci/, /Downloads/capstone-financeIQ, /Desktop/Projects/First_Priority_Projects/FinanceIQ` |
+| Report digests | `json 1e11e602983f4f67892bdb3f06bb8d5f86c9f9b8c891b5329ac3cca7003c3f68 → 520b555e6e17bac8ad4471ebd7f0917a87ce739d52c9f03675dff34a6be41f60` |
+| Protected members compared vs `main` | `351 — exactly one differs: data/trusted_clean/quarterly_snapshot_inspection.json; membership set unchanged` |
+| Boundary digest | `daa9ad3d216061bda7bc00b3630919f5cfffb82c2ac3fcdc830ec631a28494d6 → b0fce8a3d96dc845efcff4d25c3d537b0bfb7bb42d088512410a874c4550c9b0` |
+| Boundary exemption | `NONE ADDED` |
+| Independent pins updated | `4 — FROZEN_PROTECTED_BOUNDARY_SHA256 plus the three hard-coded test authorities, each with a truthful provenance comment; the test literals stay independent of the source constant` |
+| Excess regeneration | `2 FILES / 9 JSON LEAVES — boundary digest (x4), generator source hash and size (x2 files), dependent significance_report.json hash; leaf key sets identical, 0 non-provenance leaves` |
+| Leaderboard, prediction dumps, `significance_report.md` | `BYTE-IDENTICAL` |
+| Scientific leaves | `UNCHANGED — 0/6 survive Bonferroni, primary and trajectory-preserving sensitivity` |
+| Data validation | `VALID — 403 rows, 40 features, 321 target rows, benchmark available` |
+| Root suite | `1081 PASSED / 0 FAILED` |
+| Backend suite | `552 PASSED / 0 FAILED` |
+| Docs / claims lint | `PASSED — MCC v1.10.0` |
+| Out of scope | `pipeline_audit_report.json (02C), bist100_benchmark_report.json (02D), and the artifact_registry.json yearly input-path inaccuracy — each a separate producer and task` |
+| Claim boundary | Path/provenance only: no modeling row, feature, target, or statistic changed; no reliable predictive edge established |

@@ -245,8 +245,34 @@ FROZEN_BOUNDARY_EXTRA_FILES = (
 # member set is unchanged (351 members) and every other member was compared
 # against ``main`` and is byte-identical.  No exemption was added: both reports
 # remain protected members and any further change still fails closed here.
+#
+# Deliberate re-pin (2026-08-18, FI-DATA-PATH-02A quarterly-snapshot provenance
+# repair):
+# ``daa9ad3d216061bda7bc00b3630919f5cfffb82c2ac3fcdc830ec631a28494d6`` ->
+# ``b0fce8a3d96dc845efcff4d25c3d537b0bfb7bb42d088512410a874c4550c9b0``.  The sole
+# changed boundary member is
+# ``data/trusted_clean/quarterly_snapshot_inspection.json``
+# (1e11e602983f4f67892bdb3f06bb8d5f86c9f9b8c891b5329ac3cca7003c3f68 ->
+# 520b555e6e17bac8ad4471ebd7f0917a87ce739d52c9f03675dff34a6be41f60).  Its
+# registered producer,
+# ``scripts/data_collection/inspect_quarterly_snapshots.py``, serialized the
+# inspected quarterly directory with ``str(QDIR)``, so the report embedded the
+# absolute checkout location of the machine that last ran it
+# (``/Users/salihcamci/Downloads/capstone-financeIQ/...``, a location that no
+# longer exists); it now emits a repo-relative POSIX path.  Exactly one JSON
+# leaf moved, ``dir``; the file list, periods, rows-per-period, frozen and
+# varying column lists, issues, and the FROZEN SNAPSHOT verdict are all
+# unchanged, and the Markdown companion
+# ``data/trusted_clean/quarterly_snapshot_inspection.md`` is byte-identical
+# across the regeneration
+# (95675c8dd2110af3d6e7eff6876112e6bb359fb34857005e7973f6fe1486d87e).  The eight
+# read-only quarterly XLSX inputs under
+# ``data/raw/quarterly_fintables`` are byte-identical.  The member set is
+# unchanged (351 members) and every other member was compared against ``main``
+# and is byte-identical.  No exemption was added: the report remains a protected
+# member and any further change still fails closed here.
 FROZEN_PROTECTED_BOUNDARY_SHA256 = (
-    "daa9ad3d216061bda7bc00b3630919f5cfffb82c2ac3fcdc830ec631a28494d6"
+    "b0fce8a3d96dc845efcff4d25c3d537b0bfb7bb42d088512410a874c4550c9b0"
 )
 
 # ---------------------------------------------------------------------------

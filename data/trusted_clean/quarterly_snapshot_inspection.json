@@ -1,5 +1,5 @@
 {
-  "dir": "/Users/salihcamci/Downloads/capstone-financeIQ/data/raw/quarterly_fintables",
+  "dir": "data/raw/quarterly_fintables",
   "files": [
     "fintables_hisse_senetleri 1 ekim 31 aral\u0131k 2020 (2020q4).xlsx",
     "fintables_hisse_senetleri 1 ekim 31 aral\u0131k 2021 (2021q4).xlsx",
