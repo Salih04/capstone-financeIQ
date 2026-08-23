@@ -1123,3 +1123,36 @@ KAP cross-check recommended before claiming any result.
 | Docs / claims lint | `PASSED — make docs-lint, make claims-lint (MCC v1.10.0); both lint_doc_links self-tests PASSED; git diff --check clean` |
 | Out of scope | Stage B itself; any acquisition; the FI-DATA-PATH-02D stale benchmark `output` leaf; the repeated-value anomaly in the committed public-cohort `revenue`/`gross_profit`/`ebitda` cells; any Option-B bank feature contract — each a separate task |
 | Claim boundary | Preregistration document only: no modeling row, feature, target, benchmark observation, prediction, coefficient, IC, p-value, interval, or ranking changed; no predictive edge is claimed, implied, or anticipated; no reliable predictive edge established |
+
+
+## FI-SOURCE-OWNER-AMENDMENT-01 owner source-use and private-archive governance (2026-08-23; append-only)
+
+| State item | Status |
+| --- | --- |
+| Task | `FI-SOURCE-OWNER-AMENDMENT-01 — governance-only owner decision record` |
+| Starting HEAD | `6814f647b9a15a6d1bb9a4f247e27ce52f515027` (branch `main` == `origin/main`, worktree clean including untracked) |
+| Deliverable | `docs/SOURCE_USE_OWNER_AMENDMENT.md` — decision identifier `FI-SOURCE-OWNER-AMENDMENT-01` |
+| Owner internal-use authorization | `APPROVED — publicly disclosed, non-confidential financial facts from reliable sources may be collected, used, transformed and retained for FinanceIQ academic research and model development without source-by-source written permission as an INTERNAL project gate. Covers publicly disclosed Borsa Istanbul data, publicly disclosed KAP/MKK data, public market/index data, and paid/subscription exports the owner legitimately accessed under the owner's own entitlement` |
+| Private-archive authorization | `APPROVED — private local research archival, SHA-256 checksums, provenance manifests, and deterministic derived/model-ready datasets` |
+| Public redistribution | `NOT APPROVED — public redistribution of third-party raw datasets and publication of raw vendor files remain prohibited by project policy` |
+| Also NOT approved | `credential sharing; bypass of authentication/access controls; CAPTCHA/rate-limit/access-control circumvention; use of another person's paid entitlement; any representation that a third-party licence was granted; any representation that external legal review occurred` |
+| Classification distinction | `INTERNAL_OWNER_AUTHORIZED != EXTERNALLY_LICENSED — this amendment establishes the former only; as of this decision NO source in the repository is classified EXTERNALLY_LICENSED, and this amendment may never be cited to promote one` |
+| External licence claim | `NONE — no licence, permission, waiver or legal conclusion from Borsa Istanbul, KAP/MKK, Yahoo, Fintables or any vendor is claimed or implied; no external legal review occurred; this is not legal advice` |
+| Provenance requirement | `MANDATORY AND UNRELAXED — provider, source/product/document identifier, source URL or stable identifier, access method, access date, effective/as-of date, owner/account access class, raw filename, raw SHA-256, byte size, private/public storage classification, redistribution status, parser/transformation identity, derived outputs, acquisition notes. Unknown provenance FAILS CLOSED — no imputation, no substitution` |
+| Raw storage default | `PRIVATE_LOCAL_RAW — new raw third-party/vendor bytes are NOT committed to Git merely because the repository is private. Repository may retain manifests, checksums, provenance records, transformation code, and separately-acceptable derived data. Any future decision to commit raw third-party files must be recorded separately per source` |
+| Retrospective effect | `NONE — no existing raw/vendor file is deleted, moved, blessed, or reclassified; no Git history rewrite authorized; no raw file migration authorized` |
+| `FI_SOURCE_AUDIT_01_PROVENANCE_GAPS_FOUND` findings | `PRESERVED AND STILL OPEN — data/raw/yearly_xlsx provider provenance unresolved (data/raw/README.md names no provider, product identifier, access method or as-of date); data/raw/quarterly_fintables owner-access provenance to be confirmed; data/trusted_raw/shares_outstanding_manual.csv upstream provenance unresolved (source column is the free-text value "user provided merged capital research" on 240 rows and empty on 246 rows)` |
+| Effect on `FI-DATA-EXPAND-04A` | `INTERNAL ACCESS-GOVERNANCE BLOCKER SUPERSEDED — the self-imposed source-by-source written-permission gate for collecting publicly disclosed factual BIST/KAP information into a private research archive no longer blocks. That is the entire effect: no BIST/KAP licence is claimed, raw data stays private, public redistribution stays prohibited, no access control may be bypassed, provenance stays mandatory, and source-specific explicit technical restrictions must still be obeyed` |
+| `FI-DATA-EXPAND-04A-R` | `RETAINED AS HISTORICAL EVIDENCE — not rewritten, not deleted, not reinterpreted` |
+| Stage-A protocol | `UNCHANGED — docs/PREREGISTERED_DATA_EXPANSION_STAGE_A.md (FI-DATA-EXPAND-STAGE-A-v1) byte-identical, SHA-256 c5eedb6fc5e14e7ee13ec6ab4a7cd08fc70ca2066847fe3a1799752762c2513a before and after; absent from git diff. This amendment supplies the owner authorization the Stage-A sourcing workflow requires and changes source-access governance only` |
+| Stage-A elements explicitly unchanged | `candidate search floor; point-in-time membership rule; target hierarchy; 40-feature vector; missingness rule; model family; multiplicity; no-peeking boundary; stopping rule; scientific interpretation` |
+| External access | `NONE — no BIST, KAP/MKK, Yahoo, Fintables or vendor site accessed; no network fetch of any kind; no membership data collected; no document downloaded` |
+| Data acquired | `NONE` |
+| Datasets / models / artifacts | `UNCHANGED — make data, make benchmark, make research, make research-excess NOT RUN; no dataset, target, prediction, coefficient, IC, p-value, interval, or ranking changed` |
+| Member count | `351 -> 351` |
+| Boundary digest | `UNCHANGED — 98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5 before and after; recomputed live from experiments/run_excess_basis.py authority` |
+| Re-pins | `0 — no boundary authority or test digest literal touched` |
+| Tracked files changed | `2 — docs/SOURCE_USE_OWNER_AMENDMENT.md (new), TASK_STATE.md` |
+| Docs / claims lint | `PASSED — make docs-lint, make claims-lint (MCC v1.10.0); both lint_doc_links self-tests PASSED; git diff --check clean` |
+| Out of scope | Resolving the three open provenance gaps; any acquisition; any raw-file migration or history rewrite; Stage B; the FI-DATA-PATH-02D stale benchmark `output` leaf — each a separate task |
+| Claim boundary | Governance decision record only: no modeling row, feature, target, benchmark observation, prediction, coefficient, IC, p-value, interval, or ranking changed; no reliable predictive edge established |
