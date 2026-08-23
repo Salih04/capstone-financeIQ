@@ -13,7 +13,7 @@
 | Protected boundary at authoring | 351 members, digest `98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5` (unchanged by this task) |
 | Governing protocols | [`docs/PREREGISTERED_DATA_EXPANSION_STAGE_A.md`](PREREGISTERED_DATA_EXPANSION_STAGE_A.md) (`FI-DATA-EXPAND-STAGE-A-v1`), [`docs/SOURCE_USE_OWNER_AMENDMENT.md`](SOURCE_USE_OWNER_AMENDMENT.md) (`FI-SOURCE-OWNER-AMENDMENT-01`) |
 | Prior source verdict superseded in part | [`docs/UNIVERSE_HISTORY_SOURCING_SPIKE.md`](UNIVERSE_HISTORY_SOURCING_SPIKE.md) S15 — DataStore was previously recorded as uncharacterized |
-| Provenance manifest | [`data/provenance/bist_membership_source_manifest.csv`](../data/provenance/bist_membership_source_manifest.csv) — 73 rows |
+| Provenance manifest | [`docs/evidence/bist_membership_source_manifest.csv`](evidence/bist_membership_source_manifest.csv) — 73 rows |
 | Private raw archive | `PRIVATE_LOCAL_RAW` — 6 objects, outside the repository, never committed |
 | Decision | **`FI_DATA_EXPAND_04B_OWNER_PURCHASE_DECISION_REQUIRED`** |
 | No new outcome inspection | `NO_NEW_OUTCOME_INSPECTION=true` |

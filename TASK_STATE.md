@@ -1165,7 +1165,7 @@ KAP cross-check recommended before claiming any result.
 | Task | `FI-DATA-EXPAND-04B / R3-SPIKE-01a — membership/identity/provenance sourcing spike only` |
 | Starting HEAD | `7bd1dfad16eb750481603f18eca916e4ab09cfc4` (branch `main` == `origin/main`, worktree clean including untracked) |
 | Starting gate | `PASSED — repo path, branch, HEAD == origin/main == expected SHA, clean tree, Stage-A present, owner amendment present, boundary 351, digest matched expected` |
-| Deliverables | `docs/DATA_EXPANSION_MEMBERSHIP_SOURCING_REPORT.md` (new), `data/provenance/bist_membership_source_manifest.csv` (new, 73 rows) |
+| Deliverables | `docs/DATA_EXPANSION_MEMBERSHIP_SOURCING_REPORT.md` (new), `docs/evidence/bist_membership_source_manifest.csv` (new, 73 rows) |
 | Decision | `FI_DATA_EXPAND_04B_OWNER_PURCHASE_DECISION_REQUIRED` |
 | Product 3184 visible coverage | `2000-2026 inclusive, 66 catalogue objects enumerated through the product page's own pagination (4 pages: 20+20+20+6). The "since 2000" title was corroborated from the listing, not assumed` |
 | Product 3184 downloadable coverage | `NONE — 0 of 66 objects acquired. Every object is ACCESS_RESTRICTED for the same reason` |
@@ -1192,7 +1192,7 @@ KAP cross-check recommended before claiming any result.
 | Member count | `351 -> 351` |
 | Boundary digest | `UNCHANGED — 98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5 before and after; recomputed live from experiments/run_excess_basis.py authority` |
 | Re-pins | `0 — no boundary authority or test digest literal touched` |
-| Tracked files changed | `3 — docs/DATA_EXPANSION_MEMBERSHIP_SOURCING_REPORT.md (new), data/provenance/bist_membership_source_manifest.csv (new), TASK_STATE.md` |
+| Tracked files changed | `3 — docs/DATA_EXPANSION_MEMBERSHIP_SOURCING_REPORT.md (new), docs/evidence/bist_membership_source_manifest.csv (new), TASK_STATE.md` |
 | Docs / claims lint | `PASSED — make docs-lint, make claims-lint (MCC v1.10.0); both lint_doc_links self-tests PASSED; git diff --check clean` |
 | Out of scope | Acquiring any exsrk file (owner decision); assessing the Borsa/KAP event-announcement route; benchmark acquisition (Products 3180/3181, XU100 series, Yahoo); fundamentals acquisition; identity/succession classification; Stage B — each a separate task |
 | Claim boundary | Sourcing-feasibility evidence only: no modeling row, feature, target, benchmark observation, prediction, coefficient, IC, p-value, interval, or ranking changed; no predictive edge is claimed, implied, or anticipated; no reliable predictive edge established |
