@@ -1156,3 +1156,43 @@ KAP cross-check recommended before claiming any result.
 | Docs / claims lint | `PASSED — make docs-lint, make claims-lint (MCC v1.10.0); both lint_doc_links self-tests PASSED; git diff --check clean` |
 | Out of scope | Resolving the three open provenance gaps; any acquisition; any raw-file migration or history rewrite; Stage B; the FI-DATA-PATH-02D stale benchmark `output` leaf — each a separate task |
 | Claim boundary | Governance decision record only: no modeling row, feature, target, benchmark observation, prediction, coefficient, IC, p-value, interval, or ranking changed; no reliable predictive edge established |
+
+
+## FI-DATA-EXPAND-04B / R3-SPIKE-01a historical BIST membership sourcing spike (2026-08-23; append-only)
+
+| State item | Status |
+| --- | --- |
+| Task | `FI-DATA-EXPAND-04B / R3-SPIKE-01a — membership/identity/provenance sourcing spike only` |
+| Starting HEAD | `7bd1dfad16eb750481603f18eca916e4ab09cfc4` (branch `main` == `origin/main`, worktree clean including untracked) |
+| Starting gate | `PASSED — repo path, branch, HEAD == origin/main == expected SHA, clean tree, Stage-A present, owner amendment present, boundary 351, digest matched expected` |
+| Deliverables | `docs/DATA_EXPANSION_MEMBERSHIP_SOURCING_REPORT.md` (new), `data/provenance/bist_membership_source_manifest.csv` (new, 73 rows) |
+| Decision | `FI_DATA_EXPAND_04B_OWNER_PURCHASE_DECISION_REQUIRED` |
+| Product 3184 visible coverage | `2000-2026 inclusive, 66 catalogue objects enumerated through the product page's own pagination (4 pages: 20+20+20+6). The "since 2000" title was corroborated from the listing, not assumed` |
+| Product 3184 downloadable coverage | `NONE — 0 of 66 objects acquired. Every object is ACCESS_RESTRICTED for the same reason` |
+| 2017-2020 status | `VISIBLE, NOT DOWNLOADABLE — 2017:5, 2018:8, 2019:4, 2020:7 objects. Files are present, not absent; no substitution, backward extrapolation, interpolation, Wikipedia, screener or price-inferred membership was used or needed` |
+| Blocking gate | `ENTITLEMENT/CONTRACT, NOT PRICE — all 66 objects list at 0.00 TRY with accessType G, but the only acquisition control is "Sepete Ekle"; completing it needs an account, and the Giris/Kayit dialog requires accepting a Kullanici Kayit Sozlesmesi plus a KVKK notice. Owner has NO existing logged-in DataStore session (verified in both the isolated browser and the owner's own Chrome profile: logged-out, empty basket)` |
+| Actions NOT taken | `no account created, no credentials entered, no basket addition, no order submitted, no agreement or consent banner accepted, no payment, no authentication/CAPTCHA/rate-limit/access-control circumvention, no guessed download URL probed` |
+| Format authority | `Borsa Istanbul DataStore file-format specification v1.4 (15.06.2016) s.2.1.29, acquired to PRIVATE_LOCAL_RAW, SHA-256 ab76e9708e35684410c3f082b6f8bcd6cf6cecc539f76e587c559d771f9f00cc` |
+| Time semantics | `QUARTERLY, POSITIONAL — exsrk[YYYY].zip -> exsrk[YYYY].xls with fields Pay Kodu, Pay Adi, 1.Ceyrek, 2.Ceyrek, 3.Ceyrek, 4.Ceyrek. NO date field, NO effective-date field, NO ISIN or other stable identifier. Whether a quarter cell means quarter-start, quarter-end, whole-quarter or any-point-in-quarter membership is NOT documented and stays UNKNOWN` |
+| Nested-index semantics | `DOCUMENTED AND DECISIVE — BIST 30 subset BIST 50 subset BIST 100, and only the narrowest index of membership is written. XU030 MUST be expanded to XU050 and XU100; XU050 MUST be expanded to XU100. Reading the BIST 100 column literally without expansion would silently drop every BIST 30 and BIST 50 constituent` |
+| Point-in-time adequacy | `POINT_IN_TIME_CONFIRMED UNREACHABLE for every year from Product 3184 alone — Stage-A s.5.2 makes effective_from/effective_to mandatory and the product has no date field at all. Documented ceiling for 2000-2016 is QUARTERLY_ONLY_REQUIRES_EVENT_AUGMENTATION; for 2017-2026 it is UNKNOWN because spec v1.4 predates those objects. Realized status every year: UNKNOWN (not acquired). No year classified INSUFFICIENT_DATA` |
+| Event augmentation | `REQUIRED — established from the specification, not assumed. Route NOT ASSESSED: borsaistanbul.com responded and a /duyurular route was discovered from the site's own homepage links, but whether it publishes effective-dated, per-ticker index-composition changes back to 2017, distinguishing extraordinary from periodic changes, is UNKNOWN. One guessed KAP index path returned HTTP 404 and is recorded as a failed guess, not as evidence of absence` |
+| Open source gaps | `spec v1.4 currency for 2017-2026 objects unverified (byte-size discontinuities at 2019 Q3->Q4 and 2026 Q1->Q2); 2020 has two pairs of distinct objects sharing filename and publication date but differing in size (ids 982925/982927 on 27-04-2020, 1132519/1132521 on 01-10-2020) and which is authoritative is UNKNOWN; legacy 2000-2015 objects carry a date field of 31-12-(YYYY-1) against a filename year of YYYY, all bulk-uploaded 08-06-2015, and which identifies the covered year is not established` |
+| Identity / succession | `NONE RESOLVED, NONE ATTEMPTED — requires the membership rows, which were not acquired. All CATALOG_ENTRY rows carry identity_status=NOT_ASSESSED. Structural gap already known: the product carries share code and bulletin name only, with no ISIN or other stable identifier, so Stage-A s.6 cases will need a separate evidenced identity source` |
+| Private raw archive | `6 objects, all PRIVATE_LOCAL_RAW under ~/Documents/FinanceIQ-private-source-archive (outside the repository): 1 format-specification PDF + 5 catalogue-listing JSON snapshots. All SHA-256 hashed in the manifest and referenced only symbolically as PRIVATE_LOCAL_RAW:bist-membership/raw/<name>` |
+| Repository raw bytes | `NONE — no ZIP, XLSX, PDF or HTML source byte tracked in Git; no absolute archive path written into any tracked file` |
+| Membership data in repo | `NONE — ticker_or_share_code and company_name are NA on all 73 manifest rows because no membership file was opened` |
+| Redistribution | `INTERNAL_OWNER_AUTHORIZED per FI-SOURCE-OWNER-AMENDMENT-01, NOT EXTERNALLY_LICENSED; no licence, permission or waiver from Borsa Istanbul is claimed or implied; public redistribution of third-party raw data remains prohibited` |
+| No-peeking | `NO_NEW_OUTCOME_INSPECTION=true — no return, benchmark-relative outcome, model score, prediction, IC or p-value opened, loaded or inspected; no data/trusted_clean/modeling_dataset* or experiments/results_* file read` |
+| External access | `Borsa Istanbul DataStore product page, its own catalogue-listing endpoint, and its public format-specification PDF; one reachability check of borsaistanbul.com; one failed guessed KAP path. NO Yahoo, NO benchmark series, NO fundamentals, NO Products 3180/3181` |
+| Datasets / models / artifacts | `UNCHANGED — make data, make benchmark, make research, make research-excess NOT RUN; no dataset, target, feature, prediction, coefficient, IC, p-value, interval, or ranking changed` |
+| Stage A | `UNCHANGED — docs/PREREGISTERED_DATA_EXPANSION_STAGE_A.md byte-identical, SHA-256 c5eedb6fc5e14e7ee13ec6ab4a7cd08fc70ca2066847fe3a1799752762c2513a before and after; not weakened, reworded or reinterpreted to fit the source` |
+| Owner amendment | `UNCHANGED — docs/SOURCE_USE_OWNER_AMENDMENT.md byte-identical, SHA-256 953f2a5a594e748889a78658fd3f2ab2e52872121f5135123b4576ca81909b7f before and after` |
+| Stage B | `NOT AUTHORED` |
+| Member count | `351 -> 351` |
+| Boundary digest | `UNCHANGED — 98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5 before and after; recomputed live from experiments/run_excess_basis.py authority` |
+| Re-pins | `0 — no boundary authority or test digest literal touched` |
+| Tracked files changed | `3 — docs/DATA_EXPANSION_MEMBERSHIP_SOURCING_REPORT.md (new), data/provenance/bist_membership_source_manifest.csv (new), TASK_STATE.md` |
+| Docs / claims lint | `PASSED — make docs-lint, make claims-lint (MCC v1.10.0); both lint_doc_links self-tests PASSED; git diff --check clean` |
+| Out of scope | Acquiring any exsrk file (owner decision); assessing the Borsa/KAP event-announcement route; benchmark acquisition (Products 3180/3181, XU100 series, Yahoo); fundamentals acquisition; identity/succession classification; Stage B — each a separate task |
+| Claim boundary | Sourcing-feasibility evidence only: no modeling row, feature, target, benchmark observation, prediction, coefficient, IC, p-value, interval, or ranking changed; no predictive edge is claimed, implied, or anticipated; no reliable predictive edge established |
