@@ -1279,3 +1279,26 @@ KAP cross-check recommended before claiming any result.
 | Tracked files changed | `3 — docs/BIST_MEMBERSHIP_KAP_TRIGGER_AUDIT.md (new), docs/evidence/bist_membership_kap_trigger_sources.csv (new), TASK_STATE.md` |
 | Out of scope | Acquiring any Product 3184 file (owner decision); resolving BIST 100 membership on 2020-10-01 from the Borsa daily bulletin or the numbered circular series; benchmark acquisition (Products 3180/3181, XU100 series, Yahoo); fundamentals acquisition; Stage B — each a separate task |
 | Claim boundary | Sourcing-feasibility evidence only: finding the extraordinary-event stream does not make a historical universe valid, more covered years do not improve any estimate, event reconstruction does not establish model validity, and sourcing success does not imply predictive edge. No modeling row, feature, target, benchmark observation, prediction, coefficient, IC, p-value, interval or ranking changed; no reliable predictive edge established |
+
+## FI-DATA-EXPAND-04B-COLLISION-2020-01 Şişecam/Q4 2020-10-01 BIST 30/50/100 collision audit (2026-08-24; append-only)
+
+| State item | Status |
+| --- | --- |
+| Task | `FI-DATA-EXPAND-04B-COLLISION-2020-01 — outcome-blind first-party collision audit only` |
+| Starting HEAD | `4d60c7b8cb5da3c0a8942ae88660efc25e99392` (branch `main` == `origin/main`, worktree clean including untracked) |
+| Starting gate | `PASSED — exact repo, branch, HEAD == origin/main == expected SHA, clean tree, prior evidence present, boundary 351, digest matched expected` |
+| Deliverables | `docs/BIST_MEMBERSHIP_2020_10_01_COLLISION_AUDIT.md`, `docs/evidence/bist_membership_2020_10_01_sources.csv` (8 rows), `TASK_STATE.md` |
+| Decision | `FI_DATA_EXPAND_04B_COLLISION_2020_RESOLVED` |
+| First-party resolution | `Borsa announcement 14118 explicitly anticipated the Şişecam merger in the 2020Q4 selection; KAP 877486 confirms 2020-10-01 distribution; official 2020-10-01 Günlük Bülten flags SISE in XU100/XU030 and reports 100/30 members` |
+| Exact index changes | `XU100 ADD AKSGY/ALCTL/ARDYZ/INDES/PETUN/PNSUT; REMOVE ANACM/GLYHO/KARSN/KLMSN/SODA/TRKCM. XU050 ADD ALKIM/ECILC/TRGYO/TURSG; REMOVE ANACM/FROTO/SODA/TRKCM. XU030 ADD GUBRF/OYAKC; REMOVE SODA/TRKCM. Reserves remain published eligibility lists.` |
+| Identity / succession | `SISE absorbing/surviving code: SUCCESSION_RULE_CONFIRMED + DISTINCT_SECURITY relative to absorbed codes. ANACM/DENCM/SODA/TRKCM: SUCCESSION_RULE_CONFIRMED. No continuity inferred from names.` |
+| Reserve consumption | `RESERVE_CONSUMPTION_EVENT_CONFIRMED — no XU100/XU050/XU030 reserve consumed because of the merger; general sequential reserve order remains unstated.` |
+| Same-day ordering | `FINAL_STATE_DETERMINISTIC_ORDERING_UNSPECIFIED — merger and Q4 period both begin 2020-10-01; Borsa publishes final affected treatment but not internal sequence.` |
+| Q4 reconciliation | `RECONCILIATION_REQUIRES_PRODUCT_3184_ROWS — event patch is deterministic; Product 3184 rows and full XU050 seed remain owner/data-access work.` |
+| Negative evidence | `SEARCH_INCOMPLETE — bounded 2020/58–2020/62 screen found no correction/superseding index notice; no global circular-series absence claim.` |
+| Private raw archive | `1 new object — thb202010011.zip, 58182 bytes, SHA-256 32b8b67be897570d48b7f0d0b764b7b5560e39fdad2355711381e2a7d9dda9dd` |
+| Repository raw bytes | `NONE — no HTML, JSON, PDF, or ZIP source bytes tracked in Git; no data/provenance change` |
+| No-peeking | `NO_NEW_OUTCOME_INSPECTION=true — no returns, benchmark-relative outcomes, model outputs, or modeling artifacts inspected; no model/data/research command run` |
+| Stage A / owner amendment / prior evidence | `UNCHANGED — no prior evidence file edited` |
+| Member count / boundary | `351 -> 351; digest unchanged at 98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5` |
+| Out of scope | `Product 3184 acquisition, Stage B, models, returns/outcomes, data/provenance, and any prior evidence rewrite` |
