@@ -1302,3 +1302,31 @@ KAP cross-check recommended before claiming any result.
 | Stage A / owner amendment / prior evidence | `UNCHANGED — no prior evidence file edited` |
 | Member count / boundary | `351 -> 351; digest unchanged at 98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5` |
 | Out of scope | `Product 3184 acquisition, Stage B, models, returns/outcomes, data/provenance, and any prior evidence rewrite` |
+
+## FI-DATA-EXPAND-04B-P3184-2020-01 Product 3184 2020 acquisition / revision / Q4 reconciliation (2026-08-24; append-only)
+
+| State item | Status |
+| --- | --- |
+| Task | `FI-DATA-EXPAND-04B-P3184-2020-01 — outcome-blind Product 3184 2020 catalogue inspection and acquisition attempt only` |
+| Starting HEAD | `c719982fd7eae31dc57c4e4d769d7122d63e3d3e` (branch `main` == `origin/main`, worktree clean including untracked) |
+| Starting gate | `PASSED — exact repo, branch, HEAD == origin/main == expected SHA, clean tree, all prior 04B evidence present, boundary 351, digest matched expected` |
+| Deliverables | `docs/BIST_MEMBERSHIP_P3184_2020_RECONCILIATION.md`, `docs/evidence/bist_membership_p3184_2020_sources.csv` (11 rows), `docs/evidence/bist_membership_p3184_2020_q4_rows.csv` (schema header, 0 data rows), `TASK_STATE.md` |
+| Decision | `FI_DATA_EXPAND_04B_P3184_2020_LOGIN_REQUIRED` |
+| DataStore access | `NO_EXISTING_OWNER_SESSION — product page renders the anonymous Giriş control, basket 0/0.00, every catalogue object inLibrary=false; continuation requires account registration plus acceptance of the Kullanıcı Kayıt Sözleşmesi, which is a new contractual entitlement outside owner authorization` |
+| 2020 object inventory | `COMPLETE — 7 objects at catalogue positions 25-31 of 66, all named exsrk2020.zip, all 0.0 TRY, accessType G, period Q, provider date field 30-12-2020; publications 02-01-2020, 27-04-2020 (x2), 22-05-2020, 28-07-2020, 01-10-2020 (x2)` |
+| Revision semantics | `REVISION_SEMANTICS_UNRESOLVED — no revision/version/supersession/language field exists; two publication dates each carry two differently sized objects; declared size is non-monotonic across 2020 (28-07 object 59,259 bytes exceeds both 01-10 objects at 58,631 and 58,823), so "newest is canonical" is unsupported` |
+| Material 2020 hazard | `Last 2020 object was published 2020-10-01, the exact Şişecam merger effective date and Q4 review start; no later 2020 republication exists, so whether the Q4 column is pre-event, post-event, or unpopulated is decidable only from acquired bytes` |
+| Raw acquisition | `NO exsrk2020.zip OBJECT ACQUIRED — 4 catalogue-metadata JSON pages archived privately; their SHA-256 digests are byte-identical to the 2026-08-23 BM-003..BM-006 snapshots, confirming no catalogue drift` |
+| Format verification | `NOT_VERIFIED_NO_FILE_ACQUIRED — flagged: the product page currently declares 3 fields (PAY KODU, PAY ADI, BULUNDUĞU ENDEKS) while format specification v1.4 documents 6 (Pay Kodu, Pay Adı, 1.-4. Çeyrek); applicability of either layout to exsrk2020.zip is UNKNOWN` |
+| Q4 rows / index counts | `0 rows extracted; literal and nested-expanded XU030/XU050/XU100 counts UNAVAILABLE (not zero); neither NESTED_COUNTS_RECONCILED nor NESTED_COUNTS_MISMATCH issued` |
+| Collision reconciliation | `NOT_PERFORMED — prior audit FI_DATA_EXPAND_04B_COLLISION_2020_RESOLVED stands unchanged and unreinterpreted; its RECONCILIATION_REQUIRES_PRODUCT_3184_ROWS prerequisite is unchanged; SISE/ANACM/DENCM/SODA/TRKCM row-level checks remain outstanding` |
+| XU050 seed state | `XU050_SEED_STATE_UNRESOLVED` |
+| Revision canonicalization | `REVISION_CANONICALIZATION_UNRESOLVED — no raw object acquired, no mechanical comparison possible, no filesystem timestamp used as authority` |
+| Q4 state | `Q4_STATE_UNRESOLVED — 2020 is NOT promoted toward Stage-B eligibility and a separate year-level closure adjudication remains required` |
+| Private raw archive | `4 new objects under ~/Documents/FinanceIQ-private-source-archive/bist-membership/raw/p3184-2020/, catalogue metadata only, containing no membership row, ticker, company name, or index code` |
+| Repository raw bytes | `NONE — no ZIP, XLS, XLSX, PDF, HTML, or JSON source bytes tracked in Git; no data/ or data/provenance change` |
+| No-peeking | `NO_NEW_OUTCOME_INSPECTION=true — no modeling dataset, results namespace, next_year_* column, benchmark-relative outcome, IC, p-value, or model output inspected; make data / benchmark / research / research-excess not run` |
+| Stage A / owner amendment / prior evidence | `UNCHANGED — no prior evidence file edited` |
+| Member count / boundary | `351 -> 351; digest unchanged at 98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5` |
+| Out of scope | `Account registration or agreement acceptance (owner decision), Stage B, models, returns/outcomes, fundamentals, data/provenance, and any prior evidence rewrite` |
+| Claim boundary | Sourcing-feasibility and catalogue-inventory evidence only: enumerating catalogue objects does not make a historical universe valid, does not improve any estimate, and does not establish model validity. No modeling row, feature, target, benchmark observation, prediction, coefficient, IC, p-value, interval or ranking changed; no reliable predictive edge established |
