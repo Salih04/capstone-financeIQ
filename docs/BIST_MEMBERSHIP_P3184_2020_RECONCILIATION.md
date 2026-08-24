@@ -50,8 +50,8 @@ The starting gate passed:
 | Nested-count reconciliation | Not evaluable — neither `NESTED_COUNTS_RECONCILED` nor `NESTED_COUNTS_MISMATCH` can be issued without rows |
 | 2020-10-01 collision reconciliation | `NOT_PERFORMED` — the prior audit stands unchanged and unreinterpreted |
 | XU050 seed state | `XU050_SEED_STATE_UNRESOLVED` |
-| Revision canonicalization | `REVISION_CANONICALIZATION_UNRESOLVED` |
-| Q4 state | `Q4_STATE_UNRESOLVED` |
+| Revision canonicalization | ~~`REVISION_CANONICALIZATION_UNRESOLVED`~~ → `REVISION_CANONICALIZATION_RESOLVED` (2026-08-25, see §16) |
+| Q4 state | ~~`Q4_STATE_UNRESOLVED`~~ → `Q4_STATE_RESOLVED` (2026-08-25, see §16) |
 
 ## 3. DataStore access result
 
@@ -311,3 +311,131 @@ about an agreement, not about money:
 Neither outcome changes the scientific position. Sourcing progress is not
 evidence of predictive value, and no reliable predictive edge has been
 established.
+
+## 16. Addendum (2026-08-25) — FI-DATA-EXPAND-04B-P3184-Q4-RESOLUTION
+
+**This addendum is documentation and evidence reconciliation only.** It
+followed the owner's out-of-band decision to supply an already-downloaded
+private evidence archive rather than register a DataStore account; the
+gate described in §3 and §15 was not re-attempted, no DataStore session was
+established, and no browser automation or authentication was performed
+against DataStore. All bytes referenced below came from
+`~/Documents/FinanceIQ-private-source-archive/P3184_2020/exsrk2020_all/`,
+a location outside this repository.
+
+### 16.1 Acquired evidence reference
+
+| File | SHA-256 | Declared/observed size |
+| --- | --- | --- |
+| `exsrk2020.zip` (candidate A, object `3184#1132521`) | `5ad33b895bea97647ed6809f45609f2fc0782fa9f887117aa59c26ae1cf145a8` | 58,631 bytes |
+| `exsrk2020 (1).zip` (candidate B, object `3184#1132519`) | `ed59e80e386c9b54058215996ef186849aa3bca144e0cc7f59227f92a889d73c` | 58,823 bytes |
+| Extracted `exsrk2020.xls` from candidate A | `45963bdbb706eee8105fa70967ffc02ba7d029649ca53c19a18547101bac3ac2` | 421,888 bytes |
+| Extracted `exsrk2020.xls` from candidate B | `de44aa20b70d2021d8301a726a157e3d92525a7a91690ed1ebfece06259ceb34` | 420,864 bytes |
+
+Both extracted workbooks and both source ZIPs remain `PRIVATE_LOCAL_RAW`. No
+ZIP or XLS bytes were added to this repository. The full acquisition-row
+detail is recorded as source_ids `P3184-2020-12`, `P3184-2020-13`, and
+`P3184-2020-Q4-EVIDENCE` in
+[bist_membership_p3184_2020_sources.csv](evidence/bist_membership_p3184_2020_sources.csv).
+
+### 16.2 Revision canonicalization — `REVISION_CANONICALIZATION_RESOLVED`
+
+Both 01-10-2020 catalogue candidates identified in §5 item 1 were extracted
+and their workbooks converted to CSV. Result: **436 data rows × 7 columns**
+in both, and a full-file diff of the two converted CSVs found **zero
+differing cells**. The two extracted workbook files carry different
+SHA-256 digests, but the byte differences are confined to OLE-container
+metadata (internal timestamps/CLSID fields, observed at extracted-file
+offsets ~`0x460`–`0x570`), not sheet content.
+
+Conclusion: the two catalogue candidates for the 01-10-2020 publication are
+**content-equivalent at the extracted-workbook level**. The §5 item 1
+observation that the catalogue cannot distinguish the pair by metadata
+alone still stands as a description of catalogue-metadata limits; it is no
+longer a live ambiguity for row content, because both candidates resolve to
+the same rows.
+
+This does not resolve the size non-monotonicity noted in §5 item 2 (the
+28-07-2020 object remains larger by declared size than either 01-10-2020
+object) and does not, by itself, characterize the other five 2020 objects,
+which were not part of this evidence set.
+
+### 16.3 Q4 membership extraction — `Q4_STATE_RESOLVED`
+
+The workbook's `2020-10-01` column (Q4) was extracted: **100 rows**, no
+blank or malformed cells, matching the pre-registered §17 schema. Row-level
+values are recorded in
+[bist_membership_p3184_2020_q4_rows.csv](evidence/bist_membership_p3184_2020_q4_rows.csv)
+(100 data rows; source_id `P3184-2020-Q4-01`).
+
+Nested-expanded nested-index counts (per the §8 rule):
+
+| Index | Literal cell count | Nested-expanded membership |
+| --- | --- | --- |
+| XU030 | 30 | 30 (also counted in XU050 and XU100) |
+| XU050 | 20 | 50 (20 + 30, also counted in XU100) |
+| XU100 | 50 | 100 (50 + 20 + 30) |
+
+The nested-expanded XU100 count of 100 matches the official 2020-10-01
+Günlük Bülten's reported 100-member BIST 100, corroborating both the
+nested-index reading rule and the extraction. `NESTED_COUNTS_RECONCILED`
+against that external reference for XU100. XU030 (30) also matches the
+official bulletin's reported 30-member BIST 30. XU050 has no independent
+official count on record for this date (§10, `XU050_SEED_STATE_UNRESOLVED`
+in the source task), so `XU050_SEED_STATE_UNRESOLVED` for the 50-count is
+**not** newly closed by this addendum — it is now directly *observable*
+from Product 3184 (50 members), but no independent first-party figure
+exists yet to reconcile it against.
+
+### 16.4 Glass group reconciliation evidence — snapshot only, not full reconciliation
+
+Within the 100 Q4 rows, the tracked predecessor/successor group from the
+[collision audit](BIST_MEMBERSHIP_2020_10_01_COLLISION_AUDIT.md) resolves
+as:
+
+| Code | Q4 2020 state |
+| --- | --- |
+| `SISE` | present, `XU030` |
+| `ANACM` | absent |
+| `DENCM` | absent |
+| `SODA` | absent |
+| `TRKCM` | absent |
+
+This is consistent with the collision audit's `SISE` surviving-code finding
+and `ANACM`/`DENCM`/`SODA`/`TRKCM` absorbed-code finding, and corroborates
+those with a first-party Product 3184 membership row rather than the daily
+bulletin alone. **No merger mechanics are inferred beyond this membership
+snapshot** — this addendum observes presence/absence only.
+
+The row-level reconciliation checklist restated in §9 (index additions and
+removals, reserve treatment, nested-expanded counts checked against
+expected sizes) is **not fully closed** by this addendum. Only the
+surviving/absorbed-code presence check and the XU030/XU100 nested-expanded
+counts (§16.3) were verified. Full row-level reconciliation against every
+item in §9's checklist — in particular the exact ADD/REMOVE sets and
+reserve-consumption cross-check — remains open and is not claimed here.
+
+### 16.5 Status changes
+
+| Item | Previous | New | Basis |
+| --- | --- | --- | --- |
+| Revision canonicalization | `REVISION_CANONICALIZATION_UNRESOLVED` | `REVISION_CANONICALIZATION_RESOLVED` | §16.2 — both 01-10-2020 candidates extracted, content-equivalent, 0 differing cells |
+| Q4 state | `Q4_STATE_UNRESOLVED` | `Q4_STATE_RESOLVED` | §16.3 — 100 Q4 rows extracted, nested counts reconcile against official XU030/XU100 bulletin figures |
+
+### 16.6 What remains unresolved
+
+- Full 2020-10-01 row-level reconciliation per §9's checklist (exact
+  ADD/REMOVE sets, reserve consumption) beyond the surviving/absorbed-code
+  presence check in §16.4.
+- `XU050_SEED_STATE_UNRESOLVED` for an independent first-party 50-count to
+  reconcile against (the count is now observable from Product 3184, 20
+  literal / 50 nested-expanded, but unreconciled against a second source).
+- The other five 2020 catalogue objects (02-01, 27-04 ×2, 22-05, 28-07)
+  were not part of this evidence set and remain unacquired; §5's revision
+  semantics for the full 2020 series (in particular the 27-04-2020 pair and
+  the size non-monotonicity in §5 item 2) are unaffected by this addendum.
+- 2020 is **not** promoted to Stage-B eligibility by this addendum alone.
+  This is a Q4 2020 membership and revision-candidate resolution only, not
+  a full 2020 year-level closure adjudication (§12).
+- This addendum does not claim complete historical BIST membership
+  reconstruction for 2020 or any other year.

@@ -1330,3 +1330,19 @@ KAP cross-check recommended before claiming any result.
 | Member count / boundary | `351 -> 351; digest unchanged at 98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5` |
 | Out of scope | `Account registration or agreement acceptance (owner decision), Stage B, models, returns/outcomes, fundamentals, data/provenance, and any prior evidence rewrite` |
 | Claim boundary | Sourcing-feasibility and catalogue-inventory evidence only: enumerating catalogue objects does not make a historical universe valid, does not improve any estimate, and does not establish model validity. No modeling row, feature, target, benchmark observation, prediction, coefficient, IC, p-value, interval or ranking changed; no reliable predictive edge established |
+
+## FI-DATA-EXPAND-04B-P3184-Q4-RESOLUTION Product 3184 2020 Q4 documentation reconciliation (2026-08-25; append-only)
+
+| State item | Status |
+| --- | --- |
+| Task | `FI-DATA-EXPAND-04B-P3184-Q4-RESOLUTION — documentation and evidence reconciliation only, using an owner-supplied private local evidence archive; no DataStore access, browser automation, or authentication performed` |
+| Deliverables | `docs/BIST_MEMBERSHIP_P3184_2020_RECONCILIATION.md (§16 addendum added)`, `docs/evidence/bist_membership_p3184_2020_sources.csv (11 -> 14 rows)`, `docs/evidence/bist_membership_p3184_2020_q4_rows.csv (0 -> 100 data rows)`, `TASK_STATE.md` |
+| Evidence basis | `Private local archive ~/Documents/FinanceIQ-private-source-archive/P3184_2020/exsrk2020_all/ — exsrk2020.zip (SHA-256 5ad33b89...cf145a8) and exsrk2020 (1).zip (SHA-256 ed59e80e...c18f8a4), both for the 01-10-2020 publication; extracted exsrk2020.xls per candidate (SHA-256 45963bdb...c19a1854 and de44aa20...06259ceb, respectively)` |
+| Revision canonicalization | `REVISION_CANONICALIZATION_UNRESOLVED -> REVISION_CANONICALIZATION_RESOLVED — both 01-10-2020 catalogue candidates extracted and converted; 436 rows x 7 columns each; 0 differing cells; differing workbook SHA-256 traced to OLE-container metadata bytes only, not sheet content` |
+| Q4 state | `Q4_STATE_UNRESOLVED -> Q4_STATE_RESOLVED — 100 Q4 (2020-10-01) membership rows extracted; XU030=30, XU050=20, XU100=50 literal; nested-expanded XU030=30/XU050=50/XU100=100, XU030 and XU100 match the official 2020-10-01 Günlük Bülten counts (§16.3)` |
+| Glass group snapshot | `SISE present (XU030); ANACM, DENCM, SODA, TRKCM absent from the Q4 2020 snapshot — consistent with the prior collision audit's surviving/absorbed-code finding; no merger mechanics inferred beyond membership presence/absence` |
+| Remaining limitations | `Full §9 row-level reconciliation (exact ADD/REMOVE sets, reserve consumption) not performed beyond the presence/absence check; XU050_SEED_STATE_UNRESOLVED remains open pending an independent first-party 50-count; the other five 2020 catalogue objects (02-01, 27-04 x2, 22-05, 28-07) were not acquired and remain outside this evidence set; 2020 is NOT promoted to Stage-B eligibility by this addendum` |
+| Repository raw bytes | `NONE — no ZIP or XLS bytes added to Git; only documentation and evidence CSV files changed` |
+| Stage A / owner amendment / boundary calculations / provenance framework | `UNCHANGED — not modified by this task` |
+| Member count / boundary | `351 -> 351 (not touched by this task)` |
+| Out of scope | `DataStore access, browser automation, authentication, dataset regeneration, application/backend code, tests, full year-level 2020 closure adjudication` |
