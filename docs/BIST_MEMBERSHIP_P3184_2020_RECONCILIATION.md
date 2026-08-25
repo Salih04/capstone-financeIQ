@@ -52,10 +52,15 @@ The starting gate passed:
 | Format verification | ~~`NOT_VERIFIED_NO_FILE_ACQUIRED`~~ → superseded 2026-08-25 for the 01-10-2020 publication (§16.2); the §6 documentation-currency discrepancy still stands as written |
 | Q4 row extraction | ~~`0 rows`~~ → `100 rows` (2026-08-25, see §16.3) |
 | Nested-count reconciliation | ~~Not evaluable — neither `NESTED_COUNTS_RECONCILED` nor `NESTED_COUNTS_MISMATCH` can be issued without rows~~ → superseded 2026-08-25: `NESTED_COUNTS_RECONCILED` for XU030 and XU100 against the official 2020-10-01 Günlük Bülten; XU050 nested-expanded count (50) is now observable but unreconciled against an independent first-party source — `XU050_SEED_STATE_UNRESOLVED` stands (see §16.3) |
-| 2020-10-01 collision reconciliation | `NOT_PERFORMED` — the prior audit stands unchanged and unreinterpreted |
-| XU050 seed state | `XU050_SEED_STATE_UNRESOLVED` |
+| 2020-10-01 collision reconciliation | ~~`NOT_PERFORMED`~~ → superseded 2026-08-25: Q4 row-level set/ADD/REMOVE/reserve reconciliation performed against announcement 14118, see §19 |
+| XU050 seed state | `XU050_SEED_STATE_UNRESOLVED` — unchanged by §19 |
 | Revision canonicalization | ~~`REVISION_CANONICALIZATION_UNRESOLVED`~~ → `REVISION_CANONICALIZATION_RESOLVED` (2026-08-25, see §16) |
 | Q4 state | ~~`Q4_STATE_UNRESOLVED`~~ → `Q4_STATE_RESOLVED` (2026-08-25, see §16) |
+| XU030 exact-set reconciliation | `MATCH` (2026-08-25, see §19.1) |
+| XU100 exact-set reconciliation | `MATCH` (2026-08-25, see §19.1) |
+| Q4 ADD reconciliation | `MATCH` (2026-08-25, see §19.2) |
+| Q4 REMOVE reconciliation | `MATCH` (2026-08-25, see §19.2) |
+| Q4 reserve consumption | `NOT_CONSUMED` (2026-08-25, see §19.3) |
 
 ## 3. DataStore access result
 
@@ -877,3 +882,73 @@ does for §13 and §17.5.
 - Research support only; not investment advice. Normalizing provenance-record
   shape is not evidence of predictive value, and **no reliable predictive edge
   has been established**.
+
+## 19. Q4 row-level reconciliation closeout (2026-08-25) — P3184-2020-Q4-RECONCILIATION-CLOSEOUT
+
+**This addendum performs the §9 row-level reconciliation checklist against the
+existing 100 Q4 rows and the existing announcement-14118 table in the
+[collision audit](BIST_MEMBERSHIP_2020_10_01_COLLISION_AUDIT.md) §6. No new
+file was acquired, no ZIP/XLS byte was read, and no row in
+[bist_membership_p3184_2020_q4_rows.csv](evidence/bist_membership_p3184_2020_q4_rows.csv)
+was modified.** The check was performed by comparing the already-recorded
+`is_xu030`/`is_xu050`/`is_xu100` flag columns against the already-published
+additions/removals/reserves table, using the 2026-08-25 evidence state as-is.
+
+### 19.1 XU030 / XU100 exact-set reconciliation — `MATCH`
+
+The Q4 rows' `is_xu100=TRUE` tickers (100 codes) were compared set-for-set
+against the collision audit §9 official final XU100 code set (100 codes): zero
+codes present in one set and absent from the other. The Q4 rows'
+`is_xu030=TRUE` tickers (30 codes) were compared the same way against the
+official final XU030 code set (30 codes): zero codes present in one set and
+absent from the other. Both are exact-set matches, not sample checks.
+
+### 19.2 ADD / REMOVE reconciliation — `MATCH`
+
+Checked against the collision audit §6 table (Borsa announcement 14118):
+
+| Index | Additions checked | Removals checked | Result |
+| --- | --- | --- | --- |
+| XU100 | `AKSGY, ALCTL, ARDYZ, INDES, PETUN, PNSUT` | `ANACM, GLYHO, KARSN, KLMSN, SODA, TRKCM` | All 6 additions carry `is_xu100=TRUE`; all 6 removals are absent from all 100 Q4 rows entirely — `MATCH` |
+| XU030 | `GUBRF, OYAKC` | `SODA, TRKCM` | Both additions carry `is_xu030=TRUE`; both removals are absent from all 100 Q4 rows entirely — `MATCH` |
+
+`ANACM`, `SODA`, and `TRKCM` being absent from all 100 rows (not merely
+un-flagged) reconfirms, at row level, the presence/absence snapshot already
+recorded in §16.4.
+
+### 19.3 Reserve consumption — `NOT_CONSUMED`
+
+| Index | Published reserves | Q4 row state | Result |
+| --- | --- | --- | --- |
+| XU100 | `ECZYT, EGGUB, KONYA` | Absent from all 100 Q4 rows | Not consumed |
+| XU030 | `SOKM, SASA, VESTL` | Present in the Q4 rows, but each carries `is_xu030=FALSE` / `is_xu100=TRUE` (narrowest observed index is XU050/XU100, not XU030) | Not consumed into XU030 |
+
+This matches the collision audit §7 `RESERVE_CONSUMPTION_EVENT_CONFIRMED`
+finding (no XU030/XU050/XU100 reserve was consumed because of the merger) —
+the Product 3184 row data corroborates it rather than contradicting it.
+
+### 19.4 What this closeout does not do
+
+- **No revision closure.** §5 `REVISION_SEMANTICS_UNRESOLVED` is untouched.
+  This addendum reconciles row *content* against a published event table; it
+  makes no claim about which catalogue object, publication, or revision the
+  content canonically belongs to beyond what §16.2/§17 already established for
+  the 01-10-2020 pair.
+- **No XU050 closure.** `XU050_SEED_STATE_UNRESOLVED` (§10) stands. The XU050
+  ADD/REMOVE/reserve lists were not part of the requested closeout scope and
+  were not checked here; even where XU050 evidence is directly observable from
+  Product 3184, no independent first-party 50-count exists to reconcile the
+  seed state against, and this addendum does not supply one.
+- **No provider binding claim.** The catalogue-object binding limits stated in
+  §16.1, §17.2, and §17.4 (`ACQUIRED_OBJECT_BINDING_BY_DECLARED_SIZE` —
+  declared-size match only, not provider proof) are unchanged. This addendum
+  reconciles already-recorded row content; it adds no new binding evidence for
+  any catalogue object.
+- **No Stage-B promotion.** 2020 remains not promoted toward Stage-B
+  eligibility (§12, §16.6, §17.5, §18.13 unchanged). A full year-level closure
+  adjudication is still required and is out of scope here.
+- No modeling dataset, benchmark, experiment result, or model output was
+  touched. `NO_NEW_OUTCOME_INSPECTION=true` holds.
+- Research support only; not investment advice. Closing the Q4 row-level
+  checklist is not evidence of predictive value, and **no reliable predictive
+  edge has been established**.
