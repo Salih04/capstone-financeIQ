@@ -905,7 +905,7 @@ KAP cross-check recommended before claiming any result.
 | Generated artifacts | Three `data/provenance/` artifacts present with committed SHA-256s: CSV `62a4102fb3df84774fd6f6e1a9d96412a42b9fb0df1947bf7290c54925a727eb`; JSON `441d500eedd270c47460f7c645e5de5c9864d12ba159d145ad90ae314280474a`; Markdown `b61456012d9887bb5e95e9cf2b55ad398c117f6360c9228aec14f36266289d7b` |
 | Preservation / registry | Additive outside historical 351-member boundary; boundary not re-pinned or weakened; scientific values, feature-passports v1, limitations register unchanged; MCC `v1.10.0`; registry `13 governed roots / 88 entries`, schema `1.0.0`, task `R3-REL-01` |
 | Verification | Focused R4 `656/656`; root `1027/1027`; backend `552/552`; data validation `VALID`; deterministic regeneration exact; claims lint, docs lint, `git diff --check` passed; repository clean; main/origin/live remote equal |
-| Remaining tasks | R4-DIM-01 and R4-ROBUST-01 remain separate outstanding tasks; neither authorized or completed by this closure; Wave 4A not complete |
+| Remaining tasks | R4-ROBUST-01 remains outstanding; R4-DIM-01 implementation verified on branch `local/r4-dim-01-feature-dimensionality`; Wave 4A completion still requires remaining gates |
 | Claim boundary | No point-in-time correctness, rights clearance, predictive validity, alpha, profitability, investment value, or production validity established; no reliable predictive edge established |
 | Final state | `INTEGRATED / INDEPENDENT_REVIEW_APPROVED / DETERMINISTIC / CURRENT_MAIN_VERIFIED / R4_PROV_01_CLOSED` |
 
