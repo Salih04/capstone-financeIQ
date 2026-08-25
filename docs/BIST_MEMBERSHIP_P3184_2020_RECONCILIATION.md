@@ -550,10 +550,12 @@ note "unverified because the object was not downloaded". That boundary was
 false: the private evidence archive holds a corresponding ZIP for each, and each
 ZIP's extracted workbook material exists on disk.
 
-Each row now records the archive file's actual name, SHA-256, and byte count,
-plus the extracted workbook's SHA-256 and size, with the ZIP-member CRC-32 check
-binding the two. Declared-size match to the catalogue object follows the same
-size-only limit as §17.2.
+~~Each row now records the archive file's actual name, SHA-256, and byte
+count, plus the extracted workbook's SHA-256 and size, with the ZIP-member
+CRC-32 check binding the two.~~ → superseded 2026-08-25: rows `-07`…`-11` were
+restored to pure catalogue-observation shape and this archive-file detail was
+relocated to new rows `-14`…`-18` (see §18.3). Declared-size match to the
+catalogue object follows the same size-only limit as §17.2.
 
 What was **not** done for these five, and is not claimed anywhere:
 
@@ -575,8 +577,8 @@ including the two introduced by this correction:
 | `provenance_status` | Meaning |
 | --- | --- |
 | `ACQUIRED` | The named file was obtained and its bytes are identified by the recorded SHA-256. Used for the catalogue-metadata JSON snapshots, whose identity needs no further binding because the request URL is itself the identifier. |
-| `VISIBLE_NOT_ACQUIRED` | The catalogue object was observed in the provider's catalogue, but no bytes for it were held at the time the row was written. Rows `P3184-2020-05` and `-06` retain this status: they are pure catalogue-observation rows, and the archive evidence for the same two objects is carried by rows `-12` and `-13`. |
-| `ARCHIVE_PRESENT_NOT_OBJECT_BOUND` | **New (2026-08-25).** A file in the private evidence archive is present and its own identity is confirmed by SHA-256, but its binding to *this* catalogue object id is not proven — it rests on declared-size match alone — and no content-level reconciliation has been performed. Applied to `P3184-2020-07`…`-11`. |
+| `VISIBLE_NOT_ACQUIRED` | ~~The catalogue object was observed in the provider's catalogue, but no bytes for it were held at the time the row was written. Rows `P3184-2020-05` and `-06` retain this status: they are pure catalogue-observation rows, and the archive evidence for the same two objects is carried by rows `-12` and `-13`.~~ → superseded 2026-08-25, see §18.6: describes the evidence attached to *that catalogue-observation record* — the observation event carried no acquired object bytes; it does not assert no bytes exist elsewhere or later. Current affected catalogue-observation rows are `P3184-2020-05` through `-11`. |
+| `ARCHIVE_PRESENT_NOT_OBJECT_BOUND` | **New (2026-08-25).** A file in the private evidence archive is present and its own identity is confirmed by SHA-256, but its binding to *this* catalogue object id is not proven — it rests on declared-size match alone — and no content-level reconciliation has been performed. ~~Applied to `P3184-2020-07`…`-11`.~~ → superseded 2026-08-25, see §18.3 / §18.5: current live rows carrying this token are `P3184-2020-14` through `-18`. |
 | `ACQUIRED_OBJECT_BINDING_BY_DECLARED_SIZE` | **New (2026-08-25).** As `ACQUIRED` for the file's own identity, and the file's content *has* been converted and compared, but the catalogue-object assignment still rests on declared-size match alone. Applied to `P3184-2020-12` and `-13`. |
 | `DERIVED` | The row records an extraction computed from already-recorded evidence rather than a file obtained from the provider. Applied to `P3184-2020-Q4-EVIDENCE`. |
 
@@ -616,3 +618,262 @@ collision reconciliation or Stage-B approval; those remain open exactly as
 - Research support only; not investment advice. Correcting provenance records is
   not evidence of predictive value, and **no reliable predictive edge has been
   established**.
+
+## 18. Normalization addendum (2026-08-25) — P3184-2020-PROVENANCE-NORMALIZE
+
+**This addendum is a structural provenance normalization only.** It does not
+reopen, weaken, or expand any conclusion reached in §16 or §17. No ZIP, XLS, Q4
+evidence CSV, trusted data file, or model file was touched; only this document,
+[bist_membership_p3184_2020_sources.csv](evidence/bist_membership_p3184_2020_sources.csv),
+[bist_membership_source_manifest.csv](evidence/bist_membership_source_manifest.csv),
+and `TASK_STATE.md` were edited.
+
+### 18.1 Why rows `-07`…`-11` were normalized
+
+§17.3 fixed a false acquisition boundary by adding the private archive's file
+identity directly into rows `P3184-2020-07`…`-11`. That repair was correct on
+the facts but left each row describing **two different provenance events** —
+a 2026-08-24 catalogue observation (`FIRST_PARTY_CATALOGUE_API_INVOKED_BY_PRODUCT_PAGE`,
+no bytes held) and a 2026-08-25 private-archive inspection (`raw_sha256`,
+`raw_bytes`, `archive_symbol` of a local ZIP) — in one structured row under one
+`access_date_utc`/`access_method` pair. That is a schema defect, not a factual
+one: the two events have different access dates, different access methods, and
+different evidentiary weight, and collapsing them made the row's own
+`access_method` column false for half of what it recorded.
+
+### 18.2 One-observation-per-row rule
+
+Every row in this manifest now describes exactly one provenance observation or
+event: a catalogue-metadata fetch, a catalogue-object listing observed but not
+downloaded, a private-archive file inspection, or a derived extraction. Rows
+`P3184-2020-05` and `-06` already followed this rule and are the shape
+precedent used to restore `-07`…`-11`. A row that needs to describe a later
+event for the same object gets a **new row that points back to the earlier one
+by source_id**, not a merge of both events' fields into one row.
+
+### 18.3 Restored rows `-07`…`-11` and new archive rows `-14`…`-18`
+
+`P3184-2020-07`…`-11` are restored to pure catalogue-observation shape,
+matching `-05`/`-06`: `raw_filename`/`raw_sha256`/`raw_bytes`=`NA`,
+`raw_storage_class`=`NOT_ACQUIRED`, `archive_symbol`=`NA`,
+`provenance_status`=`VISIBLE_NOT_ACQUIRED`. Their catalogue facts (object id,
+publication date, declared size, catalogue order, access method/class, price)
+are unchanged from §17. Each restored row's note now points forward to its
+archive-evidence counterpart:
+
+| Catalogue row | Object | Archive-evidence row | Archive file |
+| --- | --- | --- | --- |
+| `P3184-2020-07` | `3184#1068011` | `P3184-2020-14` | `exsrk2020 (2).zip` |
+| `P3184-2020-08` | `3184#1006269` | `P3184-2020-15` | `exsrk2020 (3).zip` |
+| `P3184-2020-09` | `3184#982927` | `P3184-2020-16` | `exsrk2020 (5).zip` |
+| `P3184-2020-10` | `3184#982925` | `P3184-2020-17` | `exsrk2020 (4).zip` |
+| `P3184-2020-11` | `3184#872590` | `P3184-2020-18` | `exsrk2020 (6).zip` |
+
+Rows `-14`…`-18` carry forward, byte-for-byte, exactly the archive file
+identity, extracted-workbook identity, and CRC-32 binding that §17.3 had placed
+in `-07`…`-11` — nothing about the underlying evidence changed, only which row
+holds it. They use the same event shape as the existing archive-evidence rows
+`P3184-2020-12`/`-13`: `access_method=PRIVATE_EVIDENCE_ARCHIVE_LOCAL_FILE`,
+`access_class=PRIVATE_LOCAL_RAW`, `provenance_status=ARCHIVE_PRESENT_NOT_OBJECT_BOUND`
+(the same §17.4 token, now attached to a properly-shaped archive row instead of
+a hybrid one). Unlike rows `-12`/`-13`, rows `-14`…`-18` were **not** converted
+and compared (`content_reconciliation_status=STRUCTURAL_ONLY`, not
+`CONVERTED_AND_COMPARED`), and their `revision_status` stays
+`REVISION_SEMANTICS_UNRESOLVED` — `REVISION_CANONICALIZATION_RESOLVED` remains
+scoped to the 01-10-2020 pair only (§17.5, unchanged).
+
+### 18.4 New orthogonal provenance axes
+
+Three new columns were added to
+[bist_membership_p3184_2020_sources.csv](evidence/bist_membership_p3184_2020_sources.csv)
+only (not the global manifest, per owner decision): `archive_identity_status`,
+`catalogue_binding_status`, `content_reconciliation_status`. They separate
+three questions that `provenance_status` previously conflated into one token:
+
+| Axis | Question it answers | Values used |
+| --- | --- | --- |
+| `archive_identity_status` | Does a local archive file exist and is its own identity digest-confirmed? | `NO_LOCAL_FILE`, `LOCAL_FILE_DIGEST_CONFIRMED`, `NA` |
+| `catalogue_binding_status` | Is that file bound to a specific catalogue object id, and how strongly? | `UNBOUND`, `BINDING_BY_DECLARED_SIZE`, `NA` |
+| `content_reconciliation_status` | Has the file's content been compared against anything? | `NONE`, `STRUCTURAL_ONLY`, `CONVERTED_AND_COMPARED`, `NA` |
+
+No row in this normalization is `ROW_LEVEL_RECONCILED` on the third axis —
+§9's row-level reconciliation remains open. `NA` is used only for rows `-01`
+through `-04` (catalogue-listing pages, not per-object rows) and
+`P3184-2020-Q4-EVIDENCE` (a derived multi-candidate extraction, not a
+per-object archive observation) — the axes do not truthfully describe those
+rows' subject matter.
+
+### 18.5 `provenance_status` retained as compatibility summary
+
+`provenance_status` is unchanged in meaning and is kept as a single-token
+summary for anything that only reads that column; the three new axes are the
+authoritative detail underneath it. No existing `provenance_status` value's
+meaning was altered.
+
+### 18.6 `VISIBLE_NOT_ACQUIRED` — observation-centered definition
+
+Previous wording (§17.4): *"the catalogue object was observed in the
+provider's catalogue, but no bytes for it were held **at the time the row was
+written**."* That phrasing tied the status to row-edit time, which became
+false the moment §17.3 edited rows `-07`…`-11` in place while their
+`provenance_status` still read `VISIBLE_NOT_ACQUIRED`.
+
+**Corrected definition:** `VISIBLE_NOT_ACQUIRED` describes the evidence
+attached to *that observation record* — this catalogue-observation event
+carried no acquired object bytes. It does **not** assert that no bytes existed
+elsewhere, at any other time, for the same catalogue object; if archive bytes
+exist, they are recorded as a separate row (e.g. `P3184-2020-12` for the
+object observed at `-05`, `P3184-2020-14` for the object observed at `-07`).
+This definition now applies consistently to `-05`, `-06`, and the restored
+`-07`…`-11`.
+
+### 18.7 `BM-031`…`-037` remain historical truth; `BM-074`…`-080` are later state updates
+
+The global manifest rows `BM-031`…`BM-037` are **not modified**. They remain
+an accurate record of the 2026-08-23 catalogue-only observation for each of
+the seven 2020 objects (`VISIBLE_NOT_ACQUIRED`, `raw_sha256=NA`). Seven new
+rows, `BM-074`…`BM-080`, are appended with `record_type=ARCHIVE_ACQUISITION_STATE_UPDATE`,
+one per historical object, in the same order as `BM-031`…`-037`:
+
+| Historical row | Object | New state-update row | P3184 archive row |
+| --- | --- | --- | --- |
+| `BM-031` | `3184#1132521` | `BM-074` | `P3184-2020-12` |
+| `BM-032` | `3184#1132519` | `BM-075` | `P3184-2020-13` |
+| `BM-033` | `3184#1068011` | `BM-076` | `P3184-2020-14` |
+| `BM-034` | `3184#1006269` | `BM-077` | `P3184-2020-15` |
+| `BM-035` | `3184#982927` | `BM-078` | `P3184-2020-16` |
+| `BM-036` | `3184#982925` | `BM-079` | `P3184-2020-17` |
+| `BM-037` | `3184#872590` | `BM-080` | `P3184-2020-18` |
+
+Each `BM-07x` row's note states explicitly, per owner decision: the earlier
+`BM-03x` row remains accurate for its earlier catalogue observation; the new
+row updates later archive-state evidence only; local archive file identity is
+digest-confirmed; catalogue-object assignment remains declared-size based
+only; this is not provider proof. No `superseded_by` column was added — the
+two rows coexist, each describing a different point in the evidence timeline.
+
+Two new documented values were introduced into the global manifest's existing
+columns rather than adding new columns: `identity_status=BINDING_BY_DECLARED_SIZE`
+(the file's own identity is digest-confirmed, but its catalogue-object binding
+rests on declared-size match only — the global manifest's `identity_status`
+column previously carried only `NA`, `NOT_ASSESSED`, or `UNKNOWN`, none of
+which could truthfully express this), and `provenance_status=ACQUIRED` reused
+in its existing sense (the named archive file was obtained and its bytes are
+identified by the recorded SHA-256) — no new meaning was invented for that
+existing token.
+
+### 18.8 Acquisition/download timestamp remains unknown where not evidenced
+
+The true owner download/acquisition time for the five files newly split into
+`P3184-2020-14`…`-18` (and their `BM-076`…`-080` counterparts) was never
+recorded. Filesystem mtime is not acquisition authority, consistent with §11's
+treatment of file modification timestamps. ZIP member timestamp is treated
+only as corroboration, never as authority — that determination is established
+by this normalization addendum itself, specifically §18.9, and is not carried
+forward from an earlier section. Rather than manufacture a timestamp,
+`access_date_utc` on these twelve new rows is recorded as `NA`, and each note
+states that archive inspection occurred during the 2026-08-25
+provenance-normalization work at day-level only.
+
+`P3184-2020-12`/`-13` and `BM-031`…`-037` are unchanged and are not
+reinterpreted by this addendum. `P3184-2020-12` and `-13` carry a recorded
+inspection/access timestamp (`2026-08-25T00:24:00Z`) — the time at which the
+private-archive files were inspected during this work. That value is **not**
+evidence of the original owner acquisition/download time, which remains
+unknown; this distinction is asserted explicitly here, and the recorded
+inspection timestamp must not be reinterpreted as original download
+provenance.
+
+By the same policy, global-manifest rows `BM-074` and `BM-075` — the
+state-update rows linked to `P3184-2020-12`/`-13` — retain `access_date_utc=NA`
+for their own state-update event, even though their linked P3184 archive rows
+preserve that later `2026-08-25T00:24:00Z` inspection timestamp. The original
+owner acquisition/download time remains unknown for those two objects; the
+later inspection timestamp is not treated as the original acquisition
+timestamp for the `BM-074`/`BM-075` state-update event, and no timestamp is
+invented for either.
+
+### 18.9 ZIP member timestamp corroboration — not proof
+
+Read-only inspection (no bytes modified) found that each of the seven 2020
+archive ZIPs' `exsrk2020.xls` member timestamp matches its mapped catalogue
+publication date:
+
+| Archive | ZIP member `exsrk2020.xls` time | Catalogue publication |
+| --- | --- | --- |
+| `exsrk2020 (6).zip` | 2020-01-02 11:14 | 02-01-2020 |
+| `exsrk2020 (4).zip` | 2020-04-27 12:52 | 27-04-2020 |
+| `exsrk2020 (5).zip` | 2020-04-27 13:02 | 27-04-2020 |
+| `exsrk2020 (3).zip` | 2020-05-22 12:55 | 22-05-2020 |
+| `exsrk2020 (2).zip` | 2020-07-28 14:39 | 28-07-2020 |
+| `exsrk2020.zip` | 2020-10-01 09:42 | 01-10-2020 |
+| `exsrk2020 (1).zip` | 2020-10-01 09:46 | 01-10-2020 |
+
+This is recorded in each affected row's note as **corroboration only**. ZIP
+member timestamps carry no timezone, are not provider digests, are not
+reliable proof of object identity, and can be set independently of upload
+time. They do **not** promote `catalogue_binding_status` beyond
+`BINDING_BY_DECLARED_SIZE`, and they do not strengthen
+`ARCHIVE_PRESENT_NOT_OBJECT_BOUND` toward a stronger token.
+
+### 18.10 `22-05-2020` and `28-07-2020` are not extraordinary-event conclusions
+
+The publication dates `22-05-2020` (object `3184#1006269`) and `28-07-2020`
+(object `3184#1068011`) are treated, for now, as within-file
+republication/revision checkpoints — not as proven extraordinary index-review
+events. This normalization performs no event-level analysis and draws no
+membership-change conclusion from either date; that determination is left to
+future first-party extraordinary-event evidence, consistent with §5's
+still-open `REVISION_SEMANTICS_UNRESOLVED` status.
+
+### 18.11 Future gate — snapshot semantics unit
+
+Before any future row-level reconciliation treats a within-year publication
+date as a new membership event, it must pre-register and validate the unit
+`publication_date × quarter_column` — i.e., establish whether a given
+publication's quarter columns represent a fresh snapshot, a partial revision,
+or a stable re-cut of the same underlying quarter data — before computing any
+exact delta between publications. This normalization does not perform that
+validation and does not resolve `REVISION_SEMANTICS_UNRESOLVED`.
+
+### 18.12 Deterministic conversion prerequisite
+
+Rows `-14`…`-18` reference on-disk converted CSV exports for their objects
+only as corroborating files (structural inspection: presence, digest, size,
+ZIP-member CRC-32 binding). Before any future task treats those conversions as
+authoritative for row-level reconciliation, the XLS→CSV conversion must be
+reproduced from the verified XLS inputs with the conversion tool, tool
+version, exact command, input XLS SHA-256, output CSV SHA-256, and output
+row/column shape all recorded. That reproduction was **not** performed here.
+Consistent with the owner decision, this normalization did not open, read, or
+inspect membership values from any of the five newly-split files' converted
+CSVs — `NO_NEW_OUTCOME_INSPECTION=true` holds for this addendum exactly as it
+does for §13 and §17.5.
+
+### 18.13 Unchanged scientific/governance boundaries
+
+- `Q4_STATE_RESOLVED` (§16.3) is untouched and remains scoped to the 100
+  extracted 2020-10-01 rows.
+- `REVISION_CANONICALIZATION_RESOLVED` (§16.2) remains scoped to the
+  01-10-2020 pair only; the five objects normalized here are not part of it.
+- `REVISION_SEMANTICS_UNRESOLVED` (§5) and `XU050_SEED_STATE_UNRESOLVED` (§10)
+  remain open.
+- The 27-04-2020 pair remains unresolved; §5 item 1's observation that the
+  catalogue cannot distinguish same-date objects is untouched.
+- §9's row-level ADD/REMOVE reconciliation and reserve-consumption
+  reconciliation remain open; nothing here performs them.
+- No extraordinary-event conclusion is drawn for 22-05-2020 or 28-07-2020
+  (§18.10).
+- 2020 is **not** promoted toward Stage-B eligibility (§12, §16.6, §17.5
+  unchanged).
+- No raw ZIP or XLS bytes were added to Git.
+- No modeling dataset, benchmark, experiment result, or model output was
+  touched. `NO_NEW_OUTCOME_INSPECTION=true`.
+- No membership value was read, derived, or recorded for any of the five
+  files newly split into rows `-14`…`-18`.
+- No provider-proof or cryptographic object-binding claim is made anywhere in
+  this addendum; every catalogue-object binding for these seven files remains
+  declared-size match only.
+- Research support only; not investment advice. Normalizing provenance-record
+  shape is not evidence of predictive value, and **no reliable predictive edge
+  has been established**.
