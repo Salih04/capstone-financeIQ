@@ -260,9 +260,16 @@ task §11 is unassigned because no row exists to classify.
 
 The prior audit left XU050 seed-state reconciliation open specifically because
 the official 2020-10-01 Günlük Bülten flags BIST 100 and BIST 30 membership but
-does not flag BIST 50. Product 3184 is the source that would close it, because
-its narrowest-index encoding makes XU050 directly observable. Without acquired
-rows the gap is unchanged.
+does not flag BIST 50.
+
+Current Product 3184 Q4 evidence makes the XU050 state observable within its
+source boundary: the extracted Q4 snapshot contains 50 rows with
+`is_xu050=TRUE`. Nested-index expansion therefore produces the expected
+50-member XU050 state from the Product 3184 evidence.
+
+The unresolved point is no longer absence of Product 3184 rows. The remaining
+gate is independent first-party validation of the complete XU050 member set.
+Without that external validation source, `XU050_SEED_STATE_UNRESOLVED` remains.
 
 ## 11. Revision canonicalization — `REVISION_CANONICALIZATION_UNRESOLVED`
 
