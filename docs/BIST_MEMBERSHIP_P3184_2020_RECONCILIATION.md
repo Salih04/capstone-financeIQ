@@ -7,8 +7,12 @@
 This is an outcome-blind task. It inspected Borsa İstanbul DataStore **Product
 3184** first-party catalogue metadata for 2020, established the complete 2020
 object inventory, and stopped at the documented owner-decision gate before any
-account registration or agreement acceptance. **No Product 3184 data file was
-downloaded, opened, parsed, or reconstructed.** No modeling dataset, benchmark,
+account registration or agreement acceptance. **As of that task (2026-08-24), no
+Product 3184 data file had been downloaded, opened, parsed, or reconstructed by
+it.** That statement describes §§1–15 only and is superseded for the 01-10-2020
+publication by the §16 addendum and for the acquisition boundary of all seven
+2020 objects by the §17 provenance correction; it must not be read as a
+present-tense claim about the evidence state. No modeling dataset, benchmark,
 model, return, or outcome was touched or inspected.
 
 Research support only; not investment advice. The repository's scientific
@@ -44,8 +48,8 @@ The starting gate passed:
 | Continuation requirement | `REGISTRATION_AND_AGREEMENT_ACCEPTANCE_REQUIRED` — the combined *Giriş/Kayıt* dialog requires acknowledging the KVKK notice and accepting the **Kullanıcı Kayıt Sözleşmesi** |
 | 2020 object inventory | `COMPLETE` — 7 catalogue objects, fully enumerated below |
 | Revision semantics | `REVISION_SEMANTICS_UNRESOLVED` |
-| Raw acquisition | `NONE` — no `exsrk2020.zip` object acquired |
-| Format verification | `NOT_VERIFIED_NO_FILE_ACQUIRED`, with one documentation-currency discrepancy flagged in §6 |
+| Raw acquisition | ~~`NONE` — no `exsrk2020.zip` object acquired~~ → superseded 2026-08-25: archive material for all seven 2020 objects exists in the private evidence archive; two are at `ACQUIRED_OBJECT_BINDING_BY_DECLARED_SIZE` and five at `ARCHIVE_PRESENT_NOT_OBJECT_BOUND` (see §17) |
+| Format verification | ~~`NOT_VERIFIED_NO_FILE_ACQUIRED`~~ → superseded 2026-08-25 for the 01-10-2020 publication (§16.2); the §6 documentation-currency discrepancy still stands as written |
 | Q4 row extraction | `0 rows` |
 | Nested-count reconciliation | Not evaluable — neither `NESTED_COUNTS_RECONCILED` nor `NESTED_COUNTS_MISMATCH` can be issued without rows |
 | 2020-10-01 collision reconciliation | `NOT_PERFORMED` — the prior audit stands unchanged and unreinterpreted |
@@ -325,12 +329,26 @@ a location outside this repository.
 
 ### 16.1 Acquired evidence reference
 
-| File | SHA-256 | Declared/observed size |
-| --- | --- | --- |
-| `exsrk2020.zip` (candidate A, object `3184#1132521`) | `5ad33b895bea97647ed6809f45609f2fc0782fa9f887117aa59c26ae1cf145a8` | 58,631 bytes |
-| `exsrk2020 (1).zip` (candidate B, object `3184#1132519`) | `ed59e80e386c9b54058215996ef186849aa3bca144e0cc7f59227f92a889d73c` | 58,823 bytes |
-| Extracted `exsrk2020.xls` from candidate A | `45963bdbb706eee8105fa70967ffc02ba7d029649ca53c19a18547101bac3ac2` | 421,888 bytes |
-| Extracted `exsrk2020.xls` from candidate B | `de44aa20b70d2021d8301a726a157e3d92525a7a91690ed1ebfece06259ceb34` | 420,864 bytes |
+**Corrected 2026-08-25 — see §17.** The object↔file attribution originally
+printed in this table was inverted. The table below is re-derived from actual
+on-disk file identity (SHA-256 of each archive file, plus a ZIP-member CRC-32
+check binding each archive file to its extracted workbook).
+
+| File | SHA-256 | Size on disk | Catalogue object (declared size match only) |
+| --- | --- | --- | --- |
+| `exsrk2020 (1).zip` (candidate A) | `ed59e80e386c9b54058215996ef186849aa3bca144e0cc7f59227f92a889d73c` | 58,631 bytes | `3184#1132521` (declared 58,631) |
+| `exsrk2020.zip` (candidate B) | `5ad33b895bea97647ed6809f45609f2fc0782fa9f887117aa59c26ae1cf145a8` | 58,823 bytes | `3184#1132519` (declared 58,823) |
+| Extracted `exsrk2020.xls` from candidate A | `de44aa20b70d2021d8301a726a157e3d92525a7a91690ed1ebfece06259ceb34` | 420,864 bytes | — |
+| Extracted `exsrk2020.xls` from candidate B | `45963bdbb706eee8105fa70967ffc02ba7d029649ca53c19a18547101bac3ac2` | 421,888 bytes | — |
+| Converted CSV export, **both** candidates (byte-identical) | `4385ae8e6e7b7335add4a1072ad455c6cee317f75b9d2dc5000f7c61ed008892` | 436 lines × 7 columns | — |
+
+The archive-file identities in column 2 are confirmed by digest. The catalogue
+column is weaker: **private archive file identity confirmed; catalogue object
+assignment based on declared size match only.** No provider-side digest,
+per-object download URL, or other independent identifier was available to bind
+an archive file to a catalogue object id, so the fourth column rests on the
+seven 2020 declared sizes being pairwise distinct and matching the seven
+archive files one-to-one. It is not proof of object identity.
 
 Both extracted workbooks and both source ZIPs remain `PRIVATE_LOCAL_RAW`. No
 ZIP or XLS bytes were added to this repository. The full acquisition-row
@@ -341,12 +359,15 @@ detail is recorded as source_ids `P3184-2020-12`, `P3184-2020-13`, and
 ### 16.2 Revision canonicalization — `REVISION_CANONICALIZATION_RESOLVED`
 
 Both 01-10-2020 catalogue candidates identified in §5 item 1 were extracted
-and their workbooks converted to CSV. Result: **436 data rows × 7 columns**
-in both, and a full-file diff of the two converted CSVs found **zero
-differing cells**. The two extracted workbook files carry different
-SHA-256 digests, but the byte differences are confined to OLE-container
-metadata (internal timestamps/CLSID fields, observed at extracted-file
-offsets ~`0x460`–`0x570`), not sheet content.
+and their workbooks converted to CSV. Result: **436 lines × 7 columns** in
+both converted exports, and a full-file comparison found **zero differing
+cells** — the two exports are in fact byte-identical, SHA-256
+`4385ae8e6e7b7335add4a1072ad455c6cee317f75b9d2dc5000f7c61ed008892`.
+
+The two extracted workbook files carry different SHA-256 digests.
+**Converted CSV exports were cell-identical. Binary workbook files differed,
+but the exact binary-level cause was not fully attributed.** No claim is made
+here about which regions of the binary differ or why.
 
 Conclusion: the two catalogue candidates for the 01-10-2020 publication are
 **content-equivalent at the extracted-workbook level**. The §5 item 1
@@ -363,8 +384,10 @@ which were not part of this evidence set.
 ### 16.3 Q4 membership extraction — `Q4_STATE_RESOLVED`
 
 The workbook's `2020-10-01` column (Q4) was extracted: **100 rows**, no
-blank or malformed cells, matching the pre-registered §17 schema. Row-level
-values are recorded in
+blank or malformed cells, matching the pre-registered schema. Because the two
+candidates' converted exports are byte-identical (§16.2), this extraction is
+supported identically by either candidate and is **not** bound to a single
+catalogue object id. Row-level values are recorded in
 [bist_membership_p3184_2020_q4_rows.csv](evidence/bist_membership_p3184_2020_q4_rows.csv)
 (100 data rows; source_id `P3184-2020-Q4-01`).
 
@@ -430,12 +453,142 @@ reserve-consumption cross-check — remains open and is not claimed here.
 - `XU050_SEED_STATE_UNRESOLVED` for an independent first-party 50-count to
   reconcile against (the count is now observable from Product 3184, 20
   literal / 50 nested-expanded, but unreconciled against a second source).
-- The other five 2020 catalogue objects (02-01, 27-04 ×2, 22-05, 28-07)
-  were not part of this evidence set and remain unacquired; §5's revision
-  semantics for the full 2020 series (in particular the 27-04-2020 pair and
-  the size non-monotonicity in §5 item 2) are unaffected by this addendum.
+- The other five 2020 catalogue objects (02-01, 27-04 ×2, 22-05, 28-07) were
+  not reconciled by this addendum. **Corrected 2026-08-25 (§17):** archive
+  material for them *does* exist and is now recorded, at status
+  `ARCHIVE_PRESENT_NOT_OBJECT_BOUND`. §5's revision semantics for the full
+  2020 series (in particular the 27-04-2020 pair and the size
+  non-monotonicity in §5 item 2) are unaffected — no row-level comparison,
+  ADD/REMOVE determination, or canonical-revision conclusion was made for
+  any of the five.
 - 2020 is **not** promoted to Stage-B eligibility by this addendum alone.
   This is a Q4 2020 membership and revision-candidate resolution only, not
   a full 2020 year-level closure adjudication (§12).
 - This addendum does not claim complete historical BIST membership
   reconstruction for 2020 or any other year.
+
+## 17. Provenance correction (2026-08-25) — FI-DATA-EXPAND-04B-P3184-2020-PROVENANCE-REPAIR
+
+**This section is a provenance and wording repair only.** It expands no
+conclusion, promotes no status, and derives no new membership fact. It corrects
+three defects found by the final audit of the §16 addendum: an inverted
+object↔file attribution, an over-attributed binary-difference claim, and a false
+acquisition boundary for five catalogue objects. No ZIP, XLS, Q4 evidence CSV,
+trusted data file, or model file was modified; only this document,
+[bist_membership_p3184_2020_sources.csv](evidence/bist_membership_p3184_2020_sources.csv),
+and `TASK_STATE.md` were edited.
+
+### 17.1 Correction A — binary-difference wording withdrawn
+
+The §16.2 sentence that attributed the two extracted workbooks' byte differences
+to a specific container-metadata region, named specific metadata fields, cited
+specific byte offsets, and declared the difference to lie outside the sheet data
+**is withdrawn** in this document, in the sources manifest, and in
+`TASK_STATE.md`. It asserted a binary-level cause that the recorded evidence
+does not establish. The withdrawn wording is not reproduced here; the prior text
+is recoverable from this file's Git history if it is ever needed.
+
+What is retained is exactly what was measured:
+
+> Converted CSV exports were cell-identical. Binary workbook files differed, but
+> the exact binary-level cause was not fully attributed.
+
+The cell-equality result is unchanged and is now stated in its strongest
+verifiable form: the two converted CSV exports are byte-identical, SHA-256
+`4385ae8e6e7b7335add4a1072ad455c6cee317f75b9d2dc5000f7c61ed008892`, 436 lines ×
+7 columns each. `REVISION_CANONICALIZATION_RESOLVED` rests on that equality
+alone; it never rested on the binary claim, and it is unchanged.
+
+The §16.2 phrase "436 data rows" is also corrected to "436 lines", the measured
+quantity: the converted export's 436 lines include a header line and quarter
+banner lines, so 436 is not a count of membership rows.
+
+### 17.2 Correction B — object↔archive-file attribution rebound
+
+The §16.1 table and manifest rows `P3184-2020-12` / `P3184-2020-13` paired each
+catalogue object with the *other* archive file's name and digest, and with a
+byte count belonging to neither pairing consistently. Re-derived from disk:
+
+| Archive file | Size on disk | SHA-256 | Extracted `exsrk2020.xls` | XLS size |
+| --- | --- | --- | --- | --- |
+| `exsrk2020 (1).zip` | 58,631 | `ed59e80e…a889d73c` | `de44aa20…06259ceb34` | 420,864 |
+| `exsrk2020.zip` | 58,823 | `5ad33b89…1cf145a8` | `45963bdb…101bac3ac2` | 421,888 |
+
+Each archive file is bound to its extracted workbook by a ZIP-member CRC-32
+check, not by directory naming. Catalogue objects then attach by declared size:
+`3184#1132521` declares 58,631 and `3184#1132519` declares 58,823 (§4).
+
+The limit of that attachment is stated explicitly and is not to be strengthened
+without new evidence:
+
+> **private archive file identity confirmed; catalogue object assignment based
+> on declared size match only.**
+
+No provider-side digest, per-object download URL, or other independent
+identifier exists in the catalogue record (§4.1), so declared size is the only
+available link. The seven 2020 declared sizes are pairwise distinct and match
+the seven archive files one-to-one, which makes the assignment consistent — it
+does not make it proven.
+
+### 17.3 Correction C — acquisition boundary for `P3184-2020-07`…`-11`
+
+Manifest rows `P3184-2020-07` through `-11` (objects `3184#1068011`,
+`3184#1006269`, `3184#982927`, `3184#982925`, `3184#872590`) previously recorded
+`raw_sha256 = NA`, `raw_bytes = NA`, `raw_storage_class = NOT_ACQUIRED`, and the
+note "unverified because the object was not downloaded". That boundary was
+false: the private evidence archive holds a corresponding ZIP for each, and each
+ZIP's extracted workbook material exists on disk.
+
+Each row now records the archive file's actual name, SHA-256, and byte count,
+plus the extracted workbook's SHA-256 and size, with the ZIP-member CRC-32 check
+binding the two. Declared-size match to the catalogue object follows the same
+size-only limit as §17.2.
+
+What was **not** done for these five, and is not claimed anywhere:
+
+- no row-level reconciliation;
+- no ADD/REMOVE determination;
+- no canonical-revision or supersession conclusion;
+- no membership value read, derived, or recorded.
+
+The extractions were inspected structurally only — file presence, digest, size,
+and archive-member binding. §5 (`REVISION_SEMANTICS_UNRESOLVED`) and §5 item 2
+(declared-size non-monotonicity) are untouched by this correction.
+
+### 17.4 Provenance status vocabulary
+
+Every provenance status token used in
+[bist_membership_p3184_2020_sources.csv](evidence/bist_membership_p3184_2020_sources.csv),
+including the two introduced by this correction:
+
+| `provenance_status` | Meaning |
+| --- | --- |
+| `ACQUIRED` | The named file was obtained and its bytes are identified by the recorded SHA-256. Used for the catalogue-metadata JSON snapshots, whose identity needs no further binding because the request URL is itself the identifier. |
+| `VISIBLE_NOT_ACQUIRED` | The catalogue object was observed in the provider's catalogue, but no bytes for it were held at the time the row was written. Rows `P3184-2020-05` and `-06` retain this status: they are pure catalogue-observation rows, and the archive evidence for the same two objects is carried by rows `-12` and `-13`. |
+| `ARCHIVE_PRESENT_NOT_OBJECT_BOUND` | **New (2026-08-25).** A file in the private evidence archive is present and its own identity is confirmed by SHA-256, but its binding to *this* catalogue object id is not proven — it rests on declared-size match alone — and no content-level reconciliation has been performed. Applied to `P3184-2020-07`…`-11`. |
+| `ACQUIRED_OBJECT_BINDING_BY_DECLARED_SIZE` | **New (2026-08-25).** As `ACQUIRED` for the file's own identity, and the file's content *has* been converted and compared, but the catalogue-object assignment still rests on declared-size match alone. Applied to `P3184-2020-12` and `-13`. |
+| `DERIVED` | The row records an extraction computed from already-recorded evidence rather than a file obtained from the provider. Applied to `P3184-2020-Q4-EVIDENCE`. |
+
+`ARCHIVE_PRESENT_NOT_OBJECT_BOUND` and
+`ACQUIRED_OBJECT_BINDING_BY_DECLARED_SIZE` differ only in whether content was
+compared. Neither asserts a proven object identity. Promoting either to a
+stronger status requires a provider-side digest, a per-object download record,
+or another independent identifier — not a further inference from size.
+
+### 17.5 What this correction does not change
+
+- No status is promoted. `REVISION_CANONICALIZATION_RESOLVED` (§16.2) and
+  `Q4_STATE_RESOLVED` (§16.3) stand on the unchanged cell-equality and
+  row-extraction evidence; `REVISION_SEMANTICS_UNRESOLVED` (§5) and
+  `XU050_SEED_STATE_UNRESOLVED` (§10) remain open.
+- The §9 row-level reconciliation checklist remains open exactly as §16.4 left
+  it. The five newly bounded objects do not close any part of it.
+- 2020 is **not** promoted toward Stage-B eligibility, and §12's requirement for
+  a separate year-level closure adjudication is unchanged.
+- The [collision audit](BIST_MEMBERSHIP_2020_10_01_COLLISION_AUDIT.md) and its
+  manifest were not edited, reinterpreted, or weakened.
+- No modeling dataset, benchmark, return, model output, IC, or p-value was
+  opened or inspected. `NO_NEW_OUTCOME_INSPECTION=true` still holds.
+- Research support only; not investment advice. Correcting provenance records is
+  not evidence of predictive value, and **no reliable predictive edge has been
+  established**.
