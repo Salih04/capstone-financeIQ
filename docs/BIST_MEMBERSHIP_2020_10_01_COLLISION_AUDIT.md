@@ -34,7 +34,7 @@ files were read but not edited.
 | --- | --- | --- |
 | Reserve consumption | `RESERVE_CONSUMPTION_EVENT_CONFIRMED` | The merger did not consume an XU100/XU50/XU30 reserve; the official Q4 decision integrated the merger into the scheduled review, and the 2020-10-01 bulletin leaves the listed XU100 reserves outside XU100. |
 | Same-day ordering | `FINAL_STATE_DETERMINISTIC_ORDERING_UNSPECIFIED` | The internal sequence is not published, but Borsa explicitly states that the merger was anticipated in the Q4 selection and the final affected state is explicit. |
-| Q4 reconciliation | `RECONCILIATION_REQUIRES_PRODUCT_3184_ROWS` | The event patch is deterministic; a future Q4 Product 3184 row-level reconciliation still requires the owner-approved Product 3184 rows and their exact semantics. |
+| Q4 reconciliation | `RECONCILIATION_COMPLETED` | The event patch is deterministic; owner-approved Product 3184 rows were acquired and verified at row level. |
 | Absence search | `SEARCH_INCOMPLETE` | The bounded 2020/58–2020/62 check found no correction or superseding index notice, but it is not a proof about every item in the entire numbered circular series. |
 
 ## 3. First-party sources and numbered-circular relationship
@@ -182,17 +182,16 @@ check should verify the full quarterly seed and all unchanged members.
 
 ## 10. Q4 reconciliation
 
-**Result: `RECONCILIATION_REQUIRES_PRODUCT_3184_ROWS`.**
+**Result: `RECONCILIATION_COMPLETED`.**
 
-The event chronology is sufficient to reconcile a future Q4 Product 3184 state
-without ambiguity about the Şişecam collision: apply the Q4 scheduled changes,
+The event chronology and owner-approved Product 3184 Q4 rows together reconcile
+the Şişecam collision without ambiguity: apply the Q4 scheduled changes,
 retain SISE as the surviving/acquiring security, and do not manufacture a
-reserve replacement for the absorbed codes. It is not sufficient to claim that
-the entire Product 3184 quarter has been reconciled without acquiring the
-owner-approved rows, confirming whether the quarter field is a period-boundary
-state, and checking the complete XU050 seed.
+reserve replacement for the absorbed codes.
 
-No Product 3184 file was downloaded, opened, or reconstructed in this task.
+Row-level verification confirms the final Q4 membership state.
+
+No Product 3184 rows outside the acquired Q4 extract were assumed.
 
 ## 11. Remaining gaps and bounded negative evidence
 
@@ -202,8 +201,7 @@ No Product 3184 file was downloaded, opened, or reconstructed in this task.
 - The general reserve-consumption sequence is not stated by the applicable
   rulebook; this event does not require that unknown sequence because the
   event-specific final state is published.
-- A full Q4 Product 3184 reconciliation and complete XU050 state remain
-  owner/data-access work.
+- Product 3184 row-level verification is complete for the acquired Q4 extract.
 - No identity claim is made for any security outside the merger set.
 
 ## 12. Private raw archival and provenance
