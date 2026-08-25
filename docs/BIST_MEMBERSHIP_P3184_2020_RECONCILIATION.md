@@ -952,3 +952,31 @@ the Product 3184 row data corroborates it rather than contradicting it.
 - Research support only; not investment advice. Closing the Q4 row-level
   checklist is not evidence of predictive value, and **no reliable predictive
   edge has been established**.
+
+## 20. Revision semantics evidence classification (2026-08-25)
+
+This section does not resolve revision semantics. It classifies the current
+evidence boundary across the seven 2020 Product 3184 catalogue objects.
+
+| Object | Available evidence | Supported conclusion | Not established |
+| --- | --- | --- | --- |
+| `3184#982925` | Private archive presence, digest-confirmed file identity, declared-size match | Archive evidence exists for this catalogue observation | Provider revision status, supersession relation, canonical designation |
+| `3184#982927` | Private archive presence, digest-confirmed file identity, declared-size match | Archive evidence exists for this catalogue observation | Provider revision status, supersession relation, canonical designation |
+| `3184#1006269` | Private archive presence, digest-confirmed file identity, ZIP-member timestamp corroboration | Publication checkpoint is evidenced | Whether this object superseded or was superseded |
+| `3184#1068011` | Private archive presence, digest-confirmed file identity, ZIP-member timestamp corroboration | Publication checkpoint is evidenced | Whether this object superseded or was superseded |
+| `3184#1132519` / `3184#1132521` | Extracted workbook conversions are cell-identical for the Q4 comparison (§16.2) | Both candidates produce the same converted Q4 row projection | Provider-designated canonical object |
+
+### 20.1 Disposition
+
+`REVISION_SEMANTICS_UNRESOLVED` remains unchanged.
+
+The unresolved state is not caused by absence of archive evidence. Archive
+existence, structural identity, and the Q4 pair's converted row equivalence
+are established within their documented scopes. However, provider revision
+semantics (version, supersession, replacement, or canonical designation) are
+not published.
+
+No object is promoted to canonical status by file size, publication date,
+archive-member timestamp, or catalogue ordering.
+
+No Stage-B promotion follows from this classification.
