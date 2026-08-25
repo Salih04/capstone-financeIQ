@@ -50,8 +50,8 @@ The starting gate passed:
 | Revision semantics | `REVISION_SEMANTICS_UNRESOLVED` |
 | Raw acquisition | ~~`NONE` — no `exsrk2020.zip` object acquired~~ → superseded 2026-08-25: archive material for all seven 2020 objects exists in the private evidence archive; two are at `ACQUIRED_OBJECT_BINDING_BY_DECLARED_SIZE` and five at `ARCHIVE_PRESENT_NOT_OBJECT_BOUND` (see §17) |
 | Format verification | ~~`NOT_VERIFIED_NO_FILE_ACQUIRED`~~ → superseded 2026-08-25 for the 01-10-2020 publication (§16.2); the §6 documentation-currency discrepancy still stands as written |
-| Q4 row extraction | `0 rows` |
-| Nested-count reconciliation | Not evaluable — neither `NESTED_COUNTS_RECONCILED` nor `NESTED_COUNTS_MISMATCH` can be issued without rows |
+| Q4 row extraction | ~~`0 rows`~~ → `100 rows` (2026-08-25, see §16.3) |
+| Nested-count reconciliation | ~~Not evaluable — neither `NESTED_COUNTS_RECONCILED` nor `NESTED_COUNTS_MISMATCH` can be issued without rows~~ → superseded 2026-08-25: `NESTED_COUNTS_RECONCILED` for XU030 and XU100 against the official 2020-10-01 Günlük Bülten; XU050 nested-expanded count (50) is now observable but unreconciled against an independent first-party source — `XU050_SEED_STATE_UNRESOLVED` stands (see §16.3) |
 | 2020-10-01 collision reconciliation | `NOT_PERFORMED` — the prior audit stands unchanged and unreinterpreted |
 | XU050 seed state | `XU050_SEED_STATE_UNRESOLVED` |
 | Revision canonicalization | ~~`REVISION_CANONICALIZATION_UNRESOLVED`~~ → `REVISION_CANONICALIZATION_RESOLVED` (2026-08-25, see §16) |
@@ -199,13 +199,19 @@ parser is written; the three-field product-page description must not be assumed
 to supersede the specification, and the specification must not be assumed to
 survive the product-page description.
 
-## 7. Q4 row extraction — 0 rows
+## 7. Q4 row extraction — ~~0 rows~~ → superseded 2026-08-25, see §16.3
 
+**Historical (2026-08-24):**
 [bist_membership_p3184_2020_q4_rows.csv](evidence/bist_membership_p3184_2020_q4_rows.csv)
-carries the pre-registered §17 schema and **zero data rows**. No ticker, company
-name, index value, or membership flag was derived, estimated, or inferred.
-Literal index-code counts and nested-expanded XU030/XU050/XU100 counts are
-consequently **unavailable**, not zero.
+carried the pre-registered task-specification Q4-row schema and **zero data
+rows** at that time. No ticker, company name, index value, or membership flag
+had been derived, estimated, or inferred. Literal index-code counts and
+nested-expanded XU030/XU050/XU100 counts were consequently **unavailable**,
+not zero.
+
+**Current (2026-08-25):** the same file now carries **100** Q4 (2020-10-01)
+membership rows. See §16.3 for the extraction and §17 for the provenance
+correction to the acquisition boundary underlying it.
 
 ## 8. Nested-index semantics — rule restated, not applied
 
@@ -369,12 +375,17 @@ The two extracted workbook files carry different SHA-256 digests.
 but the exact binary-level cause was not fully attributed.** No claim is made
 here about which regions of the binary differ or why.
 
-Conclusion: the two catalogue candidates for the 01-10-2020 publication are
-**content-equivalent at the extracted-workbook level**. The §5 item 1
-observation that the catalogue cannot distinguish the pair by metadata
-alone still stands as a description of catalogue-metadata limits; it is no
-longer a live ambiguity for row content, because both candidates resolve to
-the same rows.
+Conclusion: the two catalogue candidates for the 01-10-2020 publication have
+**byte-identical converted CSV projections** (SHA-256
+`4385ae8e6e7b7335add4a1072ad455c6cee317f75b9d2dc5000f7c61ed008892`). The two
+extracted binary workbook files themselves differ (§17.1), and full workbook
+semantics — formulas, hidden sheets, formatting, or binary-level equivalence —
+were **not** established for either file. The equivalence claim is scoped to
+the extracted-and-converted CSV output only, not to the source workbooks. The
+§5 item 1 observation that the catalogue cannot distinguish the pair by
+metadata alone still stands as a description of catalogue-metadata limits; it
+is no longer a live ambiguity for the converted row content, because both
+candidates' conversions resolve to the same rows.
 
 This does not resolve the size non-monotonicity noted in §5 item 2 (the
 28-07-2020 object remains larger by declared size than either 01-10-2020
@@ -574,6 +585,19 @@ including the two introduced by this correction:
 compared. Neither asserts a proven object identity. Promoting either to a
 stronger status requires a provider-side digest, a per-object download record,
 or another independent identifier — not a further inference from size.
+
+**Scope note (Q4 rows provenance token).** The table above describes
+`provenance_status` tokens used in the source manifest
+([bist_membership_p3184_2020_sources.csv](evidence/bist_membership_p3184_2020_sources.csv)).
+The Q4 rows file
+([bist_membership_p3184_2020_q4_rows.csv](evidence/bist_membership_p3184_2020_q4_rows.csv))
+uses a separate token, `ACQUIRED_PRIVATE_LOCAL_VERIFIED`, in its own
+`provenance_status` column, for derived row-level provenance — that a given
+Q4 membership row was obtained from the private local archive and its
+extraction verified. This token is not defined in the table above because it
+is not a source-manifest state, and it does **not** imply full §9 row-level
+collision reconciliation or Stage-B approval; those remain open exactly as
+§16.4, §16.6, and §17.5 state.
 
 ### 17.5 What this correction does not change
 
