@@ -18,7 +18,8 @@
     "experiments/results_missingness",
     "experiments/results_dimensionality",
     "data/trusted_clean",
-    "data/provenance"
+    "data/provenance",
+    "docs/thesis/baseline"
   ],
   "coverage_rule": "Every file under a governed root, excluding experiments/results/runs/**, must be matched by exactly one entry below. An unmatched file (orphan) or a file matched by more than one entry (duplicate ownership) is a governance failure enforced by tests/test_artifact_registry.py.",
   "coverage_exclusions": [
@@ -1052,6 +1053,20 @@
       ],
       "hand_edit_forbidden": true,
       "notes": "Human-readable companion to cell_provenance_report.json, rendered by scripts/data_collection/build_cell_provenance.py (render_markdown) from the same computed in-memory payload. Repeats the coverage, evidence-level, source-class, transform, and unknown-cell tables plus the disclaimer verbatim, and shows the query examples for filtering the record store."
+    },
+    {
+      "path_or_glob": "docs/thesis/baseline/**",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-baseline",
+      "inputs": [
+        "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+        "data/trusted_clean/modeling_targets_alternative.csv",
+        "experiments/results/significance_report.json",
+        "experiments/results/leaderboard_by_target.csv",
+        "experiments/results_excess/significance_report.json"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Single exact glob for the frozen pre-thesis baseline record (JSON plus its rendered Markdown). Written by scripts/build_thesis_baseline.py, which reads the governed artifacts above and transcribes their values; it fits no model and recomputes no statistic. The JSON embeds source_artifacts checksums, so the staleness test re-verifies every frozen input and the freeze fails loudly if one drifts. Records ownership and provenance for later thesis comparison only."
     }
   ]
 }

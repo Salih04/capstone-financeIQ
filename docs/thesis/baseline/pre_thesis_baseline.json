@@ -1,0 +1,491 @@
+{
+  "claim_safety": {
+    "descriptive_research_evidence_only": true,
+    "investment_value_established": false,
+    "reliable_predictive_edge_established": false,
+    "statement": "This record is research provenance. It establishes no predictive edge and no investment value, and is not investment advice."
+  },
+  "dataset": {
+    "column_count": 61,
+    "feature_columns": [
+      "benchmark_same_year_return_pct",
+      "current_assets",
+      "current_ratio",
+      "ebitda",
+      "ebitda_growth_pct",
+      "ebitda_margin",
+      "enterprise_value",
+      "equity",
+      "ev_ebitda",
+      "financial_debt_ratio",
+      "gross_margin",
+      "gross_profit",
+      "gross_profit_growth_pct",
+      "leverage_ratio",
+      "long_term_liabilities",
+      "market_cap",
+      "net_debt",
+      "net_debt_to_ebitda",
+      "net_income",
+      "net_income_growth_pct",
+      "net_margin",
+      "non_current_assets",
+      "operating_income",
+      "operating_income_growth_pct",
+      "pb_ratio",
+      "pe_ratio",
+      "price_adjclose_t",
+      "price_data_available",
+      "price_drawdown_from_3y_high_pct",
+      "price_history_years_available",
+      "price_momentum_1y_pct",
+      "price_momentum_2y_pct",
+      "price_vs_bist100_1y_pct",
+      "revenue",
+      "revenue_growth_pct",
+      "roa",
+      "roe",
+      "short_term_liabilities",
+      "total_assets",
+      "working_capital"
+    ],
+    "feature_count": 40,
+    "feature_year_span": [
+      2020,
+      2025
+    ],
+    "inference_only_rows": 82,
+    "modeled_target_columns": [
+      "next_year_return_pct",
+      "next_year_excess_return_vs_bist100",
+      "next_year_outperform_bist100",
+      "next_year_top_20pct_returner"
+    ],
+    "modeled_target_count": 4,
+    "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+    "row_count": 403,
+    "rows_with_primary_target": 321,
+    "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+    "size_bytes": 256050,
+    "target_columns": [
+      "next_year_return_pct",
+      "next_year_rank_by_return",
+      "next_year_return_percentile",
+      "next_year_top_10pct_returner",
+      "next_year_top_20pct_returner",
+      "next_year_bist100_return_pct",
+      "next_year_excess_return_vs_bist100",
+      "next_year_outperform_bist100"
+    ],
+    "target_count": 8,
+    "target_nonnull_counts": {
+      "next_year_bist100_return_pct": 200,
+      "next_year_excess_return_vs_bist100": 200,
+      "next_year_outperform_bist100": 200,
+      "next_year_rank_by_return": 321,
+      "next_year_return_pct": 321,
+      "next_year_return_percentile": 321,
+      "next_year_top_10pct_returner": 321,
+      "next_year_top_20pct_returner": 321
+    },
+    "ticker_count": 81
+  },
+  "design": {
+    "baseline_models": [
+      "baseline_equal_weight",
+      "baseline_rank_score",
+      "robust_rank_aggregation"
+    ],
+    "frequency": "annual T->T+1",
+    "ml_models": [
+      "linear_regression",
+      "ridge",
+      "lasso",
+      "elasticnet",
+      "random_forest",
+      "gradient_boosting"
+    ],
+    "splits": [
+      {
+        "name": "test_2023",
+        "test_feature_year": 2022,
+        "test_target_year": 2023,
+        "train_target_years": [
+          2021,
+          2022
+        ]
+      },
+      {
+        "name": "test_2024",
+        "test_feature_year": 2023,
+        "test_target_year": 2024,
+        "train_target_years": [
+          2021,
+          2022,
+          2023
+        ]
+      },
+      {
+        "name": "test_2025",
+        "test_feature_year": 2024,
+        "test_target_year": 2025,
+        "train_target_years": [
+          2021,
+          2022,
+          2023,
+          2024
+        ]
+      }
+    ],
+    "test_years": [
+      2023,
+      2024,
+      2025
+    ]
+  },
+  "git": {
+    "note": "The commit observed when this record was generated. The commit that stores the record is necessarily its child.",
+    "sha": "70ccf4d1e374678a5aa70c85746016a763d6e58e"
+  },
+  "power": {
+    "alpha_two_sided": 0.05,
+    "designs": [
+      {
+        "analytic_minimum_detectable_abs_ic": 0.3088465894975577,
+        "design_id": "current_one_split",
+        "n_per_split": 80,
+        "scope": "actual prediction-dump design",
+        "simulated_power_at_analytic_mde": 0.8018,
+        "split_count": 1,
+        "total_evaluated_rows": 80
+      },
+      {
+        "analytic_minimum_detectable_abs_ic": 0.18227082541387504,
+        "design_id": "current_three_year_pooled",
+        "n_per_split": 80,
+        "scope": "actual prediction-dump design",
+        "simulated_power_at_analytic_mde": 0.8096,
+        "split_count": 3,
+        "total_evaluated_rows": 240
+      },
+      {
+        "analytic_minimum_detectable_abs_ic": 0.4305545355469506,
+        "design_id": "public_40_one_split_sensitivity",
+        "n_per_split": 40,
+        "scope": "planning sensitivity; not the current dump design",
+        "simulated_power_at_analytic_mde": 0.7872,
+        "split_count": 1,
+        "total_evaluated_rows": 40
+      },
+      {
+        "analytic_minimum_detectable_abs_ic": 0.2598190759194811,
+        "design_id": "public_40_three_year_sensitivity",
+        "n_per_split": 40,
+        "scope": "planning sensitivity; not the current dump design",
+        "simulated_power_at_analytic_mde": 0.793,
+        "split_count": 3,
+        "total_evaluated_rows": 120
+      }
+    ],
+    "limitations": [
+      "Only three test years are observed; treating within-year IC estimates as independent is an approximation.",
+      "The calculation assumes equal per-year sample sizes and a stable true IC across years, neither of which establishes regime generality.",
+      "The 40-ticker table is a planning sensitivity for the public-universe scale, not the current 80-row prediction-dump design.",
+      "The cohort is retrospective rather than verified point-in-time membership, and reproducibility remains numerical-environment-qualified.",
+      "Power bounds detection under assumptions; it neither estimates the true IC nor establishes practical investment relevance."
+    ],
+    "method": "two-sided Fisher z approximation for independent within-year Spearman ICs; equal year weights and variance 1/(n-3)",
+    "multiplicity_scope": "single prespecified IC test at alpha=0.05; this power calculation does not represent Bonferroni-adjusted family-wise power across six ML models",
+    "projection_40_tickers_per_year": [
+      {
+        "additional_years": 0,
+        "analytic_minimum_detectable_abs_ic": 0.2598190759194811,
+        "n_per_year": 40,
+        "total_test_years": 3
+      },
+      {
+        "additional_years": 1,
+        "analytic_minimum_detectable_abs_ic": 0.22630219427371773,
+        "n_per_year": 40,
+        "total_test_years": 4
+      },
+      {
+        "additional_years": 2,
+        "analytic_minimum_detectable_abs_ic": 0.2031120520968228,
+        "n_per_year": 40,
+        "total_test_years": 5
+      },
+      {
+        "additional_years": 3,
+        "analytic_minimum_detectable_abs_ic": 0.185844807899661,
+        "n_per_year": 40,
+        "total_test_years": 6
+      },
+      {
+        "additional_years": 5,
+        "analytic_minimum_detectable_abs_ic": 0.1614144384274509,
+        "n_per_year": 40,
+        "total_test_years": 8
+      },
+      {
+        "additional_years": 7,
+        "analytic_minimum_detectable_abs_ic": 0.14462608745653588,
+        "n_per_year": 40,
+        "total_test_years": 10
+      }
+    ],
+    "target_power": 0.8
+  },
+  "purpose": "Frozen, hash-verified description of the repository's scientific state immediately before MSc-thesis experiments begin. Every value is transcribed from a governed artifact; nothing here is recomputed, reinterpreted, or newly estimated.",
+  "record_id": "FINANCEIQ_PRE_THESIS_BASELINE",
+  "schema_version": "1.0.0",
+  "sector_coverage": {
+    "indices_column_populated_rows": 240,
+    "indices_tickers_varying_across_years": 0,
+    "note": "The sector column is empty for every row. The indices column carries BIST index membership strings and is not a sector classification; it is additionally identical across all years for every ticker, i.e. a retrospective snapshot rather than point-in-time membership. Neither field supports sector-controlled analysis at this baseline, and no sector value is imputed.",
+    "sector_column_present": true,
+    "sector_distinct_values": [],
+    "sector_populated_rows": 0,
+    "sector_total_rows": 403,
+    "usable_for_analysis": false
+  },
+  "significance": {
+    "baseline_models": [
+      {
+        "bonferroni_adjusted_p_value": null,
+        "bootstrap_ci_95": [
+          0.0239420942834559,
+          0.2667130763807406
+        ],
+        "kind": "baseline",
+        "model": "baseline_equal_weight",
+        "pooled_n": 240,
+        "pooled_observed_ic": 0.14967256500797912,
+        "raw_permutation_p_value_two_sided": 0.016798320167983202,
+        "significant_fwer_0_05": null,
+        "split_count": 3
+      },
+      {
+        "bonferroni_adjusted_p_value": null,
+        "bootstrap_ci_95": [
+          0.0239420942834559,
+          0.2667130763807406
+        ],
+        "kind": "baseline",
+        "model": "baseline_rank_score",
+        "pooled_n": 240,
+        "pooled_observed_ic": 0.14967256500797912,
+        "raw_permutation_p_value_two_sided": 0.016798320167983202,
+        "significant_fwer_0_05": null,
+        "split_count": 3
+      },
+      {
+        "bonferroni_adjusted_p_value": null,
+        "bootstrap_ci_95": [
+          -0.0010000394053779453,
+          0.24827309177531776
+        ],
+        "kind": "baseline",
+        "model": "robust_rank_aggregation",
+        "pooled_n": 240,
+        "pooled_observed_ic": 0.12775661517077427,
+        "raw_permutation_p_value_two_sided": 0.0456954304569543,
+        "significant_fwer_0_05": null,
+        "split_count": 3
+      }
+    ],
+    "bootstrap_scheme": "tickers resampled with replacement independently within each test year",
+    "bootstraps": 10000,
+    "evaluated_tickers_per_model_split": [
+      80
+    ],
+    "headline": {
+      "bonferroni_adjusted_p_value": 0.10978902109789021,
+      "bootstrap_ci_95": [
+        -0.27319356721463256,
+        -0.02808063057839817
+      ],
+      "conclusion": "No ML model is statistically distinguishable from the within-year null after Bonferroni correction; the data do not support a reliable predictive edge.",
+      "model": "random_forest",
+      "observed_ic": -0.15328380688030444,
+      "observed_null_percentile": 0.92,
+      "permutation_p_value_two_sided": 0.0182981701829817,
+      "selection": "smallest pooled raw permutation p-value among the six ML models",
+      "significant_fwer_0_05": false
+    },
+    "limitations": [
+      "Only three test years with 80 evaluated tickers per model and split; estimates remain noisy.",
+      "The cohort is a retrospectively fixed repository universe, not verified point-in-time BIST100 membership.",
+      "Prediction artifact byte reproducibility is environment-qualified; manifests separate same-environment byte identity from cross-environment semantic checks.",
+      "Nominal TRY returns cover one unusual macro regime, so absence of detected signal is not a general market-efficiency claim.",
+      "Research support only; not investment advice."
+    ],
+    "ml_family_size": 6,
+    "ml_models": [
+      {
+        "bonferroni_adjusted_p_value": 1.0,
+        "bootstrap_ci_95": [
+          -0.14945695437060746,
+          0.11246169859257003
+        ],
+        "kind": "ml",
+        "model": "elasticnet",
+        "pooled_n": 240,
+        "pooled_observed_ic": -0.019824182332074943,
+        "raw_permutation_p_value_two_sided": 0.754024597540246,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      },
+      {
+        "bonferroni_adjusted_p_value": 0.6263373662633737,
+        "bootstrap_ci_95": [
+          -0.23134780011345737,
+          0.025352953122103325
+        ],
+        "kind": "ml",
+        "model": "gradient_boosting",
+        "pooled_n": 240,
+        "pooled_observed_ic": -0.10525340071593085,
+        "raw_permutation_p_value_two_sided": 0.10438956104389562,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      },
+      {
+        "bonferroni_adjusted_p_value": 1.0,
+        "bootstrap_ci_95": [
+          -0.044755262863838643,
+          0.22070339586317883
+        ],
+        "kind": "ml",
+        "model": "lasso",
+        "pooled_n": 240,
+        "pooled_observed_ic": 0.08954532588495062,
+        "raw_permutation_p_value_two_sided": 0.16998300169983002,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      },
+      {
+        "bonferroni_adjusted_p_value": 1.0,
+        "bootstrap_ci_95": [
+          -0.08650448580949428,
+          0.17919860662365306
+        ],
+        "kind": "ml",
+        "model": "linear_regression",
+        "pooled_n": 240,
+        "pooled_observed_ic": 0.045866196556466586,
+        "raw_permutation_p_value_two_sided": 0.48025197480251974,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      },
+      {
+        "bonferroni_adjusted_p_value": 0.10978902109789021,
+        "bootstrap_ci_95": [
+          -0.27319356721463256,
+          -0.02808063057839817
+        ],
+        "kind": "ml",
+        "model": "random_forest",
+        "pooled_n": 240,
+        "pooled_observed_ic": -0.15328380688030444,
+        "raw_permutation_p_value_two_sided": 0.0182981701829817,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      },
+      {
+        "bonferroni_adjusted_p_value": 0.9419058094190582,
+        "bootstrap_ci_95": [
+          -0.038962508829267155,
+          0.22123768892037987
+        ],
+        "kind": "ml",
+        "model": "ridge",
+        "pooled_n": 240,
+        "pooled_observed_ic": 0.09265503733469788,
+        "raw_permutation_p_value_two_sided": 0.15698430156984303,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      }
+    ],
+    "multiplicity_correction": "Bonferroni across the six ML models",
+    "permutation_scheme": "two-sided; realized returns shuffled independently within each test year",
+    "permutations": 10000,
+    "seed": 42,
+    "statistic": "equal-weighted mean of within-split Spearman ICs"
+  },
+  "source_artifacts": [
+    {
+      "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "role": "canonical T->T+1 modeling dataset (features and targets)",
+      "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+      "size_bytes": 256050
+    },
+    {
+      "path": "data/trusted_clean/modeling_targets_alternative.csv",
+      "role": "derived real-TRY and USD target bases",
+      "sha256": "ba56ccca44433c5012b885dad9412c70aa96f5442b73d9873d45b062bf2ff2f4",
+      "size_bytes": 44432
+    },
+    {
+      "path": "experiments/results/significance_report.json",
+      "role": "nominal-TRY walk-forward significance and power report",
+      "sha256": "0358ed01b70b99d491f3babb4810604c09e64ef4726f12ee0b7ea0a8af12fc29",
+      "size_bytes": 40901
+    },
+    {
+      "path": "experiments/results_excess/significance_report.json",
+      "role": "excess-return-basis significance report",
+      "sha256": "461724a62106ad39c0d8d7a2538b8c260c3a26b633ebf49785490da712aa5d93",
+      "size_bytes": 123370
+    },
+    {
+      "path": "experiments/results/leaderboard_by_target.csv",
+      "role": "per-target walk-forward leaderboard",
+      "sha256": "a9e671f992336378df9e12c464ce08267180d8f1c9820a78d69b10ff748e9a9b",
+      "size_bytes": 10305
+    }
+  ],
+  "target_bases": [
+    {
+      "basis_id": "nominal_try",
+      "generator_command": "make research",
+      "label": "Nominal TRY total return, T->T+1",
+      "results_root": "experiments/results",
+      "status": "evaluated",
+      "target_column": "next_year_return_pct"
+    },
+    {
+      "basis_id": "excess_vs_bist100",
+      "generator_command": "make research-excess",
+      "headline_conclusion": null,
+      "label": "Excess return vs BIST100 (nominal TRY, percentage points)",
+      "results_root": "experiments/results_excess",
+      "status": "evaluated",
+      "target_column": "next_year_excess_return_vs_bist100"
+    },
+    {
+      "basis_id": "real_try",
+      "generator_command": "make research-real-terms",
+      "label": "CPI-deflated real TRY return",
+      "results_root": "experiments/results_real_terms/real_try",
+      "status": "evaluated",
+      "target_column": "next_year_real_return_pct"
+    },
+    {
+      "basis_id": "usd",
+      "generator_command": "make research-real-terms",
+      "label": "USD-converted return",
+      "results_root": "experiments/results_real_terms/usd",
+      "status": "evaluated",
+      "target_column": "next_year_usd_return_pct"
+    }
+  ],
+  "universe_limitations": [
+    "The cohort is a retrospectively fixed repository universe, not verified point-in-time BIST100 membership; survivorship and membership-timing effects are present and unquantified.",
+    "The `sector` column exists in the schema but is empty for every row, so no sector-neutral or sector-controlled analysis is possible at this baseline.",
+    "Three test years at 40-80 evaluated rows per model-year is a small-sample design; the minimum detectable |IC| is large relative to any effect size plausibly present in equity cross-sections.",
+    "Annual T->T+1 frequency yields at most one observation per ticker-year, which is the binding constraint on statistical power.",
+    "The evaluation window covers one unusual Turkish macro regime (high and volatile inflation), so a null result is not a general market-efficiency claim and does not transfer to other regimes or markets.",
+    "Reproducibility is numerical-environment-qualified: byte identity requires the recorded interpreter and package versions."
+  ]
+}
