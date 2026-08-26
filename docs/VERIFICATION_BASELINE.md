@@ -65,3 +65,20 @@ The `make docs-lint` row was previously red at `18514ac5`: `docs/R3_SERV_01_FABL
 ## Frontend route inventory
 
 The R3-GOV-01 spot-check found 23 `frontend/src/pages/*Page.jsx` files. `frontend/src/App.jsx` contains 27 `<Route>` declarations: 22 render page components and 5 redirect via `<Navigate>` (`/`, `/search`, `/ai-search`, `/reports`, and `*`). Re-counted 2026-08-11 and unchanged.
+
+## R4-ROBUST-01 packet reproducibility note
+
+The R4-ROBUST-01 implementation was introduced in commit `bbdd7eeeadf2583661bf39d0175f215564cfa4fe`
+(`feat: add R4 robustness diagnostics`).
+
+The implementation and generated contamination artifacts are present in repository history. The implementation contains a frozen approval gate referencing:
+
+- `/tmp/r4-robust-01-canonical-implementation-packet-v3.md`
+- `/tmp/r4-robust-01-discovery-report.md`
+- `/tmp/r4-robust-01-final-prepacket-evidence.md`
+
+Those external pre-packet evidence files are not present in the current machine filesystem and were not recoverable from repository history. Therefore `make research-contamination` cannot currently reproduce the R4 generation path because the implementation intentionally fails closed when approval packet hashes cannot be verified.
+
+No implementation files, experiment artifacts, registry entries, or claim boundaries were modified during this investigation.
+
+Status: historical artifact verified; fresh regeneration blocked by missing external approval evidence.
