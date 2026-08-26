@@ -1,36 +1,6 @@
 {
   "analysis": {
-    "aggregate_leaderboard_reconstruction": {
-      "comparison_tolerance": {
-        "absolute": 1e-12,
-        "relative": 0.0
-      },
-      "existing_artifact": "experiments/results/leaderboard_by_target.csv",
-      "existing_artifact_sha256": "a9e671f992336378df9e12c464ce08267180d8f1c9820a78d69b10ff748e9a9b",
-      "existing_rows": 27,
-      "extra_columns_in_existing": [],
-      "mismatches": [],
-      "missing_columns_in_existing": [],
-      "policy": "Any disagreement is reported here; the canonical aggregate is never patched.",
-      "reconstructed_rows": 27,
-      "status": "match"
-    },
-    "bootstrap": "ticker-cluster bootstrap: complete ticker trajectories resampled with replacement; one sampled ticker vector is shared by every evaluation year",
-    "bootstrap_procedure": {
-      "cluster_key": "ticker",
-      "clusters": 40,
-      "description": "For each resample, N ticker identities are drawn with replacement from the N cohort tickers. That single ticker vector is applied to every evaluation year, so each sampled ticker contributes its complete trajectory and repeated tickers keep their multiplicity. Years are never resampled independently. The statistic is the equal-year mean of the valid within-year Spearman ICs.",
-      "interval_convention": "percentile; 2.5th and 97.5th quantiles of the resample distribution",
-      "requested_resamples": 10000,
-      "role": "descriptive sampling uncertainty; it does not replace or weaken the Bonferroni family-wise correction",
-      "seed": 42,
-      "trajectory_years": [
-        2023,
-        2024,
-        2025
-      ],
-      "unit": "ticker_cluster"
-    },
+    "bootstrap": "tickers resampled with replacement independently within each test year",
     "bootstraps": 10000,
     "evaluated_tickers_per_model_split": [
       40
@@ -50,375 +20,30 @@
     },
     "permutation": "two-sided; realized returns shuffled independently within each test year",
     "permutations": 10000,
-    "primary_permutation": {
-      "analysis_id": "primary_independent_within_year_permutation",
-      "draws": 10000,
-      "family_size": 6,
-      "family_wise_alpha": 0.05,
-      "independent_per_year_permutation": true,
-      "monte_carlo_correction": "(extreme_count + 1) / (draw_count + 1)",
-      "multiplicity_method": "Bonferroni",
-      "null_hypothesis": "Within each evaluation year, realized cross-sectional outcomes are exchangeable relative to the model predictions, with each year permuted independently.",
-      "permutation_unit": "within-year row permutation of realized returns",
-      "prespecified": true,
-      "renamed_or_replaced_by_the_sensitivity": false,
-      "seed": 42,
-      "statistic": "equal-weighted mean of within-year Spearman ICs",
-      "status": "prespecified",
-      "tail": "absolute; |null| >= |observed|",
-      "two_sided": true,
-      "unchanged_by_human_review": true
-    },
     "seed": 42,
-    "statistic": "equal-weighted mean of within-split Spearman ICs",
-    "trajectory_preserving_sensitivity": {
-      "added_after_human_review": true,
-      "algorithm": [
-        "Use the balanced 40-ticker x 3-year panel of persisted prediction rows.",
-        "Sort and validate the unique ticker universe.",
-        "Generate one permutation of ticker identities per draw.",
-        "Apply that same ticker permutation mapping in 2023, 2024, and 2025.",
-        "Keep the prediction rows fixed.",
-        "Move each realized-outcome ticker trajectory as a complete block across all years.",
-        "Recompute the Spearman IC independently within each year.",
-        "Take the equal-year mean of the valid yearly ICs.",
-        "Repeat for 10,000 draws from the frozen documented seed.",
-        "Compute the two-sided Monte Carlo p-value (extreme_count + 1) / (draw_count + 1).",
-        "Apply the same frozen six-model Bonferroni correction min(1, raw_p * 6)."
-      ],
-      "analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-      "duplicate_free_one_to_one_mapping": true,
-      "extreme_count": 2230,
-      "family_size": 6,
-      "independent_per_year_mapping": false,
-      "invalid_draws": 0,
-      "is_bootstrap": false,
-      "multiplicity_method": "Bonferroni",
-      "null_hypothesis": "Ticker identities are exchangeable as complete cross-year trajectories: one permutation of the ticker universe is drawn per replication and applied identically in every evaluation year, so a ticker's realized outcomes move together and any cross-year persistence in the realized panel is preserved under the null.",
-      "p_value_denominator": 10001,
-      "p_value_formula": "(extreme_count + 1) / (draw_count + 1)",
-      "permutation_unit": "complete cross-year ticker trajectory",
-      "prediction_rows_fixed": true,
-      "prespecified": false,
-      "provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
-      "refusal_exceptions": [
-        "ExcessPermutationError",
-        "ExcessPanelError"
-      ],
-      "refused_inputs": [
-        "ragged ticker coverage",
-        "missing years",
-        "duplicate ticker/year rows",
-        "malformed ticker or year values",
-        "unequal ticker sets across years",
-        "non-finite targets or predictions",
-        "insufficient tickers",
-        "insufficient valid permutation draws",
-        "independently generated per-year permutation mappings",
-        "mappings that are not duplicate-free one-to-one permutations"
-      ],
-      "replaces_primary_analysis": false,
-      "requested_draws": 10000,
-      "seed": 42,
-      "seed_frozen_and_documented": true,
-      "shared_mapping_across_years": true,
-      "statistic": "equal-year mean of the valid within-year Spearman ICs",
-      "status": "post_review_sensitivity",
-      "ticker_universe_size": 40,
-      "trajectory_years": [
-        2023,
-        2024,
-        2025
-      ],
-      "two_sided": true,
-      "valid_draws": 10000
-    }
+    "statistic": "equal-weighted mean of within-split Spearman ICs"
   },
   "claim_safety": {
-    "alpha_estimated": false,
-    "benchmark_relative_magnitude_accuracy_evaluated": false,
     "benchmark_relative_signal_established": false,
-    "bootstrap_interpretation": "A bootstrap interval is descriptive uncertainty evidence and does not replace the closed-family correction. No model survives family-wise correction, and no reliable predictive edge is established.",
-    "confirmatory_family": "nominal_try_return",
-    "cross_basis_multiplicity_controlled": false,
     "descriptive_research_evidence_only": true,
-    "estimand": "within-year ordinal cross-sectional ranking",
-    "inverse_alpha_or_contrarian_interpretation": false,
     "investment_value_established": false,
     "multiplicity_gate": "Bonferroni across the same six-model ML family",
     "reliable_predictive_edge_established": false,
-    "result_driven_model_selection_performed": false,
-    "statement": "Descriptive historical research result on a benchmark-relative basis; it does not establish signal, investment value, or a reliable predictive edge.",
-    "this_basis_role": "exploratory robustness evaluation",
-    "tradable_strategy_established": false
+    "statement": "Descriptive historical research result on a benchmark-relative basis; it does not establish signal, investment value, or a reliable predictive edge, and the nominal TRY conclusion is unchanged."
   },
-  "coincident_baselines": {
-    "compared_models": [
-      "baseline_equal_weight",
-      "baseline_rank_score"
+  "headline": {
+    "bonferroni_adjusted_p_value": 0.13018698130186981,
+    "bootstrap_ci_95": [
+      -0.3870189957698389,
+      -0.023151762860386577
     ],
-    "equality_level": "identical_prediction_values",
-    "evidence_source": "persisted R3-TGT-01 prediction dumps",
-    "identical_ic_values": true,
-    "identical_prediction_ranks": true,
-    "identical_prediction_values": true,
-    "independent_baseline_diversity": false,
-    "interpretation": "Coincident baseline results must not be interpreted as independent baseline diversity: two baselines that agree at this level contribute one distinct comparison, not two.",
-    "max_absolute_prediction_difference": 0.0,
-    "per_year": [
-      {
-        "evaluation_year": 2023,
-        "identical_prediction_ranks": true,
-        "identical_prediction_values": true,
-        "identical_within_year_ic": true,
-        "max_absolute_prediction_difference": 0.0,
-        "rows": 40
-      },
-      {
-        "evaluation_year": 2024,
-        "identical_prediction_ranks": true,
-        "identical_prediction_values": true,
-        "identical_within_year_ic": true,
-        "max_absolute_prediction_difference": 0.0,
-        "rows": 40
-      },
-      {
-        "evaluation_year": 2025,
-        "identical_prediction_ranks": true,
-        "identical_prediction_values": true,
-        "identical_within_year_ic": true,
-        "max_absolute_prediction_difference": 0.0,
-        "rows": 40
-      }
-    ],
-    "removal_permitted_by_repository_authority": false,
-    "retention_policy": "Both specifications are retained for frozen-specification continuity. Neither is removed, because no repository authority has explicitly permitted removing a frozen model specification.",
-    "specifications_retained": true,
-    "strongest_supported_statement": "`baseline_equal_weight` and `baseline_rank_score` produce bitwise-identical prediction values on every evaluated ticker and year in the persisted dumps, which necessarily makes their ranks and their ICs identical as well.",
-    "wording_policy": "Only the strongest level the persisted evidence actually supports is stated; weaker or stronger characterisations are not used."
-  },
-  "cross_basis_multiplicity": {
-    "confirmatory_family": {
-      "basis_id": "nominal_try_return",
-      "note": "Nominal return is the only confirmatory target basis in this repository. Its artifacts and conclusion are unchanged by this task.",
-      "role": "sole confirmatory family",
-      "target_column": "next_year_return_pct"
-    },
-    "controls_multiplicity_across_target_bases": false,
-    "cross_basis_correction_prespecified": false,
-    "exploratory_bases": [
-      {
-        "basis_id": "real_try_return",
-        "label": "CPI-deflated real TRY return",
-        "role": "exploratory robustness evaluation",
-        "target_column": "next_year_real_return_pct"
-      },
-      {
-        "basis_id": "usd_return",
-        "label": "USD-converted return",
-        "role": "exploratory robustness evaluation",
-        "target_column": "next_year_usd_return_pct"
-      },
-      {
-        "basis_id": "excess_vs_bist100",
-        "label": "Excess return vs BIST100 (nominal TRY, percentage points)",
-        "role": "exploratory robustness evaluation",
-        "target_column": "next_year_excess_return_vs_bist100"
-      }
-    ],
-    "future_result_policy": "A future significant alternative-basis result must not be described as confirmatory without a separately prespecified cross-basis correction.",
-    "nominal_artifacts_altered": false,
-    "statement": "Nominal return is the sole confirmatory family. The real-TRY, USD, and excess-return analyses are exploratory robustness evaluations. Within-basis Bonferroni corrections do not control multiplicity across the several target bases, so the number of bases examined inflates the chance that some basis eventually produces a small p-value.",
-    "this_basis_id": "excess_vs_bist100",
-    "this_basis_role": "exploratory robustness evaluation",
-    "within_basis_correction": {
-      "family": [
-        "linear_regression",
-        "ridge",
-        "lasso",
-        "elasticnet",
-        "random_forest",
-        "gradient_boosting"
-      ],
-      "family_size": 6,
-      "method": "Bonferroni",
-      "scope": "the six-model ML family within this single target basis"
-    }
-  },
-  "estimand_invariance_audit": {
-    "audit_id": "estimand_rank_invariance",
-    "benchmark_column": "next_year_bist100_return_pct",
-    "benchmark_subtraction_alters_within_year_evaluation_ranks": false,
-    "benchmark_subtraction_may_affect_fitting": true,
-    "declared_targets_in_order": [
-      "next_year_return_pct",
-      "next_year_excess_return_vs_bist100",
-      "next_year_outperform_bist100",
-      "next_year_top_20pct_returner"
-    ],
-    "derivation": "next_year_excess_return_vs_bist100 = next_year_return_pct - next_year_bist100_return_pct",
-    "derivation_traced_not_assumed": true,
-    "establishes_investment_value": false,
-    "estimand": "within-year ordinal cross-sectional ranking",
-    "estimand_statement": "The within-year Spearman IC evaluates ordinal cross-sectional ranking: whether a model orders the evaluated cohort correctly inside one evaluation year. It does not evaluate benchmark-relative magnitude accuracy, and it does not estimate alpha, economic outperformance, investment value, or a tradable strategy.",
-    "estimates_alpha": false,
-    "estimates_economic_outperformance": false,
-    "evaluated_years": [
-      2023,
-      2024,
-      2025
-    ],
-    "evaluates_benchmark_relative_magnitude_accuracy": false,
-    "evaluates_ordinal_cross_sectional_ranking": true,
-    "excess_derivation_authority": "scripts/data_collection/pipeline.py",
-    "excess_target_column": "next_year_excess_return_vs_bist100",
-    "failure_policy": "The run fails with ExcessEstimandError if the common within-year benchmark subtraction or the resulting rank invariance does not hold.",
-    "fitting_effect_note": "Benchmark subtraction may still affect fitting: it shifts the target by a year-level constant across the training panel, so models trained on pooled years can learn different coefficients than on the nominal basis. It does not alter within-year evaluation ranks, so the evaluated estimand is unchanged.",
-    "interpretation": "Within each evaluation year the benchmark subtraction is one common constant, so the next_year_excess_return_vs_bist100 ranks equal the next_year_return_pct ranks in every year and the total rank mismatch count is 0. The within-year Spearman IC reported here is therefore the same ordinal ranking estimand as on the nominal basis, evaluated on a different cohort. Identical evaluation ranks do not make the two analyses identical: the shifted target can still change what the models fit, and an unchanged ordinal estimand is not evidence of alpha, benchmark-relative magnitude accuracy, investment value, or a tradable strategy.",
-    "nominal_target_authority": "experiments/run_experiments.py::TARGETS[0]",
-    "nominal_target_column": "next_year_return_pct",
-    "per_year": [
-      {
-        "common_benchmark_return_pct": 31.96,
-        "common_subtrahend_confirmed": true,
-        "evaluated_rows": 40,
-        "evaluation_year": 2023,
-        "persisted_benchmark_column_value": 31.96,
-        "rank_mismatch_count": 0,
-        "ranks_identical": true,
-        "within_year_subtrahend_spread": 5.684341886080802e-14
-      },
-      {
-        "common_benchmark_return_pct": 28.94,
-        "common_subtrahend_confirmed": true,
-        "evaluated_rows": 40,
-        "evaluation_year": 2024,
-        "persisted_benchmark_column_value": 28.94,
-        "rank_mismatch_count": 0,
-        "ranks_identical": true,
-        "within_year_subtrahend_spread": 1.4210854715202004e-14
-      },
-      {
-        "common_benchmark_return_pct": 12.64,
-        "common_subtrahend_confirmed": true,
-        "evaluated_rows": 40,
-        "evaluation_year": 2025,
-        "persisted_benchmark_column_value": 12.64,
-        "rank_mismatch_count": 0,
-        "ranks_identical": true,
-        "within_year_subtrahend_spread": 2.842170943040401e-14
-      }
-    ],
-    "rank_method": "average ranks, computed independently within each evaluation year",
-    "ranks_identical_in_every_year": true,
-    "represents_a_tradable_strategy": false,
-    "total_rank_mismatch_count": 0,
-    "trace_method": "AST parse of the pipeline assignment, cross-checked against the declared target order; no column name is hardcoded as the nominal target",
-    "within_year_subtrahend_tolerance": 1e-09
-  },
-  "family_conclusion": {
-    "any_model_survives_either_family_wise_correction": false,
-    "any_model_survives_family_wise_correction": false,
-    "any_model_survives_sensitivity_family_wise_correction": false,
-    "bootstrap_interpretation": "A bootstrap interval is descriptive uncertainty evidence and does not replace the closed-family correction. No model survives family-wise correction, and no reliable predictive edge is established.",
-    "conclusion": "No model in the prespecified six-model ML family is distinguishable from the within-year null after Bonferroni correction across the family, and none is distinguishable under the post-review trajectory-preserving sensitivity after the same six-model correction. The excess return basis establishes no reliable predictive edge.",
-    "conclusion_derivation": "computed from the adjusted p-values of both family-corrected analyses; non-rejection is never assumed",
-    "count_surviving_family_wise_correction": 0,
-    "count_surviving_sensitivity_family_wise_correction": 0,
-    "family_size": 6,
-    "family_wise_alpha": 0.05,
-    "models_surviving_either_family_wise_correction": [],
-    "models_surviving_family_wise_correction": [],
-    "models_surviving_sensitivity_family_wise_correction": [],
-    "multiplicity_method": "Bonferroni",
-    "primary_analysis_id": "primary_independent_within_year_permutation",
-    "reliable_predictive_edge_established": false,
-    "scope": "prespecified six-model ML family",
-    "sensitivity_analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-    "sensitivity_is_prespecified": false,
-    "sensitivity_status": "post_review_sensitivity"
-  },
-  "frozen_protected_boundary": {
-    "data_roots": [
-      "data/trusted",
-      "data/trusted_clean",
-      "data/config",
-      "data/exports",
-      "data/interim"
-    ],
-    "excluded_namespaces": [
-      "experiments/results_excess (this task's own output namespace; verified separately as this task's artifacts, not as a boundary member)"
-    ],
-    "experiment_roots": [
-      "experiments/reports",
-      "experiments/results",
-      "experiments/results_disagreement",
-      "experiments/results_forward_2026",
-      "experiments/results_influence",
-      "experiments/results_placebo",
-      "experiments/results_rank_stability",
-      "experiments/results_real_terms",
-      "experiments/results_regime",
-      "experiments/results_serving_eval"
-    ],
-    "extra_files": [
-      "experiments/leaderboard.csv",
-      "model_confidence_contract.json"
-    ],
-    "later_unrelated_additions_are_members": false,
-    "member_count": 351,
-    "member_count_by_root": {
-      "data/config": 3,
-      "data/exports": 1,
-      "data/interim": 1,
-      "data/trusted": 8,
-      "data/trusted_clean": 276,
-      "experiments/leaderboard.csv": 1,
-      "experiments/reports": 1,
-      "experiments/results": 25,
-      "experiments/results_disagreement": 3,
-      "experiments/results_forward_2026": 2,
-      "experiments/results_influence": 3,
-      "experiments/results_placebo": 2,
-      "experiments/results_rank_stability": 3,
-      "experiments/results_real_terms": 14,
-      "experiments/results_regime": 2,
-      "experiments/results_serving_eval": 5,
-      "model_confidence_contract.json": 1
-    },
-    "members_pinned_authority_sha256": "98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5",
-    "members_sha256": "98195607983a35d3ffc8996934be9ac1b808250a659fea126a1a9636e800cee5",
-    "members_sha256_definition": "sha256 of the newline-joined '<repo-relative-posix-path>:<sha256>' records for every boundary member, sorted by path. A content digest, not a file count: it detects modification or removal of an original member and is unchanged by later, unrelated namespace additions.",
-    "policy": "Curated data and the generated namespaces that already existed when R3-TGT-01 was frozen, which this excess regeneration must never mutate. Explicit historical allow-list: namespaces added by later, unrelated governed tasks are not members and are protected by their own tasks, so adding one never changes this boundary."
-  },
-  "ic_sign_note": {
-    "family_size": 6,
-    "interpreted_as_actionable_signal": false,
-    "interpreted_as_contrarian_strategy": false,
-    "interpreted_as_inverse_alpha": false,
-    "interpreted_as_validated_predictive_evidence": false,
-    "models_with_negative_pooled_ic": [
-      "elasticnet",
-      "gradient_boosting",
-      "lasso",
-      "linear_regression",
-      "random_forest",
-      "ridge"
-    ],
-    "models_with_positive_pooled_ic": [],
-    "negative_pooled_ic_count": 6,
-    "note": "Predominantly negative IC signs may reflect sampling variation, feature-orientation effects, or systematic construction effects. They are not interpreted as inverse alpha, a contrarian strategy, an actionable signal, or validated predictive evidence.",
-    "positive_pooled_ic_count": 0,
-    "possible_explanations": [
-      "sampling variation",
-      "feature-orientation effects",
-      "systematic construction effects"
-    ],
-    "predominantly_negative": true,
-    "scope": "prespecified six-model ML family",
-    "selection_note": "The note is family-level. No member is selected or privileged by the sign or magnitude of its IC, and the tree-based members are not singled out.",
-    "tree_models_selected_or_privileged": false,
-    "zero_pooled_ic_count": 0
+    "conclusion": "No ML model is statistically distinguishable from the within-year null after Bonferroni correction; the data do not support a reliable predictive edge.",
+    "model": "gradient_boosting",
+    "observed_ic": -0.21125995808938944,
+    "observed_null_percentile": 1.01,
+    "permutation_p_value_two_sided": 0.0216978302169783,
+    "selection": "smallest pooled raw permutation p-value among the six ML models",
+    "significant_fwer_0_05": false
   },
   "limitations": [
     "Only three test years with 40 evaluated tickers per model and split; estimates remain noisy.",
@@ -426,129 +51,63 @@
     "Prediction artifact byte reproducibility is environment-qualified; manifests separate same-environment byte identity from cross-environment semantic checks.",
     "Excess returns subtract the BIST100 nominal TRY index return within one unusual macro regime; they are a descriptive benchmark-relative basis and do not represent an implementable benchmark-hedged position or investment value.",
     "Research support only; not investment advice.",
-    "The evaluated cohort is the benchmark-covered public 40, not the wider internal training universe used by the nominal basis; rows without a valid excess target remain null and shrink the evaluated n per year rather than being filled.",
-    "The ticker-cluster bootstrap resamples 40 ticker trajectories, so its effective resolution is bounded by 40 clusters over three years; it describes sampling uncertainty and cannot substitute for family-wise multiplicity correction.",
-    "Bonferroni correction here is within-basis only. Nominal return is the sole confirmatory family; the real-TRY, USD, and excess-return bases are exploratory robustness evaluations, and no correction in this repository controls multiplicity across the several target bases.",
-    "Predominantly negative IC signs are not interpreted as inverse alpha, a contrarian strategy, an actionable signal, or validated predictive evidence.",
-    "The compact human-review package supports review of the persisted prediction-to-significance layer only; it does not by itself reproduce feature construction or model fitting, and no claim of complete independent fitting-stage replication is made from it alone."
+    "BIST100 benchmark-relative coverage exists for only part of the evaluation panel; rows without a valid excess target remain null and shrink the evaluated n per year rather than being filled."
   ],
-  "makefile_target_provenance": {
-    "accepted_subset": "Static, non-executing parse of a single research-excess rule; GNU Make is never invoked. Directive and rule detection operates on logical lines (backslash continuations joined) after leading whitespace is stripped, so a space-indented directive or rule is seen exactly as GNU Make sees it. Accepted: exactly one target-rule line 'research-excess:' (single ':', never '::' or ':='), optional whitespace-separated prerequisites with backslash continuation, and a contiguous block of tab-indented recipe lines recorded verbatim with backslash continuation preserved. Execution-significant recipe prefixes '@' and '-' are preserved as literal text so, e.g., 'false', '-false', '@false', and '-@false' produce distinct provenance. '.PHONY' is the one accepted special target and is NOT inert: whether research-excess is a .PHONY member decides whether an existing file of that name would suppress the recipe, so membership is parsed from every .PHONY line (leading whitespace and continuations included) and recorded truthfully as a hashed provenance field. Rejected (fail closed, before any command could run): a missing or renamed target, duplicate research-excess rule lines (at column 0 or space-indented), a '::' or ':=' form, a '+' recipe prefix, a global or target-scoped SHELL/.SHELLFLAGS/MAKESHELL/MAKEFLAGS assignment, any other special target ('.IGNORE', '.SILENT', '.ONESHELL', '.POSIX', '.RECIPEPREFIX', '.DELETE_ON_ERROR', '.NOTPARALLEL', '.SECONDEXPANSION', '.EXPORT_ALL_VARIABLES') whether global, target-scoped, or space-indented, an unsupported '.PHONY' form, '$(MAKE)'/'${MAKE}' or any recursive 'make' invocation, and any '$(...)' or '${...}' make variable/function reference (covering '$(shell ...)', '$(eval ...)', '$(call ...)', and ordinary variable expansion) in the recipe, the prerequisites, or a .PHONY member list. Escaped '$$' is left intact. Every rule line in the file is additionally checked for target-identity ambiguity, because a target expression this parser could not resolve might silently define, duplicate, or override research-excess: a multi-target rule naming research-excess in any position (including one assembled across backslash continuations), a target expression containing any '$(...)'/'${...}' variable-derived name (e.g. '$(TARGET):' or '${TARGET}:'), a pattern ('%') or glob ('*', '?', '[...]') target that could cover research-excess, a variable assignment whose literal value is research-excess, and more than one effective research-excess target definition in any mixture of literal and derived forms all fail closed, as do a static pattern rule and a ';' inline recipe on the research-excess rule line. No target expression whose effective identity cannot be established statically \u2014 without executing or expanding Make \u2014 is ever accepted. No general GNU Make equivalence is claimed.",
-    "authority": "Static, non-executing parse of the Makefile bytes under a narrow research-excess contract; GNU Make is never invoked and no recipe command can execute during provenance computation",
-    "duplicate_recipe_overridden": false,
-    "make_invoked": false,
-    "makefile": "Makefile",
-    "phony": true,
-    "phony_semantics": "True when research-excess is declared a .PHONY member (any .PHONY line in the file, leading whitespace and backslash continuations included). Membership is execution-affecting \u2014 without it an existing file named 'research-excess' would make the target up to date and the recipe would not run \u2014 so it is recorded truthfully and hashed, never ignored.",
-    "prerequisites": [],
-    "provenance_scope": "Only the research-excess prerequisites and verbatim recipe lines are a provenance dependency of this task. The whole Makefile is an invocation wrapper, not a statistical source input, so unrelated targets or variables added by other tasks do not change this recipe hash and do not stale these artifacts, while a change to the research-excess recipe or its prerequisites always does.",
-    "recipe": [
-      "PYTHONPATH=. python experiments/run_excess_basis.py"
-    ],
-    "recipe_sha256": "14758a5aa275fb9ff565991b17bf7c1bce3114da8b1d46d944930285c8ade25e",
-    "recipe_sha256_definition": "sha256 of the newline-joined parsed authority: a 'target:<name>' line, a 'prerequisites:<space-joined prerequisites>' line, a 'phony:<yes|no>' line, a 'recipe:' line, and each verbatim recipe command line (execution-significant '@'/'-' prefixes preserved). No source line numbers and no environment-derived values: repository-relative and machine-independent.",
-    "recipe_source_file": "Makefile",
-    "target": "research-excess"
-  },
   "models": [
     {
       "exploratory_by_split": [
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2023
-          },
           "bootstrap_ci_95": [
-            -0.39536268761524945,
-            0.2975184393441203
+            -0.615533308591894,
+            -0.08221681458787507
           ],
           "n": 40,
-          "observed_ic": -0.05685869869297009,
-          "observed_null_percentile": 36.53,
-          "permutation_p_value_two_sided": 0.7202279772022798,
+          "observed_ic": -0.381309820937674,
+          "observed_null_percentile": 0.765,
+          "permutation_p_value_two_sided": 0.0143985601439856,
           "split": "test_2023",
           "year": 2023
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2024
-          },
           "bootstrap_ci_95": [
-            -0.504136660769571,
-            0.11947508116481229
+            -0.28155673501297496,
+            0.3769468117727398
           ],
           "n": 40,
-          "observed_ic": -0.20356472795497185,
-          "observed_null_percentile": 10.6,
-          "permutation_p_value_two_sided": 0.20557944205579443,
+          "observed_ic": 0.055159474671669796,
+          "observed_null_percentile": 63.145,
+          "permutation_p_value_two_sided": 0.7259274072592741,
           "split": "test_2024",
           "year": 2024
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2025
-          },
           "bootstrap_ci_95": [
-            -0.4028999811994736,
-            0.22544903510830172
+            -0.32731200181852854,
+            0.39148558809473577
           ],
           "n": 40,
-          "observed_ic": -0.09061913696060038,
-          "observed_null_percentile": 29.28,
-          "permutation_p_value_two_sided": 0.5712428757124287,
+          "observed_ic": 0.04202626641651032,
+          "observed_null_percentile": 59.865,
+          "permutation_p_value_two_sided": 0.8008199180081992,
           "split": "test_2025",
           "year": 2025
         }
       ],
-      "kind": "ml",
-      "model": "linear_regression",
+      "kind": "baseline",
+      "model": "baseline_equal_weight",
       "pooled": {
-        "bonferroni_adjusted_p_value": 1.0,
-        "bootstrap": {
-          "cluster_key": "ticker",
-          "clusters": 40,
-          "independent_within_year_resampling": false,
-          "interval_convention": "percentile; 2.5th and 97.5th quantiles of the resample distribution",
-          "invalid_resamples": 0,
-          "multiplicity_preserved": true,
-          "observations_per_trajectory": 3,
-          "requested_resamples": 10000,
-          "seed": 42,
-          "shared_sample_across_years": true,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "trajectory_years": [
-            2023,
-            2024,
-            2025
-          ],
-          "unit": "ticker_cluster",
-          "valid_resamples": 10000
-        },
+        "bonferroni_adjusted_p_value": null,
         "bootstrap_ci_95": [
-          -0.264286301910576,
-          0.0469981138054691
+          -0.27336254927510323,
+          0.09116504327839163
         ],
         "n": 120,
         "null_distribution_quantiles": {
-          "0.01": -0.210966520139819,
-          "0.05": -0.15599990857117502,
-          "0.5": -0.002128065989461756,
-          "0.95": 0.1480558181158547,
-          "0.99": 0.20607645079156553
+          "0.01": -0.213214862108718,
+          "0.05": -0.1520448435828236,
+          "0.5": 0.0011560106975379604,
+          "0.95": 0.1507144021173081,
+          "0.99": 0.21095356016537165
         },
         "null_histogram": {
           "bin_edges": [
@@ -607,21 +166,21 @@
             0,
             0,
             0,
-            3,
+            0,
             7,
-            25,
-            121,
-            416,
-            864,
-            1569,
-            2111,
-            2042,
-            1503,
-            862,
-            357,
-            99,
-            16,
-            5,
+            28,
+            107,
+            377,
+            815,
+            1587,
+            2028,
+            2006,
+            1623,
+            911,
+            375,
+            101,
+            28,
+            7,
             0,
             0,
             0,
@@ -637,143 +196,67 @@
             0
           ]
         },
-        "observed_ic": -0.1170141878695141,
-        "observed_null_percentile": 10.67,
-        "permutation_p_value_two_sided": 0.20737926207379262,
-        "significant_fwer_0_05": false,
-        "split_count": 3,
-        "trajectory_preserving_sensitivity": {
-          "added_after_human_review": true,
-          "analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-          "bonferroni_adjusted_p_value": 1.0,
-          "duplicate_free_one_to_one_mapping": true,
-          "extreme_count": 2230,
-          "family_size": 6,
-          "independent_per_year_mapping": false,
-          "invalid_draws": 0,
-          "is_bootstrap": false,
-          "multiplicity_method": "Bonferroni",
-          "null_hypothesis": "Ticker identities are exchangeable as complete cross-year trajectories: one permutation of the ticker universe is drawn per replication and applied identically in every evaluation year, so a ticker's realized outcomes move together and any cross-year persistence in the realized panel is preserved under the null.",
-          "observed_ic": -0.1170141878695141,
-          "observed_null_percentile": 11.38,
-          "p_value_denominator": 10001,
-          "p_value_formula": "(extreme_count + 1) / (draw_count + 1)",
-          "permutation_p_value_two_sided": 0.22307769223077692,
-          "permutation_unit": "complete cross-year ticker trajectory",
-          "prediction_rows_fixed": true,
-          "prespecified": false,
-          "provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
-          "replaces_primary_analysis": false,
-          "requested_draws": 10000,
-          "seed": 42,
-          "seed_frozen_and_documented": true,
-          "shared_mapping_across_years": true,
-          "significant_fwer_0_05": false,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "status": "post_review_sensitivity",
-          "two_sided": true,
-          "valid_draws": 10000
-        }
+        "observed_ic": -0.09470802661649796,
+        "observed_null_percentile": 14.83,
+        "permutation_p_value_two_sided": 0.3047695230476952,
+        "significant_fwer_0_05": null,
+        "split_count": 3
       }
     },
     {
       "exploratory_by_split": [
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2023
-          },
           "bootstrap_ci_95": [
-            -0.23215471337049742,
-            0.42247733753578903
+            -0.615533308591894,
+            -0.08221681458787507
           ],
           "n": 40,
-          "observed_ic": 0.10489773125204713,
-          "observed_null_percentile": 74.125,
-          "permutation_p_value_two_sided": 0.5225477452254774,
+          "observed_ic": -0.381309820937674,
+          "observed_null_percentile": 0.765,
+          "permutation_p_value_two_sided": 0.0143985601439856,
           "split": "test_2023",
           "year": 2023
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2024
-          },
           "bootstrap_ci_95": [
-            -0.29328275753604527,
-            0.38752515837874685
+            -0.28155673501297496,
+            0.3769468117727398
           ],
           "n": 40,
-          "observed_ic": 0.04896810506566604,
-          "observed_null_percentile": 62.25,
-          "permutation_p_value_two_sided": 0.7613238676132387,
+          "observed_ic": 0.055159474671669796,
+          "observed_null_percentile": 63.145,
+          "permutation_p_value_two_sided": 0.7259274072592741,
           "split": "test_2024",
           "year": 2024
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2025
-          },
           "bootstrap_ci_95": [
-            -0.5544725245914265,
-            0.04288006250482221
+            -0.32731200181852854,
+            0.39148558809473577
           ],
           "n": 40,
-          "observed_ic": -0.26866791744840524,
-          "observed_null_percentile": 4.495,
-          "permutation_p_value_two_sided": 0.09059094090590941,
+          "observed_ic": 0.04202626641651032,
+          "observed_null_percentile": 59.865,
+          "permutation_p_value_two_sided": 0.8008199180081992,
           "split": "test_2025",
           "year": 2025
         }
       ],
-      "kind": "ml",
-      "model": "ridge",
+      "kind": "baseline",
+      "model": "baseline_rank_score",
       "pooled": {
-        "bonferroni_adjusted_p_value": 1.0,
-        "bootstrap": {
-          "cluster_key": "ticker",
-          "clusters": 40,
-          "independent_within_year_resampling": false,
-          "interval_convention": "percentile; 2.5th and 97.5th quantiles of the resample distribution",
-          "invalid_resamples": 0,
-          "multiplicity_preserved": true,
-          "observations_per_trajectory": 3,
-          "requested_resamples": 10000,
-          "seed": 42,
-          "shared_sample_across_years": true,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "trajectory_years": [
-            2023,
-            2024,
-            2025
-          ],
-          "unit": "ticker_cluster",
-          "valid_resamples": 10000
-        },
+        "bonferroni_adjusted_p_value": null,
         "bootstrap_ci_95": [
-          -0.22163890927149146,
-          0.15499483317479026
+          -0.27336254927510323,
+          0.09116504327839163
         ],
         "n": 120,
         "null_distribution_quantiles": {
-          "0.01": -0.21877956882022417,
-          "0.05": -0.15142924465510568,
-          "0.5": -0.001413748963339554,
-          "0.95": 0.15030250503180698,
-          "0.99": 0.21164214344584598
+          "0.01": -0.213214862108718,
+          "0.05": -0.1520448435828236,
+          "0.5": 0.0011560106975379604,
+          "0.95": 0.1507144021173081,
+          "0.99": 0.21095356016537165
         },
         "null_histogram": {
           "bin_edges": [
@@ -832,22 +315,22 @@
             0,
             0,
             0,
-            2,
-            4,
-            37,
-            113,
-            364,
-            859,
-            1624,
-            2055,
-            2073,
-            1486,
-            875,
-            362,
-            109,
-            34,
-            2,
-            1,
+            0,
+            7,
+            28,
+            107,
+            377,
+            815,
+            1587,
+            2028,
+            2006,
+            1623,
+            911,
+            375,
+            101,
+            28,
+            7,
+            0,
             0,
             0,
             0,
@@ -862,284 +345,19 @@
             0
           ]
         },
-        "observed_ic": -0.038267360376897354,
-        "observed_null_percentile": 34.82,
-        "permutation_p_value_two_sided": 0.682031796820318,
-        "significant_fwer_0_05": false,
-        "split_count": 3,
-        "trajectory_preserving_sensitivity": {
-          "added_after_human_review": true,
-          "analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-          "bonferroni_adjusted_p_value": 1.0,
-          "duplicate_free_one_to_one_mapping": true,
-          "extreme_count": 6963,
-          "family_size": 6,
-          "independent_per_year_mapping": false,
-          "invalid_draws": 0,
-          "is_bootstrap": false,
-          "multiplicity_method": "Bonferroni",
-          "null_hypothesis": "Ticker identities are exchangeable as complete cross-year trajectories: one permutation of the ticker universe is drawn per replication and applied identically in every evaluation year, so a ticker's realized outcomes move together and any cross-year persistence in the realized panel is preserved under the null.",
-          "observed_ic": -0.038267360376897354,
-          "observed_null_percentile": 34.65,
-          "p_value_denominator": 10001,
-          "p_value_formula": "(extreme_count + 1) / (draw_count + 1)",
-          "permutation_p_value_two_sided": 0.6963303669633036,
-          "permutation_unit": "complete cross-year ticker trajectory",
-          "prediction_rows_fixed": true,
-          "prespecified": false,
-          "provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
-          "replaces_primary_analysis": false,
-          "requested_draws": 10000,
-          "seed": 42,
-          "seed_frozen_and_documented": true,
-          "shared_mapping_across_years": true,
-          "significant_fwer_0_05": false,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "status": "post_review_sensitivity",
-          "two_sided": true,
-          "valid_draws": 10000
-        }
+        "observed_ic": -0.09470802661649796,
+        "observed_null_percentile": 14.83,
+        "permutation_p_value_two_sided": 0.3047695230476952,
+        "significant_fwer_0_05": null,
+        "split_count": 3
       }
     },
     {
       "exploratory_by_split": [
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2023
-          },
           "bootstrap_ci_95": [
-            -0.30330378687944204,
-            0.3984830831288326
-          ],
-          "n": 40,
-          "observed_ic": 0.05066616715215157,
-          "observed_null_percentile": 62.845,
-          "permutation_p_value_two_sided": 0.7474252574742526,
-          "split": "test_2023",
-          "year": 2023
-        },
-        {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2024
-          },
-          "bootstrap_ci_95": [
-            -0.45665365334366514,
-            0.17781371024389106
-          ],
-          "n": 40,
-          "observed_ic": -0.14652908067542214,
-          "observed_null_percentile": 18.35,
-          "permutation_p_value_two_sided": 0.35636436356364365,
-          "split": "test_2024",
-          "year": 2024
-        },
-        {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2025
-          },
-          "bootstrap_ci_95": [
-            -0.4958106241355856,
-            0.1368400768654776
-          ],
-          "n": 40,
-          "observed_ic": -0.18855534709193245,
-          "observed_null_percentile": 12.15,
-          "permutation_p_value_two_sided": 0.23887611238876114,
-          "split": "test_2025",
-          "year": 2025
-        }
-      ],
-      "kind": "ml",
-      "model": "lasso",
-      "pooled": {
-        "bonferroni_adjusted_p_value": 1.0,
-        "bootstrap": {
-          "cluster_key": "ticker",
-          "clusters": 40,
-          "independent_within_year_resampling": false,
-          "interval_convention": "percentile; 2.5th and 97.5th quantiles of the resample distribution",
-          "invalid_resamples": 0,
-          "multiplicity_preserved": true,
-          "observations_per_trajectory": 3,
-          "requested_resamples": 10000,
-          "seed": 42,
-          "shared_sample_across_years": true,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "trajectory_years": [
-            2023,
-            2024,
-            2025
-          ],
-          "unit": "ticker_cluster",
-          "valid_resamples": 10000
-        },
-        "bootstrap_ci_95": [
-          -0.248942382414521,
-          0.07241549446858887
-        ],
-        "n": 120,
-        "null_distribution_quantiles": {
-          "0.01": -0.21516705248206888,
-          "0.05": -0.15354198014704162,
-          "0.5": -0.0025645955061451954,
-          "0.95": 0.14848329657108852,
-          "0.99": 0.21108684283136123
-        },
-        "null_histogram": {
-          "bin_edges": [
-            -1.0,
-            -0.95,
-            -0.9,
-            -0.85,
-            -0.8,
-            -0.75,
-            -0.7,
-            -0.65,
-            -0.6,
-            -0.55,
-            -0.5,
-            -0.45,
-            -0.4,
-            -0.35,
-            -0.3,
-            -0.25,
-            -0.2,
-            -0.15,
-            -0.1,
-            -0.05,
-            0.0,
-            0.05,
-            0.1,
-            0.15,
-            0.2,
-            0.25,
-            0.3,
-            0.35,
-            0.4,
-            0.45,
-            0.5,
-            0.55,
-            0.6,
-            0.65,
-            0.7,
-            0.75,
-            0.8,
-            0.85,
-            0.9,
-            0.95,
-            1.0
-          ],
-          "counts": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            3,
-            4,
-            26,
-            118,
-            397,
-            856,
-            1620,
-            2076,
-            2030,
-            1510,
-            882,
-            338,
-            114,
-            22,
-            3,
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ]
-        },
-        "observed_ic": -0.09480608687173435,
-        "observed_null_percentile": 15.3,
-        "permutation_p_value_two_sided": 0.29927007299270075,
-        "significant_fwer_0_05": false,
-        "split_count": 3,
-        "trajectory_preserving_sensitivity": {
-          "added_after_human_review": true,
-          "analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-          "bonferroni_adjusted_p_value": 1.0,
-          "duplicate_free_one_to_one_mapping": true,
-          "extreme_count": 3299,
-          "family_size": 6,
-          "independent_per_year_mapping": false,
-          "invalid_draws": 0,
-          "is_bootstrap": false,
-          "multiplicity_method": "Bonferroni",
-          "null_hypothesis": "Ticker identities are exchangeable as complete cross-year trajectories: one permutation of the ticker universe is drawn per replication and applied identically in every evaluation year, so a ticker's realized outcomes move together and any cross-year persistence in the realized panel is preserved under the null.",
-          "observed_ic": -0.09480608687173435,
-          "observed_null_percentile": 16.73,
-          "p_value_denominator": 10001,
-          "p_value_formula": "(extreme_count + 1) / (draw_count + 1)",
-          "permutation_p_value_two_sided": 0.32996700329967005,
-          "permutation_unit": "complete cross-year ticker trajectory",
-          "prediction_rows_fixed": true,
-          "prespecified": false,
-          "provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
-          "replaces_primary_analysis": false,
-          "requested_draws": 10000,
-          "seed": 42,
-          "seed_frozen_and_documented": true,
-          "shared_mapping_across_years": true,
-          "significant_fwer_0_05": false,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "status": "post_review_sensitivity",
-          "two_sided": true,
-          "valid_draws": 10000
-        }
-      }
-    },
-    {
-      "exploratory_by_split": [
-        {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2023
-          },
-          "bootstrap_ci_95": [
-            -0.21572672004915172,
-            0.4255714513869186
+            -0.20846380375657206,
+            0.43111640943954327
           ],
           "n": 40,
           "observed_ic": 0.1161568795080808,
@@ -1149,17 +367,9 @@
           "year": 2023
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2024
-          },
           "bootstrap_ci_95": [
-            -0.35366552714357413,
-            0.34426807664971243
+            -0.34781964690858347,
+            0.3441791489667418
           ],
           "n": 40,
           "observed_ic": -0.006191369606003753,
@@ -1169,17 +379,9 @@
           "year": 2024
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2025
-          },
           "bootstrap_ci_95": [
-            -0.602987182877909,
-            0.030588303699987402
+            -0.5928935875421685,
+            0.029015245072560737
           ],
           "n": 40,
           "observed_ic": -0.299437148217636,
@@ -1193,29 +395,9 @@
       "model": "elasticnet",
       "pooled": {
         "bonferroni_adjusted_p_value": 1.0,
-        "bootstrap": {
-          "cluster_key": "ticker",
-          "clusters": 40,
-          "independent_within_year_resampling": false,
-          "interval_convention": "percentile; 2.5th and 97.5th quantiles of the resample distribution",
-          "invalid_resamples": 0,
-          "multiplicity_preserved": true,
-          "observations_per_trajectory": 3,
-          "requested_resamples": 10000,
-          "seed": 42,
-          "shared_sample_across_years": true,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "trajectory_years": [
-            2023,
-            2024,
-            2025
-          ],
-          "unit": "ticker_cluster",
-          "valid_resamples": 10000
-        },
         "bootstrap_ci_95": [
-          -0.28128467629234866,
-          0.1657167209564505
+          -0.24876305570663687,
+          0.1261133132688351
         ],
         "n": 120,
         "null_distribution_quantiles": {
@@ -1316,280 +498,15 @@
         "observed_null_percentile": 24.65,
         "permutation_p_value_two_sided": 0.48725127487251274,
         "significant_fwer_0_05": false,
-        "split_count": 3,
-        "trajectory_preserving_sensitivity": {
-          "added_after_human_review": true,
-          "analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-          "bonferroni_adjusted_p_value": 1.0,
-          "duplicate_free_one_to_one_mapping": true,
-          "extreme_count": 5565,
-          "family_size": 6,
-          "independent_per_year_mapping": false,
-          "invalid_draws": 0,
-          "is_bootstrap": false,
-          "multiplicity_method": "Bonferroni",
-          "null_hypothesis": "Ticker identities are exchangeable as complete cross-year trajectories: one permutation of the ticker universe is drawn per replication and applied identically in every evaluation year, so a ticker's realized outcomes move together and any cross-year persistence in the realized panel is preserved under the null.",
-          "observed_ic": -0.06315721277185299,
-          "observed_null_percentile": 27.54,
-          "p_value_denominator": 10001,
-          "p_value_formula": "(extreme_count + 1) / (draw_count + 1)",
-          "permutation_p_value_two_sided": 0.5565443455654434,
-          "permutation_unit": "complete cross-year ticker trajectory",
-          "prediction_rows_fixed": true,
-          "prespecified": false,
-          "provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
-          "replaces_primary_analysis": false,
-          "requested_draws": 10000,
-          "seed": 42,
-          "seed_frozen_and_documented": true,
-          "shared_mapping_across_years": true,
-          "significant_fwer_0_05": false,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "status": "post_review_sensitivity",
-          "two_sided": true,
-          "valid_draws": 10000
-        }
+        "split_count": 3
       }
     },
     {
       "exploratory_by_split": [
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2023
-          },
           "bootstrap_ci_95": [
-            -0.3673435793463813,
-            0.31105054336636573
-          ],
-          "n": 40,
-          "observed_ic": -0.034715707122770514,
-          "observed_null_percentile": 41.235,
-          "permutation_p_value_two_sided": 0.8304169583041696,
-          "split": "test_2023",
-          "year": 2023
-        },
-        {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2024
-          },
-          "bootstrap_ci_95": [
-            -0.6112136574892216,
-            -0.02765056873125606
-          ],
-          "n": 40,
-          "observed_ic": -0.33320825515947466,
-          "observed_null_percentile": 1.61,
-          "permutation_p_value_two_sided": 0.0344965503449655,
-          "split": "test_2024",
-          "year": 2024
-        },
-        {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2025
-          },
-          "bootstrap_ci_95": [
-            -0.5593862660465768,
-            0.06944845828470692
-          ],
-          "n": 40,
-          "observed_ic": -0.26604127579737336,
-          "observed_null_percentile": 4.905,
-          "permutation_p_value_two_sided": 0.09559044095590441,
-          "split": "test_2025",
-          "year": 2025
-        }
-      ],
-      "kind": "ml",
-      "model": "random_forest",
-      "pooled": {
-        "bonferroni_adjusted_p_value": 0.13378662133786623,
-        "bootstrap": {
-          "cluster_key": "ticker",
-          "clusters": 40,
-          "independent_within_year_resampling": false,
-          "interval_convention": "percentile; 2.5th and 97.5th quantiles of the resample distribution",
-          "invalid_resamples": 0,
-          "multiplicity_preserved": true,
-          "observations_per_trajectory": 3,
-          "requested_resamples": 10000,
-          "seed": 42,
-          "shared_sample_across_years": true,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "trajectory_years": [
-            2023,
-            2024,
-            2025
-          ],
-          "unit": "ticker_cluster",
-          "valid_resamples": 10000
-        },
-        "bootstrap_ci_95": [
-          -0.4201458978799183,
-          0.013822738023554923
-        ],
-        "n": 120,
-        "null_distribution_quantiles": {
-          "0.01": -0.21277581958523245,
-          "0.05": -0.15292039930898038,
-          "0.5": -0.0002782158995472406,
-          "0.95": 0.1524337801326774,
-          "0.99": 0.21522082083905422
-        },
-        "null_histogram": {
-          "bin_edges": [
-            -1.0,
-            -0.95,
-            -0.9,
-            -0.85,
-            -0.8,
-            -0.75,
-            -0.7,
-            -0.65,
-            -0.6,
-            -0.55,
-            -0.5,
-            -0.45,
-            -0.4,
-            -0.35,
-            -0.3,
-            -0.25,
-            -0.2,
-            -0.15,
-            -0.1,
-            -0.05,
-            0.0,
-            0.05,
-            0.1,
-            0.15,
-            0.2,
-            0.25,
-            0.3,
-            0.35,
-            0.4,
-            0.45,
-            0.5,
-            0.55,
-            0.6,
-            0.65,
-            0.7,
-            0.75,
-            0.8,
-            0.85,
-            0.9,
-            0.95,
-            1.0
-          ],
-          "counts": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            2,
-            24,
-            133,
-            391,
-            881,
-            1558,
-            2024,
-            2024,
-            1570,
-            867,
-            364,
-            128,
-            29,
-            4,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ]
-        },
-        "observed_ic": -0.21132174602653953,
-        "observed_null_percentile": 1.05,
-        "permutation_p_value_two_sided": 0.022297770222977704,
-        "significant_fwer_0_05": false,
-        "split_count": 3,
-        "trajectory_preserving_sensitivity": {
-          "added_after_human_review": true,
-          "analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-          "bonferroni_adjusted_p_value": 0.2495750424957504,
-          "duplicate_free_one_to_one_mapping": true,
-          "extreme_count": 415,
-          "family_size": 6,
-          "independent_per_year_mapping": false,
-          "invalid_draws": 0,
-          "is_bootstrap": false,
-          "multiplicity_method": "Bonferroni",
-          "null_hypothesis": "Ticker identities are exchangeable as complete cross-year trajectories: one permutation of the ticker universe is drawn per replication and applied identically in every evaluation year, so a ticker's realized outcomes move together and any cross-year persistence in the realized panel is preserved under the null.",
-          "observed_ic": -0.21132174602653953,
-          "observed_null_percentile": 2.24,
-          "p_value_denominator": 10001,
-          "p_value_formula": "(extreme_count + 1) / (draw_count + 1)",
-          "permutation_p_value_two_sided": 0.0415958404159584,
-          "permutation_unit": "complete cross-year ticker trajectory",
-          "prediction_rows_fixed": true,
-          "prespecified": false,
-          "provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
-          "replaces_primary_analysis": false,
-          "requested_draws": 10000,
-          "seed": 42,
-          "seed_frozen_and_documented": true,
-          "shared_mapping_across_years": true,
-          "significant_fwer_0_05": false,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "status": "post_review_sensitivity",
-          "two_sided": true,
-          "valid_draws": 10000
-        }
-      }
-    },
-    {
-      "exploratory_by_split": [
-        {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2023
-          },
-          "bootstrap_ci_95": [
-            -0.3721065252809348,
-            0.29004814352701325
+            -0.37068288673734906,
+            0.30209520702686216
           ],
           "n": 40,
           "observed_ic": -0.046725465262539775,
@@ -1599,17 +516,9 @@
           "year": 2023
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2024
-          },
           "bootstrap_ci_95": [
-            -0.6201732706317912,
-            -0.05252597687339146
+            -0.618883851506722,
+            -0.04824402696549991
           ],
           "n": 40,
           "observed_ic": -0.3592870544090056,
@@ -1619,17 +528,9 @@
           "year": 2024
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2025
-          },
           "bootstrap_ci_95": [
-            -0.5450043983953505,
-            0.12493643341030569
+            -0.5395044687107452,
+            0.12215676364210042
           ],
           "n": 40,
           "observed_ic": -0.2277673545966229,
@@ -1643,29 +544,9 @@
       "model": "gradient_boosting",
       "pooled": {
         "bonferroni_adjusted_p_value": 0.13018698130186981,
-        "bootstrap": {
-          "cluster_key": "ticker",
-          "clusters": 40,
-          "independent_within_year_resampling": false,
-          "interval_convention": "percentile; 2.5th and 97.5th quantiles of the resample distribution",
-          "invalid_resamples": 0,
-          "multiplicity_preserved": true,
-          "observations_per_trajectory": 3,
-          "requested_resamples": 10000,
-          "seed": 42,
-          "shared_sample_across_years": true,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "trajectory_years": [
-            2023,
-            2024,
-            2025
-          ],
-          "unit": "ticker_cluster",
-          "valid_resamples": 10000
-        },
         "bootstrap_ci_95": [
-          -0.42403180403061713,
-          0.0103196048017307
+          -0.3870189957698389,
+          -0.023151762860386577
         ],
         "n": 120,
         "null_distribution_quantiles": {
@@ -1766,139 +647,63 @@
         "observed_null_percentile": 1.01,
         "permutation_p_value_two_sided": 0.0216978302169783,
         "significant_fwer_0_05": false,
-        "split_count": 3,
-        "trajectory_preserving_sensitivity": {
-          "added_after_human_review": true,
-          "analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-          "bonferroni_adjusted_p_value": 0.2465753424657534,
-          "duplicate_free_one_to_one_mapping": true,
-          "extreme_count": 410,
-          "family_size": 6,
-          "independent_per_year_mapping": false,
-          "invalid_draws": 0,
-          "is_bootstrap": false,
-          "multiplicity_method": "Bonferroni",
-          "null_hypothesis": "Ticker identities are exchangeable as complete cross-year trajectories: one permutation of the ticker universe is drawn per replication and applied identically in every evaluation year, so a ticker's realized outcomes move together and any cross-year persistence in the realized panel is preserved under the null.",
-          "observed_ic": -0.21125995808938944,
-          "observed_null_percentile": 2.22,
-          "p_value_denominator": 10001,
-          "p_value_formula": "(extreme_count + 1) / (draw_count + 1)",
-          "permutation_p_value_two_sided": 0.0410958904109589,
-          "permutation_unit": "complete cross-year ticker trajectory",
-          "prediction_rows_fixed": true,
-          "prespecified": false,
-          "provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
-          "replaces_primary_analysis": false,
-          "requested_draws": 10000,
-          "seed": 42,
-          "seed_frozen_and_documented": true,
-          "shared_mapping_across_years": true,
-          "significant_fwer_0_05": false,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "status": "post_review_sensitivity",
-          "two_sided": true,
-          "valid_draws": 10000
-        }
+        "split_count": 3
       }
     },
     {
       "exploratory_by_split": [
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2023
-          },
           "bootstrap_ci_95": [
-            -0.6150459299881309,
-            -0.08300919271361636
+            -0.29293671665491133,
+            0.40586205543443793
           ],
           "n": 40,
-          "observed_ic": -0.381309820937674,
-          "observed_null_percentile": 0.765,
-          "permutation_p_value_two_sided": 0.0143985601439856,
+          "observed_ic": 0.05066616715215157,
+          "observed_null_percentile": 62.845,
+          "permutation_p_value_two_sided": 0.7474252574742526,
           "split": "test_2023",
           "year": 2023
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2024
-          },
           "bootstrap_ci_95": [
-            -0.2724607347833904,
-            0.37594459456856866
+            -0.45756577642085705,
+            0.17860836133515215
           ],
           "n": 40,
-          "observed_ic": 0.055159474671669796,
-          "observed_null_percentile": 63.145,
-          "permutation_p_value_two_sided": 0.7259274072592741,
+          "observed_ic": -0.14652908067542214,
+          "observed_null_percentile": 18.35,
+          "permutation_p_value_two_sided": 0.35636436356364365,
           "split": "test_2024",
           "year": 2024
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2025
-          },
           "bootstrap_ci_95": [
-            -0.32278921585320897,
-            0.3972455368339825
+            -0.4959698156830936,
+            0.14288604934943266
           ],
           "n": 40,
-          "observed_ic": 0.04202626641651032,
-          "observed_null_percentile": 59.865,
-          "permutation_p_value_two_sided": 0.8008199180081992,
+          "observed_ic": -0.18855534709193245,
+          "observed_null_percentile": 12.15,
+          "permutation_p_value_two_sided": 0.23887611238876114,
           "split": "test_2025",
           "year": 2025
         }
       ],
-      "kind": "baseline",
-      "model": "baseline_equal_weight",
+      "kind": "ml",
+      "model": "lasso",
       "pooled": {
-        "bonferroni_adjusted_p_value": null,
-        "bootstrap": {
-          "cluster_key": "ticker",
-          "clusters": 40,
-          "independent_within_year_resampling": false,
-          "interval_convention": "percentile; 2.5th and 97.5th quantiles of the resample distribution",
-          "invalid_resamples": 0,
-          "multiplicity_preserved": true,
-          "observations_per_trajectory": 3,
-          "requested_resamples": 10000,
-          "seed": 42,
-          "shared_sample_across_years": true,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "trajectory_years": [
-            2023,
-            2024,
-            2025
-          ],
-          "unit": "ticker_cluster",
-          "valid_resamples": 10000
-        },
+        "bonferroni_adjusted_p_value": 1.0,
         "bootstrap_ci_95": [
-          -0.3167844369166295,
-          0.13157748253439944
+          -0.28326677779709136,
+          0.10243320420306741
         ],
         "n": 120,
         "null_distribution_quantiles": {
-          "0.01": -0.213214862108718,
-          "0.05": -0.1520448435828236,
-          "0.5": 0.0011560106975379604,
-          "0.95": 0.1507144021173081,
-          "0.99": 0.21095356016537165
+          "0.01": -0.21516705248206888,
+          "0.05": -0.15354198014704162,
+          "0.5": -0.0025645955061451954,
+          "0.95": 0.14848329657108852,
+          "0.99": 0.21108684283136123
         },
         "null_histogram": {
           "bin_edges": [
@@ -1957,22 +762,22 @@
             0,
             0,
             0,
-            0,
-            7,
-            28,
-            107,
-            377,
-            815,
-            1587,
-            2028,
-            2006,
-            1623,
-            911,
-            375,
-            101,
-            28,
-            7,
-            0,
+            3,
+            4,
+            26,
+            118,
+            397,
+            856,
+            1620,
+            2076,
+            2030,
+            1510,
+            882,
+            338,
+            114,
+            22,
+            3,
+            1,
             0,
             0,
             0,
@@ -1987,143 +792,67 @@
             0
           ]
         },
-        "observed_ic": -0.09470802661649796,
-        "observed_null_percentile": 14.83,
-        "permutation_p_value_two_sided": 0.3047695230476952,
-        "significant_fwer_0_05": null,
-        "split_count": 3,
-        "trajectory_preserving_sensitivity": {
-          "added_after_human_review": true,
-          "analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-          "bonferroni_adjusted_p_value": null,
-          "duplicate_free_one_to_one_mapping": true,
-          "extreme_count": 3826,
-          "family_size": 6,
-          "independent_per_year_mapping": false,
-          "invalid_draws": 0,
-          "is_bootstrap": false,
-          "multiplicity_method": "none; baselines sit outside the corrected family",
-          "null_hypothesis": "Ticker identities are exchangeable as complete cross-year trajectories: one permutation of the ticker universe is drawn per replication and applied identically in every evaluation year, so a ticker's realized outcomes move together and any cross-year persistence in the realized panel is preserved under the null.",
-          "observed_ic": -0.09470802661649796,
-          "observed_null_percentile": 19.04,
-          "p_value_denominator": 10001,
-          "p_value_formula": "(extreme_count + 1) / (draw_count + 1)",
-          "permutation_p_value_two_sided": 0.38266173382661733,
-          "permutation_unit": "complete cross-year ticker trajectory",
-          "prediction_rows_fixed": true,
-          "prespecified": false,
-          "provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
-          "replaces_primary_analysis": false,
-          "requested_draws": 10000,
-          "seed": 42,
-          "seed_frozen_and_documented": true,
-          "shared_mapping_across_years": true,
-          "significant_fwer_0_05": null,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "status": "post_review_sensitivity",
-          "two_sided": true,
-          "valid_draws": 10000
-        }
+        "observed_ic": -0.09480608687173435,
+        "observed_null_percentile": 15.3,
+        "permutation_p_value_two_sided": 0.29927007299270075,
+        "significant_fwer_0_05": false,
+        "split_count": 3
       }
     },
     {
       "exploratory_by_split": [
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2023
-          },
           "bootstrap_ci_95": [
-            -0.6150459299881309,
-            -0.08300919271361636
+            -0.39244055638759423,
+            0.2964637780466368
           ],
           "n": 40,
-          "observed_ic": -0.381309820937674,
-          "observed_null_percentile": 0.765,
-          "permutation_p_value_two_sided": 0.0143985601439856,
+          "observed_ic": -0.05685869869297009,
+          "observed_null_percentile": 36.53,
+          "permutation_p_value_two_sided": 0.7202279772022798,
           "split": "test_2023",
           "year": 2023
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2024
-          },
           "bootstrap_ci_95": [
-            -0.2724607347833904,
-            0.37594459456856866
+            -0.5051310967014379,
+            0.1224150170997778
           ],
           "n": 40,
-          "observed_ic": 0.055159474671669796,
-          "observed_null_percentile": 63.145,
-          "permutation_p_value_two_sided": 0.7259274072592741,
+          "observed_ic": -0.20356472795497185,
+          "observed_null_percentile": 10.6,
+          "permutation_p_value_two_sided": 0.20557944205579443,
           "split": "test_2024",
           "year": 2024
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2025
-          },
           "bootstrap_ci_95": [
-            -0.32278921585320897,
-            0.3972455368339825
+            -0.4023708416200521,
+            0.2374338936364389
           ],
           "n": 40,
-          "observed_ic": 0.04202626641651032,
-          "observed_null_percentile": 59.865,
-          "permutation_p_value_two_sided": 0.8008199180081992,
+          "observed_ic": -0.09061913696060038,
+          "observed_null_percentile": 29.28,
+          "permutation_p_value_two_sided": 0.5712428757124287,
           "split": "test_2025",
           "year": 2025
         }
       ],
-      "kind": "baseline",
-      "model": "baseline_rank_score",
+      "kind": "ml",
+      "model": "linear_regression",
       "pooled": {
-        "bonferroni_adjusted_p_value": null,
-        "bootstrap": {
-          "cluster_key": "ticker",
-          "clusters": 40,
-          "independent_within_year_resampling": false,
-          "interval_convention": "percentile; 2.5th and 97.5th quantiles of the resample distribution",
-          "invalid_resamples": 0,
-          "multiplicity_preserved": true,
-          "observations_per_trajectory": 3,
-          "requested_resamples": 10000,
-          "seed": 42,
-          "shared_sample_across_years": true,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "trajectory_years": [
-            2023,
-            2024,
-            2025
-          ],
-          "unit": "ticker_cluster",
-          "valid_resamples": 10000
-        },
+        "bonferroni_adjusted_p_value": 1.0,
         "bootstrap_ci_95": [
-          -0.3167844369166295,
-          0.13157748253439944
+          -0.3032469973313057,
+          0.07458543475335974
         ],
         "n": 120,
         "null_distribution_quantiles": {
-          "0.01": -0.213214862108718,
-          "0.05": -0.1520448435828236,
-          "0.5": 0.0011560106975379604,
-          "0.95": 0.1507144021173081,
-          "0.99": 0.21095356016537165
+          "0.01": -0.210966520139819,
+          "0.05": -0.15599990857117502,
+          "0.5": -0.002128065989461756,
+          "0.95": 0.1480558181158547,
+          "0.99": 0.20607645079156553
         },
         "null_histogram": {
           "bin_edges": [
@@ -2182,21 +911,21 @@
             0,
             0,
             0,
-            0,
+            3,
             7,
-            28,
-            107,
-            377,
-            815,
-            1587,
-            2028,
-            2006,
-            1623,
-            911,
-            375,
-            101,
-            28,
-            7,
+            25,
+            121,
+            416,
+            864,
+            1569,
+            2111,
+            2042,
+            1503,
+            862,
+            357,
+            99,
+            16,
+            5,
             0,
             0,
             0,
@@ -2212,59 +941,317 @@
             0
           ]
         },
-        "observed_ic": -0.09470802661649796,
-        "observed_null_percentile": 14.83,
-        "permutation_p_value_two_sided": 0.3047695230476952,
-        "significant_fwer_0_05": null,
-        "split_count": 3,
-        "trajectory_preserving_sensitivity": {
-          "added_after_human_review": true,
-          "analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-          "bonferroni_adjusted_p_value": null,
-          "duplicate_free_one_to_one_mapping": true,
-          "extreme_count": 3826,
-          "family_size": 6,
-          "independent_per_year_mapping": false,
-          "invalid_draws": 0,
-          "is_bootstrap": false,
-          "multiplicity_method": "none; baselines sit outside the corrected family",
-          "null_hypothesis": "Ticker identities are exchangeable as complete cross-year trajectories: one permutation of the ticker universe is drawn per replication and applied identically in every evaluation year, so a ticker's realized outcomes move together and any cross-year persistence in the realized panel is preserved under the null.",
-          "observed_ic": -0.09470802661649796,
-          "observed_null_percentile": 19.04,
-          "p_value_denominator": 10001,
-          "p_value_formula": "(extreme_count + 1) / (draw_count + 1)",
-          "permutation_p_value_two_sided": 0.38266173382661733,
-          "permutation_unit": "complete cross-year ticker trajectory",
-          "prediction_rows_fixed": true,
-          "prespecified": false,
-          "provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
-          "replaces_primary_analysis": false,
-          "requested_draws": 10000,
-          "seed": 42,
-          "seed_frozen_and_documented": true,
-          "shared_mapping_across_years": true,
-          "significant_fwer_0_05": null,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "status": "post_review_sensitivity",
-          "two_sided": true,
-          "valid_draws": 10000
-        }
+        "observed_ic": -0.1170141878695141,
+        "observed_null_percentile": 10.67,
+        "permutation_p_value_two_sided": 0.20737926207379262,
+        "significant_fwer_0_05": false,
+        "split_count": 3
       }
     },
     {
       "exploratory_by_split": [
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2023
-          },
           "bootstrap_ci_95": [
-            -0.5904624555154395,
-            -0.010873023296161964
+            -0.3609610990758629,
+            0.30987224477305736
+          ],
+          "n": 40,
+          "observed_ic": -0.034715707122770514,
+          "observed_null_percentile": 41.235,
+          "permutation_p_value_two_sided": 0.8304169583041696,
+          "split": "test_2023",
+          "year": 2023
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.6080877954065956,
+            -0.01843458140008458
+          ],
+          "n": 40,
+          "observed_ic": -0.33320825515947466,
+          "observed_null_percentile": 1.61,
+          "permutation_p_value_two_sided": 0.0344965503449655,
+          "split": "test_2024",
+          "year": 2024
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.557753040765784,
+            0.07748242607387176
+          ],
+          "n": 40,
+          "observed_ic": -0.26604127579737336,
+          "observed_null_percentile": 4.905,
+          "permutation_p_value_two_sided": 0.09559044095590441,
+          "split": "test_2025",
+          "year": 2025
+        }
+      ],
+      "kind": "ml",
+      "model": "random_forest",
+      "pooled": {
+        "bonferroni_adjusted_p_value": 0.13378662133786623,
+        "bootstrap_ci_95": [
+          -0.3846619737585688,
+          -0.023277451307112118
+        ],
+        "n": 120,
+        "null_distribution_quantiles": {
+          "0.01": -0.21277581958523245,
+          "0.05": -0.15292039930898038,
+          "0.5": -0.0002782158995472406,
+          "0.95": 0.1524337801326774,
+          "0.99": 0.21522082083905422
+        },
+        "null_histogram": {
+          "bin_edges": [
+            -1.0,
+            -0.95,
+            -0.9,
+            -0.85,
+            -0.8,
+            -0.75,
+            -0.7,
+            -0.65,
+            -0.6,
+            -0.55,
+            -0.5,
+            -0.45,
+            -0.4,
+            -0.35,
+            -0.3,
+            -0.25,
+            -0.2,
+            -0.15,
+            -0.1,
+            -0.05,
+            0.0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            2,
+            24,
+            133,
+            391,
+            881,
+            1558,
+            2024,
+            2024,
+            1570,
+            867,
+            364,
+            128,
+            29,
+            4,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "observed_ic": -0.21132174602653953,
+        "observed_null_percentile": 1.05,
+        "permutation_p_value_two_sided": 0.022297770222977704,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      }
+    },
+    {
+      "exploratory_by_split": [
+        {
+          "bootstrap_ci_95": [
+            -0.23052976082145288,
+            0.4312685795761476
+          ],
+          "n": 40,
+          "observed_ic": 0.10489773125204713,
+          "observed_null_percentile": 74.125,
+          "permutation_p_value_two_sided": 0.5225477452254774,
+          "split": "test_2023",
+          "year": 2023
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.29235801487686314,
+            0.38396568698151357
+          ],
+          "n": 40,
+          "observed_ic": 0.04896810506566604,
+          "observed_null_percentile": 62.25,
+          "permutation_p_value_two_sided": 0.7613238676132387,
+          "split": "test_2024",
+          "year": 2024
+        },
+        {
+          "bootstrap_ci_95": [
+            -0.5452740231831281,
+            0.038948271141852626
+          ],
+          "n": 40,
+          "observed_ic": -0.26866791744840524,
+          "observed_null_percentile": 4.495,
+          "permutation_p_value_two_sided": 0.09059094090590941,
+          "split": "test_2025",
+          "year": 2025
+        }
+      ],
+      "kind": "ml",
+      "model": "ridge",
+      "pooled": {
+        "bonferroni_adjusted_p_value": 1.0,
+        "bootstrap_ci_95": [
+          -0.22256694254636103,
+          0.15164466878434654
+        ],
+        "n": 120,
+        "null_distribution_quantiles": {
+          "0.01": -0.21877956882022417,
+          "0.05": -0.15142924465510568,
+          "0.5": -0.001413748963339554,
+          "0.95": 0.15030250503180698,
+          "0.99": 0.21164214344584598
+        },
+        "null_histogram": {
+          "bin_edges": [
+            -1.0,
+            -0.95,
+            -0.9,
+            -0.85,
+            -0.8,
+            -0.75,
+            -0.7,
+            -0.65,
+            -0.6,
+            -0.55,
+            -0.5,
+            -0.45,
+            -0.4,
+            -0.35,
+            -0.3,
+            -0.25,
+            -0.2,
+            -0.15,
+            -0.1,
+            -0.05,
+            0.0,
+            0.05,
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            4,
+            37,
+            113,
+            364,
+            859,
+            1624,
+            2055,
+            2073,
+            1486,
+            875,
+            362,
+            109,
+            34,
+            2,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "observed_ic": -0.038267360376897354,
+        "observed_null_percentile": 34.82,
+        "permutation_p_value_two_sided": 0.682031796820318,
+        "significant_fwer_0_05": false,
+        "split_count": 3
+      }
+    },
+    {
+      "exploratory_by_split": [
+        {
+          "bootstrap_ci_95": [
+            -0.5926281099985584,
+            -0.0026325109247726025
           ],
           "n": 40,
           "observed_ic": -0.32837459925815266,
@@ -2274,17 +1261,9 @@
           "year": 2023
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2024
-          },
           "bootstrap_ci_95": [
-            -0.25978215938801863,
-            0.3697566878949346
+            -0.266945431700936,
+            0.36678278616091764
           ],
           "n": 40,
           "observed_ic": 0.05290806754221388,
@@ -2294,17 +1273,9 @@
           "year": 2024
         },
         {
-          "bootstrap": {
-            "cluster_key": "ticker",
-            "invalid_resamples": 0,
-            "note": "marginal year view of the shared ticker-cluster resample; the same sampled ticker vector is used in every year",
-            "unit": "ticker_cluster",
-            "valid_resamples": 10000,
-            "year": 2025
-          },
           "bootstrap_ci_95": [
-            -0.371047120192384,
-            0.3289504317126044
+            -0.37093491665170686,
+            0.32575062390000337
           ],
           "n": 40,
           "observed_ic": -0.023078005560357166,
@@ -2318,29 +1289,9 @@
       "model": "robust_rank_aggregation",
       "pooled": {
         "bonferroni_adjusted_p_value": null,
-        "bootstrap": {
-          "cluster_key": "ticker",
-          "clusters": 40,
-          "independent_within_year_resampling": false,
-          "interval_convention": "percentile; 2.5th and 97.5th quantiles of the resample distribution",
-          "invalid_resamples": 0,
-          "multiplicity_preserved": true,
-          "observations_per_trajectory": 3,
-          "requested_resamples": 10000,
-          "seed": 42,
-          "shared_sample_across_years": true,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "trajectory_years": [
-            2023,
-            2024,
-            2025
-          ],
-          "unit": "ticker_cluster",
-          "valid_resamples": 10000
-        },
         "bootstrap_ci_95": [
-          -0.3036172698951796,
-          0.11698182759897267
+          -0.2758150152062092,
+          0.08933059020923086
         ],
         "n": 120,
         "null_distribution_quantiles": {
@@ -2441,206 +1392,200 @@
         "observed_null_percentile": 13.85,
         "permutation_p_value_two_sided": 0.27957204279572045,
         "significant_fwer_0_05": null,
-        "split_count": 3,
-        "trajectory_preserving_sensitivity": {
-          "added_after_human_review": true,
-          "analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-          "bonferroni_adjusted_p_value": null,
-          "duplicate_free_one_to_one_mapping": true,
-          "extreme_count": 3652,
-          "family_size": 6,
-          "independent_per_year_mapping": false,
-          "invalid_draws": 0,
-          "is_bootstrap": false,
-          "multiplicity_method": "none; baselines sit outside the corrected family",
-          "null_hypothesis": "Ticker identities are exchangeable as complete cross-year trajectories: one permutation of the ticker universe is drawn per replication and applied identically in every evaluation year, so a ticker's realized outcomes move together and any cross-year persistence in the realized panel is preserved under the null.",
-          "observed_ic": -0.0995148457587653,
-          "observed_null_percentile": 18.11,
-          "p_value_denominator": 10001,
-          "p_value_formula": "(extreme_count + 1) / (draw_count + 1)",
-          "permutation_p_value_two_sided": 0.36526347365263473,
-          "permutation_unit": "complete cross-year ticker trajectory",
-          "prediction_rows_fixed": true,
-          "prespecified": false,
-          "provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
-          "replaces_primary_analysis": false,
-          "requested_draws": 10000,
-          "seed": 42,
-          "seed_frozen_and_documented": true,
-          "shared_mapping_across_years": true,
-          "significant_fwer_0_05": null,
-          "statistic": "equal-year mean of the valid within-year Spearman ICs",
-          "status": "post_review_sensitivity",
-          "two_sided": true,
-          "valid_draws": 10000
-        }
+        "split_count": 3
       }
     }
   ],
   "power_analysis": {
     "alpha_two_sided": 0.05,
-    "current_design": {
-      "derivation": "computed from the persisted R3-TGT-01 prediction dumps, not from a planning assumption",
-      "description": "The evaluated design is 40 rows per evaluation year in 2023, 2024, and 2025.",
-      "design_id": "current_design",
-      "rows_per_year": 40,
-      "status": "observed",
-      "test_years": 3,
-      "total_evaluated_rows_per_model": 120,
-      "views": [
-        {
-          "absolute_power_difference": 0.006200000000000094,
-          "agreement_within_tolerance": true,
-          "analytic_minimum_detectable_abs_ic": 0.4305545355469506,
-          "label": "one evaluation year of the current design, viewed on its own",
-          "n_per_split": 40,
-          "simulated_power_at_analytic_mde": 0.7938,
-          "simulation_curve": [
-            {
-              "analytic_power": 0.050000000000000044,
-              "assumed_true_ic": 0.0,
-              "simulated_rejection_rate": 0.0478
-            },
-            {
-              "analytic_power": 0.2649548620094478,
-              "assumed_true_ic": 0.2152772677734753,
-              "simulated_rejection_rate": 0.2566
-            },
-            {
-              "analytic_power": 0.8,
-              "assumed_true_ic": 0.4305545355469506,
-              "simulated_rejection_rate": 0.7986
-            },
-            {
-              "analytic_power": 0.9553854140325572,
-              "assumed_true_ic": 0.5381931694336882,
-              "simulated_rejection_rate": 0.9488
-            }
-          ],
-          "split_count": 1,
-          "total_evaluated_rows": 40,
-          "view_id": "single_evaluation_year",
-          "view_of": "current_design"
-        },
-        {
-          "absolute_power_difference": 0.009400000000000075,
-          "agreement_within_tolerance": true,
-          "analytic_minimum_detectable_abs_ic": 0.2598190759194811,
-          "label": "all evaluation years of the current design, pooled with equal weights",
-          "n_per_split": 40,
-          "simulated_power_at_analytic_mde": 0.7906,
-          "simulation_curve": [
-            {
-              "analytic_power": 0.050000000000000044,
-              "assumed_true_ic": 0.0,
-              "simulated_rejection_rate": 0.0462
-            },
-            {
-              "analytic_power": 0.28020147066638307,
-              "assumed_true_ic": 0.12990953795974056,
-              "simulated_rejection_rate": 0.2786
-            },
-            {
-              "analytic_power": 0.8000000000000003,
-              "assumed_true_ic": 0.2598190759194811,
-              "simulated_rejection_rate": 0.8
-            },
-            {
-              "analytic_power": 0.9441146809252015,
-              "assumed_true_ic": 0.3247738448993514,
-              "simulated_rejection_rate": 0.9408
-            }
-          ],
-          "split_count": 3,
-          "total_evaluated_rows": 120,
-          "view_id": "pooled_evaluation_years",
-          "view_of": "current_design"
-        }
-      ],
-      "years": [
-        2023,
-        2024,
-        2025
-      ]
-    },
     "definitions": {
       "detectable_ic": "assumed true absolute IC yielding 80% long-run rejection probability under the stated approximation; not a hard significance cutoff",
       "observed_ic": "sample estimate computed from persisted prediction dumps",
       "practical_relevance": "not evaluated by this calculation; detectability does not establish economic value, robustness, implementability, or investment relevance",
       "statistical_power": "long-run probability of rejecting a zero-IC null when the stated true IC and design assumptions hold"
     },
-    "hypothetical_planning_sensitivities": {
-      "deduplicated_against_current_design": true,
-      "deduplication_key": [
-        "rows_per_year",
-        "test_years"
-      ],
-      "entries": [
-        {
-          "additional_test_years": 1,
-          "analytic_minimum_detectable_abs_ic": 0.22630219427371773,
-          "is_current_evidence": false,
-          "planning_rows_per_year": 40,
-          "status": "hypothetical",
-          "total_test_years": 4
-        },
-        {
-          "additional_test_years": 2,
-          "analytic_minimum_detectable_abs_ic": 0.2031120520968228,
-          "is_current_evidence": false,
-          "planning_rows_per_year": 40,
-          "status": "hypothetical",
-          "total_test_years": 5
-        },
-        {
-          "additional_test_years": 3,
-          "analytic_minimum_detectable_abs_ic": 0.185844807899661,
-          "is_current_evidence": false,
-          "planning_rows_per_year": 40,
-          "status": "hypothetical",
-          "total_test_years": 6
-        },
-        {
-          "additional_test_years": 5,
-          "analytic_minimum_detectable_abs_ic": 0.1614144384274509,
-          "is_current_evidence": false,
-          "planning_rows_per_year": 40,
-          "status": "hypothetical",
-          "total_test_years": 8
-        },
-        {
-          "additional_test_years": 7,
-          "analytic_minimum_detectable_abs_ic": 0.14462608745653588,
-          "is_current_evidence": false,
-          "planning_rows_per_year": 40,
-          "status": "hypothetical",
-          "total_test_years": 10
-        }
-      ],
-      "excluded_duplicates_of_current_design": [
-        {
-          "planning_rows_per_year": 40,
-          "reason": "identical to the observed current design; a hypothetical entry may never restate current evidence",
-          "total_test_years": 3
-        }
-      ],
-      "framing": "The pipeline is ready for more data; this is pipeline capability, not a promise that more data will produce predictive skill or practical returns.",
-      "is_current_evidence": false,
-      "label": "hypothetical planning horizons for the public-universe scale; never a description of the evidence that exists today",
-      "planning_rows_per_year": 40,
-      "status": "hypothetical"
-    },
+    "designs": [
+      {
+        "absolute_power_difference": 0.006200000000000094,
+        "agreement_within_tolerance": true,
+        "analytic_minimum_detectable_abs_ic": 0.4305545355469506,
+        "design_id": "current_one_split",
+        "n_per_split": 40,
+        "scope": "actual prediction-dump design",
+        "simulated_power_at_analytic_mde": 0.7938,
+        "simulation_curve": [
+          {
+            "analytic_power": 0.050000000000000044,
+            "assumed_true_ic": 0.0,
+            "simulated_rejection_rate": 0.0478
+          },
+          {
+            "analytic_power": 0.2649548620094478,
+            "assumed_true_ic": 0.2152772677734753,
+            "simulated_rejection_rate": 0.2566
+          },
+          {
+            "analytic_power": 0.8,
+            "assumed_true_ic": 0.4305545355469506,
+            "simulated_rejection_rate": 0.7986
+          },
+          {
+            "analytic_power": 0.9553854140325572,
+            "assumed_true_ic": 0.5381931694336882,
+            "simulated_rejection_rate": 0.9488
+          }
+        ],
+        "split_count": 1,
+        "total_evaluated_rows": 40
+      },
+      {
+        "absolute_power_difference": 0.009400000000000075,
+        "agreement_within_tolerance": true,
+        "analytic_minimum_detectable_abs_ic": 0.2598190759194811,
+        "design_id": "current_three_year_pooled",
+        "n_per_split": 40,
+        "scope": "actual prediction-dump design",
+        "simulated_power_at_analytic_mde": 0.7906,
+        "simulation_curve": [
+          {
+            "analytic_power": 0.050000000000000044,
+            "assumed_true_ic": 0.0,
+            "simulated_rejection_rate": 0.0462
+          },
+          {
+            "analytic_power": 0.28020147066638307,
+            "assumed_true_ic": 0.12990953795974056,
+            "simulated_rejection_rate": 0.2786
+          },
+          {
+            "analytic_power": 0.8000000000000003,
+            "assumed_true_ic": 0.2598190759194811,
+            "simulated_rejection_rate": 0.8
+          },
+          {
+            "analytic_power": 0.9441146809252015,
+            "assumed_true_ic": 0.3247738448993514,
+            "simulated_rejection_rate": 0.9408
+          }
+        ],
+        "split_count": 3,
+        "total_evaluated_rows": 120
+      },
+      {
+        "absolute_power_difference": 0.012800000000000034,
+        "agreement_within_tolerance": true,
+        "analytic_minimum_detectable_abs_ic": 0.4305545355469506,
+        "design_id": "public_40_one_split_sensitivity",
+        "n_per_split": 40,
+        "scope": "planning sensitivity; not the current dump design",
+        "simulated_power_at_analytic_mde": 0.7872,
+        "simulation_curve": [
+          {
+            "analytic_power": 0.050000000000000044,
+            "assumed_true_ic": 0.0,
+            "simulated_rejection_rate": 0.0476
+          },
+          {
+            "analytic_power": 0.2649548620094478,
+            "assumed_true_ic": 0.2152772677734753,
+            "simulated_rejection_rate": 0.2538
+          },
+          {
+            "analytic_power": 0.8,
+            "assumed_true_ic": 0.4305545355469506,
+            "simulated_rejection_rate": 0.7984
+          },
+          {
+            "analytic_power": 0.9553854140325572,
+            "assumed_true_ic": 0.5381931694336882,
+            "simulated_rejection_rate": 0.9528
+          }
+        ],
+        "split_count": 1,
+        "total_evaluated_rows": 40
+      },
+      {
+        "absolute_power_difference": 0.007000000000000006,
+        "agreement_within_tolerance": true,
+        "analytic_minimum_detectable_abs_ic": 0.2598190759194811,
+        "design_id": "public_40_three_year_sensitivity",
+        "n_per_split": 40,
+        "scope": "planning sensitivity; not the current dump design",
+        "simulated_power_at_analytic_mde": 0.793,
+        "simulation_curve": [
+          {
+            "analytic_power": 0.050000000000000044,
+            "assumed_true_ic": 0.0,
+            "simulated_rejection_rate": 0.0416
+          },
+          {
+            "analytic_power": 0.28020147066638307,
+            "assumed_true_ic": 0.12990953795974056,
+            "simulated_rejection_rate": 0.2772
+          },
+          {
+            "analytic_power": 0.8000000000000003,
+            "assumed_true_ic": 0.2598190759194811,
+            "simulated_rejection_rate": 0.8042
+          },
+          {
+            "analytic_power": 0.9441146809252015,
+            "assumed_true_ic": 0.3247738448993514,
+            "simulated_rejection_rate": 0.948
+          }
+        ],
+        "split_count": 3,
+        "total_evaluated_rows": 120
+      }
+    ],
     "limitations": [
       "Only three test years are observed; treating within-year IC estimates as independent is an approximation.",
       "The calculation assumes equal per-year sample sizes and a stable true IC across years, neither of which establishes regime generality.",
-      "The evaluated design is 40 rows per evaluation year across 2023, 2024, and 2025; the additional-test-year table is a hypothetical planning horizon and is not current evidence.",
+      "The 40-ticker table is a planning sensitivity for the public-universe scale, not the current 80-row prediction-dump design.",
       "The cohort is retrospective rather than verified point-in-time membership, and reproducibility remains numerical-environment-qualified.",
-      "Power bounds detection under assumptions; it neither estimates the true IC nor establishes practical investment relevance.",
-      "A low-power non-rejection is not a demonstration that the true IC is zero, and no power figure here is a statement of predictive validity."
+      "Power bounds detection under assumptions; it neither estimates the true IC nor establishes practical investment relevance."
     ],
     "method": "two-sided Fisher z approximation for independent within-year Spearman ICs; equal year weights and variance 1/(n-3)",
     "multiplicity_scope": "single prespecified IC test at alpha=0.05; this power calculation does not represent Bonferroni-adjusted family-wise power across six ML models",
-    "non_rejection_interpretation": "The detectable |IC| at the current design is large relative to any plausible annual equity-ranking IC, so the family-wide failure to reject is a low-power non-rejection. It does not establish that the true IC is zero, and it is not evidence of predictive validity in either direction.",
+    "projection_40_tickers_per_year": [
+      {
+        "additional_years": 0,
+        "analytic_minimum_detectable_abs_ic": 0.2598190759194811,
+        "n_per_year": 40,
+        "total_test_years": 3
+      },
+      {
+        "additional_years": 1,
+        "analytic_minimum_detectable_abs_ic": 0.22630219427371773,
+        "n_per_year": 40,
+        "total_test_years": 4
+      },
+      {
+        "additional_years": 2,
+        "analytic_minimum_detectable_abs_ic": 0.2031120520968228,
+        "n_per_year": 40,
+        "total_test_years": 5
+      },
+      {
+        "additional_years": 3,
+        "analytic_minimum_detectable_abs_ic": 0.185844807899661,
+        "n_per_year": 40,
+        "total_test_years": 6
+      },
+      {
+        "additional_years": 5,
+        "analytic_minimum_detectable_abs_ic": 0.1614144384274509,
+        "n_per_year": 40,
+        "total_test_years": 8
+      },
+      {
+        "additional_years": 7,
+        "analytic_minimum_detectable_abs_ic": 0.14462608745653588,
+        "n_per_year": 40,
+        "total_test_years": 10
+      }
+    ],
+    "projection_framing": "The pipeline is ready for more data; this is pipeline capability, not a promise that more data will produce predictive skill or practical returns.",
     "simulation": {
       "agreement_tolerance_absolute_power": 0.05,
       "method": "seeded Gaussian-copula draws calibrated to assumed Spearman IC, converted to ranks, and rejected with the same Fisher-z approximation",
@@ -2649,594 +1594,7 @@
     },
     "target_power": 0.8
   },
-  "provenance": {
-    "effective_estimator_parameters": {
-      "baseline_equal_weight": {
-        "callable": "_score_equal_weight",
-        "estimator_class": null,
-        "estimator_module": "experiments.run_experiments",
-        "extraction": "deterministic scoring function; no fitted estimator",
-        "parameters": {}
-      },
-      "baseline_rank_score": {
-        "callable": "_score_rank",
-        "estimator_class": null,
-        "estimator_module": "experiments.run_experiments",
-        "extraction": "deterministic scoring function; no fitted estimator",
-        "parameters": {}
-      },
-      "elasticnet": {
-        "estimator_class": "ElasticNet",
-        "estimator_module": "sklearn.linear_model._coordinate_descent",
-        "extraction": "estimator.get_params(deep=False)",
-        "parameters": {
-          "alpha": 0.1,
-          "copy_X": true,
-          "fit_intercept": true,
-          "l1_ratio": 0.5,
-          "max_iter": 5000,
-          "positive": false,
-          "precompute": false,
-          "random_state": null,
-          "selection": "cyclic",
-          "tol": 0.0001,
-          "warm_start": false
-        }
-      },
-      "gradient_boosting": {
-        "estimator_class": "GradientBoostingRegressor",
-        "estimator_module": "sklearn.ensemble._gb",
-        "extraction": "estimator.get_params(deep=False)",
-        "parameters": {
-          "alpha": 0.9,
-          "ccp_alpha": 0.0,
-          "criterion": "friedman_mse",
-          "init": null,
-          "learning_rate": 0.1,
-          "loss": "squared_error",
-          "max_depth": 2,
-          "max_features": null,
-          "max_leaf_nodes": null,
-          "min_impurity_decrease": 0.0,
-          "min_samples_leaf": 1,
-          "min_samples_split": 2,
-          "min_weight_fraction_leaf": 0.0,
-          "n_estimators": 120,
-          "n_iter_no_change": null,
-          "random_state": 42,
-          "subsample": 1.0,
-          "tol": 0.0001,
-          "validation_fraction": 0.1,
-          "verbose": 0,
-          "warm_start": false
-        }
-      },
-      "lasso": {
-        "estimator_class": "Lasso",
-        "estimator_module": "sklearn.linear_model._coordinate_descent",
-        "extraction": "estimator.get_params(deep=False)",
-        "parameters": {
-          "alpha": 0.1,
-          "copy_X": true,
-          "fit_intercept": true,
-          "max_iter": 5000,
-          "positive": false,
-          "precompute": false,
-          "random_state": null,
-          "selection": "cyclic",
-          "tol": 0.0001,
-          "warm_start": false
-        }
-      },
-      "linear_regression": {
-        "estimator_class": "LinearRegression",
-        "estimator_module": "sklearn.linear_model._base",
-        "extraction": "estimator.get_params(deep=False)",
-        "parameters": {
-          "copy_X": true,
-          "fit_intercept": true,
-          "n_jobs": null,
-          "positive": false
-        }
-      },
-      "random_forest": {
-        "estimator_class": "RandomForestRegressor",
-        "estimator_module": "sklearn.ensemble._forest",
-        "extraction": "estimator.get_params(deep=False)",
-        "parameters": {
-          "bootstrap": true,
-          "ccp_alpha": 0.0,
-          "criterion": "squared_error",
-          "max_depth": 4,
-          "max_features": 1.0,
-          "max_leaf_nodes": null,
-          "max_samples": null,
-          "min_impurity_decrease": 0.0,
-          "min_samples_leaf": 1,
-          "min_samples_split": 2,
-          "min_weight_fraction_leaf": 0.0,
-          "monotonic_cst": null,
-          "n_estimators": 200,
-          "n_jobs": null,
-          "oob_score": false,
-          "random_state": 42,
-          "verbose": 0,
-          "warm_start": false
-        }
-      },
-      "ridge": {
-        "estimator_class": "Ridge",
-        "estimator_module": "sklearn.linear_model._ridge",
-        "extraction": "estimator.get_params(deep=False)",
-        "parameters": {
-          "alpha": 1.0,
-          "copy_X": true,
-          "fit_intercept": true,
-          "max_iter": null,
-          "positive": false,
-          "random_state": null,
-          "solver": "auto",
-          "tol": 0.0001
-        }
-      },
-      "robust_rank_aggregation": {
-        "callable": "_score_robust_rank_aggregation",
-        "estimator_class": null,
-        "estimator_module": "experiments.run_experiments",
-        "extraction": "deterministic scoring function; no fitted estimator",
-        "parameters": {}
-      }
-    },
-    "environment": {
-      "determinism": "Regeneration is deterministic within this recorded numerical environment: repeated runs of the recorded command on the same interpreter, package versions, and platform reproduce identical output bytes. Byte identity across different environments is not claimed.",
-      "machine": "arm64",
-      "packages": {
-        "numpy": "1.26.4",
-        "pandas": "2.2.2",
-        "scikit-learn": "1.5.1",
-        "scipy": "1.13.1"
-      },
-      "platform": "macOS-26.6-arm64-arm-64bit",
-      "processor": "arm",
-      "python_implementation": "CPython",
-      "python_version": "3.12.3",
-      "python_version_info": [
-        3,
-        12,
-        3
-      ],
-      "release": "25.6.0",
-      "system": "Darwin"
-    },
-    "feature_columns": {
-      "checksum_definition": "sha256 of the newline-joined feature column names in fitting order",
-      "columns": [
-        "benchmark_same_year_return_pct",
-        "current_assets",
-        "current_ratio",
-        "ebitda",
-        "ebitda_growth_pct",
-        "ebitda_margin",
-        "enterprise_value",
-        "equity",
-        "ev_ebitda",
-        "financial_debt_ratio",
-        "gross_margin",
-        "gross_profit",
-        "gross_profit_growth_pct",
-        "leverage_ratio",
-        "long_term_liabilities",
-        "market_cap",
-        "net_debt",
-        "net_debt_to_ebitda",
-        "net_income",
-        "net_income_growth_pct",
-        "net_margin",
-        "non_current_assets",
-        "operating_income",
-        "operating_income_growth_pct",
-        "pb_ratio",
-        "pe_ratio",
-        "price_adjclose_t",
-        "price_data_available",
-        "price_drawdown_from_3y_high_pct",
-        "price_history_years_available",
-        "price_momentum_1y_pct",
-        "price_momentum_2y_pct",
-        "price_vs_bist100_1y_pct",
-        "revenue",
-        "revenue_growth_pct",
-        "roa",
-        "roe",
-        "short_term_liabilities",
-        "total_assets",
-        "working_capital"
-      ],
-      "count": 40,
-      "sha256": "041566fc685b043c8618af859c268aa736fa5ae87b0d2679a2b35df779659575"
-    },
-    "generator": "experiments/run_excess_basis.py",
-    "model_family_membership": {
-      "baselines_outside_family": [
-        "baseline_equal_weight",
-        "baseline_rank_score",
-        "robust_rank_aggregation"
-      ],
-      "ml_family": [
-        "linear_regression",
-        "ridge",
-        "lasso",
-        "elasticnet",
-        "random_forest",
-        "gradient_boosting"
-      ]
-    },
-    "model_specifications": {
-      "baseline_equal_weight": {
-        "kind": "baseline",
-        "parameters": {},
-        "seed": null
-      },
-      "baseline_rank_score": {
-        "kind": "baseline",
-        "parameters": {},
-        "seed": null
-      },
-      "elasticnet": {
-        "kind": "ml",
-        "parameters": {
-          "alpha": 0.1,
-          "max_iter": 5000
-        },
-        "seed": null
-      },
-      "gradient_boosting": {
-        "kind": "ml",
-        "parameters": {
-          "max_depth": 2,
-          "n_estimators": 120
-        },
-        "seed": 42
-      },
-      "lasso": {
-        "kind": "ml",
-        "parameters": {
-          "alpha": 0.1,
-          "max_iter": 5000
-        },
-        "seed": null
-      },
-      "linear_regression": {
-        "kind": "ml",
-        "parameters": {},
-        "seed": null
-      },
-      "random_forest": {
-        "kind": "ml",
-        "parameters": {
-          "max_depth": 4,
-          "n_estimators": 200
-        },
-        "seed": 42
-      },
-      "ridge": {
-        "kind": "ml",
-        "parameters": {
-          "alpha": 1.0
-        },
-        "seed": null
-      },
-      "robust_rank_aggregation": {
-        "kind": "baseline",
-        "parameters": {},
-        "seed": null
-      }
-    },
-    "output_path_policy": {
-      "arbitrary_external_paths_accepted": false,
-      "default_is_the_only_repository_destination": true,
-      "default_output_directory": "experiments/results_excess",
-      "refusal_exception": "ExcessOutputPathError",
-      "refusal_timing": "before any output file is created or overwritten",
-      "required_destination_name_prefix": "financeiq-r3-tgt-01-",
-      "resolved_containment_under_temporary_root_required": true,
-      "symlinked_destination_accepted": false,
-      "symlinked_path_component_accepted": false,
-      "temporary_override_scope": "isolated tests and deterministic verification only; this generator is not a general arbitrary-output utility",
-      "temporary_root_authority": "tempfile.gettempdir()",
-      "temporary_root_hardcoded": false,
-      "temporary_root_itself_accepted": false
-    },
-    "preprocessing": "Existing build_panel_for_target rules: year-local feature percentile ranks, existing feature registry exclusions, null target rows dropped, and ML-only missing-feature rank-center handling unchanged.",
-    "regeneration_command": "make research-excess",
-    "resampling": {
-      "bootstrap_cluster_key": "ticker",
-      "bootstrap_unit": "ticker_cluster",
-      "bootstraps": 10000,
-      "permutation_unit": "within-year row permutation of realized returns",
-      "permutations": 10000
-    },
-    "schema_versions": {
-      "artifact_manifest_json": {
-        "version": "2.0.0"
-      },
-      "leaderboard_csv": {
-        "key_columns": [
-          "target",
-          "split",
-          "model",
-          "kind"
-        ],
-        "line_terminator": "\\n",
-        "version": "1.0.0"
-      },
-      "prediction_csv": {
-        "columns": [
-          "ticker",
-          "year",
-          "model",
-          "y_true",
-          "y_pred"
-        ],
-        "float_format": "%.17g",
-        "line_terminator": "\\n",
-        "version": "1.0.0"
-      },
-      "significance_report_json": {
-        "version": 2
-      }
-    },
-    "seeds": {
-      "bootstrap_seed": 42,
-      "model_seeds": {
-        "gradient_boosting": 42,
-        "random_forest": 42
-      },
-      "permutation_seed": 42,
-      "significance_seed": 42
-    },
-    "selection_policy": "Frozen nine-model family; no search, additions, removals, tuning, or selection based on excess-target results. All six prespecified ML-family members are reported symmetrically. No model is selected or privileged using the observed excess-target IC, raw p-value, adjusted p-value, bootstrap interval, or any other outcome-derived statistic.",
-    "target": "next_year_excess_return_vs_bist100",
-    "walk_forward_splits": [
-      {
-        "name": "test_2023",
-        "test_feature_year": 2022,
-        "train_target_years": [
-          2021,
-          2022
-        ]
-      },
-      {
-        "name": "test_2024",
-        "test_feature_year": 2023,
-        "train_target_years": [
-          2021,
-          2022,
-          2023
-        ]
-      },
-      {
-        "name": "test_2025",
-        "test_feature_year": 2024,
-        "train_target_years": [
-          2021,
-          2022,
-          2023,
-          2024
-        ]
-      }
-    ]
-  },
-  "reporting_policy": {
-    "frozen_baseline_order": [
-      "baseline_equal_weight",
-      "baseline_rank_score",
-      "robust_rank_aggregation"
-    ],
-    "frozen_ml_family_order": [
-      "linear_regression",
-      "ridge",
-      "lasso",
-      "elasticnet",
-      "random_forest",
-      "gradient_boosting"
-    ],
-    "headline_scope": "family-level only; no individual model is singled out",
-    "model_presentation": "symmetric across the prespecified ML family",
-    "ordering": "frozen prespecified order; never reordered by an outcome statistic",
-    "outcome_statistics_excluded_from_selection": [
-      "observed_ic",
-      "permutation_p_value_two_sided",
-      "bonferroni_adjusted_p_value",
-      "bootstrap_ci_95",
-      "observed_null_percentile"
-    ],
-    "report_construction": {
-      "builder": "experiments/run_excess_basis.py::build_family_report",
-      "note": "The report is assembled from per-model, non-selecting analyses. No helper that chooses a minimum raw p-value, minimum adjusted p-value, strongest IC, narrowest interval, or any other outcome-derived winner is executed at any intermediate or final layer, so no selected field ever exists to be deleted afterwards.",
-      "outcome_dependent_selection_helpers_invoked": [],
-      "significance_build_report_invoked": false
-    },
-    "result_driven_selection_performed": false,
-    "statement": "All six prespecified ML-family members are reported symmetrically. No model is selected or privileged using the observed excess-target IC, raw p-value, adjusted p-value, bootstrap interval, or any other outcome-derived statistic."
-  },
-  "review_package_scope": {
-    "complete_independent_fitting_stage_replication_claimed": false,
-    "repository_technical_review_covers": [
-      "governed source paths",
-      "protected hashes",
-      "split tracing",
-      "implementation behavior"
-    ],
-    "standalone_feature_construction_reproduction": false,
-    "standalone_model_fitting_reproduction": false,
-    "statements": [
-      "The compact package supports review of the persisted prediction-to-significance layer: the row-level prediction dumps, the dump-reconstructed leaderboard, the significance report, and the artifact manifest.",
-      "It does not alone provide standalone reproduction of feature construction and model fitting.",
-      "The repository technical review separately covers governed source paths, protected hashes, split tracing, and implementation behavior.",
-      "No claim of complete independent fitting-stage replication is made from the compact package alone."
-    ],
-    "supports": "review of the persisted prediction-to-significance layer: row-level prediction dumps, the dump-reconstructed leaderboard, the significance report, and the artifact manifest"
-  },
   "schema_version": 2,
-  "significance_comparison": {
-    "any_model_rejects_under_either_after_correction": false,
-    "baselines_outside_the_corrected_family": {
-      "note": "The three baselines sit outside the six-model correction family. Their p-values are unadjusted context and are never folded into the family gate.",
-      "rows": [
-        {
-          "bonferroni_adjusted": false,
-          "inside_corrected_family": false,
-          "model": "baseline_equal_weight",
-          "pooled_equal_year_ic": -0.09470802661649796,
-          "primary_raw_permutation_p": 0.3047695230476952,
-          "sensitivity_raw_permutation_p": 0.38266173382661733,
-          "ticker_cluster_bootstrap_ci_95": [
-            -0.3167844369166295,
-            0.13157748253439944
-          ]
-        },
-        {
-          "bonferroni_adjusted": false,
-          "inside_corrected_family": false,
-          "model": "baseline_rank_score",
-          "pooled_equal_year_ic": -0.09470802661649796,
-          "primary_raw_permutation_p": 0.3047695230476952,
-          "sensitivity_raw_permutation_p": 0.38266173382661733,
-          "ticker_cluster_bootstrap_ci_95": [
-            -0.3167844369166295,
-            0.13157748253439944
-          ]
-        },
-        {
-          "bonferroni_adjusted": false,
-          "inside_corrected_family": false,
-          "model": "robust_rank_aggregation",
-          "pooled_equal_year_ic": -0.0995148457587653,
-          "primary_raw_permutation_p": 0.27957204279572045,
-          "sensitivity_raw_permutation_p": 0.36526347365263473,
-          "ticker_cluster_bootstrap_ci_95": [
-            -0.3036172698951796,
-            0.11698182759897267
-          ]
-        }
-      ]
-    },
-    "conclusion": "Neither the prespecified primary permutation nor the post-review trajectory-preserving sensitivity rejects for any of the six family members after the six-model Bonferroni correction at a family-wise alpha of 0.05.",
-    "family": [
-      {
-        "either_family_corrected_analysis_rejects_fwer_0_05": false,
-        "model": "linear_regression",
-        "pooled_equal_year_ic": -0.1170141878695141,
-        "primary_bonferroni_p": 1.0,
-        "primary_raw_permutation_p": 0.20737926207379262,
-        "primary_rejects_fwer_0_05": false,
-        "sensitivity_bonferroni_p": 1.0,
-        "sensitivity_raw_permutation_p": 0.22307769223077692,
-        "sensitivity_rejects_fwer_0_05": false,
-        "ticker_cluster_bootstrap_ci_95": [
-          -0.264286301910576,
-          0.0469981138054691
-        ]
-      },
-      {
-        "either_family_corrected_analysis_rejects_fwer_0_05": false,
-        "model": "ridge",
-        "pooled_equal_year_ic": -0.038267360376897354,
-        "primary_bonferroni_p": 1.0,
-        "primary_raw_permutation_p": 0.682031796820318,
-        "primary_rejects_fwer_0_05": false,
-        "sensitivity_bonferroni_p": 1.0,
-        "sensitivity_raw_permutation_p": 0.6963303669633036,
-        "sensitivity_rejects_fwer_0_05": false,
-        "ticker_cluster_bootstrap_ci_95": [
-          -0.22163890927149146,
-          0.15499483317479026
-        ]
-      },
-      {
-        "either_family_corrected_analysis_rejects_fwer_0_05": false,
-        "model": "lasso",
-        "pooled_equal_year_ic": -0.09480608687173435,
-        "primary_bonferroni_p": 1.0,
-        "primary_raw_permutation_p": 0.29927007299270075,
-        "primary_rejects_fwer_0_05": false,
-        "sensitivity_bonferroni_p": 1.0,
-        "sensitivity_raw_permutation_p": 0.32996700329967005,
-        "sensitivity_rejects_fwer_0_05": false,
-        "ticker_cluster_bootstrap_ci_95": [
-          -0.248942382414521,
-          0.07241549446858887
-        ]
-      },
-      {
-        "either_family_corrected_analysis_rejects_fwer_0_05": false,
-        "model": "elasticnet",
-        "pooled_equal_year_ic": -0.06315721277185299,
-        "primary_bonferroni_p": 1.0,
-        "primary_raw_permutation_p": 0.48725127487251274,
-        "primary_rejects_fwer_0_05": false,
-        "sensitivity_bonferroni_p": 1.0,
-        "sensitivity_raw_permutation_p": 0.5565443455654434,
-        "sensitivity_rejects_fwer_0_05": false,
-        "ticker_cluster_bootstrap_ci_95": [
-          -0.28128467629234866,
-          0.1657167209564505
-        ]
-      },
-      {
-        "either_family_corrected_analysis_rejects_fwer_0_05": false,
-        "model": "random_forest",
-        "pooled_equal_year_ic": -0.21132174602653953,
-        "primary_bonferroni_p": 0.13378662133786623,
-        "primary_raw_permutation_p": 0.022297770222977704,
-        "primary_rejects_fwer_0_05": false,
-        "sensitivity_bonferroni_p": 0.2495750424957504,
-        "sensitivity_raw_permutation_p": 0.0415958404159584,
-        "sensitivity_rejects_fwer_0_05": false,
-        "ticker_cluster_bootstrap_ci_95": [
-          -0.4201458978799183,
-          0.013822738023554923
-        ]
-      },
-      {
-        "either_family_corrected_analysis_rejects_fwer_0_05": false,
-        "model": "gradient_boosting",
-        "pooled_equal_year_ic": -0.21125995808938944,
-        "primary_bonferroni_p": 0.13018698130186981,
-        "primary_raw_permutation_p": 0.0216978302169783,
-        "primary_rejects_fwer_0_05": false,
-        "sensitivity_bonferroni_p": 0.2465753424657534,
-        "sensitivity_raw_permutation_p": 0.0410958904109589,
-        "sensitivity_rejects_fwer_0_05": false,
-        "ticker_cluster_bootstrap_ci_95": [
-          -0.42403180403061713,
-          0.0103196048017307
-        ]
-      }
-    ],
-    "fields_reported_for_every_member": [
-      "pooled_equal_year_ic",
-      "primary_raw_permutation_p",
-      "primary_bonferroni_p",
-      "sensitivity_raw_permutation_p",
-      "sensitivity_bonferroni_p",
-      "ticker_cluster_bootstrap_ci_95",
-      "either_family_corrected_analysis_rejects_fwer_0_05"
-    ],
-    "models_rejecting_under_either_after_correction": [],
-    "models_rejecting_under_primary_after_correction": [],
-    "models_rejecting_under_sensitivity_after_correction": [],
-    "ordering": "frozen prespecified order; never reordered by an observed statistic",
-    "primary_analysis_id": "primary_independent_within_year_permutation",
-    "scope": "prespecified six-model ML family, reported symmetrically",
-    "selection_performed": false,
-    "sensitivity_analysis_id": "trajectory_preserving_ticker_permutation_sensitivity",
-    "sensitivity_is_prespecified": false,
-    "sensitivity_provenance": "Added after human review at the reviewer's request. It is a sensitivity analysis, not a prespecified analysis and not a replacement for the primary independently-within-year permutation, which is retained unchanged.",
-    "sensitivity_replaces_primary": false,
-    "sensitivity_status": "post_review_sensitivity"
-  },
   "source_artifacts": [
     {
       "models": [
@@ -3288,47 +1646,10 @@
       "rows": 360,
       "sha256": "52b4b3a7eaa2c99bc67bd62106399824b1c0696b22ab81af97e3fa4a6aa392c1",
       "year": 2025
-    },
-    {
-      "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
-      "role": "trusted modeling features and excess-return target",
-      "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
-      "size_bytes": 256050
-    },
-    {
-      "path": "experiments/results/leaderboard_by_target.csv",
-      "role": "read-only aggregate excess leaderboard used only for comparison",
-      "sha256": "a9e671f992336378df9e12c464ce08267180d8f1c9820a78d69b10ff748e9a9b",
-      "size_bytes": 10305
-    },
-    {
-      "path": "experiments/run_excess_basis.py",
-      "role": "R3-TGT-01 generator",
-      "sha256": "e37bca5910aa1663be8727d02a7671385e6c4909c000852a53dafd66011a68e5",
-      "size_bytes": 219916
-    },
-    {
-      "path": "experiments/run_experiments.py",
-      "role": "frozen preprocessing, splits, models, and metrics",
-      "sha256": "265f58678d522eea0c48fbccba415ed30b3e20abc6bb7ae0a8e33857c5feb543",
-      "size_bytes": 32280
-    },
-    {
-      "path": "experiments/run_alternative_targets.py",
-      "role": "existing isolated prediction-dump fitting path",
-      "sha256": "4afa0576d817ed1d8de4cac852796266faf7b8bd7fdf3e5e57fe43910a77abd0",
-      "size_bytes": 8566
-    },
-    {
-      "path": "experiments/significance.py",
-      "role": "seeded IC, permutation, and Bonferroni conventions",
-      "sha256": "5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6",
-      "size_bytes": 32055
     }
   ],
   "target_basis": {
-    "cohort": "benchmark-covered public 40",
-    "cohort_note": "The evaluated cohort is the 40-ticker benchmark-covered public universe, a subset of the wider internal training universe used by the nominal basis. Missing excess targets remain null and are never filled.",
+    "coverage_note": "Benchmark-relative coverage shrinks the evaluated panel relative to the nominal basis; missing excess targets remain null and are never filled.",
     "evaluated_rows_per_year": {
       "2023": 40,
       "2024": 40,
@@ -3336,6 +1657,8 @@
     },
     "id": "excess_vs_bist100",
     "label": "Excess return vs BIST100 (nominal TRY, percentage points)",
+    "modeling_dataset_path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+    "modeling_dataset_sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
     "nominal_basis_rows_per_test_year_context": 80,
     "target_column": "next_year_excess_return_vs_bist100"
   },
