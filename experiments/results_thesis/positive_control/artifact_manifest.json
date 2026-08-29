@@ -1,0 +1,62 @@
+{
+  "artifacts": [
+    {
+      "path": "experiments/results_thesis/positive_control/attenuation_by_stage.csv",
+      "sha256": "1eac340bf9050b4d88efd8e62f9c574ca92f7f81009b66e85d7cfa3d34660889",
+      "size_bytes": 22340
+    },
+    {
+      "path": "experiments/results_thesis/positive_control/detection_curve.csv",
+      "sha256": "fed684602b3a9a04bc64e2bc6a822924de86bba4a3b4ee46b6065f247b0d7793",
+      "size_bytes": 2514
+    },
+    {
+      "path": "experiments/results_thesis/positive_control/positive_control_report.json",
+      "sha256": "04e3a7ac754c2f48b2114666cef258cd978789b2a264001a37a24a41fcc55008",
+      "size_bytes": 77241
+    },
+    {
+      "path": "experiments/results_thesis/positive_control/positive_control_report.md",
+      "sha256": "a0534727d1e04a738ba2faec0878a6e108f6ad8a46e4dbe19989ec267e9c6312",
+      "size_bytes": 10538
+    },
+    {
+      "path": "experiments/results_thesis/positive_control/repetitions.csv",
+      "sha256": "23eb51d8b0c264ee8919ff42916e1365284b6526b520e2f3cd76fc92ded493cf",
+      "size_bytes": 779244
+    }
+  ],
+  "claim_safety": {
+    "descriptive_research_evidence_only": true,
+    "investment_value_established": false,
+    "reliable_predictive_edge_established": false
+  },
+  "confirmatory_family_size": 5,
+  "confirmatory_passed": false,
+  "experiment": "positive_control",
+  "git": {
+    "dirty": true,
+    "sha": "794804e0c13664bf2ccce2cfc99c533586576e21",
+    "short_sha": "794804e0"
+  },
+  "ic_grid": [
+    0.0,
+    0.1,
+    0.2,
+    0.3,
+    0.4
+  ],
+  "implementation_sha256": "44c897568f17618b7db0a42103384f43d24da5fb296bf092b422ef51a495e27d",
+  "permutations": 10000,
+  "repetitions_per_level": 200,
+  "seed": 42,
+  "source_artifacts": [
+    {
+      "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "role": "modeling dataset (read-only; never modified)",
+      "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+      "size_bytes": 256050
+    }
+  ],
+  "stage": "Stage 1 \u2014 raw-layer positive control"
+}

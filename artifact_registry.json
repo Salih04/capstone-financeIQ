@@ -17,6 +17,7 @@
     "experiments/results_forward_2026",
     "experiments/results_missingness",
     "experiments/results_dimensionality",
+    "experiments/results_thesis/positive_control",
     "data/trusted_clean",
     "data/provenance",
     "docs/thesis/baseline"
@@ -51,6 +52,54 @@
   },
   "reproducibility_note": "Regeneration reproduces content in an environment-qualified sense only: byte identity requires matching Python, platform, and numerical-package versions (see METHODOLOGY 'Reproducibility and run provenance'). This registry does not claim universal byte reproducibility.",
   "entries": [
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control/positive_control_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-positive-control",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Machine-readable Stage 1 result: confirmatory gate, post-run gate-informativeness diagnostic, detection curve, identity/substantive checkpoint roles, background diagnostics, and analytic-vs-empirical comparison. Written by experiments/thesis/positive_control.py."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control/positive_control_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-positive-control",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Human-readable rendering of the same Stage 1 result. Passes the shared placebo claim-safety validator before it is written."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control/repetitions.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-positive-control",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "One row per (arm, injection level, repetition): seeds, injected-dataset SHA256, every checkpoint, ratio-to-injected diagnostics, permutation p, and the Bonferroni-adjusted decision."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control/detection_curve.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-positive-control",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "One row per (arm, injection level): detection rate with a fixed-panel-conditional Wilson interval, mean recovered IC, recovery bias, checkpoint populations, and clearly labeled heuristic background diagnostics."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control/attenuation_by_stage.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-positive-control",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Long-form checkpoint table: one row per (arm, injection level, checkpoint) with raw IC, identity/substantive role, theta=0 background IC, heuristic background-adjusted diagnostics, and ratios suppressed for identity checkpoints or background-dominated levels."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control/artifact_manifest.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-positive-control",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "SHA256 manifest emitted by experiments/thesis/provenance.py write_manifest, recording the seed, the git SHA, the implementation hash, and the read-only source dataset."
+    },
     {
       "path_or_glob": "experiments/results/coverage_impact.csv",
       "artifact_class": "generated",
@@ -948,7 +997,8 @@
         "experiments/results_regime/regime_context_report.json",
         "experiments/results_serving_eval/serving_eval_report.json",
         "experiments/results_dimensionality/dimensionality_report.json",
-        "experiments/results_contamination/contamination_report.json"
+        "experiments/results_contamination/contamination_report.json",
+        "experiments/results_thesis/positive_control/positive_control_report.json"
       ],
       "hand_edit_forbidden": true,
       "notes": "Written by scripts/build_limitations_register.py, which holds the reviewed curated seed quotations as source-bound constants (hence the script is a declared input). Resolves only registered JSON paths and globs — never a filesystem scan — and emits every top-level limitations[] entry verbatim. The listed report inputs are the registered JSON artifacts that currently carry a top-level limitations list; a newly registered report carrying one also becomes an input and must be added here."

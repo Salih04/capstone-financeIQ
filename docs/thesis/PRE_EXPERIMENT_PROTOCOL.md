@@ -217,4 +217,116 @@ observed at the time of the change, and how the multiplicity correction was
 updated. An undated or unexplained change to a fixed constant invalidates the
 stage.
 
-*No amendments recorded.*
+### 2026-08-27 — Stage 1 implementation entry
+
+**Status when written:** Stage 1 had not been run. No injected-signal result of
+any kind had been observed. One runtime benchmark of the unmodified pipeline was
+executed while sizing the repetition count; it re-derived the already-committed
+baseline number (ridge pooled walk-forward IC 0.0927, permutation p 0.157, not
+significant) and produced no Stage 1 quantity. Nothing below is chosen from a
+Stage 1 outcome.
+
+**What changed.** Nothing in the *Fixed constants* section. `MDE_base`, the
+injection grid `IC_inject ∈ {0.00, 0.10, 0.20, 0.30, 0.40}`, the equivalence
+margin δ, the primary model (`ridge`), the confirmatory family size (5), and the
+Bonferroni convention are all carried over unedited. This entry adds the
+implementation detail the original Stage 1 text left open, plus two arms that
+make **no confirmatory claim**.
+
+**Why.** Stage 1 as written fixes the levels and the decision rule but not the
+injection site or the mechanism, and a single run per level cannot estimate a
+detection *probability*. Both gaps are filled here, before the run, so the
+choices are visible as a diff rather than as a post-hoc rationalisation.
+
+#### Injection site
+
+Signal is injected into one existing **raw** feature column of
+`data/trusted_clean/modeling_dataset_training_2020_2025.csv`, in that column's
+own units, before `run_experiments.build_panel()` performs feature
+construction. No new variable is created; no target column is touched. The
+injected table is written to a private temporary directory and is never written
+under `data/`.
+
+Carrier columns are fixed by rule, not by outcome:
+
+- **Primary (confirmatory):** the alphabetically first feature column whose
+  observed coverage is 100% in every panel year → **`equity`**. Full coverage
+  makes the intended→realized IC map exact, so the primary arm measures
+  *pipeline* attenuation uncontaminated by carrier missingness.
+- **Secondary (descriptive only):** the alphabetically first feature column
+  whose overall coverage is below 0.60 → **`current_ratio`** (≈0.49 in each
+  test year). This arm exists to quantify the missingness/imputation
+  attenuation channel and carries no confirmatory claim.
+
+#### Injection mechanism
+
+For each feature year `Y`, with `O` the rows whose carrier cell is observed and
+`T ⊆ O` those whose `next_year_return_pct` is also observed:
+
+1. `z = Φ⁻¹(rank(y_T)/(|T|+1))`, rescaled to unit standard deviation — normal
+   scores of the future-return ranking.
+2. `ρ = 2·sin(π·θ/6)` — the Gaussian-copula Spearman identity, the *same*
+   relation already used by `experiments/significance.py::simulate_fisher_power`.
+3. `s = ρ·z + √(1−ρ²)·ε` on `T`, and `s = ε` on `O∖T`, with `ε ~ N(0,1)` iid
+   from a declared seed.
+4. The carrier's own observed values are re-assigned within `Y` in ascending
+   order of `s`.
+
+Step 4 is a within-year permutation of the column's own values, so the within-year
+marginal distribution and the missingness pattern are preserved exactly, the
+target and all other columns are bit-identical, and `θ = 0` reduces to a plain
+random permutation with no forced correlation. The cost, stated rather than
+hidden, is that the carrier's correlations with the other 39 features are
+destroyed; the `θ = 0` rung carries the identical damage, so it is the correct
+background for comparison.
+
+#### Arms
+
+| Arm | Levels | Reps | Confirmatory? | Family |
+|---|---|---|---|---|
+| Primary confirmatory | 5 grid levels | 1 (repetition index 0) | **Yes** | 5 tests, Bonferroni ×5 |
+| Primary descriptive | 5 grid levels | 200 | No | not corrected; no claim |
+| Secondary descriptive (`current_ratio`) | 5 grid levels | 200 | No | not corrected; no claim |
+| Strong-signal sanity | θ = 0.90 only | 200 | No | not corrected; no claim |
+
+- The **confirmatory arm is the preregistered Stage 1 test, unchanged**: one run
+  per level, five tests, Bonferroni across five, and the pass rule stated in the
+  Stage 1 entry above. The gate decision is taken on this arm alone.
+- The **descriptive arms** estimate detection probability, recovery bias, and
+  stage-by-stage attenuation. They make no confirmatory claim, so they add
+  nothing to the confirmatory family and cannot convert a failed gate into a
+  passed one.
+- The **strong-signal sanity arm** at θ = 0.90 is a smoke test with an expected
+  answer, in the same spirit as Stage 3's binary checks. It is **outside the
+  preregistered grid**, is excluded from the power curve, and may not be used to
+  determine the ≥80% detection threshold. The threshold is read off the five
+  preregistered grid levels only, with no interpolation and no added level.
+
+#### Fixed numbers
+
+- Repetitions per level in each descriptive arm: **R = 200**, fixed here.
+- Permutations and bootstrap resamples: **10,000** each — the governed defaults
+  in `experiments/significance.py`, unchanged.
+- Detection at repetition `j` means `min(1, 5·p_j) < 0.05`, i.e. the same
+  Bonferroni-×5 rule as the confirmatory arm.
+- Seeds derive from `provenance.seed_for("positive_control")` = 42 by declared
+  formula; repetition 0's permutation seed is the governed default 42.
+
+No significance threshold, no equivalence margin, and no grid level is altered
+by this entry.
+
+#### POST-RUN chronology note (added 2026-08-27, after the Stage 1 run)
+
+The amendment text above is preserved exactly as it was first written; this note
+does not revise it. It records only how strongly the chronology can be
+evidenced.
+
+File mtimes and the matching implementation/artifact hashes recorded in the run
+provenance (`experiments/results_thesis/positive_control/positive_control_report.json`
+and `artifact_manifest.json`) are consistent with the amendment having been
+written before the run. Temporal pre-registration is **not** cryptographically
+proven in Git history: at the time of the run this repository's history did not
+contain a commit of the amendment predating the run, and no later commit can
+retroactively establish pre-run pre-registration. The chronology claim rests on
+the mtime and hash evidence and is stated at that strength — corroborated, not
+Git-proven.

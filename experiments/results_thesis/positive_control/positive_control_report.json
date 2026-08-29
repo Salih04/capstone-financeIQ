@@ -1,0 +1,2424 @@
+{
+  "analytic_vs_empirical_power": {
+    "primary": [
+      {
+        "analytic_power_at_injected": null,
+        "analytic_power_at_recovered": 0.116886625944,
+        "arm": "primary",
+        "empirical_detection_rate": 0.0,
+        "empirical_detection_rate_ci_95": [
+          0.0,
+          0.018845326377
+        ],
+        "ic_injected": 0.0,
+        "mean_recovered_ic": 0.090871241231,
+        "simulated_power_at_recovered": 0.113
+      },
+      {
+        "analytic_power_at_injected": 0.146681104902,
+        "analytic_power_at_recovered": 0.146994502893,
+        "arm": "primary",
+        "empirical_detection_rate": 0.0,
+        "empirical_detection_rate_ci_95": [
+          0.0,
+          0.018845326377
+        ],
+        "ic_injected": 0.1,
+        "mean_recovered_ic": 0.100088851949,
+        "simulated_power_at_recovered": 0.1442
+      },
+      {
+        "analytic_power_at_injected": 0.693374654794,
+        "analytic_power_at_recovered": 0.313488084276,
+        "arm": "primary",
+        "empirical_detection_rate": 0.17,
+        "empirical_detection_rate_ci_95": [
+          0.124279079126,
+          0.228158836283
+        ],
+        "ic_injected": 0.2,
+        "mean_recovered_ic": 0.136641167329,
+        "simulated_power_at_recovered": 0.306
+      },
+      {
+        "analytic_power_at_injected": 0.983350576473,
+        "analytic_power_at_recovered": 0.577083568223,
+        "arm": "primary",
+        "empirical_detection_rate": 0.615,
+        "empirical_detection_rate_ci_95": [
+          0.545998672202,
+          0.679666902731
+        ],
+        "ic_injected": 0.3,
+        "mean_recovered_ic": 0.180278186933,
+        "simulated_power_at_recovered": 0.5726
+      },
+      {
+        "analytic_power_at_injected": 0.999944016147,
+        "analytic_power_at_recovered": 0.884168879483,
+        "arm": "primary",
+        "empirical_detection_rate": 0.93,
+        "empirical_detection_rate_ci_95": [
+          0.885945191144,
+          0.957847828172
+        ],
+        "ic_injected": 0.4,
+        "mean_recovered_ic": 0.243201367798,
+        "simulated_power_at_recovered": 0.882
+      }
+    ],
+    "sanity": [
+      {
+        "analytic_power_at_injected": 1.0,
+        "analytic_power_at_recovered": 1.0,
+        "arm": "sanity",
+        "empirical_detection_rate": 1.0,
+        "empirical_detection_rate_ci_95": [
+          0.981154673623,
+          1.0
+        ],
+        "ic_injected": 0.9,
+        "mean_recovered_ic": 0.76399636516,
+        "simulated_power_at_recovered": 1.0
+      }
+    ],
+    "secondary": [
+      {
+        "analytic_power_at_injected": null,
+        "analytic_power_at_recovered": 0.130777897857,
+        "arm": "secondary",
+        "empirical_detection_rate": 0.0,
+        "empirical_detection_rate_ci_95": [
+          0.0,
+          0.018845326377
+        ],
+        "ic_injected": 0.0,
+        "mean_recovered_ic": 0.095308622487,
+        "simulated_power_at_recovered": 0.1282
+      },
+      {
+        "analytic_power_at_injected": 0.146681104902,
+        "analytic_power_at_recovered": 0.151557091185,
+        "arm": "secondary",
+        "empirical_detection_rate": 0.005,
+        "empirical_detection_rate_ci_95": [
+          0.000883168716,
+          0.027773704398
+        ],
+        "ic_injected": 0.1,
+        "mean_recovered_ic": 0.101368074339,
+        "simulated_power_at_recovered": 0.1498
+      },
+      {
+        "analytic_power_at_injected": 0.693374654794,
+        "analytic_power_at_recovered": 0.219700065124,
+        "arm": "secondary",
+        "empirical_detection_rate": 0.035,
+        "empirical_detection_rate_ci_95": [
+          0.017055542009,
+          0.070470611522
+        ],
+        "ic_injected": 0.2,
+        "mean_recovered_ic": 0.118049539527,
+        "simulated_power_at_recovered": 0.2154
+      },
+      {
+        "analytic_power_at_injected": 0.983350576473,
+        "analytic_power_at_recovered": 0.335599223719,
+        "arm": "secondary",
+        "empirical_detection_rate": 0.17,
+        "empirical_detection_rate_ci_95": [
+          0.124279079126,
+          0.228158836283
+        ],
+        "ic_injected": 0.3,
+        "mean_recovered_ic": 0.140608820263,
+        "simulated_power_at_recovered": 0.3294
+      },
+      {
+        "analytic_power_at_injected": 0.999944016147,
+        "analytic_power_at_recovered": 0.573526730219,
+        "arm": "secondary",
+        "empirical_detection_rate": 0.6,
+        "empirical_detection_rate_ci_95": [
+          0.530836720393,
+          0.665394214332
+        ],
+        "ic_injected": 0.4,
+        "mean_recovered_ic": 0.17970025323,
+        "simulated_power_at_recovered": 0.5686
+      }
+    ]
+  },
+  "background_ic_theta_zero": 0.090871241231,
+  "checkpoint_definitions": {
+    "ic_final_evaluation": "evaluation identity checkpoint: pooled IC as reported by the governed significance machinery",
+    "ic_injected": "intended injected IC (design constant theta)",
+    "ic_model_input_carrier": "identity/invariant checkpoint: IC of the carrier column as the model actually receives it, after NaN -> 0.5 rank imputation, full cross-section",
+    "ic_model_prediction": "substantive transition: IC of the fitted ridge prediction vector against the realized target",
+    "ic_panel_carrier": "identity/invariant checkpoint: IC of the carrier after build_panel's within-year rank-percentile normalization",
+    "ic_raw_carrier": "identity/invariant checkpoint: realized IC of the carrier column in the raw CSV, observed cells only, before feature construction"
+  },
+  "checkpoint_roles": {
+    "ic_final_evaluation": "evaluation_identity",
+    "ic_injected": "design_constant",
+    "ic_model_input_carrier": "identity_invariant",
+    "ic_model_prediction": "substantive_transition",
+    "ic_panel_carrier": "identity_invariant",
+    "ic_raw_carrier": "identity_invariant"
+  },
+  "claim_safety": {
+    "apparatus_validation_only": true,
+    "descriptive_research_evidence_only": true,
+    "investment_value_established": false,
+    "reliable_predictive_edge_established": false,
+    "statement": "This stage injects a synthetic relationship into one raw column and measures how much of it survives the pipeline. It is apparatus validation on manufactured input, not evidence about BIST equities: recovering an injected quantity says only that the instrument responds to a known input, and the repository's committed walk-forward null is untouched by anything measured here."
+  },
+  "confirmatory": {
+    "adjusted_p_values": [
+      0.763923607639,
+      0.378462153785,
+      0.46495350465,
+      0.115488451155,
+      0.000499950005
+    ],
+    "alpha_family_wise": 0.05,
+    "family_size": 5,
+    "gate_level_rejects": {
+      "0.3": false,
+      "0.4": true
+    },
+    "gate_levels": [
+      0.3,
+      0.4
+    ],
+    "gate_levels_all_reject": false,
+    "levels": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.4
+    ],
+    "monotone_increasing": false,
+    "multiplicity": "Bonferroni across the 5 preregistered injection levels",
+    "passed": false,
+    "recovered_ic": [
+      0.09406142009,
+      0.116002328212,
+      0.109438802294,
+      0.151687843758,
+      0.304713005705
+    ],
+    "rule": "Stage 1 pass requires recovered IC strictly increasing across the five preregistered levels AND both levels above MDE_base rejecting at FWER 0.05."
+  },
+  "design": {
+    "alpha_family_wise": 0.05,
+    "bootstraps": 10000,
+    "carrier_rules": {
+      "primary": "alphabetically first feature column with 100% coverage in every panel year",
+      "secondary": "alphabetically first feature column with overall coverage below 0.60"
+    },
+    "carriers": {
+      "primary": "equity",
+      "secondary": "current_ratio"
+    },
+    "confirmatory_family_size": 5,
+    "descriptive_repetitions": 200,
+    "gate_levels": [
+      0.3,
+      0.4
+    ],
+    "ic_grid": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.4
+    ],
+    "injection_site": "one raw feature column of the modeling CSV, in its own units, before run_experiments.build_panel() performs feature construction",
+    "mde_base": 0.182271,
+    "mechanism": "within-year permutation of the carrier's own observed values into the order of a Gaussian-copula latent score s = rho*z + sqrt(1-rho^2)*eps, where z is the unit-scaled normal score of the future-return ranking and rho = 2*sin(pi*theta/6)",
+    "model": "ridge",
+    "multiplicity": "Bonferroni across the 5 preregistered levels",
+    "n_per_split": 80,
+    "not_preserved": [
+      "the carrier's correlations with the other 39 features, which the permutation destroys; the theta=0 rung carries identical damage and is therefore the correct background for comparison"
+    ],
+    "permutations": 10000,
+    "preserved_exactly": [
+      "carrier within-year marginal distribution (permutation of its own values)",
+      "carrier missingness pattern (null stays null; nothing imputed)",
+      "target column and every non-carrier column, bit-identical",
+      "year structure, ticker structure, row count"
+    ],
+    "seed_formulas": {
+      "injection": "base_seed*1000003 + level_index*10007 + repetition",
+      "permutation": "significance.DEFAULT_SEED + repetition (repetition 0 = governed default)"
+    },
+    "split_count": 3
+  },
+  "detection_curve": {
+    "primary": [
+      {
+        "arm": "primary",
+        "attenuation_suppression_reason": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_model_prediction": null,
+          "ic_panel_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_raw_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted"
+        },
+        "background_adjusted_ic_heuristic": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_ratio_heuristic": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_recovered_ic_heuristic": null,
+        "background_dominated": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_ic": {
+          "ic_final_evaluation": 0.090871241231,
+          "ic_injected": 0.0,
+          "ic_model_input_carrier": 0.000470399552,
+          "ic_model_prediction": 0.090871241231,
+          "ic_panel_carrier": 0.000470399552,
+          "ic_raw_carrier": 0.000470399552
+        },
+        "carrier": "equity",
+        "checkpoint_n_summary": {
+          "ic_final_evaluation": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_injected": {
+            "all_equal": false,
+            "max": null,
+            "min": null,
+            "n": 0,
+            "unique": []
+          },
+          "ic_model_input_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_model_prediction": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_panel_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_raw_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          }
+        },
+        "checkpoint_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.090871241231,
+            "n": 200,
+            "p05": 0.070205207267,
+            "p50": 0.09021317583,
+            "p95": 0.113916082107,
+            "sd": 0.013193450875
+          },
+          "ic_injected": {
+            "mean": 0.0,
+            "n": 200,
+            "p05": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "sd": 0.0
+          },
+          "ic_model_input_carrier": {
+            "mean": 0.000470399552,
+            "n": 200,
+            "p05": -0.103807846388,
+            "p50": -0.001222310634,
+            "p95": 0.11118164659,
+            "sd": 0.067432023258
+          },
+          "ic_model_prediction": {
+            "mean": 0.090871241231,
+            "n": 200,
+            "p05": 0.070205207267,
+            "p50": 0.09021317583,
+            "p95": 0.113916082107,
+            "sd": 0.013193450875
+          },
+          "ic_panel_carrier": {
+            "mean": 0.000470399552,
+            "n": 200,
+            "p05": -0.103807846388,
+            "p50": -0.001222310634,
+            "p95": 0.11118164659,
+            "sd": 0.067432023258
+          },
+          "ic_raw_carrier": {
+            "mean": 0.000470399552,
+            "n": 200,
+            "p05": -0.103807846388,
+            "p50": -0.001222310634,
+            "p95": 0.11118164659,
+            "sd": 0.067432023258
+          }
+        },
+        "detection_rate": 0.0,
+        "detection_rate_ci_95": [
+          0.0,
+          0.018845326377
+        ],
+        "detections": 0,
+        "ic_injected": 0.0,
+        "permutation_p_summary": {
+          "mean": 0.170652434757,
+          "n": 200,
+          "p05": 0.078892110789,
+          "p50": 0.165883411659,
+          "p95": 0.277347265274,
+          "sd": 0.064765483076
+        },
+        "ratio_to_injected_summary": {
+          "ic_final_evaluation": {
+            "mean": null,
+            "n": 0,
+            "p05": null,
+            "p50": null,
+            "p95": null,
+            "sd": null
+          },
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": {
+            "mean": null,
+            "n": 0,
+            "p05": null,
+            "p50": null,
+            "p95": null,
+            "sd": null
+          },
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "recovery_bias": 0.090871241231,
+        "repetitions": 200
+      },
+      {
+        "arm": "primary",
+        "attenuation_suppression_reason": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_model_prediction": null,
+          "ic_panel_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_raw_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted"
+        },
+        "background_adjusted_ic_heuristic": {
+          "ic_final_evaluation": 0.009217610718,
+          "ic_injected": 0.1,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.009217610718,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_ratio_heuristic": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_recovered_ic_heuristic": 0.009217610718,
+        "background_dominated": {
+          "ic_final_evaluation": true,
+          "ic_injected": false,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": true,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_ic": {
+          "ic_final_evaluation": 0.090871241231,
+          "ic_injected": 0.0,
+          "ic_model_input_carrier": 0.000470399552,
+          "ic_model_prediction": 0.090871241231,
+          "ic_panel_carrier": 0.000470399552,
+          "ic_raw_carrier": 0.000470399552
+        },
+        "carrier": "equity",
+        "checkpoint_n_summary": {
+          "ic_final_evaluation": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_injected": {
+            "all_equal": false,
+            "max": null,
+            "min": null,
+            "n": 0,
+            "unique": []
+          },
+          "ic_model_input_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_model_prediction": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_panel_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_raw_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          }
+        },
+        "checkpoint_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.100088851949,
+            "n": 200,
+            "p05": 0.074612509698,
+            "p50": 0.096725787914,
+            "p95": 0.139827112105,
+            "sd": 0.019251483571
+          },
+          "ic_injected": {
+            "mean": 0.1,
+            "n": 200,
+            "p05": 0.1,
+            "p50": 0.1,
+            "p95": 0.1,
+            "sd": 0.0
+          },
+          "ic_model_input_carrier": {
+            "mean": 0.101985172708,
+            "n": 200,
+            "p05": 0.004155928815,
+            "p50": 0.103911095088,
+            "p95": 0.206176469928,
+            "sd": 0.062025872369
+          },
+          "ic_model_prediction": {
+            "mean": 0.100088851949,
+            "n": 200,
+            "p05": 0.074612509698,
+            "p50": 0.096725787914,
+            "p95": 0.139827112105,
+            "sd": 0.019251483571
+          },
+          "ic_panel_carrier": {
+            "mean": 0.101985172708,
+            "n": 200,
+            "p05": 0.004155928815,
+            "p50": 0.103911095088,
+            "p95": 0.206176469928,
+            "sd": 0.062025872369
+          },
+          "ic_raw_carrier": {
+            "mean": 0.101985172708,
+            "n": 200,
+            "p05": 0.004155928815,
+            "p50": 0.103911095088,
+            "p95": 0.206176469928,
+            "sd": 0.062025872369
+          }
+        },
+        "detection_rate": 0.0,
+        "detection_rate_ci_95": [
+          0.0,
+          0.018845326377
+        ],
+        "detections": 0,
+        "ic_injected": 0.1,
+        "permutation_p_summary": {
+          "mean": 0.138134686531,
+          "n": 200,
+          "p05": 0.031061893811,
+          "p50": 0.135836416359,
+          "p95": 0.251909809019,
+          "sd": 0.068844457109
+        },
+        "ratio_to_injected_summary": {
+          "ic_final_evaluation": {
+            "mean": 1.000888519485,
+            "n": 200,
+            "p05": 0.746125096982,
+            "p50": 0.967257879145,
+            "p95": 1.398271121042,
+            "sd": 0.192514835712
+          },
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": {
+            "mean": 1.000888519485,
+            "n": 200,
+            "p05": 0.746125096982,
+            "p50": 0.967257879145,
+            "p95": 1.398271121042,
+            "sd": 0.192514835712
+          },
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "recovery_bias": 8.8851949e-05,
+        "repetitions": 200
+      },
+      {
+        "arm": "primary",
+        "attenuation_suppression_reason": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_model_prediction": null,
+          "ic_panel_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_raw_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted"
+        },
+        "background_adjusted_ic_heuristic": {
+          "ic_final_evaluation": 0.045769926098,
+          "ic_injected": 0.2,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.045769926098,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_ratio_heuristic": {
+          "ic_final_evaluation": 0.22884963049,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.22884963049,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_recovered_ic_heuristic": 0.045769926098,
+        "background_dominated": {
+          "ic_final_evaluation": false,
+          "ic_injected": false,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": false,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_ic": {
+          "ic_final_evaluation": 0.090871241231,
+          "ic_injected": 0.0,
+          "ic_model_input_carrier": 0.000470399552,
+          "ic_model_prediction": 0.090871241231,
+          "ic_panel_carrier": 0.000470399552,
+          "ic_raw_carrier": 0.000470399552
+        },
+        "carrier": "equity",
+        "checkpoint_n_summary": {
+          "ic_final_evaluation": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_injected": {
+            "all_equal": false,
+            "max": null,
+            "min": null,
+            "n": 0,
+            "unique": []
+          },
+          "ic_model_input_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_model_prediction": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_panel_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_raw_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          }
+        },
+        "checkpoint_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.136641167329,
+            "n": 200,
+            "p05": 0.09285687684,
+            "p50": 0.135302331377,
+            "p95": 0.194102890669,
+            "sd": 0.03132296936
+          },
+          "ic_injected": {
+            "mean": 0.2,
+            "n": 200,
+            "p05": 0.2,
+            "p50": 0.2,
+            "p95": 0.2,
+            "sd": 0.0
+          },
+          "ic_model_input_carrier": {
+            "mean": 0.210672521451,
+            "n": 200,
+            "p05": 0.119652274382,
+            "p50": 0.215488010231,
+            "p95": 0.2961953599,
+            "sd": 0.05755676175
+          },
+          "ic_model_prediction": {
+            "mean": 0.136641167329,
+            "n": 200,
+            "p05": 0.09285687684,
+            "p50": 0.135302331377,
+            "p95": 0.194102890669,
+            "sd": 0.03132296936
+          },
+          "ic_panel_carrier": {
+            "mean": 0.210672521451,
+            "n": 200,
+            "p05": 0.119652274382,
+            "p50": 0.215488010231,
+            "p95": 0.2961953599,
+            "sd": 0.05755676175
+          },
+          "ic_raw_carrier": {
+            "mean": 0.210672521451,
+            "n": 200,
+            "p05": 0.119652274382,
+            "p50": 0.215488010231,
+            "p95": 0.2961953599,
+            "sd": 0.05755676175
+          }
+        },
+        "detection_rate": 0.17,
+        "detection_rate_ci_95": [
+          0.124279079126,
+          0.228158836283
+        ],
+        "detections": 34,
+        "ic_injected": 0.2,
+        "permutation_p_summary": {
+          "mean": 0.056070892911,
+          "n": 200,
+          "p05": 0.002589741026,
+          "p50": 0.037796220378,
+          "p95": 0.157784221578,
+          "sd": 0.053539655493
+        },
+        "ratio_to_injected_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.683205836645,
+            "n": 200,
+            "p05": 0.4642843842,
+            "p50": 0.676511656885,
+            "p95": 0.970514453347,
+            "sd": 0.156614846801
+          },
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": {
+            "mean": 0.683205836645,
+            "n": 200,
+            "p05": 0.4642843842,
+            "p50": 0.676511656885,
+            "p95": 0.970514453347,
+            "sd": 0.156614846801
+          },
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "recovery_bias": -0.063358832671,
+        "repetitions": 200
+      },
+      {
+        "arm": "primary",
+        "attenuation_suppression_reason": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_model_prediction": null,
+          "ic_panel_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_raw_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted"
+        },
+        "background_adjusted_ic_heuristic": {
+          "ic_final_evaluation": 0.089406945702,
+          "ic_injected": 0.3,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.089406945702,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_ratio_heuristic": {
+          "ic_final_evaluation": 0.29802315234,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.29802315234,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_recovered_ic_heuristic": 0.089406945702,
+        "background_dominated": {
+          "ic_final_evaluation": false,
+          "ic_injected": false,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": false,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_ic": {
+          "ic_final_evaluation": 0.090871241231,
+          "ic_injected": 0.0,
+          "ic_model_input_carrier": 0.000470399552,
+          "ic_model_prediction": 0.090871241231,
+          "ic_panel_carrier": 0.000470399552,
+          "ic_raw_carrier": 0.000470399552
+        },
+        "carrier": "equity",
+        "checkpoint_n_summary": {
+          "ic_final_evaluation": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_injected": {
+            "all_equal": false,
+            "max": null,
+            "min": null,
+            "n": 0,
+            "unique": []
+          },
+          "ic_model_input_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_model_prediction": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_panel_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_raw_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          }
+        },
+        "checkpoint_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.180278186933,
+            "n": 200,
+            "p05": 0.12551028544,
+            "p50": 0.179735902489,
+            "p95": 0.244476984315,
+            "sd": 0.037454383559
+          },
+          "ic_injected": {
+            "mean": 0.3,
+            "n": 200,
+            "p05": 0.3,
+            "p50": 0.3,
+            "p95": 0.3,
+            "sd": 0.0
+          },
+          "ic_model_input_carrier": {
+            "mean": 0.300351960259,
+            "n": 200,
+            "p05": 0.216646861146,
+            "p50": 0.296623032178,
+            "p95": 0.388255532776,
+            "sd": 0.055117318821
+          },
+          "ic_model_prediction": {
+            "mean": 0.180278186933,
+            "n": 200,
+            "p05": 0.12551028544,
+            "p50": 0.179735902489,
+            "p95": 0.244476984315,
+            "sd": 0.037454383559
+          },
+          "ic_panel_carrier": {
+            "mean": 0.300351960259,
+            "n": 200,
+            "p05": 0.216646861146,
+            "p50": 0.296623032178,
+            "p95": 0.388255532776,
+            "sd": 0.055117318821
+          },
+          "ic_raw_carrier": {
+            "mean": 0.300351960259,
+            "n": 200,
+            "p05": 0.216646861146,
+            "p50": 0.296623032178,
+            "p95": 0.388255532776,
+            "sd": 0.055117318821
+          }
+        },
+        "detection_rate": 0.615,
+        "detection_rate_ci_95": [
+          0.545998672202,
+          0.679666902731
+        ],
+        "detections": 123,
+        "ic_injected": 0.3,
+        "permutation_p_summary": {
+          "mean": 0.014625037496,
+          "n": 200,
+          "p05": 0.000199980002,
+          "p50": 0.005699430057,
+          "p95": 0.052164783522,
+          "sd": 0.021772155278
+        },
+        "ratio_to_injected_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.600927289776,
+            "n": 200,
+            "p05": 0.41836761813,
+            "p50": 0.599119674963,
+            "p95": 0.814923281048,
+            "sd": 0.124847945197
+          },
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": {
+            "mean": 0.600927289776,
+            "n": 200,
+            "p05": 0.41836761813,
+            "p50": 0.599119674963,
+            "p95": 0.814923281048,
+            "sd": 0.124847945197
+          },
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "recovery_bias": -0.119721813067,
+        "repetitions": 200
+      },
+      {
+        "arm": "primary",
+        "attenuation_suppression_reason": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_model_prediction": null,
+          "ic_panel_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_raw_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted"
+        },
+        "background_adjusted_ic_heuristic": {
+          "ic_final_evaluation": 0.152330126567,
+          "ic_injected": 0.4,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.152330126567,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_ratio_heuristic": {
+          "ic_final_evaluation": 0.380825316418,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.380825316418,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_recovered_ic_heuristic": 0.152330126567,
+        "background_dominated": {
+          "ic_final_evaluation": false,
+          "ic_injected": false,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": false,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_ic": {
+          "ic_final_evaluation": 0.090871241231,
+          "ic_injected": 0.0,
+          "ic_model_input_carrier": 0.000470399552,
+          "ic_model_prediction": 0.090871241231,
+          "ic_panel_carrier": 0.000470399552,
+          "ic_raw_carrier": 0.000470399552
+        },
+        "carrier": "equity",
+        "checkpoint_n_summary": {
+          "ic_final_evaluation": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_injected": {
+            "all_equal": false,
+            "max": null,
+            "min": null,
+            "n": 0,
+            "unique": []
+          },
+          "ic_model_input_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_model_prediction": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_panel_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_raw_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          }
+        },
+        "checkpoint_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.243201367798,
+            "n": 200,
+            "p05": 0.160850913802,
+            "p50": 0.243409837123,
+            "p95": 0.321447310201,
+            "sd": 0.048583160296
+          },
+          "ic_injected": {
+            "mean": 0.4,
+            "n": 200,
+            "p05": 0.4,
+            "p50": 0.4,
+            "p95": 0.4,
+            "sd": 0.0
+          },
+          "ic_model_input_carrier": {
+            "mean": 0.393879206336,
+            "n": 200,
+            "p05": 0.300825616875,
+            "p50": 0.390427581997,
+            "p95": 0.480241144792,
+            "sd": 0.054266505321
+          },
+          "ic_model_prediction": {
+            "mean": 0.243201367798,
+            "n": 200,
+            "p05": 0.160850913802,
+            "p50": 0.243409837123,
+            "p95": 0.321447310201,
+            "sd": 0.048583160296
+          },
+          "ic_panel_carrier": {
+            "mean": 0.393879206336,
+            "n": 200,
+            "p05": 0.300825616875,
+            "p50": 0.390427581997,
+            "p95": 0.480241144792,
+            "sd": 0.054266505321
+          },
+          "ic_raw_carrier": {
+            "mean": 0.393879206336,
+            "n": 200,
+            "p05": 0.300825616875,
+            "p50": 0.390427581997,
+            "p95": 0.480241144792,
+            "sd": 0.054266505321
+          }
+        },
+        "detection_rate": 0.93,
+        "detection_rate_ci_95": [
+          0.885945191144,
+          0.957847828172
+        ],
+        "detections": 186,
+        "ic_injected": 0.4,
+        "permutation_p_summary": {
+          "mean": 0.00298320168,
+          "n": 200,
+          "p05": 9.9990001e-05,
+          "p50": 0.000199980002,
+          "p95": 0.014153584642,
+          "sd": 0.01214059782
+        },
+        "ratio_to_injected_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.608003419495,
+            "n": 200,
+            "p05": 0.402127284506,
+            "p50": 0.608524592806,
+            "p95": 0.803618275505,
+            "sd": 0.12145790074
+          },
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": {
+            "mean": 0.608003419495,
+            "n": 200,
+            "p05": 0.402127284506,
+            "p50": 0.608524592806,
+            "p95": 0.803618275505,
+            "sd": 0.12145790074
+          },
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "recovery_bias": -0.156798632202,
+        "repetitions": 200
+      }
+    ],
+    "sanity": [
+      {
+        "arm": "sanity",
+        "attenuation_suppression_reason": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_model_prediction": null,
+          "ic_panel_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_raw_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted"
+        },
+        "background_adjusted_ic_heuristic": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_ratio_heuristic": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_recovered_ic_heuristic": null,
+        "background_dominated": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_ic": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "carrier": "equity",
+        "checkpoint_n_summary": {
+          "ic_final_evaluation": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_injected": {
+            "all_equal": false,
+            "max": null,
+            "min": null,
+            "n": 0,
+            "unique": []
+          },
+          "ic_model_input_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_model_prediction": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_panel_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_raw_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          }
+        },
+        "checkpoint_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.76399636516,
+            "n": 200,
+            "p05": 0.736549168465,
+            "p50": 0.764339193101,
+            "p95": 0.789097445408,
+            "sd": 0.016663222797
+          },
+          "ic_injected": {
+            "mean": 0.9,
+            "n": 200,
+            "p05": 0.9,
+            "p50": 0.9,
+            "p95": 0.9,
+            "sd": 0.0
+          },
+          "ic_model_input_carrier": {
+            "mean": 0.904583602843,
+            "n": 200,
+            "p05": 0.886598399894,
+            "p50": 0.905300968351,
+            "p95": 0.920641727534,
+            "sd": 0.010812547688
+          },
+          "ic_model_prediction": {
+            "mean": 0.76399636516,
+            "n": 200,
+            "p05": 0.736549168465,
+            "p50": 0.764339193101,
+            "p95": 0.789097445408,
+            "sd": 0.016663222797
+          },
+          "ic_panel_carrier": {
+            "mean": 0.904583602843,
+            "n": 200,
+            "p05": 0.886598399894,
+            "p50": 0.905300968351,
+            "p95": 0.920641727534,
+            "sd": 0.010812547688
+          },
+          "ic_raw_carrier": {
+            "mean": 0.904583602843,
+            "n": 200,
+            "p05": 0.886598399894,
+            "p50": 0.905300968351,
+            "p95": 0.920641727534,
+            "sd": 0.010812547688
+          }
+        },
+        "detection_rate": 1.0,
+        "detection_rate_ci_95": [
+          0.981154673623,
+          1.0
+        ],
+        "detections": 200,
+        "ic_injected": 0.9,
+        "permutation_p_summary": {
+          "mean": 9.9990001e-05,
+          "n": 200,
+          "p05": 9.9990001e-05,
+          "p50": 9.9990001e-05,
+          "p95": 9.9990001e-05,
+          "sd": 0.0
+        },
+        "ratio_to_injected_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.848884850178,
+            "n": 200,
+            "p05": 0.818387964961,
+            "p50": 0.849265770113,
+            "p95": 0.876774939342,
+            "sd": 0.018514691997
+          },
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": {
+            "mean": 0.848884850178,
+            "n": 200,
+            "p05": 0.818387964961,
+            "p50": 0.849265770113,
+            "p95": 0.876774939342,
+            "sd": 0.018514691997
+          },
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "recovery_bias": -0.13600363484,
+        "repetitions": 200
+      }
+    ],
+    "secondary": [
+      {
+        "arm": "secondary",
+        "attenuation_suppression_reason": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_model_prediction": null,
+          "ic_panel_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_raw_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted"
+        },
+        "background_adjusted_ic_heuristic": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_ratio_heuristic": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_recovered_ic_heuristic": null,
+        "background_dominated": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_ic": {
+          "ic_final_evaluation": 0.095308622487,
+          "ic_injected": 0.0,
+          "ic_model_input_carrier": -0.000921770981,
+          "ic_model_prediction": 0.095308622487,
+          "ic_panel_carrier": -0.003695375136,
+          "ic_raw_carrier": -0.003695375136
+        },
+        "carrier": "current_ratio",
+        "checkpoint_n_summary": {
+          "ic_final_evaluation": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_injected": {
+            "all_equal": false,
+            "max": null,
+            "min": null,
+            "n": 0,
+            "unique": []
+          },
+          "ic_model_input_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_model_prediction": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_panel_carrier": {
+            "all_equal": true,
+            "max": 120,
+            "min": 120,
+            "n": 200,
+            "unique": [
+              120
+            ]
+          },
+          "ic_raw_carrier": {
+            "all_equal": true,
+            "max": 120,
+            "min": 120,
+            "n": 200,
+            "unique": [
+              120
+            ]
+          }
+        },
+        "checkpoint_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.095308622487,
+            "n": 200,
+            "p05": 0.077235973426,
+            "p50": 0.095467914213,
+            "p95": 0.111792150127,
+            "sd": 0.011272258628
+          },
+          "ic_injected": {
+            "mean": 0.0,
+            "n": 200,
+            "p05": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "sd": 0.0
+          },
+          "ic_model_input_carrier": {
+            "mean": -0.000921770981,
+            "n": 200,
+            "p05": -0.108715515133,
+            "p50": 0.002973170253,
+            "p95": 0.106533410769,
+            "sd": 0.064282075822
+          },
+          "ic_model_prediction": {
+            "mean": 0.095308622487,
+            "n": 200,
+            "p05": 0.077235973426,
+            "p50": 0.095467914213,
+            "p95": 0.111792150127,
+            "sd": 0.011272258628
+          },
+          "ic_panel_carrier": {
+            "mean": -0.003695375136,
+            "n": 200,
+            "p05": -0.149710195092,
+            "p50": -0.000737315231,
+            "p95": 0.144614337672,
+            "sd": 0.087918017071
+          },
+          "ic_raw_carrier": {
+            "mean": -0.003695375136,
+            "n": 200,
+            "p05": -0.149710195092,
+            "p50": -0.000737315231,
+            "p95": 0.144614337672,
+            "sd": 0.087918017071
+          }
+        },
+        "detection_rate": 0.0,
+        "detection_rate_ci_95": [
+          0.0,
+          0.018845326377
+        ],
+        "detections": 0,
+        "ic_injected": 0.0,
+        "permutation_p_summary": {
+          "mean": 0.148135686432,
+          "n": 200,
+          "p05": 0.084901509849,
+          "p50": 0.141585841416,
+          "p95": 0.230821917808,
+          "sd": 0.049606106599
+        },
+        "ratio_to_injected_summary": {
+          "ic_final_evaluation": {
+            "mean": null,
+            "n": 0,
+            "p05": null,
+            "p50": null,
+            "p95": null,
+            "sd": null
+          },
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": {
+            "mean": null,
+            "n": 0,
+            "p05": null,
+            "p50": null,
+            "p95": null,
+            "sd": null
+          },
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "recovery_bias": 0.095308622487,
+        "repetitions": 200
+      },
+      {
+        "arm": "secondary",
+        "attenuation_suppression_reason": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_model_prediction": null,
+          "ic_panel_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_raw_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted"
+        },
+        "background_adjusted_ic_heuristic": {
+          "ic_final_evaluation": 0.006059451852,
+          "ic_injected": 0.1,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.006059451852,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_ratio_heuristic": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": null,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_recovered_ic_heuristic": 0.006059451852,
+        "background_dominated": {
+          "ic_final_evaluation": true,
+          "ic_injected": false,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": true,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_ic": {
+          "ic_final_evaluation": 0.095308622487,
+          "ic_injected": 0.0,
+          "ic_model_input_carrier": -0.000921770981,
+          "ic_model_prediction": 0.095308622487,
+          "ic_panel_carrier": -0.003695375136,
+          "ic_raw_carrier": -0.003695375136
+        },
+        "carrier": "current_ratio",
+        "checkpoint_n_summary": {
+          "ic_final_evaluation": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_injected": {
+            "all_equal": false,
+            "max": null,
+            "min": null,
+            "n": 0,
+            "unique": []
+          },
+          "ic_model_input_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_model_prediction": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_panel_carrier": {
+            "all_equal": true,
+            "max": 120,
+            "min": 120,
+            "n": 200,
+            "unique": [
+              120
+            ]
+          },
+          "ic_raw_carrier": {
+            "all_equal": true,
+            "max": 120,
+            "min": 120,
+            "n": 200,
+            "unique": [
+              120
+            ]
+          }
+        },
+        "checkpoint_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.101368074339,
+            "n": 200,
+            "p05": 0.080549097039,
+            "p50": 0.099457024611,
+            "p95": 0.128953770023,
+            "sd": 0.015718433333
+          },
+          "ic_injected": {
+            "mean": 0.1,
+            "n": 200,
+            "p05": 0.1,
+            "p50": 0.1,
+            "p95": 0.1,
+            "sd": 0.0
+          },
+          "ic_model_input_carrier": {
+            "mean": 0.067779573496,
+            "n": 200,
+            "p05": -0.033277948794,
+            "p50": 0.068771175361,
+            "p95": 0.168012206755,
+            "sd": 0.063528520681
+          },
+          "ic_model_prediction": {
+            "mean": 0.101368074339,
+            "n": 200,
+            "p05": 0.080549097039,
+            "p50": 0.099457024611,
+            "p95": 0.128953770023,
+            "sd": 0.015718433333
+          },
+          "ic_panel_carrier": {
+            "mean": 0.105410873126,
+            "n": 200,
+            "p05": -0.032868307585,
+            "p50": 0.106582643228,
+            "p95": 0.245591022103,
+            "sd": 0.087165779273
+          },
+          "ic_raw_carrier": {
+            "mean": 0.105410873126,
+            "n": 200,
+            "p05": -0.032868307585,
+            "p50": 0.106582643228,
+            "p95": 0.245591022103,
+            "sd": 0.087165779273
+          }
+        },
+        "detection_rate": 0.005,
+        "detection_rate_ci_95": [
+          0.000883168716,
+          0.027773704398
+        ],
+        "detections": 1,
+        "ic_injected": 0.1,
+        "permutation_p_summary": {
+          "mean": 0.128243675633,
+          "n": 200,
+          "p05": 0.04902009799,
+          "p50": 0.12603739626,
+          "p95": 0.213728627137,
+          "sd": 0.053615600719
+        },
+        "ratio_to_injected_summary": {
+          "ic_final_evaluation": {
+            "mean": 1.013680743387,
+            "n": 200,
+            "p05": 0.80549097039,
+            "p50": 0.994570246111,
+            "p95": 1.289537700233,
+            "sd": 0.15718433333
+          },
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": {
+            "mean": 1.013680743387,
+            "n": 200,
+            "p05": 0.80549097039,
+            "p50": 0.994570246111,
+            "p95": 1.289537700233,
+            "sd": 0.15718433333
+          },
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "recovery_bias": 0.001368074339,
+        "repetitions": 200
+      },
+      {
+        "arm": "secondary",
+        "attenuation_suppression_reason": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_model_prediction": null,
+          "ic_panel_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_raw_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted"
+        },
+        "background_adjusted_ic_heuristic": {
+          "ic_final_evaluation": 0.02274091704,
+          "ic_injected": 0.2,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.02274091704,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_ratio_heuristic": {
+          "ic_final_evaluation": 0.1137045852,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.1137045852,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_recovered_ic_heuristic": 0.02274091704,
+        "background_dominated": {
+          "ic_final_evaluation": false,
+          "ic_injected": false,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": false,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_ic": {
+          "ic_final_evaluation": 0.095308622487,
+          "ic_injected": 0.0,
+          "ic_model_input_carrier": -0.000921770981,
+          "ic_model_prediction": 0.095308622487,
+          "ic_panel_carrier": -0.003695375136,
+          "ic_raw_carrier": -0.003695375136
+        },
+        "carrier": "current_ratio",
+        "checkpoint_n_summary": {
+          "ic_final_evaluation": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_injected": {
+            "all_equal": false,
+            "max": null,
+            "min": null,
+            "n": 0,
+            "unique": []
+          },
+          "ic_model_input_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_model_prediction": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_panel_carrier": {
+            "all_equal": true,
+            "max": 120,
+            "min": 120,
+            "n": 200,
+            "unique": [
+              120
+            ]
+          },
+          "ic_raw_carrier": {
+            "all_equal": true,
+            "max": 120,
+            "min": 120,
+            "n": 200,
+            "unique": [
+              120
+            ]
+          }
+        },
+        "checkpoint_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.118049539527,
+            "n": 200,
+            "p05": 0.084178237095,
+            "p50": 0.114904573145,
+            "p95": 0.157395202059,
+            "sd": 0.022788931823
+          },
+          "ic_injected": {
+            "mean": 0.2,
+            "n": 200,
+            "p05": 0.2,
+            "p50": 0.2,
+            "p95": 0.2,
+            "sd": 0.0
+          },
+          "ic_model_input_carrier": {
+            "mean": 0.13041902153,
+            "n": 200,
+            "p05": 0.034173720783,
+            "p50": 0.127293204964,
+            "p95": 0.232855343099,
+            "sd": 0.064016151458
+          },
+          "ic_model_prediction": {
+            "mean": 0.118049539527,
+            "n": 200,
+            "p05": 0.084178237095,
+            "p50": 0.114904573145,
+            "p95": 0.157395202059,
+            "sd": 0.022788931823
+          },
+          "ic_panel_carrier": {
+            "mean": 0.197911084164,
+            "n": 200,
+            "p05": 0.051404812166,
+            "p50": 0.202032581747,
+            "p95": 0.336941760382,
+            "sd": 0.086775269854
+          },
+          "ic_raw_carrier": {
+            "mean": 0.197911084164,
+            "n": 200,
+            "p05": 0.051404812166,
+            "p50": 0.202032581747,
+            "p95": 0.336941760382,
+            "sd": 0.086775269854
+          }
+        },
+        "detection_rate": 0.035,
+        "detection_rate_ci_95": [
+          0.017055542009,
+          0.070470611522
+        ],
+        "detections": 7,
+        "ic_injected": 0.2,
+        "permutation_p_summary": {
+          "mean": 0.084701529847,
+          "n": 200,
+          "p05": 0.013673632637,
+          "p50": 0.076642335766,
+          "p95": 0.194620537946,
+          "sd": 0.054912829977
+        },
+        "ratio_to_injected_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.590247697633,
+            "n": 200,
+            "p05": 0.420891185475,
+            "p50": 0.574522865722,
+            "p95": 0.786976010298,
+            "sd": 0.113944659115
+          },
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": {
+            "mean": 0.590247697633,
+            "n": 200,
+            "p05": 0.420891185475,
+            "p50": 0.574522865722,
+            "p95": 0.786976010298,
+            "sd": 0.113944659115
+          },
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "recovery_bias": -0.081950460473,
+        "repetitions": 200
+      },
+      {
+        "arm": "secondary",
+        "attenuation_suppression_reason": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_model_prediction": null,
+          "ic_panel_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_raw_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted"
+        },
+        "background_adjusted_ic_heuristic": {
+          "ic_final_evaluation": 0.045300197776,
+          "ic_injected": 0.3,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.045300197776,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_ratio_heuristic": {
+          "ic_final_evaluation": 0.151000659253,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.151000659253,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_recovered_ic_heuristic": 0.045300197776,
+        "background_dominated": {
+          "ic_final_evaluation": false,
+          "ic_injected": false,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": false,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_ic": {
+          "ic_final_evaluation": 0.095308622487,
+          "ic_injected": 0.0,
+          "ic_model_input_carrier": -0.000921770981,
+          "ic_model_prediction": 0.095308622487,
+          "ic_panel_carrier": -0.003695375136,
+          "ic_raw_carrier": -0.003695375136
+        },
+        "carrier": "current_ratio",
+        "checkpoint_n_summary": {
+          "ic_final_evaluation": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_injected": {
+            "all_equal": false,
+            "max": null,
+            "min": null,
+            "n": 0,
+            "unique": []
+          },
+          "ic_model_input_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_model_prediction": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_panel_carrier": {
+            "all_equal": true,
+            "max": 120,
+            "min": 120,
+            "n": 200,
+            "unique": [
+              120
+            ]
+          },
+          "ic_raw_carrier": {
+            "all_equal": true,
+            "max": 120,
+            "min": 120,
+            "n": 200,
+            "unique": [
+              120
+            ]
+          }
+        },
+        "checkpoint_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.140608820263,
+            "n": 200,
+            "p05": 0.099411548026,
+            "p50": 0.138033471268,
+            "p95": 0.188737108164,
+            "sd": 0.029558000958
+          },
+          "ic_injected": {
+            "mean": 0.3,
+            "n": 200,
+            "p05": 0.3,
+            "p50": 0.3,
+            "p95": 0.3,
+            "sd": 0.0
+          },
+          "ic_model_input_carrier": {
+            "mean": 0.205348505018,
+            "n": 200,
+            "p05": 0.110774450112,
+            "p50": 0.206883680865,
+            "p95": 0.304879698144,
+            "sd": 0.058900393111
+          },
+          "ic_model_prediction": {
+            "mean": 0.140608820263,
+            "n": 200,
+            "p05": 0.099411548026,
+            "p50": 0.138033471268,
+            "p95": 0.188737108164,
+            "sd": 0.029558000958
+          },
+          "ic_panel_carrier": {
+            "mean": 0.308008502637,
+            "n": 200,
+            "p05": 0.186742717213,
+            "p50": 0.310023467813,
+            "p95": 0.43229479251,
+            "sd": 0.077868860913
+          },
+          "ic_raw_carrier": {
+            "mean": 0.308008502637,
+            "n": 200,
+            "p05": 0.186742717213,
+            "p50": 0.310023467813,
+            "p95": 0.43229479251,
+            "sd": 0.077868860913
+          }
+        },
+        "detection_rate": 0.17,
+        "detection_rate_ci_95": [
+          0.124279079126,
+          0.228158836283
+        ],
+        "detections": 34,
+        "ic_injected": 0.3,
+        "permutation_p_summary": {
+          "mean": 0.046374362564,
+          "n": 200,
+          "p05": 0.00298970103,
+          "p50": 0.033546645336,
+          "p95": 0.12194280572,
+          "sd": 0.041267800957
+        },
+        "ratio_to_injected_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.468696067544,
+            "n": 200,
+            "p05": 0.331371826755,
+            "p50": 0.460111570896,
+            "p95": 0.629123693881,
+            "sd": 0.098526669859
+          },
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": {
+            "mean": 0.468696067544,
+            "n": 200,
+            "p05": 0.331371826755,
+            "p50": 0.460111570896,
+            "p95": 0.629123693881,
+            "sd": 0.098526669859
+          },
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "recovery_bias": -0.159391179737,
+        "repetitions": 200
+      },
+      {
+        "arm": "secondary",
+        "attenuation_suppression_reason": {
+          "ic_final_evaluation": null,
+          "ic_injected": null,
+          "ic_model_input_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_model_prediction": null,
+          "ic_panel_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted",
+          "ic_raw_carrier": "identity/invariant checkpoint \u2014 attenuation ratio not interpreted"
+        },
+        "background_adjusted_ic_heuristic": {
+          "ic_final_evaluation": 0.084391630743,
+          "ic_injected": 0.4,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.084391630743,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_ratio_heuristic": {
+          "ic_final_evaluation": 0.210979076857,
+          "ic_injected": null,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": 0.210979076857,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_adjusted_recovered_ic_heuristic": 0.084391630743,
+        "background_dominated": {
+          "ic_final_evaluation": false,
+          "ic_injected": false,
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": false,
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "background_ic": {
+          "ic_final_evaluation": 0.095308622487,
+          "ic_injected": 0.0,
+          "ic_model_input_carrier": -0.000921770981,
+          "ic_model_prediction": 0.095308622487,
+          "ic_panel_carrier": -0.003695375136,
+          "ic_raw_carrier": -0.003695375136
+        },
+        "carrier": "current_ratio",
+        "checkpoint_n_summary": {
+          "ic_final_evaluation": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_injected": {
+            "all_equal": false,
+            "max": null,
+            "min": null,
+            "n": 0,
+            "unique": []
+          },
+          "ic_model_input_carrier": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_model_prediction": {
+            "all_equal": true,
+            "max": 240,
+            "min": 240,
+            "n": 200,
+            "unique": [
+              240
+            ]
+          },
+          "ic_panel_carrier": {
+            "all_equal": true,
+            "max": 120,
+            "min": 120,
+            "n": 200,
+            "unique": [
+              120
+            ]
+          },
+          "ic_raw_carrier": {
+            "all_equal": true,
+            "max": 120,
+            "min": 120,
+            "n": 200,
+            "unique": [
+              120
+            ]
+          }
+        },
+        "checkpoint_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.17970025323,
+            "n": 200,
+            "p05": 0.126609600677,
+            "p50": 0.177789596263,
+            "p95": 0.237701509568,
+            "sd": 0.036672733008
+          },
+          "ic_injected": {
+            "mean": 0.4,
+            "n": 200,
+            "p05": 0.4,
+            "p50": 0.4,
+            "p95": 0.4,
+            "sd": 0.0
+          },
+          "ic_model_input_carrier": {
+            "mean": 0.263803893684,
+            "n": 200,
+            "p05": 0.154431534829,
+            "p50": 0.265934070742,
+            "p95": 0.363636184463,
+            "sd": 0.060127707334
+          },
+          "ic_model_prediction": {
+            "mean": 0.17970025323,
+            "n": 200,
+            "p05": 0.126609600677,
+            "p50": 0.177789596263,
+            "p95": 0.237701509568,
+            "sd": 0.036672733008
+          },
+          "ic_panel_carrier": {
+            "mean": 0.401865041854,
+            "n": 200,
+            "p05": 0.281002526699,
+            "p50": 0.408743697791,
+            "p95": 0.533206248528,
+            "sd": 0.077038793004
+          },
+          "ic_raw_carrier": {
+            "mean": 0.401865041854,
+            "n": 200,
+            "p05": 0.281002526699,
+            "p50": 0.408743697791,
+            "p95": 0.533206248528,
+            "sd": 0.077038793004
+          }
+        },
+        "detection_rate": 0.6,
+        "detection_rate_ci_95": [
+          0.530836720393,
+          0.665394214332
+        ],
+        "detections": 120,
+        "ic_injected": 0.4,
+        "permutation_p_summary": {
+          "mean": 0.014348065193,
+          "n": 200,
+          "p05": 0.000199980002,
+          "p50": 0.006549345066,
+          "p95": 0.053194680532,
+          "sd": 0.020999323799
+        },
+        "ratio_to_injected_summary": {
+          "ic_final_evaluation": {
+            "mean": 0.449250633074,
+            "n": 200,
+            "p05": 0.316524001693,
+            "p50": 0.444473990658,
+            "p95": 0.594253773918,
+            "sd": 0.091681832519
+          },
+          "ic_model_input_carrier": null,
+          "ic_model_prediction": {
+            "mean": 0.449250633074,
+            "n": 200,
+            "p05": 0.316524001693,
+            "p50": 0.444473990658,
+            "p95": 0.594253773918,
+            "sd": 0.091681832519
+          },
+          "ic_panel_carrier": null,
+          "ic_raw_carrier": null
+        },
+        "recovery_bias": -0.22029974677,
+        "repetitions": 200
+      }
+    ]
+  },
+  "detection_threshold": {
+    "primary": {
+      "interpolated": false,
+      "lowest_grid_level_reaching_target": 0.4,
+      "note": "Read off the preregistered grid only. The true crossing lies somewhere at or below this level; this design cannot localize it further without adding levels, which the protocol forbids.",
+      "observed_detection_rate": 0.93,
+      "observed_detection_rate_ci_95": [
+        0.885945191144,
+        0.957847828172
+      ],
+      "reached": true,
+      "target_detection_rate": 0.8
+    },
+    "sanity": {
+      "interpolated": false,
+      "lowest_grid_level_reaching_target": null,
+      "note": "Not applicable: this arm does not cover the preregistered grid, so no detection threshold may be read from it.",
+      "observed_detection_rate": null,
+      "observed_detection_rate_ci_95": null,
+      "reached": null,
+      "target_detection_rate": 0.8
+    },
+    "secondary": {
+      "interpolated": false,
+      "lowest_grid_level_reaching_target": null,
+      "note": "No preregistered grid level reached the target detection rate.",
+      "observed_detection_rate": null,
+      "observed_detection_rate_ci_95": null,
+      "reached": false,
+      "target_detection_rate": 0.8
+    }
+  },
+  "experiment": "positive_control",
+  "gate_informativeness": {
+    "coherent_draw_definition": "one existing primary descriptive repetition across all five preregistered levels",
+    "counts": {
+      "both_required_high_grid_levels_reject": 112,
+      "original_stage_1_gate_passes": 39,
+      "strictly_monotone_recovered_ic": 59
+    },
+    "note": "Descriptive only. These probabilities do not alter the original gate, its thresholds, or the Stage 1 status.",
+    "probabilities": {
+      "both_required_high_grid_levels_reject": 0.56,
+      "original_stage_1_gate_passes": 0.195,
+      "strictly_monotone_recovered_ic": 0.295
+    },
+    "repetitions": 200,
+    "status": "POST_RUN_DIAGNOSTIC"
+  },
+  "limitations": [
+    "Signal is injected into one carrier column; the recovered IC therefore reflects the pipeline's ability to isolate one informative feature among 40, not its ability to aggregate signal spread across many.",
+    "The injection permutes the carrier's values within each year, which destroys that column's joint structure with the other features. The theta=0 rung shares the damage, so comparisons along the curve are internally consistent, but the absolute recovered IC is not the IC an equally strong naturally-occurring feature would give.",
+    "The theta=0 rung is not a zero-IC world: the other 39 features retain whatever weak real structure they carry, so recovered IC at theta=0 estimates that background rather than zero.",
+    "Only three test cross-sections of about 80 rows exist. Detection rates are measured over 200 repetitions and carry binomial uncertainty of roughly +/-3 percentage points.",
+    "The detection threshold is read off five preregistered grid points. The true crossing is not localized, and no interpolated value is reported.",
+    "Each Wilson detection-rate interval is conditional on the one fixed realized panel. It captures only the repetition-to-repetition variation over the declared repetitions -- across repetitions the synthetic injection draw changes and the permutation-test RNG changes, so it carries injection-draw randomness plus permutation Monte-Carlo randomness -- and excludes resampling uncertainty from drawing a different equity panel or time sample.",
+    "The realized equity panel is fixed across repetitions. The synthetic injection changes across repetitions and the permutation-test RNG also changes across repetitions, so the empirical detection-rate variation includes injection-draw randomness plus permutation Monte-Carlo randomness; it still does not include resampling uncertainty from drawing another market panel or time sample. Fisher-z analytic/simulation power instead integrates over cross-sectional sampling variability, so the two curves condition on different randomness; their residual difference cannot be attributed simply to the test, and the curves are diagnostic rather than interchangeable power estimates.",
+    "The raw, feature-construction, and model-input/imputation checkpoints for the primary 100%-coverage carrier are identity/invariant checks, not empirical claims of no attenuation. The substantive measured transition is carrier signal to fitted model prediction.",
+    "The secondary carrier changes row population: its observed-carrier checkpoint n differs from the post-imputation full-cross-section n. Its stagewise ratio therefore mixes missingness/imputation dilution with changed evaluation population and is not a pure attenuation coefficient.",
+    "Any background-adjusted ratio is a heuristic descriptive diagnostic, not a mathematically exact decomposition of Spearman IC. The ratio is emitted as NA for identity/invariant checkpoints and the injected design constant -- where it would sit near 1.0 by construction and could be misread as a measured attenuation coefficient -- and for levels where the theta=0 background dominates.",
+    "The temporary run_experiments.TRAINING_MODELING override is process-global and this experiment is single-threaded; concurrent execution is outside this task's scope.",
+    "Results describe this pipeline on this panel with this carrier. They do not generalize to other designs, frequencies, universes, or feature sets, and they establish nothing about BIST returns or investment value."
+  ],
+  "protocol": "docs/thesis/PRE_EXPERIMENT_PROTOCOL.md",
+  "provenance": {
+    "duration_seconds": 1024.309,
+    "git": {
+      "dirty": true,
+      "sha": "794804e0c13664bf2ccce2cfc99c533586576e21",
+      "short_sha": "794804e0"
+    },
+    "implementation_sha256": "44c897568f17618b7db0a42103384f43d24da5fb296bf092b422ef51a495e27d",
+    "pipeline_module_sha256": "265f58678d522eea0c48fbccba415ed30b3e20abc6bb7ae0a8e33857c5feb543",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.3",
+    "seed": 42,
+    "significance_module_sha256": "5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6",
+    "source_dataset": {
+      "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+      "size_bytes": 256050
+    },
+    "started_at_utc": "2026-08-29T09:57:08.809038Z"
+  },
+  "schema_version": 4,
+  "secondary_population": {
+    "interpretation": "The secondary stagewise ratio mixes missingness/imputation dilution with a changed evaluation population; it is not a pure attenuation coefficient.",
+    "n_differs": true,
+    "observed_carrier_checkpoint": {
+      "checkpoint": "ic_raw_carrier",
+      "n": 120
+    },
+    "post_imputation_full_cross_section_checkpoint": {
+      "checkpoint": "ic_model_input_carrier",
+      "n": 240
+    }
+  },
+  "stage": "Stage 1 \u2014 raw-layer positive control / synthetic signal injection"
+}
