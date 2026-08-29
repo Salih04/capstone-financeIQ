@@ -207,6 +207,23 @@ Registered through: `experiments/results_serving_eval/serving_eval_report.json`
 - The raw serving p-value belongs to one prespecified test outside the six-model Bonferroni family and is not family-corrected.
 - Research support only; not investment advice.
 
+### experiments/results_thesis/positive_control/positive_control_report.json
+
+Registered through: `experiments/results_thesis/positive_control/positive_control_report.json`
+
+- Signal is injected into one carrier column; the recovered IC therefore reflects the pipeline's ability to isolate one informative feature among 40, not its ability to aggregate signal spread across many.
+- The injection permutes the carrier's values within each year, which destroys that column's joint structure with the other features. The theta=0 rung shares the damage, so comparisons along the curve are internally consistent, but the absolute recovered IC is not the IC an equally strong naturally-occurring feature would give.
+- The theta=0 rung is not a zero-IC world: the other 39 features retain whatever weak real structure they carry, so recovered IC at theta=0 estimates that background rather than zero.
+- Only three test cross-sections of about 80 rows exist. Detection rates are measured over 200 repetitions and carry binomial uncertainty of roughly +/-3 percentage points.
+- The detection threshold is read off five preregistered grid points. The true crossing is not localized, and no interpolated value is reported.
+- Each Wilson detection-rate interval is conditional on the one fixed realized panel. It captures only the repetition-to-repetition variation over the declared repetitions -- across repetitions the synthetic injection draw changes and the permutation-test RNG changes, so it carries injection-draw randomness plus permutation Monte-Carlo randomness -- and excludes resampling uncertainty from drawing a different equity panel or time sample.
+- The realized equity panel is fixed across repetitions. The synthetic injection changes across repetitions and the permutation-test RNG also changes across repetitions, so the empirical detection-rate variation includes injection-draw randomness plus permutation Monte-Carlo randomness; it still does not include resampling uncertainty from drawing another market panel or time sample. Fisher-z analytic/simulation power instead integrates over cross-sectional sampling variability, so the two curves condition on different randomness; their residual difference cannot be attributed simply to the test, and the curves are diagnostic rather than interchangeable power estimates.
+- The raw, feature-construction, and model-input/imputation checkpoints for the primary 100%-coverage carrier are identity/invariant checks, not empirical claims of no attenuation. The substantive measured transition is carrier signal to fitted model prediction.
+- The secondary carrier changes row population: its observed-carrier checkpoint n differs from the post-imputation full-cross-section n. Its stagewise ratio therefore mixes missingness/imputation dilution with changed evaluation population and is not a pure attenuation coefficient.
+- Any background-adjusted ratio is a heuristic descriptive diagnostic, not a mathematically exact decomposition of Spearman IC. The ratio is emitted as NA for identity/invariant checkpoints and the injected design constant -- where it would sit near 1.0 by construction and could be misread as a measured attenuation coefficient -- and for levels where the theta=0 background dominates.
+- The temporary run_experiments.TRAINING_MODELING override is process-global and this experiment is single-threaded; concurrent execution is outside this task's scope.
+- Results describe this pipeline on this panel with this carrier. They do not generalize to other designs, frequencies, universes, or feature sets, and they establish nothing about BIST returns or investment value.
+
 ## Curated seed limitations
 
 ### retrospective cohort

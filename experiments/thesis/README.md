@@ -1,8 +1,8 @@
 # Thesis experiment namespace
 
-Prepared in Week 0/1. **No experiment in this namespace is implemented yet.**
-This directory currently holds only the shared provenance helpers and the rules
-below.
+Prepared in Week 0/1. **Stage 1 (`positive_control`) is implemented and has
+run; the remaining slugs are still placeholders.** This directory holds the
+shared provenance helpers, the implemented stages, and the rules below.
 
 ## Output isolation
 
@@ -20,7 +20,7 @@ that record null findings.
 
 | Slug | Purpose |
 |---|---|
-| `positive_control` | Inject a known signal at the raw layer and confirm the pipeline recovers it. Validates that the measurement apparatus can detect an effect that is genuinely present. |
+| `positive_control` | **Implemented** — `positive_control.py`, run via `make thesis-positive-control`. Injects a known-strength synthetic signal into one raw feature column before feature construction and measures how much survives each pipeline stage. Validates that the measurement apparatus responds to an effect that is provably present. |
 | `negative_control` | Expand the existing placebo/negative-control family. Confirms the apparatus reports nothing when nothing is there. |
 | `defect_injection` | Deliberately introduce known defects (leakage, misalignment, look-ahead) and confirm the guards catch each one. |
 | `informativeness` | Map the power/informativeness frontier: what effect size this design could detect, as a function of n, years, and frequency. |
@@ -53,13 +53,15 @@ input fails the root suite and names the file.
 on disk, and that every file under a governed root be owned by exactly one
 entry. Consequently:
 
-- `experiments/results_thesis/` is **not** in `governed_roots` yet, and has no
-  registry entry, because it contains no artifacts yet. The registry's own
-  `proposed_future` class documents exactly this: *"Intentionally has NO
-  registry entry until the file exists."*
-- When an experiment is implemented, that task adds its output root to
-  `governed_roots`, adds one entry whose `generator_command` is a real Makefile
-  target, and adds the target. Doing it earlier breaks the suite.
+- An experiment's output root joins `governed_roots` only once it has actually
+  written artifacts. `experiments/results_thesis/positive_control` is registered
+  now, with one entry per emitted file and `make thesis-positive-control` as the
+  `generator_command`. The other four slugs are still absent from the registry,
+  as the `proposed_future` class prescribes: *"Intentionally has NO registry
+  entry until the file exists."*
+- When the next experiment is implemented, that task adds its output root to
+  `governed_roots`, adds one entry per artifact whose `generator_command` is a
+  real Makefile target, and adds the target. Doing it earlier breaks the suite.
 
 ## Claim discipline
 
@@ -69,3 +71,48 @@ IC statistically indistinguishable from zero after multiplicity correction —
 stands until a pre-registered experiment overturns it, and the pre-registration
 protocol in `docs/thesis/PRE_EXPERIMENT_PROTOCOL.md` governs the order in which
 that may be attempted.
+
+## Stage 1 injection safety
+
+`positive_control.py` manufactures a relationship between a raw feature column
+and the future-return ranking, which makes containment a correctness property
+rather than a nicety. Four things hold by construction and are asserted in
+`tests/test_thesis_positive_control.py`:
+
+- the injected table is written to a private temporary directory and deleted
+  when the repetition ends — never under `data/`;
+- the carrier column's own observed values are permuted within each year, so no
+  value is fabricated, the within-year marginal is preserved exactly, and null
+  stays null;
+- the target column and every non-carrier column come out bit-identical;
+- the pipeline's dataset path is restored on every exit path, including on an
+  exception, so ordinary `make research` behaviour is unchanged the moment a
+  repetition ends.
+
+The temporary `run_experiments.TRAINING_MODELING` override is process-global and
+not thread-safe. Stage 1 is intentionally single-threaded; concurrent execution
+is outside this task's scope.
+
+`theta = 0` sets the copula correlation to exactly zero, so the null rung is a
+plain random permutation that forces no correlation at all.
+
+For the 100%-coverage primary carrier, the raw, feature-construction, and
+model-input/imputation checkpoints are identity/invariant checkpoints. Their
+equality is not evidence of empirically absent attenuation; the substantive
+measured transition is carrier signal to fitted model prediction. The
+background-adjusted ratio diagnostic is emitted as NA for those identity
+checkpoints and for the injected design constant, because it sits near 1.0 there
+by construction and would read as a measured attenuation coefficient. The
+secondary missingness arm changes row population: observed-carrier checkpoint
+`n` differs from post-imputation full-cross-section `n`, so its stagewise ratio
+mixes missingness/imputation dilution with changed evaluation population and is
+not a pure attenuation coefficient.
+
+Detection-rate Wilson intervals are conditional on the fixed realized panel.
+The realized equity panel is held fixed across repetitions; the synthetic
+injection changes across repetitions and the permutation-test RNG also changes
+across repetitions, so the empirical detection-rate variation carries
+injection-draw randomness plus permutation Monte-Carlo randomness. It does not
+include resampling uncertainty from drawing a different equity panel or time
+sample. The analytic Fisher-z and empirical curves condition on different
+randomness and are diagnostic rather than interchangeable power estimates.
