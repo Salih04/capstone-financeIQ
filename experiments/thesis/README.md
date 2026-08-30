@@ -1,8 +1,32 @@
 # Thesis experiment namespace
 
 Prepared in Week 0/1. **Stage 1 (`positive_control`) is implemented and has
-run; the remaining slugs are still placeholders.** This directory holds the
-shared provenance helpers, the implemented stages, and the rules below.
+run; Stage 1b (`positive_control_calibration`) is registered but NOT
+implemented; the remaining slugs are still placeholders.** This directory holds
+the shared provenance helpers, the implemented stages, and the rules below.
+
+## Stage 1b — registered, not implemented
+
+`docs/thesis/STAGE_1B_REGISTRATION.md` is the frozen, owner-approved,
+prospective (but **not blind**) registration for Stage 1b, a diagnostic /
+calibration experiment. `experiments/thesis/stage1b_registration.py` holds its
+machine-checkable constants; `tests/test_thesis_stage1b_registration.py` proves
+code == registration. **No Stage 1b run has been executed and no Stage 1b
+outcome inspected.** Stage 1b reuses the Stage 1 carrier (`equity`), model
+(`ridge`), splits, significance machinery, seed framework, and the
+Stage-1-operational-rule detection point; adds the single grid rung `0.35`; uses `R = 400`
+fresh repetitions with global ids `200 … 599` (non-overlapping with Stage 1's
+`0 … 199`); excludes the historical `current_ratio` and theta=0.90 arms; and
+has **no scientific performance PASS/FAIL gate**. When Stage 1b is implemented,
+that same commit — before the first run — adds the runner, the `thesis-stage1b`
+Makefile target, the
+`experiments/results_thesis/positive_control_calibration/` output root **to
+`artifact_registry.json` `governed_roots`**, one registry entry per emitted
+output, and no-orphan-output tests; and it replaces/inverts the
+registration-phase absence guards in the same commit. None of that exists yet,
+per the `proposed_future` convention below. Adding only per-file registry
+entries without the `governed_roots` root is insufficient. Stage 1 stays frozen;
+Stage 2 stays blocked.
 
 ## Output isolation
 
@@ -21,6 +45,7 @@ that record null findings.
 | Slug | Purpose |
 |---|---|
 | `positive_control` | **Implemented** — `positive_control.py`, run via `make thesis-positive-control`. Injects a known-strength synthetic signal into one raw feature column before feature construction and measures how much survives each pipeline stage. Validates that the measurement apparatus responds to an effect that is provably present. |
+| `positive_control_calibration` | **Registered, not implemented** — Stage 1b. `docs/thesis/STAGE_1B_REGISTRATION.md` + `stage1b_registration.py`. Prospective (not blind) calibration/diagnostic re-scope of Stage 1: same carrier/model/splits/seed framework, adds the `0.35` grid rung, `R = 400` fresh repetitions (ids 200–599), Stage-1-operational-rule detection probability as the primary result, raw-p<0.05 detection probability as a secondary non-gating diagnostic, and no performance gate. No run executed. |
 | `negative_control` | Expand the existing placebo/negative-control family. Confirms the apparatus reports nothing when nothing is there. |
 | `defect_injection` | Deliberately introduce known defects (leakage, misalignment, look-ahead) and confirm the guards catch each one. |
 | `informativeness` | Map the power/informativeness frontier: what effect size this design could detect, as a function of n, years, and frequency. |
@@ -56,9 +81,10 @@ entry. Consequently:
 - An experiment's output root joins `governed_roots` only once it has actually
   written artifacts. `experiments/results_thesis/positive_control` is registered
   now, with one entry per emitted file and `make thesis-positive-control` as the
-  `generator_command`. The other four slugs are still absent from the registry,
-  as the `proposed_future` class prescribes: *"Intentionally has NO registry
-  entry until the file exists."*
+  `generator_command`. The other five slugs (`positive_control_calibration`,
+  `negative_control`, `defect_injection`, `informativeness`, `monthly_panel`)
+  are still absent from the registry, as the `proposed_future` class prescribes:
+  *"Intentionally has NO registry entry until the file exists."*
 - When the next experiment is implemented, that task adds its output root to
   `governed_roots`, adds one entry per artifact whose `generator_command` is a
   real Makefile target, and adds the target. Doing it earlier breaks the suite.
