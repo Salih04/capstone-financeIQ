@@ -30,6 +30,9 @@ THESIS_RESULTS_ROOT = ROOT / "experiments" / "results_thesis"
 #: silently create an unregistered results tree.
 EXPERIMENT_SLUGS: tuple[str, ...] = (
     "positive_control",
+    # Stage 1b — prospective calibration/diagnostic. Registered in
+    # docs/thesis/STAGE_1B_REGISTRATION.md; NOT yet implemented or run.
+    "positive_control_calibration",
     "negative_control",
     "defect_injection",
     "informativeness",
@@ -47,6 +50,7 @@ EXPERIMENT_SLUGS: tuple[str, ...] = (
 #: seed chosen for effect.
 SEEDS: dict[str, int] = {
     "positive_control": 42,
+    "positive_control_calibration": 42,
     "negative_control": 42,
     "defect_injection": 42,
     "informativeness": 42,

@@ -330,3 +330,109 @@ contain a commit of the amendment predating the run, and no later commit can
 retroactively establish pre-run pre-registration. The chronology claim rests on
 the mtime and hash evidence and is stated at that strength — corroborated, not
 Git-proven.
+
+### 2026-08-29 — Stage 1b prospective calibration amendment
+
+**This amendment does not rewrite any Stage 1 text.** The Stage 1 entry, its
+fixed constants, its pass rule, and its recorded result are unchanged. Stage 1
+remains **FAILED AS WRITTEN — INFORMATIVE**.
+
+Full registration: `docs/thesis/STAGE_1B_REGISTRATION.md`. Machine-checked
+constants: `experiments/thesis/stage1b_registration.py`, verified by
+`tests/test_thesis_stage1b_registration.py`.
+
+**Chronology.** Initial Stage 1b design work began on 2026-08-29 (this
+amendment's date). The registration was then independently reviewed and repaired
+after that date; the reviewed-registration date is 2026-08-31. This reviewed
+registration is committed before any Stage 1b implementation or run, and the
+registration commit itself is the authoritative prospective Git chronology
+anchor. Unlike Stage 1, Stage 1b prospective ordering will be Git-proven by that
+registration commit preceding the implementation and run commits. No claim is
+made that the final text was wholly written on a single date, and no
+implementation or run commit SHA exists yet.
+
+**Status when written.** Stage 1b was designed **after** completed Stage 1
+outcomes were known — it is prospective but **not blind**. Stage 1 outcomes had
+already been inspected: the primary `equity` per-repetition detection was
+approximately 0.615 at θ = 0.30 and 0.930 at θ = 0.40, the original Stage 1
+gate-pass diagnostic was approximately 0.195, and the theta=0 background/final
+evaluated IC was non-zero, a known interpretation limitation. No Stage 1b
+repetition had been executed, no Stage 1b estimate computed, and no Stage 1b
+result artifact generated when this amendment and the registration were written;
+`experiments/results_thesis/positive_control_calibration/` did not exist.
+
+**What Stage 1b is.** A prospective diagnostic / calibration experiment that
+characterizes, for each grid level `θ` on the fixed realized `equity` panel, the
+chain *nominal theta → realized raw carrier IC → ridge final IC →
+Stage-1-operational-rule detection probability*. The primary estimand is
+descriptive and vector-valued.
+
+**What carries over from Stage 1, unchanged.** The frozen panel; the ridge
+model; the walk-forward splits; `experiments/significance.py`; 10,000
+permutations; 10,000 bootstraps; the Stage 1 seed-derivation framework
+(`derive_injection_seed` / `derive_permutation_seed`); the carrier `equity`; the
+within-year own-value permutation injection with the same Gaussian-copula
+relationship and exact missingness preservation; and the numerical operating
+point `detected_stage1_rule = min(1, 5 * p_raw) < 0.05`.
+
+**What changes.**
+
+- **Grid.** `{0.00, 0.10, 0.20, 0.30, 0.35, 0.40}`. The **only** new rung is
+  `0.35` — the mechanical midpoint of the already observed 0.30–0.40 Stage 1
+  detection bracket (approximately 0.615 at 0.30 and 0.930 at 0.40). It is
+  **not** derived from `MDE_BASE`, **not** a realistic market IC, **not** a
+  SESOI, and **not** tuned to create a pass. The approximately 0.80 value is a
+  Stage 1 descriptive reference only. Legacy Stage 1 level indices are
+  preserved; `0.35` takes stable new level index 5; no existing seed stream is
+  renumbered.
+- **Repetitions.** `R = 400` fresh repetitions per level, global repetition ids
+  `200 … 599` — non-overlapping with Stage 1's ids `0 … 199`. Stage 1
+  repetitions are never pooled into Stage 1b estimates. The non-overlap proof is
+  in the registration.
+- **No scientific performance gate.** Stage 1b has **no** PASS/FAIL performance
+  gate. Removing the gate does **not** reinterpret Stage 1 as passed; it
+  reflects that Stage 1's literal gate is a low-power instrument on this panel
+  (post-run diagnostic: P(original Stage 1 gate passes) = 0.195). Run validity
+  is governed **only** by the complete closed integrity contract in the
+  registration. A flat, non-monotone, weak, surprising, or high-background
+  diagnostic curve is a scientific result, not an integrity failure. Stage 1b
+  does not compute an 80%-detection gate, `confirmatory_gate`,
+  `gate_informativeness`, strict-monotonicity pass/fail, or `GATE_LEVELS`
+  rejection criterion, and no Stage 1b threshold crossing is a success
+  criterion. Such a curve does not itself invalidate the run.
+- **Secondary diagnostic.** **Raw-p<0.05 detection probability — secondary,
+  non-gating diagnostic** may be reported. The primary result is
+  **Stage-1-operational-rule detection probability**. The historical divisor 5
+  is retained as a fixed operating point only; Stage 1b's six levels are not a
+  hypothesis family and no family-wise-error-control claim is made across them.
+  Wilson intervals are pointwise per theta only.
+- **SESOI.** Remains **UNRESOLVED**. No final SESOI is defined here.
+
+**Stage 2.** Remains **BLOCKED** until the one prospective Stage 1b run is
+completed, all deterministic integrity checks pass, the governed Stage 1b
+artifacts are complete and reproducible, and the run is independently reviewed.
+
+**Fixed-panel boundary.** Across Stage 1b repetitions the realized equity panel
+is fixed. The synthetic injection draw changes and the permutation-test RNG
+changes. Empirical calibration and detection curves therefore reflect
+injection-draw randomness and permutation Monte-Carlo randomness conditional on
+this one realized panel. They exclude uncertainty from another equity universe,
+market panel, time period, PIT universe, or monthly sample. Pointwise Wilson
+intervals are not unconditional market-level power intervals. The permutation
+seed does not depend on theta or level index, so the permutation RNG stream is
+shared across theta levels for the same repetition id; the intervals are
+therefore marginal and are not simultaneous or between-level comparison
+intervals.
+
+**Precision boundary.** For R=400, the approximate worst-case pointwise Wilson
+half-width is about 4.9 percentage points near p=0.50 and about 3.9 percentage
+points near p=0.80. R=400 improves grid-point precision but does not identify an
+exact between-grid crossing; no interpolation is confirmatory.
+
+**Run rule.** Exactly one governed prospective Stage 1b run after this amendment
+and the registration are committed and independently reviewed. The seed schedule
+is frozen in the registration. A deterministic replay with identical settings
+is verification, not a new scientific run. An execution crash may be repeated
+only with identical registered settings, and both attempts must be recorded. Any
+post-outcome change to grid, R, carrier, model, seed policy, detection rule, or
+inference requires a dated amendment stating what was already observed.
