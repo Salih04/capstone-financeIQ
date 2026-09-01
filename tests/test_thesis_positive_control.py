@@ -243,15 +243,27 @@ def test_protected_results_roots_are_refused(monkeypatch):
 
 
 def test_every_governed_results_root_is_protected():
-    """The registry's governed roots under experiments/ must all be refused."""
+    """The registry's governed roots under experiments/ must all be refused.
+
+    A thesis experiment's OWN output root is the single exception: that is where
+    the experiment writes, so it cannot also be refused. The exception set is
+    derived from the declared slugs rather than hardcoded, so registering a
+    second governed thesis root (Stage 1b) cannot silently exempt an unrelated
+    root, and a governed thesis root with no declared slug fails here.
+    """
     registry = json.loads((REPO_ROOT / "artifact_registry.json").read_text(encoding="utf-8"))
+    thesis_owned = {f"experiments/results_thesis/{slug}" for slug in prov.EXPERIMENT_SLUGS}
     governed = [
         root
         for root in registry["governed_roots"]
-        if root.startswith("experiments/") and root != "experiments/results_thesis/positive_control"
+        if root.startswith("experiments/") and root not in thesis_owned
     ]
     missing = sorted(set(governed) - set(prov.PROTECTED_RESULTS_ROOTS))
     assert missing == [], f"governed roots not protected from thesis writes: {missing}"
+    for root in registry["governed_roots"]:
+        if root.startswith("experiments/results_thesis/"):
+            assert root in thesis_owned, f"governed thesis root has no declared slug: {root}"
+            assert root not in prov.PROTECTED_RESULTS_ROOTS
 
 
 def test_undeclared_slug_cannot_claim_an_output_dir():

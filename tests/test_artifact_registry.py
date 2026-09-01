@@ -148,6 +148,25 @@ def empty_patterns(entries: list[dict]) -> list[str]:
     return [e["path_or_glob"] for e in entries if not expand_pattern(e["path_or_glob"])]
 
 
+def prospective_transition_failures(
+    registered: list[dict],
+    entries: list[dict],
+    remaining_prospective: list[dict],
+    resolved_patterns: set[str],
+) -> list[str]:
+    """Bind a prospective contract's exact, verbatim transition into entries[]."""
+    failures: list[str] = []
+    for item in registered:
+        pattern = item["path_or_glob"]
+        if pattern not in resolved_patterns:
+            continue
+        if item not in entries:
+            failures.append(f"resolved prospective contract is not verbatim in entries[]: {pattern}")
+        if pattern in {entry["path_or_glob"] for entry in remaining_prospective}:
+            failures.append(f"resolved prospective contract remains in prospective_entries[]: {pattern}")
+    return failures
+
+
 def checksum_staleness() -> list[str]:
     """Auto-discover reports with a top-level source_artifacts list and re-verify.
 
@@ -212,6 +231,30 @@ def test_every_entry_matches_at_least_one_file():
     """Stale-path guard: no registry entry may point at a vanished artifact."""
     stale = empty_patterns(load_registry()["entries"])
     assert stale == [], f"registry patterns matching no files (stale paths): {stale}"
+
+
+def test_resolved_prospective_contracts_transition_verbatim():
+    """Prospective ownership is fixed before the run and cannot mutate on entry."""
+    registry = load_registry()
+    prospective = registry.get("prospective_entries", [])
+    resolved_now = {
+        entry["path_or_glob"]
+        for entry in prospective
+        if expand_pattern(entry["path_or_glob"])
+    }
+    assert prospective_transition_failures(
+        prospective, registry["entries"], prospective, resolved_now
+    ) == []
+
+    item = prospective[0]
+    assert prospective_transition_failures([item], [dict(item)], [], {item["path_or_glob"]}) == []
+    mutated = {**item, "notes": item["notes"] + " changed"}
+    assert prospective_transition_failures(
+        [item], [mutated], [], {item["path_or_glob"]}
+    )
+    assert prospective_transition_failures(
+        [item], [dict(item)], [item], {item["path_or_glob"]}
+    )
 
 
 def test_full_coverage_exactly_one_owner():
