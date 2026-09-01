@@ -18,11 +18,13 @@
     "experiments/results_missingness",
     "experiments/results_dimensionality",
     "experiments/results_thesis/positive_control",
+    "experiments/results_thesis/positive_control_calibration",
     "data/trusted_clean",
     "data/provenance",
     "docs/thesis/baseline"
   ],
   "coverage_rule": "Every file under a governed root, excluding experiments/results/runs/**, must be matched by exactly one entry below. An unmatched file (orphan) or a file matched by more than one entry (duplicate ownership) is a governance failure enforced by tests/test_artifact_registry.py.",
+  "prospective_entry_rule": "prospective_entries[] carries the frozen ownership contract for governed outputs whose registration requires ownership to be fixed before the run that creates them (docs/thesis/STAGE_1B_REGISTRATION.md, 'Governance wiring required before the first Stage 1b execution'). Each item has the same shape as an entries[] item and the same 'make <target>' generator_command rule, but is not yet subject to coverage_rule because its files do not exist yet and every entries[] entry must match at least one real file. When the governed run creates the files, that run's commit moves these items verbatim into entries[] and removes them from here; nothing about an item may change during that move.",
   "coverage_exclusions": [
     {
       "glob": "experiments/results/runs/**",
@@ -35,7 +37,7 @@
     "human_document": "Hand-authored / human-reviewed document. Owned by a human editor, not a generator; hand_edit_forbidden is false.",
     "source_input": "Manually curated raw input. Lives under data/trusted_raw/, outside these governed roots; listed here only for vocabulary completeness.",
     "runtime_output": "Output produced by the running application at request time. Outside these governed roots; listed here only for vocabulary completeness.",
-    "proposed_future": "Artifact named by a future task but not yet created. Intentionally has NO registry entry until the file exists, because every entry must match at least one real file."
+    "proposed_future": "Artifact named by a future task but not yet created. Intentionally has NO entries[] entry until the file exists, because every entries[] entry must match at least one real file. Where a registration fixes ownership BEFORE the run that creates the file, the frozen ownership contract is declared in prospective_entries[] instead, and the run commit moves it verbatim into entries[]."
   },
   "checksum_verification": {
     "rule": "Reports that embed a top-level source_artifacts list of {path, sha256} objects are re-verified: each referenced path is re-hashed and compared to the recorded sha256. A mismatch is stale evidence — regenerate the report via its generator_command or investigate the upstream change. The verification set is auto-discovered across the governed roots by the test, so newly added reports are covered automatically.",
@@ -51,6 +53,56 @@
     ]
   },
   "reproducibility_note": "Regeneration reproduces content in an environment-qualified sense only: byte identity requires matching Python, platform, and numerical-package versions (see METHODOLOGY 'Reproducibility and run provenance'). This registry does not claim universal byte reproducibility.",
+  "prospective_entries": [
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/positive_control_calibration_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Machine-readable Stage 1b result: the registered design, the per-theta calibration and detection curve, the closed deterministic integrity contract, and replay evidence. Carries no scientific performance PASS/FAIL gate. Written by experiments/thesis/positive_control_calibration.py."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/positive_control_calibration_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Human-readable rendering of the same Stage 1b result. Passes the shared placebo claim-safety validator before it is written."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/repetitions.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "One row per (injection level, repetition id 200-599): the frozen seed level index, both declared seeds, the injected-table SHA256, every checkpoint IC and its row count, the raw permutation p, the Stage-1-operational-rule operating point, the primary and secondary detection flags, and the per-cell mechanism-invariant results."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/calibration_curve.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "One row per injection level: registered descriptive summaries (mean, SD, median, p05, p95) of the realized raw equity carrier IC and of the final evaluated IC, the Stage-1-operational-rule detection rate with its pointwise 95% Wilson interval, and the secondary non-gating raw-p<0.05 rate. Wilson intervals are pointwise; no simultaneous or between-theta interval is claimed."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/artifact_manifest.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "SHA256 manifest emitted by experiments/thesis/provenance.py write_manifest, recording the seed, the git SHA, the runner and registration-module hashes, the frozen design constants, the integrity verdict, and the read-only source dataset."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/attempt_provenance.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": [],
+      "hand_edit_forbidden": true,
+      "notes": "Operational governance/provenance marker recording initial and crash-recovery attempts, registered configuration identity, seed-schedule identity, prior-incomplete status, and attempt completion status. It is not a scientific emitted artifact; artifact_manifest.json remains the completion authority."
+    }
+  ],
   "entries": [
     {
       "path_or_glob": "experiments/results_thesis/positive_control/positive_control_report.json",

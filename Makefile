@@ -8,7 +8,8 @@
 	research-agent-autoresearch-iteration demo-check research-verify-run research-significance research-calibration limitations-register \
 	fetch-usdtry alternative-targets research-real-terms research-excess research-regime research-friction research-disagreement research-influence research-rank-stability research-placebo research-serving-eval research-dimensionality \
 	freeze-forward-2026 evaluate-forward-2026 research-missingness claims-lint docs-lint cell-provenance research-contamination \
-	test-root-portable thesis-baseline thesis-positive-control thesis-positive-control-replay
+	test-root-portable thesis-baseline thesis-positive-control thesis-positive-control-replay \
+	thesis-stage1b thesis-stage1b-replay
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -251,6 +252,21 @@ thesis-positive-control:
 # fail if the two runs differ. Writes nothing.
 thesis-positive-control-replay:
 	PYTHONPATH=. python experiments/thesis/positive_control.py --replay-check
+
+# Thesis Stage 1b positive-control calibration: the ONE governed prospective run
+# registered in docs/thesis/STAGE_1B_REGISTRATION.md. Descriptive/diagnostic
+# only -- no scientific performance PASS/FAIL gate. Writes only under
+# experiments/results_thesis/positive_control_calibration/; Stage 1's historical
+# namespace, the modeling dataset, and every protected data tree are read-only
+# to it. The runner refuses to do anything without the explicit --run flag.
+thesis-stage1b:
+	PYTHONPATH=. python experiments/thesis/positive_control_calibration.py --run
+
+# Determinism probe for the stage above: run one registered repetition id across
+# the grid twice at reduced permutations and fail if the two passes differ.
+# Writes nothing, creates no result root, and reports no scientific value.
+thesis-stage1b-replay:
+	PYTHONPATH=. python experiments/thesis/positive_control_calibration.py --replay-check
 
 # Fetch/cache year-end TRY-per-USD quotes for the parallel return-basis audit.
 fetch-usdtry:

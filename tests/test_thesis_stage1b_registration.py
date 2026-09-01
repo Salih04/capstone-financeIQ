@@ -254,24 +254,59 @@ def test_stage1b_root_is_distinct_declared_and_absent(doc):
     assert reg.STAGE_1B_SLUG in prov.EXPERIMENT_SLUGS
     assert prov.seed_for(reg.STAGE_1B_SLUG) == 42
     assert STAGE_1B_OUTPUT_DIR != STAGE_1_OUTPUT_ROOT
-    # REGISTRATION-PHASE GUARD (result root absence) — inverted by the Stage 1b
-    # implementation commit, before the first run.
+    # IMPLEMENTATION-PHASE GUARD (result root absence). The implementation commit
+    # adds the runner and the governance wiring but does NOT run Stage 1b, so this
+    # guard survives it unchanged and sunsets only when the one governed run
+    # executes. See tests/test_thesis_stage1b_implementation.py.
     assert not STAGE_1B_OUTPUT_DIR.exists()
     assert "must be absent now" in doc
     assert "does not create the result root" in doc
 
 
-def test_future_generator_and_registry_entries_are_deferred():
-    # REGISTRATION-PHASE GUARD. Asserts the current pre-implementation state.
-    # The Stage 1b implementation commit MUST replace/invert this in the SAME
-    # commit that adds the runner, the `thesis-stage1b` target, the
-    # `governed_roots` entry, and the per-artifact registry entries. Do not
-    # delete or weaken it before then. See the "Registration-phase guards —
-    # sunset on implementation" section of the registration.
+def test_governance_wiring_is_present_and_the_run_has_not_happened():
+    """The inverted registration-phase guard: wiring present, run still absent.
+
+    This replaces the pre-implementation ``..._are_deferred`` guard in the same
+    commit that added the runner, the ``thesis-stage1b`` target, the
+    ``governed_roots`` entry, and the per-artifact ownership contracts — exactly
+    the sunset the registration's "Registration-phase guards" section requires.
+    It is not a weakening: the pre-implementation absences are replaced by the
+    stricter presence contract, and the one absence that must survive until the
+    governed run — the result root — is asserted here too.
+    """
     makefile = (REPO_ROOT / "Makefile").read_text(encoding="utf-8")
-    registry = (REPO_ROOT / "artifact_registry.json").read_text(encoding="utf-8")
-    assert "thesis-stage1b:" not in makefile
-    assert "positive_control_calibration" not in registry
+    registry = json.loads((REPO_ROOT / "artifact_registry.json").read_text(encoding="utf-8"))
+
+    # 1. the runner exists and 2. the Makefile target exists.
+    assert (REPO_ROOT / "experiments/thesis/positive_control_calibration.py").is_file()
+    assert "thesis-stage1b:" in makefile
+    assert (
+        "PYTHONPATH=. python experiments/thesis/positive_control_calibration.py --run"
+        in makefile
+    )
+
+    # 3. the governed root is registered.
+    assert reg.STAGE_1B_RESULT_ROOT.rstrip("/") in registry["governed_roots"]
+
+    # 4. one ownership contract per emitted governed output, none of which may
+    #    sit in entries[] yet, because entries[] requires a real file on disk.
+    prospective = {
+        entry["path_or_glob"] for entry in registry["prospective_entries"]
+    }
+    assert prospective and all(
+        path.startswith(reg.STAGE_1B_RESULT_ROOT) for path in prospective
+    )
+    assert all(
+        entry["generator_command"] == "make thesis-stage1b"
+        for entry in registry["prospective_entries"]
+    )
+    assert not any(
+        entry["path_or_glob"].startswith(reg.STAGE_1B_RESULT_ROOT)
+        for entry in registry["entries"]
+    )
+
+    # 5. and the run itself has still not happened.
+    assert not STAGE_1B_OUTPUT_DIR.exists()
 
 
 def test_closed_integrity_contract_has_only_machine_declared_conditions(doc):
@@ -554,10 +589,13 @@ def test_registration_phase_guard_sunset_is_declared(doc):
         assert future_state in normalized
     assert "Execution is still **not performed**".replace("**", "") in normalized
     assert "must not be deleted or weakened before" in normalized
-    # The concrete guards still hold NOW (registration phase).
-    assert not STAGE_1B_OUTPUT_DIR.exists()
+    # The sunset has now happened for the wiring guards: the runner and the
+    # Makefile target exist. The result-root absence is the one guard that must
+    # survive the implementation commit and sunset only at the governed run.
     makefile = (REPO_ROOT / "Makefile").read_text(encoding="utf-8")
-    assert "thesis-stage1b:" not in makefile
+    assert "thesis-stage1b:" in makefile
+    assert (REPO_ROOT / "experiments/thesis/positive_control_calibration.py").is_file()
+    assert not STAGE_1B_OUTPUT_DIR.exists()
 
 
 # --------------------------------------------------------------------------- #

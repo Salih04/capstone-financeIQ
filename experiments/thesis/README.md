@@ -1,11 +1,12 @@
 # Thesis experiment namespace
 
 Prepared in Week 0/1. **Stage 1 (`positive_control`) is implemented and has
-run; Stage 1b (`positive_control_calibration`) is registered but NOT
-implemented; the remaining slugs are still placeholders.** This directory holds
-the shared provenance helpers, the implemented stages, and the rules below.
+run; Stage 1b (`positive_control_calibration`) is registered and implemented but
+has NOT been run; the remaining slugs are still placeholders.** This directory
+holds the shared provenance helpers, the implemented stages, and the rules
+below.
 
-## Stage 1b — registered, not implemented
+## Stage 1b — registered and implemented, NOT run
 
 `docs/thesis/STAGE_1B_REGISTRATION.md` is the frozen, owner-approved,
 prospective (but **not blind**) registration for Stage 1b, a diagnostic /
@@ -17,16 +18,45 @@ outcome inspected.** Stage 1b reuses the Stage 1 carrier (`equity`), model
 Stage-1-operational-rule detection point; adds the single grid rung `0.35`; uses `R = 400`
 fresh repetitions with global ids `200 … 599` (non-overlapping with Stage 1's
 `0 … 199`); excludes the historical `current_ratio` and theta=0.90 arms; and
-has **no scientific performance PASS/FAIL gate**. When Stage 1b is implemented,
-that same commit — before the first run — adds the runner, the `thesis-stage1b`
-Makefile target, the
-`experiments/results_thesis/positive_control_calibration/` output root **to
-`artifact_registry.json` `governed_roots`**, one registry entry per emitted
-output, and no-orphan-output tests; and it replaces/inverts the
-registration-phase absence guards in the same commit. None of that exists yet,
-per the `proposed_future` convention below. Adding only per-file registry
-entries without the `governed_roots` root is insufficient. Stage 1 stays frozen;
-Stage 2 stays blocked.
+has **no scientific performance PASS/FAIL gate**.
+
+The runner is `experiments/thesis/positive_control_calibration.py`, invoked by
+`make thesis-stage1b`; `make thesis-stage1b-replay` is its determinism probe and
+writes nothing. Both are the implementation commit's work, added *before* the
+first run together with the `governed_roots` entry and one ownership contract per
+emitted output. **The Stage 1b result root is still absent**: it does not exist,
+and nothing but the one governed run may create it.
+
+Two properties the runner is built around, both machine-checked in
+`tests/test_thesis_stage1b_implementation.py`:
+
+- **The operating divisor is a frozen literal.** The primary rule is the
+  unchanged Stage 1 operating point `min(1, 5 * p_raw) < 0.05`. The `5` comes
+  from `stage1b_registration.STAGE1_OPERATIONAL_DIVISOR` and is never recomputed
+  from a grid length or a family size; the six theta levels are not a hypothesis
+  family, and the AST-level test proves the detection functions reference
+  nothing else.
+- **Seed identity comes from the frozen map.** Report order is numeric, but seed
+  level indices come from `stage1b_registration.level_index_for` — never from
+  `enumerate` — so `0.40` keeps index 4 and `0.35` takes the new index 5. The
+  runner contains no `enumerate` call at all.
+
+The runner takes no scientific parameters: the grid, `R`, seeds, permutations,
+bootstraps, alpha, carrier, model, and detection rules are frozen in the
+registration and cannot be reduced or overridden at runtime. It refuses to do
+anything without an explicit `--run` or `--repeat-after-crash`, so ordinary
+verification cannot trip the governed run. A durable
+`attempt_provenance.json` marker is written first, and scientific files go into
+an attempt-specific `.staging/` directory. Integrity and claim-safety checks
+inspect the actual recursive staging surface before promotion; the final
+`artifact_manifest.json` is written last as completion evidence. A failed or
+interrupted attempt remains visibly incomplete and normal `--run` refuses it;
+only `--repeat-after-crash` may clean the known Stage 1b leftovers and retry
+with the identical registered configuration and seed schedule.
+
+Stage 1 stays frozen; Stage 2 stays blocked until the one governed run is
+completed, its closed integrity contract passes, and it is independently
+reviewed.
 
 ## Output isolation
 
@@ -45,7 +75,7 @@ that record null findings.
 | Slug | Purpose |
 |---|---|
 | `positive_control` | **Implemented** — `positive_control.py`, run via `make thesis-positive-control`. Injects a known-strength synthetic signal into one raw feature column before feature construction and measures how much survives each pipeline stage. Validates that the measurement apparatus responds to an effect that is provably present. |
-| `positive_control_calibration` | **Registered, not implemented** — Stage 1b. `docs/thesis/STAGE_1B_REGISTRATION.md` + `stage1b_registration.py`. Prospective (not blind) calibration/diagnostic re-scope of Stage 1: same carrier/model/splits/seed framework, adds the `0.35` grid rung, `R = 400` fresh repetitions (ids 200–599), Stage-1-operational-rule detection probability as the primary result, raw-p<0.05 detection probability as a secondary non-gating diagnostic, and no performance gate. No run executed. |
+| `positive_control_calibration` | **Registered and implemented, not run** — Stage 1b. `docs/thesis/STAGE_1B_REGISTRATION.md` + `stage1b_registration.py` + `positive_control_calibration.py`, run via `make thesis-stage1b`. Prospective (not blind) calibration/diagnostic re-scope of Stage 1: same carrier/model/splits/seed framework, adds the `0.35` grid rung, `R = 400` fresh repetitions (ids 200–599), Stage-1-operational-rule detection probability as the primary result, raw-p<0.05 detection probability as a secondary non-gating diagnostic, and no performance gate. No run executed; the result root is absent. |
 | `negative_control` | Expand the existing placebo/negative-control family. Confirms the apparatus reports nothing when nothing is there. |
 | `defect_injection` | Deliberately introduce known defects (leakage, misalignment, look-ahead) and confirm the guards catch each one. |
 | `informativeness` | Map the power/informativeness frontier: what effect size this design could detect, as a function of n, years, and frequency. |
@@ -78,16 +108,22 @@ input fails the root suite and names the file.
 on disk, and that every file under a governed root be owned by exactly one
 entry. Consequently:
 
-- An experiment's output root joins `governed_roots` only once it has actually
-  written artifacts. `experiments/results_thesis/positive_control` is registered
-  now, with one entry per emitted file and `make thesis-positive-control` as the
-  `generator_command`. The other five slugs (`positive_control_calibration`,
-  `negative_control`, `defect_injection`, `informativeness`, `monthly_panel`)
-  are still absent from the registry, as the `proposed_future` class prescribes:
-  *"Intentionally has NO registry entry until the file exists."*
-- When the next experiment is implemented, that task adds its output root to
-  `governed_roots`, adds one entry per artifact whose `generator_command` is a
-  real Makefile target, and adds the target. Doing it earlier breaks the suite.
+- `experiments/results_thesis/positive_control` is registered in `entries[]`,
+  with one entry per emitted file and `make thesis-positive-control` as the
+  `generator_command`. Its files exist, which is what `entries[]` requires.
+- Stage 1b's root is in `governed_roots` now, but its per-file ownership lives in
+  `prospective_entries[]`, because an `entries[]` entry must match at least one
+  real file and no Stage 1b file exists yet. That block is the registry's answer
+  to a registration that fixes ownership *before* the run which creates the
+  files: same entry shape, same `make <target>` rule, not yet subject to
+  `coverage_rule`. The run commit moves those items verbatim into `entries[]`.
+- The remaining four slugs (`negative_control`, `defect_injection`,
+  `informativeness`, `monthly_panel`) have no registry entry of either kind, as
+  the `proposed_future` class prescribes.
+- When one of them is implemented, that task adds its output root to
+  `governed_roots`, adds the Makefile target, and declares ownership — in
+  `prospective_entries[]` if the registration requires ownership before the run,
+  otherwise in `entries[]` once the files exist.
 
 ## Claim discipline
 
