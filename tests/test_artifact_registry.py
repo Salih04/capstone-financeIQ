@@ -234,7 +234,15 @@ def test_every_entry_matches_at_least_one_file():
 
 
 def test_resolved_prospective_contracts_transition_verbatim():
-    """Prospective ownership is fixed before the run and cannot mutate on entry."""
+    """Prospective ownership is fixed before the run and cannot mutate on entry.
+
+    Live-registry assertion: any prospective contract that now resolves to real
+    files must already be verbatim in entries[] and gone from prospective_entries[].
+    Zero remaining prospective entries is a valid post-transition state, so this
+    never indexes prospective[0]. The transition machinery itself — including its
+    negative paths — is exercised against a synthetic fixture that does not depend
+    on the live registry holding an unresolved prospective contract.
+    """
     registry = load_registry()
     prospective = registry.get("prospective_entries", [])
     resolved_now = {
@@ -246,15 +254,34 @@ def test_resolved_prospective_contracts_transition_verbatim():
         prospective, registry["entries"], prospective, resolved_now
     ) == []
 
-    item = prospective[0]
-    assert prospective_transition_failures([item], [dict(item)], [], {item["path_or_glob"]}) == []
-    mutated = {**item, "notes": item["notes"] + " changed"}
+    # Synthetic contract: the governance rule is "when a prospective contract
+    # resolves to a governed file, the identical dict must appear in entries[] and
+    # the prospective copy must be removed." Proven here without needing a live
+    # unresolved entry.
+    synthetic = {
+        "path_or_glob": "experiments/results_thesis/__transition_probe__/report.json",
+        "artifact_class": "generated",
+        "generator_command": "make thesis-stage1b",
+        "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+        "hand_edit_forbidden": True,
+        "notes": "synthetic transition-machinery fixture; not a real registry entry",
+    }
+    pattern = synthetic["path_or_glob"]
+    # Clean verbatim transition: identical dict in entries[], removed from prospective[].
     assert prospective_transition_failures(
-        [item], [mutated], [], {item["path_or_glob"]}
-    )
+        [synthetic], [dict(synthetic)], [], {pattern}
+    ) == []
+    # Mutated on the way into entries[] -> failure.
+    mutated = {**synthetic, "notes": synthetic["notes"] + " changed"}
+    assert prospective_transition_failures([synthetic], [mutated], [], {pattern})
+    # Resolved but still left behind in prospective_entries[] -> failure.
     assert prospective_transition_failures(
-        [item], [dict(item)], [item], {item["path_or_glob"]}
+        [synthetic], [dict(synthetic)], [synthetic], {pattern}
     )
+    # Still unresolved (no files on disk yet) -> no transition required, no failure.
+    assert prospective_transition_failures(
+        [synthetic], [], [synthetic], set()
+    ) == []
 
 
 def test_full_coverage_exactly_one_owner():
