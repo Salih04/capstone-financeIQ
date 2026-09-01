@@ -53,56 +53,7 @@
     ]
   },
   "reproducibility_note": "Regeneration reproduces content in an environment-qualified sense only: byte identity requires matching Python, platform, and numerical-package versions (see METHODOLOGY 'Reproducibility and run provenance'). This registry does not claim universal byte reproducibility.",
-  "prospective_entries": [
-    {
-      "path_or_glob": "experiments/results_thesis/positive_control_calibration/positive_control_calibration_report.json",
-      "artifact_class": "generated",
-      "generator_command": "make thesis-stage1b",
-      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
-      "hand_edit_forbidden": true,
-      "notes": "Machine-readable Stage 1b result: the registered design, the per-theta calibration and detection curve, the closed deterministic integrity contract, and replay evidence. Carries no scientific performance PASS/FAIL gate. Written by experiments/thesis/positive_control_calibration.py."
-    },
-    {
-      "path_or_glob": "experiments/results_thesis/positive_control_calibration/positive_control_calibration_report.md",
-      "artifact_class": "generated",
-      "generator_command": "make thesis-stage1b",
-      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
-      "hand_edit_forbidden": true,
-      "notes": "Human-readable rendering of the same Stage 1b result. Passes the shared placebo claim-safety validator before it is written."
-    },
-    {
-      "path_or_glob": "experiments/results_thesis/positive_control_calibration/repetitions.csv",
-      "artifact_class": "generated",
-      "generator_command": "make thesis-stage1b",
-      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
-      "hand_edit_forbidden": true,
-      "notes": "One row per (injection level, repetition id 200-599): the frozen seed level index, both declared seeds, the injected-table SHA256, every checkpoint IC and its row count, the raw permutation p, the Stage-1-operational-rule operating point, the primary and secondary detection flags, and the per-cell mechanism-invariant results."
-    },
-    {
-      "path_or_glob": "experiments/results_thesis/positive_control_calibration/calibration_curve.csv",
-      "artifact_class": "generated",
-      "generator_command": "make thesis-stage1b",
-      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
-      "hand_edit_forbidden": true,
-      "notes": "One row per injection level: registered descriptive summaries (mean, SD, median, p05, p95) of the realized raw equity carrier IC and of the final evaluated IC, the Stage-1-operational-rule detection rate with its pointwise 95% Wilson interval, and the secondary non-gating raw-p<0.05 rate. Wilson intervals are pointwise; no simultaneous or between-theta interval is claimed."
-    },
-    {
-      "path_or_glob": "experiments/results_thesis/positive_control_calibration/artifact_manifest.json",
-      "artifact_class": "generated",
-      "generator_command": "make thesis-stage1b",
-      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
-      "hand_edit_forbidden": true,
-      "notes": "SHA256 manifest emitted by experiments/thesis/provenance.py write_manifest, recording the seed, the git SHA, the runner and registration-module hashes, the frozen design constants, the integrity verdict, and the read-only source dataset."
-    },
-    {
-      "path_or_glob": "experiments/results_thesis/positive_control_calibration/attempt_provenance.json",
-      "artifact_class": "generated",
-      "generator_command": "make thesis-stage1b",
-      "inputs": [],
-      "hand_edit_forbidden": true,
-      "notes": "Operational governance/provenance marker recording initial and crash-recovery attempts, registered configuration identity, seed-schedule identity, prior-incomplete status, and attempt completion status. It is not a scientific emitted artifact; artifact_manifest.json remains the completion authority."
-    }
-  ],
+  "prospective_entries": [],
   "entries": [
     {
       "path_or_glob": "experiments/results_thesis/positive_control/positive_control_report.json",
@@ -1050,7 +1001,8 @@
         "experiments/results_serving_eval/serving_eval_report.json",
         "experiments/results_dimensionality/dimensionality_report.json",
         "experiments/results_contamination/contamination_report.json",
-        "experiments/results_thesis/positive_control/positive_control_report.json"
+        "experiments/results_thesis/positive_control/positive_control_report.json",
+        "experiments/results_thesis/positive_control_calibration/positive_control_calibration_report.json"
       ],
       "hand_edit_forbidden": true,
       "notes": "Written by scripts/build_limitations_register.py, which holds the reviewed curated seed quotations as source-bound constants (hence the script is a declared input). Resolves only registered JSON paths and globs — never a filesystem scan — and emits every top-level limitations[] entry verbatim. The listed report inputs are the registered JSON artifacts that currently carry a top-level limitations list; a newly registered report carrying one also becomes an input and must be added here."
@@ -1169,6 +1121,54 @@
       ],
       "hand_edit_forbidden": true,
       "notes": "Single exact glob for the frozen pre-thesis baseline record (JSON plus its rendered Markdown). Written by scripts/build_thesis_baseline.py, which reads the governed artifacts above and transcribes their values; it fits no model and recomputes no statistic. The JSON embeds source_artifacts checksums, so the staleness test re-verifies every frozen input and the freeze fails loudly if one drifts. Records ownership and provenance for later thesis comparison only."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/positive_control_calibration_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Machine-readable Stage 1b result: the registered design, the per-theta calibration and detection curve, the closed deterministic integrity contract, and replay evidence. Carries no scientific performance PASS/FAIL gate. Written by experiments/thesis/positive_control_calibration.py."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/positive_control_calibration_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Human-readable rendering of the same Stage 1b result. Passes the shared placebo claim-safety validator before it is written."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/repetitions.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "One row per (injection level, repetition id 200-599): the frozen seed level index, both declared seeds, the injected-table SHA256, every checkpoint IC and its row count, the raw permutation p, the Stage-1-operational-rule operating point, the primary and secondary detection flags, and the per-cell mechanism-invariant results."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/calibration_curve.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "One row per injection level: registered descriptive summaries (mean, SD, median, p05, p95) of the realized raw equity carrier IC and of the final evaluated IC, the Stage-1-operational-rule detection rate with its pointwise 95% Wilson interval, and the secondary non-gating raw-p<0.05 rate. Wilson intervals are pointwise; no simultaneous or between-theta interval is claimed."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/artifact_manifest.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "SHA256 manifest emitted by experiments/thesis/provenance.py write_manifest, recording the seed, the git SHA, the runner and registration-module hashes, the frozen design constants, the integrity verdict, and the read-only source dataset."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/positive_control_calibration/attempt_provenance.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage1b",
+      "inputs": [],
+      "hand_edit_forbidden": true,
+      "notes": "Operational governance/provenance marker recording initial and crash-recovery attempts, registered configuration identity, seed-schedule identity, prior-incomplete status, and attempt completion status. It is not a scientific emitted artifact; artifact_manifest.json remains the completion authority."
     }
   ]
 }

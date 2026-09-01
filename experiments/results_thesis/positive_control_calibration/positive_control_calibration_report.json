@@ -1,0 +1,905 @@
+{
+  "calibration_curve": [
+    {
+      "carrier": "equity",
+      "checkpoint_summary": {
+        "ic_final_evaluation": {
+          "mean": 0.090305625773,
+          "median": 0.091275853045,
+          "n": 400,
+          "p05": 0.070382922608,
+          "p95": 0.108042562512,
+          "sd": 0.01215560758
+        },
+        "ic_injected": {
+          "mean": 0.0,
+          "median": 0.0,
+          "n": 400,
+          "p05": 0.0,
+          "p95": 0.0,
+          "sd": 0.0
+        },
+        "ic_model_input_carrier": {
+          "mean": -0.00434849601,
+          "median": -0.002234941873,
+          "n": 400,
+          "p05": -0.121988691177,
+          "p95": 0.098909061966,
+          "sd": 0.067700144829
+        },
+        "ic_model_prediction": {
+          "mean": 0.090305625773,
+          "median": 0.091275853045,
+          "n": 400,
+          "p05": 0.070382922608,
+          "p95": 0.108042562512,
+          "sd": 0.01215560758
+        },
+        "ic_panel_carrier": {
+          "mean": -0.00434849601,
+          "median": -0.002234941873,
+          "n": 400,
+          "p05": -0.121988691177,
+          "p95": 0.098909061966,
+          "sd": 0.067700144829
+        },
+        "ic_raw_carrier": {
+          "mean": -0.00434849601,
+          "median": -0.002234941873,
+          "n": 400,
+          "p05": -0.121988691177,
+          "p95": 0.098909061966,
+          "sd": 0.067700144829
+        }
+      },
+      "final_evaluated_ic": {
+        "mean": 0.090305625773,
+        "median": 0.091275853045,
+        "n": 400,
+        "p05": 0.070382922608,
+        "p95": 0.108042562512,
+        "sd": 0.01215560758
+      },
+      "ic_injected": 0.0,
+      "level_index": 0,
+      "model": "ridge",
+      "permutation_p_summary": {
+        "mean": 0.172154784522,
+        "median": 0.162333766624,
+        "n": 400,
+        "p05": 0.096765323468,
+        "p95": 0.277772222778,
+        "sd": 0.063624397811
+      },
+      "primary_detection": {
+        "detections": 0,
+        "name": "Stage-1-operational-rule detection probability",
+        "rate": 0.0,
+        "raw_equivalent": "p_raw < 0.01 (subject to the discrete permutation p-value convention)",
+        "rule": "detected_stage1_rule = min(1, 5 * p_raw) < 0.05",
+        "wilson_95_pointwise": [
+          0.0,
+          0.009512294334
+        ]
+      },
+      "realized_raw_carrier_ic": {
+        "mean": -0.00434849601,
+        "median": -0.002234941873,
+        "n": 400,
+        "p05": -0.121988691177,
+        "p95": 0.098909061966,
+        "sd": 0.067700144829
+      },
+      "repetition_id_range": [
+        200,
+        599
+      ],
+      "repetitions": 400,
+      "secondary_detection": {
+        "detections": 1,
+        "gating": false,
+        "name": "raw-p<0.05 detection probability \u2014 secondary, non-gating diagnostic",
+        "rate": 0.0025,
+        "rule": "raw p < 0.05",
+        "wilson_95_pointwise": [
+          0.000441447787,
+          0.014023285076
+        ]
+      }
+    },
+    {
+      "carrier": "equity",
+      "checkpoint_summary": {
+        "ic_final_evaluation": {
+          "mean": 0.099628182092,
+          "median": 0.096960295888,
+          "n": 400,
+          "p05": 0.073554497655,
+          "p95": 0.136879941381,
+          "sd": 0.019432697249
+        },
+        "ic_injected": {
+          "mean": 0.1,
+          "median": 0.1,
+          "n": 400,
+          "p05": 0.1,
+          "p95": 0.1,
+          "sd": 0.0
+        },
+        "ic_model_input_carrier": {
+          "mean": 0.102416596163,
+          "median": 0.10515055301,
+          "n": 400,
+          "p05": -0.00526366149,
+          "p95": 0.205753868395,
+          "sd": 0.066112555564
+        },
+        "ic_model_prediction": {
+          "mean": 0.099628182092,
+          "median": 0.096960295888,
+          "n": 400,
+          "p05": 0.073554497655,
+          "p95": 0.136879941381,
+          "sd": 0.019432697249
+        },
+        "ic_panel_carrier": {
+          "mean": 0.102416596163,
+          "median": 0.10515055301,
+          "n": 400,
+          "p05": -0.00526366149,
+          "p95": 0.205753868395,
+          "sd": 0.066112555564
+        },
+        "ic_raw_carrier": {
+          "mean": 0.102416596163,
+          "median": 0.10515055301,
+          "n": 400,
+          "p05": -0.00526366149,
+          "p95": 0.205753868395,
+          "sd": 0.066112555564
+        }
+      },
+      "final_evaluated_ic": {
+        "mean": 0.099628182092,
+        "median": 0.096960295888,
+        "n": 400,
+        "p05": 0.073554497655,
+        "p95": 0.136879941381,
+        "sd": 0.019432697249
+      },
+      "ic_injected": 0.1,
+      "level_index": 1,
+      "model": "ridge",
+      "permutation_p_summary": {
+        "mean": 0.141103889611,
+        "median": 0.137086291371,
+        "n": 400,
+        "p05": 0.035441455854,
+        "p95": 0.257089291071,
+        "sd": 0.079313905834
+      },
+      "primary_detection": {
+        "detections": 1,
+        "name": "Stage-1-operational-rule detection probability",
+        "rate": 0.0025,
+        "raw_equivalent": "p_raw < 0.01 (subject to the discrete permutation p-value convention)",
+        "rule": "detected_stage1_rule = min(1, 5 * p_raw) < 0.05",
+        "wilson_95_pointwise": [
+          0.000441447787,
+          0.014023285076
+        ]
+      },
+      "realized_raw_carrier_ic": {
+        "mean": 0.102416596163,
+        "median": 0.10515055301,
+        "n": 400,
+        "p05": -0.00526366149,
+        "p95": 0.205753868395,
+        "sd": 0.066112555564
+      },
+      "repetition_id_range": [
+        200,
+        599
+      ],
+      "repetitions": 400,
+      "secondary_detection": {
+        "detections": 34,
+        "gating": false,
+        "name": "raw-p<0.05 detection probability \u2014 secondary, non-gating diagnostic",
+        "rate": 0.085,
+        "rule": "raw p < 0.05",
+        "wilson_95_pointwise": [
+          0.061463020024,
+          0.116432184274
+        ]
+      }
+    },
+    {
+      "carrier": "equity",
+      "checkpoint_summary": {
+        "ic_final_evaluation": {
+          "mean": 0.130441418767,
+          "median": 0.129110233513,
+          "n": 400,
+          "p05": 0.087510954976,
+          "p95": 0.186733651365,
+          "sd": 0.029645593161
+        },
+        "ic_injected": {
+          "mean": 0.2,
+          "median": 0.2,
+          "n": 400,
+          "p05": 0.2,
+          "p95": 0.2,
+          "sd": 0.0
+        },
+        "ic_model_input_carrier": {
+          "mean": 0.201434488856,
+          "median": 0.200517391834,
+          "n": 400,
+          "p05": 0.106018556104,
+          "p95": 0.299537544947,
+          "sd": 0.058325205601
+        },
+        "ic_model_prediction": {
+          "mean": 0.130441418767,
+          "median": 0.129110233513,
+          "n": 400,
+          "p05": 0.087510954976,
+          "p95": 0.186733651365,
+          "sd": 0.029645593161
+        },
+        "ic_panel_carrier": {
+          "mean": 0.201434488856,
+          "median": 0.200517391834,
+          "n": 400,
+          "p05": 0.106018556104,
+          "p95": 0.299537544947,
+          "sd": 0.058325205601
+        },
+        "ic_raw_carrier": {
+          "mean": 0.201434488856,
+          "median": 0.200517391834,
+          "n": 400,
+          "p05": 0.106018556104,
+          "p95": 0.299537544947,
+          "sd": 0.058325205601
+        }
+      },
+      "final_evaluated_ic": {
+        "mean": 0.130441418767,
+        "median": 0.129110233513,
+        "n": 400,
+        "p05": 0.087510954976,
+        "p95": 0.186733651365,
+        "sd": 0.029645593161
+      },
+      "ic_injected": 0.2,
+      "level_index": 2,
+      "model": "ridge",
+      "permutation_p_summary": {
+        "mean": 0.065891910809,
+        "median": 0.047245275473,
+        "n": 400,
+        "p05": 0.003889611039,
+        "p95": 0.181886811319,
+        "sd": 0.062857470722
+      },
+      "primary_detection": {
+        "detections": 45,
+        "name": "Stage-1-operational-rule detection probability",
+        "rate": 0.1125,
+        "raw_equivalent": "p_raw < 0.01 (subject to the discrete permutation p-value convention)",
+        "rule": "detected_stage1_rule = min(1, 5 * p_raw) < 0.05",
+        "wilson_95_pointwise": [
+          0.085148458786,
+          0.147223569323
+        ]
+      },
+      "realized_raw_carrier_ic": {
+        "mean": 0.201434488856,
+        "median": 0.200517391834,
+        "n": 400,
+        "p05": 0.106018556104,
+        "p95": 0.299537544947,
+        "sd": 0.058325205601
+      },
+      "repetition_id_range": [
+        200,
+        599
+      ],
+      "repetitions": 400,
+      "secondary_detection": {
+        "detections": 211,
+        "gating": false,
+        "name": "raw-p<0.05 detection probability \u2014 secondary, non-gating diagnostic",
+        "rate": 0.5275,
+        "rule": "raw p < 0.05",
+        "wilson_95_pointwise": [
+          0.478546027087,
+          0.575930796724
+        ]
+      }
+    },
+    {
+      "carrier": "equity",
+      "checkpoint_summary": {
+        "ic_final_evaluation": {
+          "mean": 0.182221558521,
+          "median": 0.178707851065,
+          "n": 400,
+          "p05": 0.120969663659,
+          "p95": 0.254268175635,
+          "sd": 0.042859752336
+        },
+        "ic_injected": {
+          "mean": 0.3,
+          "median": 0.3,
+          "n": 400,
+          "p05": 0.3,
+          "p95": 0.3,
+          "sd": 0.0
+        },
+        "ic_model_input_carrier": {
+          "mean": 0.303809043034,
+          "median": 0.303436179995,
+          "n": 400,
+          "p05": 0.210453044349,
+          "p95": 0.3946986016,
+          "sd": 0.05755521222
+        },
+        "ic_model_prediction": {
+          "mean": 0.182221558521,
+          "median": 0.178707851065,
+          "n": 400,
+          "p05": 0.120969663659,
+          "p95": 0.254268175635,
+          "sd": 0.042859752336
+        },
+        "ic_panel_carrier": {
+          "mean": 0.303809043034,
+          "median": 0.303436179995,
+          "n": 400,
+          "p05": 0.210453044349,
+          "p95": 0.3946986016,
+          "sd": 0.05755521222
+        },
+        "ic_raw_carrier": {
+          "mean": 0.303809043034,
+          "median": 0.303436179995,
+          "n": 400,
+          "p05": 0.210453044349,
+          "p95": 0.3946986016,
+          "sd": 0.05755521222
+        }
+      },
+      "final_evaluated_ic": {
+        "mean": 0.182221558521,
+        "median": 0.178707851065,
+        "n": 400,
+        "p05": 0.120969663659,
+        "p95": 0.254268175635,
+        "sd": 0.042859752336
+      },
+      "ic_injected": 0.3,
+      "level_index": 3,
+      "model": "ridge",
+      "permutation_p_summary": {
+        "mean": 0.016710828917,
+        "median": 0.005699430057,
+        "n": 400,
+        "p05": 9.9990001e-05,
+        "p95": 0.06203379662,
+        "sd": 0.03201253178
+      },
+      "primary_detection": {
+        "detections": 243,
+        "name": "Stage-1-operational-rule detection probability",
+        "rate": 0.6075,
+        "raw_equivalent": "p_raw < 0.01 (subject to the discrete permutation p-value convention)",
+        "rule": "detected_stage1_rule = min(1, 5 * p_raw) < 0.05",
+        "wilson_95_pointwise": [
+          0.558841383341,
+          0.654113473377
+        ]
+      },
+      "realized_raw_carrier_ic": {
+        "mean": 0.303809043034,
+        "median": 0.303436179995,
+        "n": 400,
+        "p05": 0.210453044349,
+        "p95": 0.3946986016,
+        "sd": 0.05755521222
+      },
+      "repetition_id_range": [
+        200,
+        599
+      ],
+      "repetitions": 400,
+      "secondary_detection": {
+        "detections": 365,
+        "gating": false,
+        "name": "raw-p<0.05 detection probability \u2014 secondary, non-gating diagnostic",
+        "rate": 0.9125,
+        "rule": "raw p < 0.05",
+        "wilson_95_pointwise": [
+          0.880739267386,
+          0.936413089788
+        ]
+      }
+    },
+    {
+      "carrier": "equity",
+      "checkpoint_summary": {
+        "ic_final_evaluation": {
+          "mean": 0.212800525022,
+          "median": 0.21118571714,
+          "n": 400,
+          "p05": 0.142252868563,
+          "p95": 0.286311329611,
+          "sd": 0.044267350772
+        },
+        "ic_injected": {
+          "mean": 0.35,
+          "median": 0.35,
+          "n": 400,
+          "p05": 0.35,
+          "p95": 0.35,
+          "sd": 0.0
+        },
+        "ic_model_input_carrier": {
+          "mean": 0.35281815782,
+          "median": 0.351467487753,
+          "n": 400,
+          "p05": 0.259936429359,
+          "p95": 0.444905466996,
+          "sd": 0.055636098693
+        },
+        "ic_model_prediction": {
+          "mean": 0.212800525022,
+          "median": 0.21118571714,
+          "n": 400,
+          "p05": 0.142252868563,
+          "p95": 0.286311329611,
+          "sd": 0.044267350772
+        },
+        "ic_panel_carrier": {
+          "mean": 0.35281815782,
+          "median": 0.351467487753,
+          "n": 400,
+          "p05": 0.259936429359,
+          "p95": 0.444905466996,
+          "sd": 0.055636098693
+        },
+        "ic_raw_carrier": {
+          "mean": 0.35281815782,
+          "median": 0.351467487753,
+          "n": 400,
+          "p05": 0.259936429359,
+          "p95": 0.444905466996,
+          "sd": 0.055636098693
+        }
+      },
+      "final_evaluated_ic": {
+        "mean": 0.212800525022,
+        "median": 0.21118571714,
+        "n": 400,
+        "p05": 0.142252868563,
+        "p95": 0.286311329611,
+        "sd": 0.044267350772
+      },
+      "ic_injected": 0.35,
+      "level_index": 5,
+      "model": "ridge",
+      "permutation_p_summary": {
+        "mean": 0.00604289571,
+        "median": 0.001299870013,
+        "n": 400,
+        "p05": 9.9990001e-05,
+        "p95": 0.029427057294,
+        "sd": 0.015143365201
+      },
+      "primary_detection": {
+        "detections": 347,
+        "name": "Stage-1-operational-rule detection probability",
+        "rate": 0.8675,
+        "raw_equivalent": "p_raw < 0.01 (subject to the discrete permutation p-value convention)",
+        "rule": "detected_stage1_rule = min(1, 5 * p_raw) < 0.05",
+        "wilson_95_pointwise": [
+          0.830753680303,
+          0.897254783361
+        ]
+      },
+      "realized_raw_carrier_ic": {
+        "mean": 0.35281815782,
+        "median": 0.351467487753,
+        "n": 400,
+        "p05": 0.259936429359,
+        "p95": 0.444905466996,
+        "sd": 0.055636098693
+      },
+      "repetition_id_range": [
+        200,
+        599
+      ],
+      "repetitions": 400,
+      "secondary_detection": {
+        "detections": 387,
+        "gating": false,
+        "name": "raw-p<0.05 detection probability \u2014 secondary, non-gating diagnostic",
+        "rate": 0.9675,
+        "rule": "raw p < 0.05",
+        "wilson_95_pointwise": [
+          0.945195847176,
+          0.980910157621
+        ]
+      }
+    },
+    {
+      "carrier": "equity",
+      "checkpoint_summary": {
+        "ic_final_evaluation": {
+          "mean": 0.250279183231,
+          "median": 0.246339816232,
+          "n": 400,
+          "p05": 0.170402817717,
+          "p95": 0.327473005722,
+          "sd": 0.047514762659
+        },
+        "ic_injected": {
+          "mean": 0.4,
+          "median": 0.4,
+          "n": 400,
+          "p05": 0.4,
+          "p95": 0.4,
+          "sd": 0.0
+        },
+        "ic_model_input_carrier": {
+          "mean": 0.408354038501,
+          "median": 0.407563685169,
+          "n": 400,
+          "p05": 0.315470079455,
+          "p95": 0.501511380515,
+          "sd": 0.055175199467
+        },
+        "ic_model_prediction": {
+          "mean": 0.250279183231,
+          "median": 0.246339816232,
+          "n": 400,
+          "p05": 0.170402817717,
+          "p95": 0.327473005722,
+          "sd": 0.047514762659
+        },
+        "ic_panel_carrier": {
+          "mean": 0.408354038501,
+          "median": 0.407563685169,
+          "n": 400,
+          "p05": 0.315470079455,
+          "p95": 0.501511380515,
+          "sd": 0.055175199467
+        },
+        "ic_raw_carrier": {
+          "mean": 0.408354038501,
+          "median": 0.407563685169,
+          "n": 400,
+          "p05": 0.315470079455,
+          "p95": 0.501511380515,
+          "sd": 0.055175199467
+        }
+      },
+      "final_evaluated_ic": {
+        "mean": 0.250279183231,
+        "median": 0.246339816232,
+        "n": 400,
+        "p05": 0.170402817717,
+        "p95": 0.327473005722,
+        "sd": 0.047514762659
+      },
+      "ic_injected": 0.4,
+      "level_index": 4,
+      "model": "ridge",
+      "permutation_p_summary": {
+        "mean": 0.001744075592,
+        "median": 0.000199980002,
+        "n": 400,
+        "p05": 9.9990001e-05,
+        "p95": 0.008604139586,
+        "sd": 0.005952430309
+      },
+      "primary_detection": {
+        "detections": 384,
+        "name": "Stage-1-operational-rule detection probability",
+        "rate": 0.96,
+        "raw_equivalent": "p_raw < 0.01 (subject to the discrete permutation p-value convention)",
+        "rule": "detected_stage1_rule = min(1, 5 * p_raw) < 0.05",
+        "wilson_95_pointwise": [
+          0.936017752282,
+          0.97523093693
+        ]
+      },
+      "realized_raw_carrier_ic": {
+        "mean": 0.408354038501,
+        "median": 0.407563685169,
+        "n": 400,
+        "p05": 0.315470079455,
+        "p95": 0.501511380515,
+        "sd": 0.055175199467
+      },
+      "repetition_id_range": [
+        200,
+        599
+      ],
+      "repetitions": 400,
+      "secondary_detection": {
+        "detections": 398,
+        "gating": false,
+        "name": "raw-p<0.05 detection probability \u2014 secondary, non-gating diagnostic",
+        "rate": 0.995,
+        "rule": "raw p < 0.05",
+        "wilson_95_pointwise": [
+          0.981955081564,
+          0.998627747045
+        ]
+      }
+    }
+  ],
+  "checkpoint_definitions": {
+    "ic_final_evaluation": "evaluation identity checkpoint: pooled IC as reported by the governed significance machinery",
+    "ic_injected": "intended injected IC (design constant theta)",
+    "ic_model_input_carrier": "identity/invariant checkpoint: IC of the carrier column as the model actually receives it, after NaN -> 0.5 rank imputation, full cross-section",
+    "ic_model_prediction": "substantive transition: IC of the fitted ridge prediction vector against the realized target",
+    "ic_panel_carrier": "identity/invariant checkpoint: IC of the carrier after build_panel's within-year rank-percentile normalization",
+    "ic_raw_carrier": "identity/invariant checkpoint: realized IC of the carrier column in the raw CSV, observed cells only, before feature construction"
+  },
+  "checkpoint_roles": {
+    "ic_final_evaluation": "evaluation_identity",
+    "ic_injected": "design_constant",
+    "ic_model_input_carrier": "identity_invariant",
+    "ic_model_prediction": "substantive_transition",
+    "ic_panel_carrier": "identity_invariant",
+    "ic_raw_carrier": "identity_invariant"
+  },
+  "claim_safety": {
+    "apparatus_characterization_only": true,
+    "descriptive_research_evidence_only": true,
+    "investment_value_established": false,
+    "reliable_predictive_edge_established": false,
+    "statement": "Stage 1b characterizes how the frozen measurement pipeline responds to a synthetic relationship of known nominal strength injected into one raw column. It is apparatus characterization on manufactured input, not evidence about BIST equities: a recovered quantity here measures the instrument, and the repository's committed walk-forward null is untouched by anything reported here."
+  },
+  "design": {
+    "alpha": 0.05,
+    "bootstraps": 10000,
+    "carrier": "equity",
+    "carriers": [
+      "equity"
+    ],
+    "detection_interval": "pointwise 95% Wilson",
+    "excluded_stage_1_carrier_arms": [
+      "current_ratio missingness arm"
+    ],
+    "excluded_stage_1_theta_arms": [
+      0.9
+    ],
+    "has_performance_gate": false,
+    "ic_grid": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.35,
+      0.4
+    ],
+    "injection_mechanism": "within-year permutation of the carrier's own observed values into the order of a Gaussian-copula latent score s = rho*z + sqrt(1-rho^2)*eps, rho = 2*sin(pi*theta/6); missingness preserved exactly; no fabricated values",
+    "level_index_map": {
+      "0.0": 0,
+      "0.1": 1,
+      "0.2": 2,
+      "0.3": 3,
+      "0.35": 5,
+      "0.4": 4
+    },
+    "model": "ridge",
+    "new_rung": 0.35,
+    "not_computed": [
+      "Stage 1 confirmatory_gate",
+      "Stage 1 gate_informativeness",
+      "strict-monotonicity pass/fail",
+      "GATE_LEVELS rejection criterion",
+      "80%-detection gate or interpolated threshold crossing"
+    ],
+    "permutations": 10000,
+    "primary_detection": {
+      "name": "Stage-1-operational-rule detection probability",
+      "raw_equivalent": "p_raw < 0.01 (subject to the discrete permutation p-value convention)",
+      "rule": "detected_stage1_rule = min(1, 5 * p_raw) < 0.05"
+    },
+    "prospective_not_blind": true,
+    "repetition_ids": [
+      200,
+      599
+    ],
+    "repetitions_per_level": 400,
+    "report_order": "numeric; seed identity is the frozen level-index map",
+    "secondary_detection": {
+      "gating": false,
+      "name": "raw-p<0.05 detection probability \u2014 secondary, non-gating diagnostic",
+      "rule": "raw p < 0.05"
+    },
+    "seed_formulas": {
+      "injection": "base_seed*1_000_003 + level_index*10_007 + repetition",
+      "permutation": "significance.DEFAULT_SEED + repetition"
+    },
+    "sesoi_status": "UNRESOLVED",
+    "split_count": 3,
+    "stage1_operational_divisor": 5,
+    "stage1_operational_divisor_note": "Frozen historical Stage 1 operating divisor, retained as one fixed operating point only. Not derived from len(IC_GRID), not a Stage 1b hypothesis-family size, and not a six-level family-wise-error-control claim.",
+    "stage_1_status": "FAILED AS WRITTEN \u2014 INFORMATIVE",
+    "stage_2_status": "BLOCKED",
+    "test_split_sizes": [
+      80,
+      80,
+      80
+    ]
+  },
+  "execution_preconditions": {
+    "checks": [
+      "registered carrier assertion",
+      "registered seed/provenance equality",
+      "malformed or empty level result rejection",
+      "injected-table hash internal consistency",
+      "filesystem-backed staged-output confinement",
+      "outside-namespace workspace write confinement"
+    ],
+    "classification": "execution preconditions / implementation invariants",
+    "note": "These checks protect the registered execution and provenance boundary; they are not additional scientific integrity or performance gates."
+  },
+  "experiment": "positive_control_calibration",
+  "integrity": {
+    "contract": "closed deterministic list \u2014 docs/thesis/STAGE_1B_REGISTRATION.md",
+    "excluded_from_every_check": [
+      "recovered IC magnitude",
+      "detection probability",
+      "monotonicity",
+      "Wilson interval position",
+      "Stage 1b theta=0 diagnostic",
+      "crossing location",
+      "any performance statistic"
+    ],
+    "failures": [],
+    "has_performance_gate": false,
+    "mechanical": {
+      "Stage 1 historical namespace is not overwritten": {
+        "detail": "6 Stage 1 files hashed before and after",
+        "passed": true
+      },
+      "Stage 1b writes only to its isolated namespace": {
+        "detail": "root=experiments/results_thesis/positive_control_calibration; escaping=[]; protected_hits=[]; actual_files=['calibration_curve.csv', 'positive_control_calibration_report.json', 'positive_control_calibration_report.md', 'repetitions.csv']; unexpected_files=[]; unexpected_directories=[]; missing=[]; outside_namespace_unchanged=True",
+        "passed": true
+      },
+      "complete 6 \u00d7 400 matrix": {
+        "detail": "2400 cells over 6 levels \u00d7 400 repetitions",
+        "passed": true
+      },
+      "declared seed formulas reproduced": {
+        "detail": "0 cells disagreed with the declared formulas",
+        "passed": true
+      },
+      "no Stage 1 repetition/seed overlap": {
+        "detail": "0 seeds shared with Stage 1 streams",
+        "passed": true
+      },
+      "no data/trusted*, data/trusted_clean*, or data/provenance* mutation": {
+        "detail": "563 protected data files hashed before and after",
+        "passed": true
+      },
+      "no missing/duplicate repetition cells": {
+        "detail": "missing=[] duplicates=[]",
+        "passed": true
+      },
+      "no seed collision": {
+        "detail": "2400 distinct injection seeds; injection/permutation streams disjoint=True",
+        "passed": true
+      },
+      "registered source dataset hash matches": {
+        "detail": "pre-run source sha256 3923888b548e\u2026 vs registered 3923888b548e\u2026",
+        "passed": true
+      },
+      "replay deterministic": {
+        "detail": "replay probe theta=0.0 repetition=200 identical=True",
+        "passed": true
+      },
+      "required outputs finite": {
+        "detail": "0 non-finite required outputs: []",
+        "passed": true
+      },
+      "runtime override restored on every exit path": {
+        "detail": "run_experiments.TRAINING_MODELING matched its pre-run value after the grid",
+        "passed": true
+      },
+      "source remains unchanged": {
+        "detail": "post-run source sha256 3923888b548e\u2026",
+        "passed": true
+      }
+    },
+    "mechanism": {
+      "carrier missingness mask preserved": {
+        "detail": "null stays null, cell for cell",
+        "passed": true
+      },
+      "carrier observed-value multiset preserved within year": {
+        "detail": "per-year sorted observed carrier values identical to the source table",
+        "passed": true
+      },
+      "equity reaches the modeled feature path": {
+        "detail": "equity measured at the model-input checkpoint in every cell",
+        "passed": true
+      },
+      "identity/invariant checkpoint ICs agree within the already governed Stage 1 numerical tolerance": {
+        "detail": "identity checkpoints ['ic_raw_carrier', 'ic_panel_carrier', 'ic_model_input_carrier'] agree within 1e-12",
+        "passed": true
+      },
+      "non-carrier features unchanged": {
+        "detail": "every non-carrier column identical",
+        "passed": true
+      },
+      "ridge prediction IC and final evaluation IC agree within the already governed Stage 1 numerical tolerance": {
+        "detail": "ic_model_prediction equals ic_final_evaluation within 1e-12",
+        "passed": true
+      },
+      "targets unchanged": {
+        "detail": "next_year_return_pct identical to the source table",
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  "limitations": [
+    "Stage 1b is apparatus characterization on synthetic input. It establishes no predictive edge, no alpha, no investment value, and no production readiness, and the repository's committed walk-forward finding is unchanged by it.",
+    "The primary result is descriptive. Stage 1b has no scientific performance PASS/FAIL gate: a flat, non-monotone, weak, surprising, or high-background curve is a scientific result, not an integrity failure.",
+    "The realized equity panel is fixed across repetitions. The synthetic injection draw changes and the permutation-test RNG changes, so the reported variation carries injection-draw randomness plus permutation Monte-Carlo randomness conditional on this one realized panel. It excludes uncertainty from drawing another equity universe, market panel, time period, PIT universe, or monthly sample.",
+    "Wilson intervals are pointwise per theta. The permutation seed does not depend on theta or level index, so the permutation RNG stream is shared across theta levels for the same repetition id; the intervals are marginal and are not simultaneous or between-level comparison intervals. No between-theta inference is drawn from them.",
+    "For R=400 the approximate worst-case pointwise Wilson half-width is about 4.9 percentage points near p=0.50 and about 3.9 percentage points near p=0.80. R=400 improves grid-point precision but does not identify an exact between-grid crossing, and no interpolation is confirmatory.",
+    "The divisor 5 in the primary rule is the frozen historical Stage 1 operating divisor, retained as one fixed operating point for comparability. Stage 1b's six theta levels are not a hypothesis family and no family-wise-error-control claim is made across them.",
+    "theta=0 is not a zero-signal market world: the real non-carrier features remain in the pipeline, so the theta=0 rung describes that background rather than zero.",
+    "theta is a synthetic copula design constant. It is not a realistic BIST IC, not a universal IC benchmark, and not a smallest effect size of interest; SESOI remains UNRESOLVED.",
+    "The injection permutes the carrier's own observed values within each year, which destroys that column's joint structure with the other features. Every rung including theta=0 carries the same damage, so the curve is internally consistent, but the absolute recovered IC is not the IC an equally strong naturally-occurring feature would give.",
+    "The temporary run_experiments.TRAINING_MODELING override is process-global and this stage is single-threaded; concurrent execution is outside its scope."
+  ],
+  "protocol": "docs/thesis/PRE_EXPERIMENT_PROTOCOL.md",
+  "provenance": {
+    "duration_seconds": 1050.59,
+    "git": {
+      "dirty": true,
+      "sha": "9681646e5199896c11b48c3bb6cd0319deba0c09",
+      "short_sha": "9681646e"
+    },
+    "implementation_sha256": "61a34acd577874ec269e4a654a686bdd1224c99016950aac01af694d10903020",
+    "pipeline_module_sha256": "265f58678d522eea0c48fbccba415ed30b3e20abc6bb7ae0a8e33857c5feb543",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.3",
+    "registration_module_sha256": "7a140f8caf4d2f58db6479a1124bf97241eb91dd6d207f12bc974f6110bf0caa",
+    "seed": 42,
+    "significance_module_sha256": "5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6",
+    "source_dataset": {
+      "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "registered_sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+      "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+      "size_bytes": 256050
+    },
+    "stage1_implementation_sha256": "44c897568f17618b7db0a42103384f43d24da5fb296bf092b422ef51a495e27d",
+    "started_at_utc": "2026-09-01T16:04:05.954191Z"
+  },
+  "registration": "docs/thesis/STAGE_1B_REGISTRATION.md",
+  "replay": {
+    "probe": {
+      "digest": "3bebc67ff27bcb637b360a4d1f6df0a5f8ef5e4f3e2d4dea81a23e7f6dc45cd1",
+      "ic_injected": 0.0,
+      "identical": true,
+      "repetition": 200
+    },
+    "records_digest": "2fabdb5d2f9875fc1b6877a7225db75820a3b84014cf556fac087c5d988fed2b",
+    "rule": "One governed prospective run with the frozen seed schedule. A deterministic replay with identical settings is verification, not a new scientific run."
+  },
+  "schema_version": 1,
+  "stage": "Stage 1b \u2014 prospective calibration / diagnostic re-scope of the Stage 1 positive control"
+}

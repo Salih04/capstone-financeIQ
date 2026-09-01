@@ -43,6 +43,32 @@ MAKEFILE = REPO_ROOT / "Makefile"
 REGISTRY = REPO_ROOT / "artifact_registry.json"
 
 
+def stage1b_result_root_snapshot() -> dict:
+    """A structural snapshot of the completed Stage 1b result root.
+
+    POST-RUN, inertness of an import / no-op CLI / ``registered_plan()`` call is
+    SNAPSHOT-UNCHANGED, not result-root absence. The snapshot binds the file
+    inventory, every artifact hash, and the absence of ``.staging``. Empty inventory
+    when the root does not exist.
+    """
+    root = STAGE_1B_OUTPUT_DIR
+    files: dict[str, str] = {}
+    dirs: list[str] = []
+    if root.exists():
+        for path in sorted(root.rglob("*")):
+            rel = path.relative_to(root).as_posix()
+            if path.is_file():
+                files[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
+            elif path.is_dir():
+                dirs.append(rel)
+    return {
+        "exists": root.exists(),
+        "files": files,
+        "dirs": dirs,
+        "staging": (root / pcc.STAGING_DIRNAME).exists(),
+    }
+
+
 @pytest.fixture(scope="module")
 def source() -> str:
     return RUNNER_PATH.read_text(encoding="utf-8")
@@ -180,31 +206,60 @@ def _synthetic_raw(rows_per_year: int = 40, seed: int = 5) -> pd.DataFrame:
 # 1 / 24. Import is inert; nothing is created and nothing is mutated
 # --------------------------------------------------------------------------- #
 def test_importing_the_runner_creates_nothing_and_mutates_nothing():
+    """Importing the runner and calling ``registered_plan()`` execute nothing.
+
+    POST-RUN, inertness is SNAPSHOT-UNCHANGED: the modeling dataset, the completed
+    Stage 1b artifact inventory and hashes, and the absence of ``.staging`` are all
+    left exactly as found. ``registered_plan()['executed']`` is False because this
+    process did not run Stage 1b — not because Stage 1b has never run.
+    """
     dataset = REPO_ROOT / reg.DATASET_PATH
     before = hashlib.sha256(dataset.read_bytes()).hexdigest()
     assert before == reg.DATASET_SHA256
+    snapshot_before = stage1b_result_root_snapshot()
     script = (
-        "import hashlib, pathlib\n"
+        "import hashlib, json, pathlib\n"
         f"dataset = pathlib.Path({str(dataset)!r})\n"
+        f"root = pathlib.Path({str(STAGE_1B_OUTPUT_DIR)!r})\n"
+        "def snap():\n"
+        "    files, dirs = {}, []\n"
+        "    if root.exists():\n"
+        "        for p in sorted(root.rglob('*')):\n"
+        "            rel = p.relative_to(root).as_posix()\n"
+        "            if p.is_file():\n"
+        "                files[rel] = hashlib.sha256(p.read_bytes()).hexdigest()\n"
+        "            elif p.is_dir():\n"
+        "                dirs.append(rel)\n"
+        "    return {'exists': root.exists(), 'files': files, 'dirs': dirs,\n"
+        "            'staging': (root / '.staging').exists()}\n"
         "before = hashlib.sha256(dataset.read_bytes()).hexdigest()\n"
+        "snap_before = snap()\n"
         "import experiments.thesis.positive_control_calibration as pcc\n"
         "after = hashlib.sha256(dataset.read_bytes()).hexdigest()\n"
         "assert after == before, 'import mutated the modeling dataset'\n"
-        f"assert not pathlib.Path({str(STAGE_1B_OUTPUT_DIR)!r}).exists()\n"
+        "assert snap() == snap_before, 'import changed the Stage 1b result root'\n"
         "plan = pcc.registered_plan()\n"
         "assert plan['executed'] is False\n"
-        f"assert not pathlib.Path({str(STAGE_1B_OUTPUT_DIR)!r}).exists()\n"
+        "assert snap() == snap_before, 'registered_plan() changed the Stage 1b result root'\n"
+        "assert not (root / '.staging').exists()\n"
     )
     result = subprocess.run(
         [sys.executable, "-c", script], cwd=REPO_ROOT, capture_output=True, text=True, check=False
     )
     assert result.returncode == 0, result.stderr
     assert hashlib.sha256(dataset.read_bytes()).hexdigest() == before
-    assert not STAGE_1B_OUTPUT_DIR.exists()
+    assert stage1b_result_root_snapshot() == snapshot_before
+    assert not (STAGE_1B_OUTPUT_DIR / pcc.STAGING_DIRNAME).exists()
 
 
 def test_cli_without_an_explicit_run_flag_executes_nothing():
-    """Normal verification cannot trip the governed run: --run is mandatory."""
+    """Normal verification cannot trip the governed run: --run is mandatory.
+
+    POST-RUN this is snapshot-unchanged inertness — the CLI without ``--run`` still
+    returns ``executed=False`` and leaves the completed result root byte-for-byte
+    as it found it.
+    """
+    snapshot_before = stage1b_result_root_snapshot()
     result = subprocess.run(
         [sys.executable, "-m", "experiments.thesis.positive_control_calibration"],
         cwd=REPO_ROOT,
@@ -217,11 +272,12 @@ def test_cli_without_an_explicit_run_flag_executes_nothing():
     payload = json.loads(result.stdout)
     assert payload["executed"] is False
     assert payload["experiment"] == reg.STAGE_1B_SLUG
-    assert not STAGE_1B_OUTPUT_DIR.exists()
+    assert stage1b_result_root_snapshot() == snapshot_before
+    assert not (STAGE_1B_OUTPUT_DIR / pcc.STAGING_DIRNAME).exists()
 
 
 # --------------------------------------------------------------------------- #
-# 2 / 6 / 23. Namespace: registered slug, distinct from Stage 1, still absent
+# 2 / 6 / 23. Namespace: registered slug, distinct from Stage 1, now populated
 # --------------------------------------------------------------------------- #
 def test_runner_points_at_the_registered_slug_and_root():
     assert pcc.SLUG == reg.STAGE_1B_SLUG == "positive_control_calibration"
@@ -229,7 +285,9 @@ def test_runner_points_at_the_registered_slug_and_root():
     assert pcc.RESULT_ROOT.relative_to(REPO_ROOT).as_posix() + "/" == reg.STAGE_1B_RESULT_ROOT
     assert prov.output_dir(pcc.SLUG, create=False) == pcc.RESULT_ROOT
     assert prov.seed_for(pcc.SLUG) == pcc.BASE_SEED == reg.BASE_SEED == 42
-    assert not STAGE_1B_OUTPUT_DIR.exists()
+    # POST-RUN: the runner's registered root now holds the completed governed run.
+    assert STAGE_1B_OUTPUT_DIR.is_dir()
+    assert (STAGE_1B_OUTPUT_DIR / pcc.MANIFEST_FILENAME).is_file()
 
 
 def test_stage1_root_stays_distinct_and_is_never_a_stage1b_target():
@@ -241,9 +299,38 @@ def test_stage1_root_stays_distinct_and_is_never_a_stage1b_target():
     assert root != "experiments/results_thesis/positive_control"
 
 
-def test_result_root_is_absent_before_the_governed_run():
-    assert not STAGE_1B_OUTPUT_DIR.exists()
+def test_result_root_is_complete_after_the_governed_run():
+    """POST-RUN completion guard (replaces the pre-run absence guard).
+
+    Lifecycle/completion state only: root existence, manifest existence, contract
+    location, file inventory, ``.staging`` absence. No scientific quantity is
+    inspected. ``RESULT_ROOT_EXISTS_AT_REGISTRATION`` stays False as a historical
+    registration fact; the current filesystem carries the completed run.
+    """
     assert reg.RESULT_ROOT_EXISTS_AT_REGISTRATION is False
+    assert STAGE_1B_OUTPUT_DIR.is_dir()
+    assert (STAGE_1B_OUTPUT_DIR / pcc.MANIFEST_FILENAME).is_file()
+    assert not (STAGE_1B_OUTPUT_DIR / pcc.STAGING_DIRNAME).exists()
+
+    # Exactly the expected persistent surface, recursively: five scientific
+    # outputs (pcc.EMITTED_FILENAMES) plus the one operational attempt marker.
+    # No unexpected persistent file, no unexpected directory.
+    files = {
+        path.relative_to(STAGE_1B_OUTPUT_DIR).as_posix()
+        for path in STAGE_1B_OUTPUT_DIR.rglob("*")
+        if path.is_file()
+    }
+    subdirs = [path for path in STAGE_1B_OUTPUT_DIR.rglob("*") if path.is_dir()]
+    assert files == set(pcc.EMITTED_FILENAMES) | set(pcc.OPERATIONAL_FILENAMES)
+    assert subdirs == []
+
+    # The five scientific outputs remain exactly five; attempt_provenance.json is
+    # operational, not a sixth scientific endpoint. artifact_manifest.json stays
+    # the completion authority.
+    assert len(pcc.EMITTED_FILENAMES) == 5
+    assert pcc.OPERATIONAL_FILENAMES == ("attempt_provenance.json",)
+    assert "attempt_provenance.json" not in pcc.EMITTED_FILENAMES
+    assert pcc.MANIFEST_FILENAME in pcc.EMITTED_FILENAMES
 
 
 # --------------------------------------------------------------------------- #
@@ -711,14 +798,35 @@ def test_make_target_exists_and_requires_the_explicit_run_flag(makefile):
     assert "thesis-stage1b" in phony and "thesis-stage1b-replay" in phony
 
 
-def test_artifact_contracts_cover_every_future_emitted_file(registry):
-    """Scientific outputs and operational marker each have frozen contracts."""
+def test_artifact_contracts_cover_every_emitted_file(registry):
+    """Scientific outputs and operational marker each have frozen contracts.
+
+    POST-RUN: the six frozen ownership contracts now live in entries[] (entries[]
+    requires a real file on disk) and none remains in prospective_entries[]. The
+    contract dictionaries are still exactly the preregistered ones — the registry
+    transition machinery (tests/test_artifact_registry.py) forbids any mutation on
+    the move.
+    """
     root = reg.STAGE_1B_RESULT_ROOT.rstrip("/")
     contracts = [
         entry
-        for entry in registry["prospective_entries"]
+        for entry in registry["entries"]
         if entry["path_or_glob"].startswith(root + "/")
     ]
+    assert not any(
+        entry["path_or_glob"].startswith(root)
+        for entry in registry.get("prospective_entries", [])
+    )
+    # No duplicate ownership within the Stage 1b root.
+    patterns = [entry["path_or_glob"] for entry in contracts]
+    assert len(patterns) == len(set(patterns))
+    # No orphan governed output: every persistent file on disk is a contract.
+    on_disk = {
+        f"{root}/{path.relative_to(STAGE_1B_OUTPUT_DIR).as_posix()}"
+        for path in STAGE_1B_OUTPUT_DIR.rglob("*")
+        if path.is_file()
+    }
+    assert on_disk == set(patterns)
     scientific = [
         entry for entry in contracts if entry["path_or_glob"].rsplit("/", 1)[-1] in pcc.EMITTED_FILENAMES
     ]
@@ -753,16 +861,27 @@ def test_artifact_contracts_cover_every_future_emitted_file(registry):
         assert entry["notes"].strip()
 
 
-def test_no_orphan_output_and_no_premature_entries_ownership(registry):
-    """Every emitted name is owned, and none is claimed in entries[] yet.
+def test_stage1b_outputs_are_owned_by_entries_after_the_run(registry):
+    """Every emitted name is owned by entries[], and none stays prospective.
 
-    entries[] requires a real file on disk, so pre-run ownership lives in
-    prospective_entries[] and the run commit moves it across verbatim. The rule
-    that governs that move is stated in the registry itself.
+    entries[] requires a real file on disk. Pre-run the ownership lived in
+    prospective_entries[]; the governed-run commit moved every Stage 1b contract
+    across verbatim. The rule that governs that move is stated in the registry
+    itself and its wording is unchanged.
     """
     root = reg.STAGE_1B_RESULT_ROOT.rstrip("/")
+    owned = {
+        entry["path_or_glob"]
+        for entry in registry["entries"]
+        if entry["path_or_glob"].startswith(root)
+    }
+    assert owned == {
+        f"{root}/{name}"
+        for name in set(pcc.EMITTED_FILENAMES) | set(pcc.OPERATIONAL_FILENAMES)
+    }
     assert not any(
-        entry["path_or_glob"].startswith(root) for entry in registry["entries"]
+        entry["path_or_glob"].startswith(root)
+        for entry in registry.get("prospective_entries", [])
     )
     assert "prospective_entry_rule" in registry
     rule = registry["prospective_entry_rule"]

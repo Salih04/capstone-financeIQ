@@ -27,6 +27,25 @@ STAGE_1_REPORT = REPO_ROOT / "experiments/results_thesis/positive_control/positi
 STAGE_1_IMPLEMENTATION = REPO_ROOT / "experiments/thesis/positive_control.py"
 STAGE_1_OUTPUT_ROOT = REPO_ROOT / "experiments/results_thesis/positive_control"
 
+def stage1b_result_root_inventory() -> dict[str, str]:
+    """Relative filename -> sha256 for every file under the Stage 1b result root.
+
+    Empty when the root does not exist. Used for POST-RUN snapshot-unchanged
+    inertness checks: an operation is inert now if it leaves this inventory, the
+    modeling-dataset hash, and the absence of ``.staging`` exactly as it found
+    them — not if it keeps the result root from ever existing.
+    """
+    root = STAGE_1B_OUTPUT_DIR
+    if not root.exists():
+        return {}
+    inventory: dict[str, str] = {}
+    for path in sorted(root.rglob("*")):
+        if path.is_file():
+            inventory[path.relative_to(root).as_posix()] = hashlib.sha256(
+                path.read_bytes()
+            ).hexdigest()
+    return inventory
+
 
 def compact(text: str) -> str:
     """Normalize Markdown wrapping for semantic assertions."""
@@ -246,33 +265,37 @@ def test_stage1b_seed_streams_have_no_collision_or_stage1_overlap():
     assert all_stage1b_seeds.isdisjoint(stage1_injection | stage1_permutation)
 
 
-def test_stage1b_root_is_distinct_declared_and_absent(doc):
+def test_stage1b_root_is_distinct_declared_and_now_completed(doc):
     assert reg.STAGE_1B_SLUG == "positive_control_calibration"
     assert reg.STAGE_1B_SLUG != reg.STAGE_1_SLUG == stage1.SLUG
     assert reg.STAGE_1B_RESULT_ROOT == "experiments/results_thesis/positive_control_calibration/"
+    # HISTORICAL REGISTRATION FACT: the result root did not exist at registration.
+    # This is a fact about the registration commit and never changes.
     assert reg.RESULT_ROOT_EXISTS_AT_REGISTRATION is False
     assert reg.STAGE_1B_SLUG in prov.EXPERIMENT_SLUGS
     assert prov.seed_for(reg.STAGE_1B_SLUG) == 42
     assert STAGE_1B_OUTPUT_DIR != STAGE_1_OUTPUT_ROOT
-    # IMPLEMENTATION-PHASE GUARD (result root absence). The implementation commit
-    # adds the runner and the governance wiring but does NOT run Stage 1b, so this
-    # guard survives it unchanged and sunsets only when the one governed run
-    # executes. See tests/test_thesis_stage1b_implementation.py.
-    assert not STAGE_1B_OUTPUT_DIR.exists()
+    # CURRENT POST-RUN STATE: the one governed Stage 1b run has executed, so the
+    # result root now exists with its completed, immutable artifacts and no
+    # ``.staging`` scratch dir. The registration-phase absence guard has sunset.
+    assert STAGE_1B_OUTPUT_DIR.is_dir()
+    assert (STAGE_1B_OUTPUT_DIR / "artifact_manifest.json").is_file()
+    assert not (STAGE_1B_OUTPUT_DIR / ".staging").exists()
+    # The registration's pre-run prospective language remains as historical text.
     assert "must be absent now" in doc
     assert "does not create the result root" in doc
 
 
-def test_governance_wiring_is_present_and_the_run_has_not_happened():
-    """The inverted registration-phase guard: wiring present, run still absent.
+def test_governance_wiring_is_present_and_the_run_has_completed():
+    """The fully sunset registration-phase guard: wiring present, run completed.
 
-    This replaces the pre-implementation ``..._are_deferred`` guard in the same
-    commit that added the runner, the ``thesis-stage1b`` target, the
-    ``governed_roots`` entry, and the per-artifact ownership contracts — exactly
-    the sunset the registration's "Registration-phase guards" section requires.
-    It is not a weakening: the pre-implementation absences are replaced by the
-    stricter presence contract, and the one absence that must survive until the
-    governed run — the result root — is asserted here too.
+    This began as the inverted pre-implementation ``..._are_deferred`` guard and
+    is now advanced one more lifecycle step: the runner, the ``thesis-stage1b``
+    target, the ``governed_roots`` entry, and the per-artifact ownership contracts
+    all exist, AND the one governed run has executed. It is not a weakening: the
+    pre-implementation absences were replaced by a presence contract, and the
+    result-root absence — the one guard that survived implementation — has now
+    sunset to a completion contract in the governed-run artifact commit.
     """
     makefile = (REPO_ROOT / "Makefile").read_text(encoding="utf-8")
     registry = json.loads((REPO_ROOT / "artifact_registry.json").read_text(encoding="utf-8"))
@@ -288,25 +311,26 @@ def test_governance_wiring_is_present_and_the_run_has_not_happened():
     # 3. the governed root is registered.
     assert reg.STAGE_1B_RESULT_ROOT.rstrip("/") in registry["governed_roots"]
 
-    # 4. one ownership contract per emitted governed output, none of which may
-    #    sit in entries[] yet, because entries[] requires a real file on disk.
-    prospective = {
-        entry["path_or_glob"] for entry in registry["prospective_entries"]
-    }
-    assert prospective and all(
-        path.startswith(reg.STAGE_1B_RESULT_ROOT) for path in prospective
-    )
-    assert all(
-        entry["generator_command"] == "make thesis-stage1b"
-        for entry in registry["prospective_entries"]
+    # 4. one ownership contract per emitted governed output. entries[] requires a
+    #    real file on disk, so now that the governed run has executed these
+    #    contracts live in entries[] and none remains in prospective_entries[].
+    stage1b_entries = [
+        entry
+        for entry in registry["entries"]
+        if entry["path_or_glob"].startswith(reg.STAGE_1B_RESULT_ROOT)
+    ]
+    assert stage1b_entries and all(
+        entry["generator_command"] == "make thesis-stage1b" for entry in stage1b_entries
     )
     assert not any(
         entry["path_or_glob"].startswith(reg.STAGE_1B_RESULT_ROOT)
-        for entry in registry["entries"]
+        for entry in registry.get("prospective_entries", [])
     )
 
-    # 5. and the run itself has still not happened.
-    assert not STAGE_1B_OUTPUT_DIR.exists()
+    # 5. and the one governed run has now completed.
+    assert STAGE_1B_OUTPUT_DIR.is_dir()
+    assert (STAGE_1B_OUTPUT_DIR / "artifact_manifest.json").is_file()
+    assert not (STAGE_1B_OUTPUT_DIR / ".staging").exists()
 
 
 def test_closed_integrity_contract_has_only_machine_declared_conditions(doc):
@@ -417,20 +441,41 @@ def test_status_and_stage1_primary_carrier_match_governed_report(doc):
 
 
 def test_registration_module_import_remains_inert():
+    """Importing the registration module changes nothing.
+
+    POST-RUN, inertness is SNAPSHOT-UNCHANGED, not result-root absence: the import
+    must leave the modeling dataset, the completed Stage 1b artifact inventory and
+    hashes, and the absence of ``.staging`` exactly as it found them. "This import
+    did not execute Stage 1b" is the invariant — not "Stage 1b has never run".
+    """
     dataset = REPO_ROOT / reg.DATASET_PATH
     before = hashlib.sha256(dataset.read_bytes()).hexdigest()
     assert before == reg.DATASET_SHA256
+    inventory_before = stage1b_result_root_inventory()
+    staging_before = (STAGE_1B_OUTPUT_DIR / ".staging").exists()
     script = (
-        "import hashlib, pathlib\n"
+        "import hashlib, pathlib, json\n"
         f"dataset = pathlib.Path({str(dataset)!r})\n"
+        f"root = pathlib.Path({str(STAGE_1B_OUTPUT_DIR)!r})\n"
+        "def inventory():\n"
+        "    if not root.exists():\n"
+        "        return {}\n"
+        "    return {\n"
+        "        p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()\n"
+        "        for p in sorted(root.rglob('*')) if p.is_file()\n"
+        "    }\n"
         "before = hashlib.sha256(dataset.read_bytes()).hexdigest()\n"
+        "inv_before = inventory()\n"
+        "staging_before = (root / '.staging').exists()\n"
         "import experiments.thesis.stage1b_registration as reg\n"
         "after = hashlib.sha256(dataset.read_bytes()).hexdigest()\n"
         "assert after == before\n"
         "assert not hasattr(reg, 'run')\n"
         "assert not hasattr(reg, 'run_repetition')\n"
         "assert not hasattr(reg, 'inject_carrier')\n"
-        f"assert not pathlib.Path({str(STAGE_1B_OUTPUT_DIR)!r}).exists()\n"
+        "assert inventory() == inv_before, 'import changed the Stage 1b artifact inventory/hashes'\n"
+        "assert (root / '.staging').exists() == staging_before\n"
+        "assert not (root / '.staging').exists()\n"
     )
     result = subprocess.run(
         [sys.executable, "-c", script],
@@ -441,6 +486,9 @@ def test_registration_module_import_remains_inert():
     )
     assert result.returncode == 0, result.stderr
     assert hashlib.sha256(dataset.read_bytes()).hexdigest() == before
+    assert stage1b_result_root_inventory() == inventory_before
+    assert (STAGE_1B_OUTPUT_DIR / ".staging").exists() == staging_before
+    assert not (STAGE_1B_OUTPUT_DIR / ".staging").exists()
 
 
 def test_registration_module_has_no_pipeline_or_statistical_imports():
@@ -589,13 +637,18 @@ def test_registration_phase_guard_sunset_is_declared(doc):
         assert future_state in normalized
     assert "Execution is still **not performed**".replace("**", "") in normalized
     assert "must not be deleted or weakened before" in normalized
-    # The sunset has now happened for the wiring guards: the runner and the
-    # Makefile target exist. The result-root absence is the one guard that must
-    # survive the implementation commit and sunset only at the governed run.
+    # The sunset is now complete. The wiring guards sunset at implementation (the
+    # runner and Makefile target exist); the result-root absence guard — the one
+    # that survived implementation — has sunset in this governed-run artifact
+    # commit: the root now exists, holds its completed manifest, and carries no
+    # ``.staging`` scratch dir. The registration doc keeps its pre-run prospective
+    # language as historical text (asserted above); only the tests advance.
     makefile = (REPO_ROOT / "Makefile").read_text(encoding="utf-8")
     assert "thesis-stage1b:" in makefile
     assert (REPO_ROOT / "experiments/thesis/positive_control_calibration.py").is_file()
-    assert not STAGE_1B_OUTPUT_DIR.exists()
+    assert STAGE_1B_OUTPUT_DIR.is_dir()
+    assert (STAGE_1B_OUTPUT_DIR / "artifact_manifest.json").is_file()
+    assert not (STAGE_1B_OUTPUT_DIR / ".staging").exists()
 
 
 # --------------------------------------------------------------------------- #

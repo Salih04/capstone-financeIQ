@@ -224,6 +224,21 @@ Registered through: `experiments/results_thesis/positive_control/positive_contro
 - The temporary run_experiments.TRAINING_MODELING override is process-global and this experiment is single-threaded; concurrent execution is outside this task's scope.
 - Results describe this pipeline on this panel with this carrier. They do not generalize to other designs, frequencies, universes, or feature sets, and they establish nothing about BIST returns or investment value.
 
+### experiments/results_thesis/positive_control_calibration/positive_control_calibration_report.json
+
+Registered through: `experiments/results_thesis/positive_control_calibration/positive_control_calibration_report.json`
+
+- Stage 1b is apparatus characterization on synthetic input. It establishes no predictive edge, no alpha, no investment value, and no production readiness, and the repository's committed walk-forward finding is unchanged by it.
+- The primary result is descriptive. Stage 1b has no scientific performance PASS/FAIL gate: a flat, non-monotone, weak, surprising, or high-background curve is a scientific result, not an integrity failure.
+- The realized equity panel is fixed across repetitions. The synthetic injection draw changes and the permutation-test RNG changes, so the reported variation carries injection-draw randomness plus permutation Monte-Carlo randomness conditional on this one realized panel. It excludes uncertainty from drawing another equity universe, market panel, time period, PIT universe, or monthly sample.
+- Wilson intervals are pointwise per theta. The permutation seed does not depend on theta or level index, so the permutation RNG stream is shared across theta levels for the same repetition id; the intervals are marginal and are not simultaneous or between-level comparison intervals. No between-theta inference is drawn from them.
+- For R=400 the approximate worst-case pointwise Wilson half-width is about 4.9 percentage points near p=0.50 and about 3.9 percentage points near p=0.80. R=400 improves grid-point precision but does not identify an exact between-grid crossing, and no interpolation is confirmatory.
+- The divisor 5 in the primary rule is the frozen historical Stage 1 operating divisor, retained as one fixed operating point for comparability. Stage 1b's six theta levels are not a hypothesis family and no family-wise-error-control claim is made across them.
+- theta=0 is not a zero-signal market world: the real non-carrier features remain in the pipeline, so the theta=0 rung describes that background rather than zero.
+- theta is a synthetic copula design constant. It is not a realistic BIST IC, not a universal IC benchmark, and not a smallest effect size of interest; SESOI remains UNRESOLVED.
+- The injection permutes the carrier's own observed values within each year, which destroys that column's joint structure with the other features. Every rung including theta=0 carries the same damage, so the curve is internally consistent, but the absolute recovered IC is not the IC an equally strong naturally-occurring feature would give.
+- The temporary run_experiments.TRAINING_MODELING override is process-global and this stage is single-threaded; concurrent execution is outside its scope.
+
 ## Curated seed limitations
 
 ### retrospective cohort
