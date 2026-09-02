@@ -1484,6 +1484,7 @@ def test_stage1_implementation_and_artifacts_are_not_modified():
     # surface; historical reports retain the pre-fix hash below.
     tracked = [
         STAGE_1_IMPLEMENTATION,
+        REPO_ROOT / "experiments/significance.py",
         REPO_ROOT / "experiments/run_experiments.py",
         REPO_ROOT / "docs/thesis/STAGE_1B_REGISTRATION.md",
         REPO_ROOT / "docs/thesis/PRE_EXPERIMENT_PROTOCOL.md",
