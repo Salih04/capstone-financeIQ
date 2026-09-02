@@ -41,6 +41,7 @@ STAGE_1_OUTPUT_ROOT = REPO_ROOT / "experiments/results_thesis/positive_control"
 STAGE_1_IMPLEMENTATION = REPO_ROOT / "experiments/thesis/positive_control.py"
 MAKEFILE = REPO_ROOT / "Makefile"
 REGISTRY = REPO_ROOT / "artifact_registry.json"
+HISTORICAL_SIGNIFICANCE_SHA256 = "5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6"
 
 
 def stage1b_result_root_snapshot() -> dict:
@@ -1479,6 +1480,8 @@ def test_identity_checkpoint_tolerance_is_the_governed_stage1_granularity():
 # 30. Stage 1's historical surface is untouched
 # --------------------------------------------------------------------------- #
 def test_stage1_implementation_and_artifacts_are_not_modified():
+    # The shared significance module is the explicitly bounded remediation
+    # surface; historical reports retain the pre-fix hash below.
     tracked = [
         STAGE_1_IMPLEMENTATION,
         REPO_ROOT / "experiments/significance.py",
@@ -1503,6 +1506,17 @@ def test_stage1_implementation_and_artifacts_are_not_modified():
     for path in tracked:
         assert path.exists(), path
         assert path.relative_to(REPO_ROOT).as_posix() not in changed
+
+
+def test_historical_reports_retain_the_pre_fix_significance_provenance():
+    for path in (
+        STAGE_1_OUTPUT_ROOT / "positive_control_report.json",
+        STAGE_1B_OUTPUT_DIR / "positive_control_calibration_report.json",
+    ):
+        report = json.loads(path.read_text(encoding="utf-8"))
+        assert report["provenance"]["significance_module_sha256"] == (
+            HISTORICAL_SIGNIFICANCE_SHA256
+        )
 
 
 def test_stage1b_reuses_stage1_helpers_without_redefining_them(source):

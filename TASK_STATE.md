@@ -1556,3 +1556,11 @@ KAP cross-check recommended before claiming any result.
 - The result is diagnostic/calibration only. Stage 2 unblock conditions are all **YES**.
 - Independent-review findings are preserved as: **MEDIUM ledger drift**; **LOW unexplained git.dirty disclosure**; **LOW two-step guard sunset**.
 - This closeout changes bookkeeping only: Stage 1/1b result artifacts, Stage 2 design, and `experiments/significance.py` were not changed; no commit was made.
+
+### FINANCEIQ-SIGNIFICANCE-REMEDIATION-PRECOMMIT-HYGIENE (2026-09-02; append-only)
+
+- `experiments/significance.py` was remediated from old SHA `5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6` to new SHA `08062b5e2e9af9d9a91200665811492c373dc6fa8db1acd0a849cb3d3d932ab3`.
+- The remediation is fail-closed validation only; deterministic finite-input behavior is unchanged.
+- Historical Stage 1, Stage 1b, excess-basis, serving-eval, and contamination artifacts remain evidence under the old implementation and are not rewritten.
+- `contamination_lab`'s expected SHA is repinned only as a forward-run gate. No historical scientific rerun occurred, and no Stage 2 run occurred.
+- Stage 2 registration must pin the repaired SHA after this remediation merges.

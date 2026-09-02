@@ -30,6 +30,9 @@ from scipy.stats import rankdata
 from experiments import run_alternative_targets, run_experiments, significance
 from experiments import run_excess_basis as excess
 
+HISTORICAL_SIGNIFICANCE_SHA256 = "5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6"
+REPAIRED_SIGNIFICANCE_SHA256 = "08062b5e2e9af9d9a91200665811492c373dc6fa8db1acd0a849cb3d3d932ab3"
+
 
 # ---------------------------------------------------------------------------
 # helpers
@@ -1779,7 +1782,11 @@ def test_generated_artifacts_are_isolated_complete_and_claim_safe() -> None:
 
     for source in report["source_artifacts"]:
         assert (excess.ROOT / source["path"]).is_file()
-        assert source["sha256"] == _sha256(excess.ROOT / source["path"])
+        if source["path"] == "experiments/significance.py":
+            assert source["sha256"] == HISTORICAL_SIGNIFICANCE_SHA256
+            assert _sha256(excess.ROOT / source["path"]) == REPAIRED_SIGNIFICANCE_SHA256
+        else:
+            assert source["sha256"] == _sha256(excess.ROOT / source["path"])
 
     # The whole Makefile is an invocation wrapper, not a statistical source
     # input: it must not appear in source_artifacts (that is what let an

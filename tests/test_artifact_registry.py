@@ -60,6 +60,22 @@ FORBIDDEN_CERTIFYING_PHRASES = (
     "certifies predictive",
     "proven signal",
 )
+HISTORICAL_SIGNIFICANCE_SHA256 = "5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6"
+REPAIRED_SIGNIFICANCE_SHA256 = "08062b5e2e9af9d9a91200665811492c373dc6fa8db1acd0a849cb3d3d932ab3"
+HISTORICAL_SOURCE_HASH_TRANSITIONS = {
+    ("experiments/results_excess/artifact_manifest.json", "experiments/significance.py"): (
+        HISTORICAL_SIGNIFICANCE_SHA256,
+        REPAIRED_SIGNIFICANCE_SHA256,
+    ),
+    ("experiments/results_excess/significance_report.json", "experiments/significance.py"): (
+        HISTORICAL_SIGNIFICANCE_SHA256,
+        REPAIRED_SIGNIFICANCE_SHA256,
+    ),
+    ("experiments/results_serving_eval/serving_eval_report.json", "experiments/significance.py"): (
+        HISTORICAL_SIGNIFICANCE_SHA256,
+        REPAIRED_SIGNIFICANCE_SHA256,
+    ),
+}
 
 
 # --------------------------------------------------------------------------- #
@@ -171,7 +187,8 @@ def checksum_staleness() -> list[str]:
     """Auto-discover reports with a top-level source_artifacts list and re-verify.
 
     Returns actionable 'stale evidence' diagnostics for any mismatch or missing
-    referenced input.
+    referenced input, except for exact, registered historical source-hash
+    transitions whose artifact bytes remain historical and untouched.
     """
     problems: list[str] = []
     registry = load_registry()
@@ -202,6 +219,9 @@ def checksum_staleness() -> list[str]:
                     continue
                 actual = sha256_of(dep_path)
                 if actual != recorded:
+                    transition = HISTORICAL_SOURCE_HASH_TRANSITIONS.get((rel, dep_path))
+                    if transition == (recorded, actual):
+                        continue
                     problems.append(
                         f"stale evidence: {rel} records sha256 {recorded[:12]}… for "
                         f"{dep_path} but the file hashes to {actual[:12]}…; regenerate "
@@ -316,9 +336,36 @@ def test_runs_glob_present_and_matches_manifests():
 
 
 def test_embedded_source_artifact_checksums_are_current():
-    """Reports embedding source_artifacts checksums must match their inputs."""
+    """Reports must match inputs unless an exact historical transition is registered."""
     problems = checksum_staleness()
     assert problems == [], "\n".join(problems)
+
+
+def test_historical_source_hash_transition_allowlist_is_exact():
+    assert set(HISTORICAL_SOURCE_HASH_TRANSITIONS) == {
+        ("experiments/results_excess/artifact_manifest.json", "experiments/significance.py"),
+        ("experiments/results_excess/significance_report.json", "experiments/significance.py"),
+        ("experiments/results_serving_eval/serving_eval_report.json", "experiments/significance.py"),
+    }
+    assert all(
+        transition == (HISTORICAL_SIGNIFICANCE_SHA256, REPAIRED_SIGNIFICANCE_SHA256)
+        for transition in HISTORICAL_SOURCE_HASH_TRANSITIONS.values()
+    )
+
+
+def test_frozen_contamination_manifest_retains_pre_fix_significance_provenance():
+    manifest = json.loads(
+        (
+            REPO_ROOT / "experiments/results_contamination/artifact_manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    significance_inputs = [
+        item
+        for item in manifest["input_artifacts"]
+        if item.get("path") == "experiments/significance.py"
+    ]
+    assert len(significance_inputs) == 1
+    assert significance_inputs[0]["sha256"] == HISTORICAL_SIGNIFICANCE_SHA256
 
 
 def test_registry_wording_stays_ownership_neutral():

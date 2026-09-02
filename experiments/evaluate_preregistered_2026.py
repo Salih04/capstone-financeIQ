@@ -454,13 +454,15 @@ def within_year_permutation_p(
 ) -> float:
     """The one two-sided within-year seeded permutation p-value."""
     observed = abs(significance.spearman_ic(y_true, y_pred))
+    significance._require_finite_observed(
+        observed, context="forward 2026 observed absolute Spearman IC"
+    )
     rng = np.random.default_rng(seed)
     y_true = np.asarray(y_true, dtype=float)
-    count = 0
+    null_statistics = []
     for _ in range(permutations):
-        if abs(significance.spearman_ic(rng.permutation(y_true), y_pred)) >= observed:
-            count += 1
-    return (1 + count) / (1 + permutations)
+        null_statistics.append(significance.spearman_ic(rng.permutation(y_true), y_pred))
+    return significance._two_sided_p_value(observed, np.asarray(null_statistics, dtype=float))
 
 
 def descriptive_power_context(usable_rows: int) -> dict[str, Any]:
