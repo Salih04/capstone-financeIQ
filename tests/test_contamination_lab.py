@@ -19,6 +19,7 @@ from experiments import contamination_lab as lab
 
 
 ROOT = Path(__file__).resolve().parents[1]
+EXPECTED_REPAIRED_SIGNIFICANCE_SHA256 = "08062b5e2e9af9d9a91200665811492c373dc6fa8db1acd0a849cb3d3d932ab3"
 
 
 def _frame(rows_per_year: int = 80) -> pd.DataFrame:
@@ -277,9 +278,10 @@ def test_limitations_register_contains_generated_report_section():
     assert lab.LIMITATIONS[-1] in text
 
 
-def test_protected_boundary_hashes_remain_unchanged():
+def test_protected_boundary_hashes_are_pinned():
     assert lab.sha256_path(lab.CANONICAL_INPUT) == lab.EXPECTED_MODELING_SHA256
     assert lab.sha256_path(ROOT / "experiments/run_experiments.py") == lab.EXPECTED_RUN_EXPERIMENTS_SHA256
+    assert lab.EXPECTED_SIGNIFICANCE_SHA256 == EXPECTED_REPAIRED_SIGNIFICANCE_SHA256
     assert lab.sha256_path(ROOT / "experiments/significance.py") == lab.EXPECTED_SIGNIFICANCE_SHA256
 
 

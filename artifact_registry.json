@@ -40,7 +40,7 @@
     "proposed_future": "Artifact named by a future task but not yet created. Intentionally has NO entries[] entry until the file exists, because every entries[] entry must match at least one real file. Where a registration fixes ownership BEFORE the run that creates the file, the frozen ownership contract is declared in prospective_entries[] instead, and the run commit moves it verbatim into entries[]."
   },
   "checksum_verification": {
-    "rule": "Reports that embed a top-level source_artifacts list of {path, sha256} objects are re-verified: each referenced path is re-hashed and compared to the recorded sha256. A mismatch is stale evidence — regenerate the report via its generator_command or investigate the upstream change. The verification set is auto-discovered across the governed roots by the test, so newly added reports are covered automatically.",
+    "rule": "Reports that embed a top-level source_artifacts list of {path, sha256} objects are re-verified: each referenced path is re-hashed and compared to the recorded sha256. A mismatch is stale evidence — regenerate the report via its generator_command or investigate the upstream change. The sole current-state exception is the exact historical experiments/significance.py hash transition registered in tests/test_artifact_registry.py for the frozen excess-basis and serving-eval reports; those historical artifact bytes and recorded hashes remain untouched. The verification set is auto-discovered across the governed roots by the test, so newly added reports are covered automatically.",
     "known_reports_on_creation": [
       "experiments/results/significance_report.json",
       "experiments/results/friction_report.json",
@@ -433,7 +433,7 @@
         "data/trusted_clean/modeling_dataset_training_2020_2025.csv"
       ],
       "hand_edit_forbidden": true,
-      "notes": "Deterministic provenance manifest for the isolated tail-handling sensitivity family; records ownership and inputs without certifying statistical validity or predictive value."
+      "notes": "Deterministic provenance manifest for the isolated tail-handling sensitivity family; records ownership and inputs without certifying statistical validity or predictive value. Historical note: this frozen contamination artifact was produced under the pre-fix experiments/significance.py SHA 5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6; contamination_lab.EXPECTED_SIGNIFICANCE_SHA256 is a FORWARD RUN GATE for future contamination executions and does not mean this historical artifact was produced under the repaired source. Historical contamination artifacts must not be regenerated merely because that forward guard moved."
     },
     {
       "path_or_glob": "experiments/results_contamination/contamination_cells.csv",

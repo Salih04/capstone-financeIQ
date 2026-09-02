@@ -26,6 +26,100 @@ def _prediction_frame(y_true: list[np.ndarray], y_pred: list[np.ndarray]) -> pd.
     return pd.concat(frames, ignore_index=True)
 
 
+def test_two_sided_p_value_preserves_finite_input_formula() -> None:
+    null = np.array([-2.0, 0.5, 1.0])
+
+    assert significance._two_sided_p_value(1.0, null) == (2 + 1) / (3 + 1)
+
+
+@pytest.mark.parametrize("observed", [np.nan, np.inf, -np.inf])
+def test_two_sided_p_value_rejects_nonfinite_observed(observed: float) -> None:
+    with pytest.raises(significance.DegenerateStatisticError):
+        significance._two_sided_p_value(observed, np.array([-1.0, 0.0, 1.0]))
+
+
+def test_two_sided_p_value_rejects_empty_finite_null() -> None:
+    with pytest.raises(significance.DegenerateStatisticError):
+        significance._two_sided_p_value(0.0, np.array([np.nan, np.inf, -np.inf]))
+
+
+def test_ci_rejects_empty_finite_distribution() -> None:
+    with pytest.raises(significance.DegenerateStatisticError):
+        significance._ci(np.array([np.nan, np.inf, -np.inf]))
+
+
+@pytest.mark.parametrize("observed", [np.nan, np.inf, -np.inf])
+def test_percentile_rejects_nonfinite_observed(observed: float) -> None:
+    with pytest.raises(significance.DegenerateStatisticError):
+        significance._percentile(observed, np.array([-1.0, 0.0, 1.0]))
+
+
+def test_percentile_rejects_empty_finite_null() -> None:
+    with pytest.raises(significance.DegenerateStatisticError):
+        significance._percentile(0.0, np.array([np.nan, np.inf, -np.inf]))
+
+
+def test_analyze_model_rejects_constant_prediction_with_context() -> None:
+    frame = _prediction_frame(
+        [np.array([1.0, 2.0, 3.0])], [np.array([4.0, 4.0, 4.0])]
+    )
+
+    with pytest.raises(
+        significance.DegenerateStatisticError,
+        match=r"model=test_model; split=test_2023; reason=non-finite Spearman IC",
+    ):
+        significance.analyze_model(frame, permutations=1_000, bootstraps=400)
+
+
+def test_analyze_model_rejects_constant_target_with_context() -> None:
+    frame = _prediction_frame(
+        [np.array([2.0, 2.0, 2.0])], [np.array([1.0, 2.0, 3.0])]
+    )
+
+    with pytest.raises(
+        significance.DegenerateStatisticError,
+        match=r"model=test_model; split=test_2023; reason=non-finite Spearman IC",
+    ):
+        significance.analyze_model(frame, permutations=1_000, bootstraps=400)
+
+
+def test_analyze_model_does_not_drop_a_split_without_finite_pairs() -> None:
+    frame = _prediction_frame(
+        [np.array([1.0, 2.0, 3.0]), np.array([np.nan, np.nan, np.nan])],
+        [np.array([1.0, 2.0, 3.0]), np.array([1.0, 2.0, 3.0])],
+    )
+
+    with pytest.raises(
+        significance.DegenerateStatisticError,
+        match=r"model=test_model; split=test_2024; reason=no finite paired observations",
+    ):
+        significance.analyze_model(frame, permutations=1_000, bootstraps=400)
+
+
+def test_healthy_finite_fixture_preserves_existing_numerics() -> None:
+    actual = [
+        np.array([1.0, 4.0, 2.0, 8.0, 5.0, 7.0]),
+        np.array([2.0, 9.0, 3.0, 6.0, 4.0, 8.0]),
+    ]
+    predicted = [
+        np.array([1.5, 3.5, 2.5, 7.0, 5.5, 6.5]),
+        np.array([2.2, 8.0, 3.4, 5.5, 4.8, 7.2]),
+    ]
+
+    result = significance.analyze_model(
+        _prediction_frame(actual, predicted),
+        permutations=1_000,
+        bootstraps=400,
+        seed=17,
+    )
+
+    assert result["pooled"]["observed_ic"] == 1.0
+    assert result["pooled"]["permutation_p_value_two_sided"] == pytest.approx(
+        0.000999000999000999
+    )
+    assert result["pooled"]["bootstrap_ci_95"] == [1.0, 1.0]
+
+
 def test_planted_signal_has_small_permutation_p_value() -> None:
     rng = np.random.default_rng(11)
     actual = [rng.normal(size=32) for _ in range(3)]

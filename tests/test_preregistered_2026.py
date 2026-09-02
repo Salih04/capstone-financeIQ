@@ -372,6 +372,55 @@ def test_missing_frozen_ranking_is_reported(tmp_path: Path):
     assert state["metric_computed"] is False
 
 
+def test_within_year_permutation_p_preserves_finite_behavior():
+    y_true = np.array([1.0, 4.0, 2.0, 8.0, 5.0, 7.0])
+    y_pred = np.array([1.5, 3.5, 2.5, 7.0, 5.5, 6.5])
+
+    result = ev.within_year_permutation_p(y_true, y_pred, permutations=1_000, seed=17)
+
+    assert result == pytest.approx(3 / 1_001)
+
+
+@pytest.mark.parametrize(
+    ("y_true", "y_pred"),
+    [
+        (np.array([1.0, 2.0, 3.0]), np.array([4.0, 4.0, 4.0])),
+        (np.array([2.0, 2.0, 2.0]), np.array([1.0, 2.0, 3.0])),
+    ],
+)
+def test_within_year_permutation_p_rejects_constant_observed_statistic(
+    y_true: np.ndarray, y_pred: np.ndarray
+):
+    with pytest.raises(ev.significance.DegenerateStatisticError):
+        ev.within_year_permutation_p(y_true, y_pred, permutations=20)
+
+
+@pytest.mark.parametrize("observed", [np.nan, np.inf, -np.inf])
+def test_within_year_permutation_p_rejects_nonfinite_observed(
+    monkeypatch: pytest.MonkeyPatch, observed: float
+):
+    monkeypatch.setattr(ev.significance, "spearman_ic", lambda *_args: observed)
+
+    with pytest.raises(ev.significance.DegenerateStatisticError):
+        ev.within_year_permutation_p(np.arange(4.0), np.arange(4.0), permutations=20)
+
+
+def test_within_year_permutation_p_rejects_unusable_null_distribution(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    calls = 0
+
+    def observed_then_nonfinite(*_args):
+        nonlocal calls
+        calls += 1
+        return 0.25 if calls == 1 else np.nan
+
+    monkeypatch.setattr(ev.significance, "spearman_ic", observed_then_nonfinite)
+
+    with pytest.raises(ev.significance.DegenerateStatisticError):
+        ev.within_year_permutation_p(np.arange(4.0), np.arange(4.0), permutations=20)
+
+
 # --------------------------------------------------------------------------- #
 # Future outcome-schema refusals (all inert until valid data exists)
 # --------------------------------------------------------------------------- #

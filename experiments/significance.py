@@ -39,6 +39,10 @@ PROJECTION_EXTRA_YEARS = (0, 1, 2, 3, 5, 7)
 _STANDARD_NORMAL = NormalDist()
 
 
+class DegenerateStatisticError(ValueError):
+    """Raised when a requested statistic has no valid finite definition."""
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -362,18 +366,47 @@ def _bootstrap_distribution(
     return _rowwise_correlation(true_rank, pred_rank)
 
 
+def _require_finite_observed(observed: float, *, context: str) -> None:
+    try:
+        finite = bool(np.isfinite(observed))
+    except (TypeError, ValueError) as exc:
+        raise DegenerateStatisticError(
+            f"{context} must be a finite scalar; got {observed!r}"
+        ) from exc
+    if not finite:
+        raise DegenerateStatisticError(f"{context} must be finite; got {observed!r}")
+
+
+def _finite_distribution(values: np.ndarray, *, context: str) -> np.ndarray:
+    try:
+        valid = values[np.isfinite(values)]
+    except (TypeError, ValueError) as exc:
+        raise DegenerateStatisticError(
+            f"{context} must contain a finite distribution"
+        ) from exc
+    if len(valid) == 0:
+        raise DegenerateStatisticError(
+            f"{context} must contain at least one finite value"
+        )
+    return valid
+
+
 def _two_sided_p_value(observed: float, null: np.ndarray) -> float:
-    valid = null[np.isfinite(null)]
+    _require_finite_observed(
+        observed, context="two-sided p-value observed statistic"
+    )
+    valid = _finite_distribution(null, context="two-sided p-value null distribution")
     return float((np.sum(np.abs(valid) >= abs(observed)) + 1) / (len(valid) + 1))
 
 
 def _percentile(observed: float, null: np.ndarray) -> float:
-    valid = null[np.isfinite(null)]
+    _require_finite_observed(observed, context="percentile observed statistic")
+    valid = _finite_distribution(null, context="percentile null distribution")
     return float(100.0 * (np.sum(valid < observed) + 0.5 * np.sum(valid == observed)) / len(valid))
 
 
 def _ci(distribution: np.ndarray) -> list[float]:
-    valid = distribution[np.isfinite(distribution)]
+    valid = _finite_distribution(distribution, context="bootstrap CI distribution")
     lower, upper = np.quantile(valid, [0.025, 0.975])
     return [float(lower), float(upper)]
 
@@ -410,9 +443,35 @@ def analyze_model(
     if bootstraps < 1:
         raise ValueError("bootstraps must be positive")
 
+    model_values = (
+        predictions["model"].dropna().astype(str).unique().tolist()
+        if "model" in predictions
+        else []
+    )
+    model_context = ",".join(sorted(model_values)) or "<unknown>"
     clean = predictions.dropna(subset=["y_true", "y_pred"]).copy()
-    if not np.isfinite(clean[["y_true", "y_pred"]].to_numpy(dtype=float)).all():
-        raise ValueError("predictions contain non-finite values")
+    if not clean.empty:
+        finite_mask = np.isfinite(clean[["y_true", "y_pred"]].to_numpy(dtype=float))
+        if not finite_mask.all():
+            bad_split = clean.loc[~finite_mask.all(axis=1), "split"].iloc[0]
+            raise DegenerateStatisticError(
+                f"model={model_context}; split={bad_split}; "
+                "reason=prediction input contains non-finite values"
+            )
+
+    input_splits = set(predictions["split"].dropna())
+    clean_splits = set(clean["split"].dropna())
+    if not input_splits:
+        raise DegenerateStatisticError(
+            f"model={model_context}; split=<none>; "
+            "reason=no evaluated splits"
+        )
+    dropped_splits = sorted(input_splits - clean_splits, key=str)
+    if dropped_splits:
+        raise DegenerateStatisticError(
+            f"model={model_context}; split={dropped_splits[0]}; "
+            "reason=no finite paired observations after null filtering"
+        )
 
     rng = np.random.default_rng(seed)
     split_results = []
@@ -428,9 +487,22 @@ def analyze_model(
         y_true = group["y_true"].to_numpy(dtype=float)
         y_pred = group["y_pred"].to_numpy(dtype=float)
         observed = spearman_ic(y_true, y_pred)
+        _require_finite_observed(
+            observed,
+            context=(
+                f"model={model_context}; split={split}; "
+                "reason=non-finite Spearman IC (constant y_true, constant y_pred, "
+                "or otherwise degenerate)"
+            ),
+        )
         null = _permutation_distribution(y_true, y_pred, permutations, rng)
         bootstrap = _bootstrap_distribution(y_true, y_pred, bootstraps, rng)
-        stats = _statistic(observed, null, bootstrap, len(group))
+        try:
+            stats = _statistic(observed, null, bootstrap, len(group))
+        except DegenerateStatisticError as exc:
+            raise DegenerateStatisticError(
+                f"model={model_context}; split={split}; reason={exc}"
+            ) from exc
         stats.update({"split": str(split), "year": int(group["year"].iloc[0])})
         split_results.append(stats)
         permutation_parts.append(null)
