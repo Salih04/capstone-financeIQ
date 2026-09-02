@@ -1533,3 +1533,26 @@ KAP cross-check recommended before claiming any result.
 - Replaced sequential final-root writes with attempt staging, recursive filesystem-backed output inspection, known-namespace cleanup on recovery, promotion only after integrity and claim-safety checks, and final manifest write last. Outside-namespace workspace changes are also checked; no scientific integrity/performance conditions were added.
 - Added binding prospective-entry transition tests requiring exact dictionary equality when a prospective path becomes real, run-orchestration order tests, recursive unexpected-output tests, scratch lifecycle tests, and Stage 1 safe-field-discard AST coverage.
 - Validation after this microfix: focused Stage 1b implementation/registry checks passed; prior full root run passed 1,230 tests with only the expected dirty-worktree changed-path allowlist failure. `make claims-lint`, `make docs-lint`, and `git diff --check` passed. Stage 1b was not run, and `experiments/results_thesis/positive_control_calibration/` remains absent.
+
+### FINANCEIQ-STAGE1B-BOOKKEEPING-CLOSEOUT (2026-09-02; append-only)
+
+| State item | Status |
+|---|---|
+| Governed run | `cb3cf211a21ec39d65deec6f49230306cfd882f7` |
+| Merged main | `98855aeaccddfff707dd0a9c2732f151b0e07e4f` |
+| Attempt history | `EXACTLY ONE ATTEMPT / NO RERUN` |
+| Matrix | `COMPLETE — 6 × 400` |
+| Integrity | `PASSED` |
+| Replay | `IDENTICAL` |
+| Result scope | `DIAGNOSTIC / CALIBRATION ONLY` |
+| Independent review | `PASS` |
+| Stage 2 unblock conditions | `ALL YES` |
+| Findings | `MEDIUM ledger drift; LOW unexplained git.dirty disclosure; LOW two-step guard sunset` |
+
+### FINANCEIQ-STAGE1B-INDEPENDENT-REVIEW-CLOSEOUT (2026-09-02; append-only)
+
+- Independent review of governed run `cb3cf211a21ec39d65deec6f49230306cfd882f7` at merged main `98855aeaccddfff707dd0a9c2732f151b0e07e4f` is **PASS**.
+- The run completed exactly one attempt with no rerun and the complete 6 × 400 matrix; integrity passed and replay was identical.
+- The result is diagnostic/calibration only. Stage 2 unblock conditions are all **YES**.
+- Independent-review findings are preserved as: **MEDIUM ledger drift**; **LOW unexplained git.dirty disclosure**; **LOW two-step guard sunset**.
+- This closeout changes bookkeeping only: Stage 1/1b result artifacts, Stage 2 design, and `experiments/significance.py` were not changed; no commit was made.

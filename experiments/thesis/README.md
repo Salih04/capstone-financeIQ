@@ -1,19 +1,21 @@
 # Thesis experiment namespace
 
 Prepared in Week 0/1. **Stage 1 (`positive_control`) is implemented and has
-run; Stage 1b (`positive_control_calibration`) is registered and implemented but
-has NOT been run; the remaining slugs are still placeholders.** This directory
+run; Stage 1b (`positive_control_calibration`) is registered, implemented, and
+has completed its one governed run; the remaining slugs are still placeholders.** This directory
 holds the shared provenance helpers, the implemented stages, and the rules
 below.
 
-## Stage 1b — registered and implemented, NOT run
+## Stage 1b — governed run complete; diagnostic/calibration only
 
 `docs/thesis/STAGE_1B_REGISTRATION.md` is the frozen, owner-approved,
 prospective (but **not blind**) registration for Stage 1b, a diagnostic /
 calibration experiment. `experiments/thesis/stage1b_registration.py` holds its
 machine-checkable constants; `tests/test_thesis_stage1b_registration.py` proves
-code == registration. **No Stage 1b run has been executed and no Stage 1b
-outcome inspected.** Stage 1b reuses the Stage 1 carrier (`equity`), model
+code == registration. **One governed Stage 1b run has completed and its outcome
+has been inspected.** It used exactly one attempt (no rerun), completed the
+6 × 400 matrix, passed integrity, and produced an identical replay. The result
+is diagnostic/calibration only. Stage 1b reuses the Stage 1 carrier (`equity`), model
 (`ridge`), splits, significance machinery, seed framework, and the
 Stage-1-operational-rule detection point; adds the single grid rung `0.35`; uses `R = 400`
 fresh repetitions with global ids `200 … 599` (non-overlapping with Stage 1's
@@ -22,10 +24,10 @@ has **no scientific performance PASS/FAIL gate**.
 
 The runner is `experiments/thesis/positive_control_calibration.py`, invoked by
 `make thesis-stage1b`; `make thesis-stage1b-replay` is its determinism probe and
-writes nothing. Both are the implementation commit's work, added *before* the
-first run together with the `governed_roots` entry and one ownership contract per
-emitted output. **The Stage 1b result root is still absent**: it does not exist,
-and nothing but the one governed run may create it.
+writes nothing. Both were added *before* the governed run together with the
+`governed_roots` entry and one ownership contract per emitted output. **The Stage
+1b result root is present from that one governed run**, and nothing but the one
+governed run may create it.
 
 Two properties the runner is built around, both machine-checked in
 `tests/test_thesis_stage1b_implementation.py`:
@@ -54,9 +56,9 @@ interrupted attempt remains visibly incomplete and normal `--run` refuses it;
 only `--repeat-after-crash` may clean the known Stage 1b leftovers and retry
 with the identical registered configuration and seed schedule.
 
-Stage 1 stays frozen; Stage 2 stays blocked until the one governed run is
-completed, its closed integrity contract passes, and it is independently
-reviewed.
+Stage 1 stays frozen. The one governed run is complete, its closed integrity
+contract passes, and independent review passed; all Stage 2 unblock conditions
+are YES. Stage 2 design remains outside this task.
 
 ## Output isolation
 
@@ -75,7 +77,7 @@ that record null findings.
 | Slug | Purpose |
 |---|---|
 | `positive_control` | **Implemented** — `positive_control.py`, run via `make thesis-positive-control`. Injects a known-strength synthetic signal into one raw feature column before feature construction and measures how much survives each pipeline stage. Validates that the measurement apparatus responds to an effect that is provably present. |
-| `positive_control_calibration` | **Registered and implemented, not run** — Stage 1b. `docs/thesis/STAGE_1B_REGISTRATION.md` + `stage1b_registration.py` + `positive_control_calibration.py`, run via `make thesis-stage1b`. Prospective (not blind) calibration/diagnostic re-scope of Stage 1: same carrier/model/splits/seed framework, adds the `0.35` grid rung, `R = 400` fresh repetitions (ids 200–599), Stage-1-operational-rule detection probability as the primary result, raw-p<0.05 detection probability as a secondary non-gating diagnostic, and no performance gate. No run executed; the result root is absent. |
+| `positive_control_calibration` | **Governed run complete — diagnostic/calibration only** — Stage 1b. `docs/thesis/STAGE_1B_REGISTRATION.md` + `stage1b_registration.py` + `positive_control_calibration.py`, run via `make thesis-stage1b`. Prospective (not blind) calibration/diagnostic re-scope of Stage 1: same carrier/model/splits/seed framework, adds the `0.35` grid rung, `R = 400` fresh repetitions (ids 200–599), Stage-1-operational-rule detection probability as the primary result, raw-p<0.05 detection probability as a secondary non-gating diagnostic, and no performance gate. Exactly one attempt (no rerun) completed the 6 × 400 matrix; integrity passed, replay was identical, and independent review was PASS. Stage 2 unblock conditions are all YES. |
 | `negative_control` | Expand the existing placebo/negative-control family. Confirms the apparatus reports nothing when nothing is there. |
 | `defect_injection` | Deliberately introduce known defects (leakage, misalignment, look-ahead) and confirm the guards catch each one. |
 | `informativeness` | Map the power/informativeness frontier: what effect size this design could detect, as a function of n, years, and frequency. |
@@ -111,12 +113,10 @@ entry. Consequently:
 - `experiments/results_thesis/positive_control` is registered in `entries[]`,
   with one entry per emitted file and `make thesis-positive-control` as the
   `generator_command`. Its files exist, which is what `entries[]` requires.
-- Stage 1b's root is in `governed_roots` now, but its per-file ownership lives in
-  `prospective_entries[]`, because an `entries[]` entry must match at least one
-  real file and no Stage 1b file exists yet. That block is the registry's answer
-  to a registration that fixes ownership *before* the run which creates the
-  files: same entry shape, same `make <target>` rule, not yet subject to
-  `coverage_rule`. The run commit moves those items verbatim into `entries[]`.
+- Stage 1b's root is in `governed_roots`, and its five emitted files are now
+  present and owned by `entries[]`. The `prospective_entries[]` block was the
+  pre-run ownership contract: it fixed ownership before the run, and the
+  governed run moved those items verbatim into `entries[]`.
 - The remaining four slugs (`negative_control`, `defect_injection`,
   `informativeness`, `monthly_panel`) have no registry entry of either kind, as
   the `proposed_future` class prescribes.
