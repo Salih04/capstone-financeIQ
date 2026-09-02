@@ -436,3 +436,332 @@ is verification, not a new scientific run. An execution crash may be repeated
 only with identical registered settings, and both attempts must be recorded. Any
 post-outcome change to grid, R, carrier, model, seed policy, detection rule, or
 inference requires a dated amendment stating what was already observed.
+
+### 2026-09-02 — Stage 2 dated amendment and registration
+
+This amendment is appended prospectively after the one governed Stage 1b run
+completed with PASS integrity, its independent review was PASS, its governance
+bookkeeping was merged, and the fail-closed significance remediation was merged
+and verified. It does not silently rewrite the original Stage 2 block above.
+The complete machine-checkable registration is
+docs/thesis/STAGE_2_REGISTRATION.md and its constants are in
+experiments/thesis/stage2_registration.py.
+
+#### Status and explicit supersession
+
+Before this amendment, the old Stage 2 design stated:
+
+> 6 models × 2 null constructions = 12 tests, Bonferroni across 12
+
+That old design is **superseded prospectively before any Stage 2 outcome**. The
+old text remains above as historical protocol text; this amendment is the
+operative Stage 2 design. No Stage 2 result exists at amendment time.
+
+The amended multiplicity structure is:
+
+- the real evaluation's within-repetition operating family is six ML models;
+- the model-family divisor is the frozen literal 6;
+- the two confirmatory controls form a separate progression-decision family;
+- the across-control gate uses exact one-sided binomial tests with Bonferroni
+  alpha=.025 per control; and
+- the Stage 1 divisor 5 is not used.
+
+The equivalence limb delta=.05 is retained as descriptive/non-gating. Recording
+it this way is a weakening of the previously written Stage 2 pass rule. Delta
+is not a FinanceIQ SESOI; SESOI remains UNRESOLVED.
+
+#### Pre-run disclosures
+
+The following was already known before this Stage 2 registration:
+
+1. Stage 1 outcome: **FAILED AS WRITTEN — INFORMATIVE**.
+
+2. The complete Stage 1b calibration outcomes had already been inspected:
+
+   Detection probabilities at theta:
+
+   | theta | detection probability |
+   |---:|---:|
+   | 0.00 | 0/400 = 0.0000 |
+   | 0.10 | 1/400 = 0.0025 |
+   | 0.20 | 45/400 = 0.1125 |
+   | 0.30 | 243/400 = 0.6075 |
+   | 0.35 | 347/400 = 0.8675 |
+   | 0.40 | 384/400 = 0.9600 |
+
+   Mean final evaluated IC:
+
+   | theta | mean final evaluated IC |
+   |---:|---:|
+   | 0.00 | 0.090305625773 |
+   | 0.10 | 0.099628182092 |
+   | 0.20 | 0.130441418767 |
+   | 0.30 | 0.182221558521 |
+   | 0.35 | 0.212800525022 |
+   | 0.40 | 0.250279183231 |
+
+   At theta=0, mean raw carrier IC was approximately -0.0043485 and mean final
+   IC was approximately +0.0903056.
+
+3. The legacy dense-Gaussian placebo had R=25, 0 family-wise rejections, and 0
+   failed repetitions. It is a historical smoke test only, not Stage 2
+   calibration.
+
+4. The pre-Stage-2 design review computed one missingness indicator pooled IC
+   approximately +0.225, and 19 of 33 mask columns had |pooled IC| > .05.
+   These observations motivated the NC0 design below.
+
+5. Known significance defects were discovered before Stage 2:
+
+   - a non-finite observed statistic could produce the minimum p-value in a
+     helper;
+   - the forward-2026 hand-rolled permutation path had the same failure mode;
+     and
+   - analyze_model degeneracy behavior was unsafe / generic.
+
+   They were repaired before this registration. The old significance SHA was
+   5fe0e88f9742c32b94425c493a41661ff541b6f1cc21d3c758293a06f09017e6. The
+   repaired Stage 2 significance SHA is
+   08062b5e2e9af9d9a91200665811492c373dc6fa8db1acd0a849cb3d3d932ab3.
+   Historical Stage 1, Stage 1b, and other artifacts were not rerun or
+   rewritten.
+
+6. No Stage 2 scientific draw or outcome exists.
+
+#### Frozen source, controls, and mechanism definitions
+
+The source dataset is
+data/trusted_clean/modeling_dataset_training_2020_2025.csv with SHA-256
+3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78. The
+canonical panel/splits source is experiments/run_experiments.py with SHA-256
+265f58678d522eea0c48fbccba415ed30b3e20abc6bb7ae0a8e33857c5feb543. The
+repaired significance source is pinned to the SHA above.
+
+There are exactly two confirmatory controls:
+
+- NC1_TARGET_PERMUTATION, CONFIRMATORY / GATING;
+- NC0_ROW_PERMUTED_MASK_RANK_GAUSSIAN, CONFIRMATORY / GATING.
+
+NC1 operates on the frozen canonical source/panel pipeline. For every
+repetition it permutes only observed next-year target values independently
+within every target year, preserves target-null locations exactly, includes all
+years used by training and testing, retrains all six models under the permuted
+target, and evaluates all registered splits normally. Test-year-only target
+permutation is FORBIDDEN.
+
+NC1 preserves the target multiset within year, target missingness/null
+locations, feature matrix, row universe, and train/test split definitions. It
+destroys within-year feature/target association and training signal from the
+real target mapping. It is a null for within-year rank association and does not
+establish absence of feature-side leakage. Holding y_pred fixed and permuting
+only a test year's y_true is circular because it is one draw from the same
+within-year reference distribution already used by significance.py; it does not
+test retraining/apparatus behavior.
+
+NC0, for every repetition:
+
+1. generates fresh iid N(0,1) for every canonical row × feature cell;
+2. takes the canonical real 40-column missingness matrix separately for each
+   feature year;
+3. applies one independently seeded row permutation within that year jointly
+   across all 40 feature columns;
+4. applies the permuted mask to the fresh noise;
+5. applies the same canonical within-year average-rank percentile transform;
+6. keeps the real target unchanged;
+7. keeps canonical imputation unchanged, NaN -> 0.5; and
+8. retrains/evaluates the full six-model pipeline.
+
+NC0 preserves each feature-year missingness rate and the row-wise co-missingness
+pattern multiset. It destroys mask-to-target row alignment. The raw N(0,1)
+construction without the rank transform is forbidden because imputation value
+0.5 would form an artificial off-centre cluster not present in the canonical
+rank-percentile panel.
+
+The following NC0 alternatives are rejected and are not confirmatory arms:
+
+- LEGACY DENSE GAUSSIAN is a valid mathematical null, but removes the real
+  missingness/imputation path and runs an easier design matrix than the real
+  apparatus.
+- EXACT UNPERMUTED REAL MASK is not a confirmatory null because pre-run
+  diagnostics showed that the mask itself is target-associated.
+
+NC0_MASK_ALIGNED_DIAGNOSTIC is included as a diagnostic, non-gating arm outside
+the confirmatory family. It uses R=1000, IDs 3000-3999, fresh rank-Gaussian
+noise, and the exact real per-cell missingness mask retained in real row
+alignment, with target unchanged. It measures mask-mediated target association
+and imputation-channel behavior. It is not an exact null-FPR test because the
+real mask is target-associated. Its outcome cannot affect confirmatory
+multiplicity, Stage 2 PASS/FAIL, control definitions, or the gate.
+
+NC2 is defined as cross-year/cohort target derangement that moves target values
+across years while preserving a ticker/cohort relation. It is **EXCLUDED FROM
+STAGE 2 CONFIRMATORY FAMILY** and has no Stage 2 execution because it is not a
+clean null for the within-year Spearman estimand: it can preserve persistent
+ticker return structure or alter year distributions, with low marginal value
+versus NC1 and later alignment-defect testing.
+
+NC3 is defined as single-feature-at-a-time within-year permutation while other
+features remain aligned. It is a **DEFERRED DIAGNOSTIC** with no Stage 2
+execution because it is feature importance/ablation, not a negative-control
+null. Independently permuting all features within year, if discussed, is a
+separate diagnostic construction, not NC3 confirmatory and not a third
+confirmatory family member.
+
+#### Repetitions and RNG
+
+BASE_SEED = provenance.SEEDS["negative_control"] = 42.
+
+Stage 1 uses IDs 0-199; Stage 1b uses IDs 200-599; the reserved gap is
+600-999. Stage 2 NC0 uses IDs 1000-1999 inclusive, NC1 uses IDs 2000-2999
+inclusive, and NC0_MASK_ALIGNED_DIAGNOSTIC uses IDs 3000-3999 inclusive.
+R_CONFIRMATORY_PER_CONTROL=1000 and R_DIAGNOSTIC=1000. There is no pooling
+with Stage 1 or Stage 1b.
+
+Construction seeds are:
+
+seed(stream, repetition_id) = BASE_SEED * 1_000_003
+                           + stream * 10_007
+                           + repetition_id
+
+with fixed streams NC0_NOISE=10, NC0_MASK_ROW_PERMUTATION=11,
+NC1_TARGET_PERMUTATION=20, and NC0_DIAGNOSTIC_NOISE=30. Fixed sorted year,
+row, and feature-column order is required. Stream identity must not be
+invented with enumerate(sorted(...)).
+
+Significance seeds are:
+
+significance_seed(repetition_id) = significance.DEFAULT_SEED + repetition_id
+                                  = 42 + repetition_id
+
+The same registered significance seed is supplied to all six model analyses for
+that repetition. Construction streams are disjoint, no construction or
+significance collision is permitted, and Stage 2 streams must not overlap
+Stage 1/1b governed streams. Each model uses 10,000 permutations and 10,000
+bootstraps.
+
+#### Model family and splits
+
+The six ML models are exactly linear_regression, ridge, lasso, elasticnet,
+random_forest, and gradient_boosting. No model may be added or removed. The
+within-repetition family divisor is the frozen literal 6. It is not derived
+from control count, diagnostic count, grid length, or surviving models. Each
+model's permutation p is two-sided.
+
+For each complete repetition:
+
+min_raw_p = minimum valid raw two-sided permutation p across the six models
+family_reject = min(1, 6 * min_raw_p) < 0.05
+
+Headline tie-breaking is minimum raw p, then model name ascending. The
+canonical splits remain exactly:
+
+| Split | Training target years | Test feature year |
+|---|---|---:|
+| test_2023 | 2021, 2022 | 2022 |
+| test_2024 | 2021, 2022, 2023 | 2023 |
+| test_2025 | 2021, 2022, 2023, 2024 | 2024 |
+
+#### Completeness, exact gate, and equivalence
+
+The denominator is strictly complete. Before significance analysis, every model
+and evaluated split is checked for target with fewer than two distinct finite
+values, prediction with fewer than two distinct finite values, and a non-finite
+observed Spearman statistic. Partial-model degeneracy is
+INVALID / DEGENERATE_PARTIAL_MODEL; all-model degeneracy is INVALID /
+DEGENERATE_ALL_MODELS; and an unexpected exception is INTEGRITY_FAILURE and
+aborts/fails closed. Invalid repetitions may not disappear, become p=1, count
+as non-rejections, reduce divisor 6, or reduce the denominator while allowing
+PASS. Model-level degeneracy is recorded explicitly.
+
+MIN_ANALYZABLE_DENOMINATOR=1000 exactly. If either confirmatory control has
+fewer than 1000 analyzable repetitions, Stage 2 is INCONCLUSIVE and cannot PASS
+or FAIL through the scientific FPR gate.
+
+For each control c, X_c is the number of the 1000 complete repetitions in which
+the six-model family rejects. The descriptive FPR estimate is X_c / 1000 with
+a pointwise two-sided 95% Wilson interval. The Wilson interval is not the gate.
+
+The two controls form a decision family of size 2 with family-level target 0.05.
+For each control, H0: FPR_c <= 0.05 and H1: FPR_c > 0.05. The exact one-sided
+boundary test is X_c ~ Binomial(1000, 0.05), with Bonferroni alpha=.025 per
+control. The exact critical count is 65 because:
+
+P[Binomial(1000,.05) >= 65] = 0.02074989936553777 <= .025
+
+while:
+
+P[Binomial(1000,.05) >= 64] = 0.028428397283993795 > .025
+
+A control fails iff X_c >= 65. Stage 2 fails iff NC0 fails or NC1 fails. Stage
+2 passes iff both controls have exactly 1000 analyzable repetitions, NC0 X <=
+64, NC1 X <= 64, and the integrity contract passed. The Bonferroni family
+control is valid under arbitrary dependence between NC0 and NC1; the controls
+are not assumed independent.
+
+Declared per-control power to trigger the exact >=65 rule is 0.2703680264 at
+true FPR=.06, 0.8982904410 at true FPR=.075, and 0.9999627573 at true FPR=.10.
+Stage 2 has low power against mild inflation around .06. R=1000 is not a
+magical resolution threshold.
+
+EQUIVALENCE_DELTA=.05 is descriptive/non-gating. Report mean pooled IC per
+confirmatory control per model with a two-sided 90% CI against ±.05. A violation
+is a reportable finding requiring investigation before Stage 3 progression, but
+does not by itself cause Stage 2 scientific FAIL. This weakens the previous
+Stage 2 pass rule. SESOI remains UNRESOLVED and is not required for Stage 2.
+
+#### Closed integrity contract
+
+The following is the complete and closed integrity list:
+
+1. frozen source dataset path and SHA match;
+2. repaired significance.py SHA matches
+   08062b5e2e9af9d9a91200665811492c373dc6fa8db1acd0a849cb3d3d932ab3;
+3. registered Stage 2 source/module hashes match;
+4. complete expected repetition-ID matrices;
+5. no duplicates;
+6. exact seed formulas reproduce;
+7. no collisions / forbidden overlap;
+8. writes confined to the Stage 2 result namespace;
+9. Stage 1 and Stage 1b result roots untouched;
+10. no data/trusted*, data/trusted_clean*, or data/provenance mutation;
+11. whole-repo protected digest outside the Stage 2 result root unchanged where
+    current infrastructure supports it;
+12. runtime source override restored on all exit paths;
+13. deterministic replay contract;
+14. finite valid statistics OR explicit registered degeneracy classification;
+15. all expected model cells present for analyzable repetitions.
+
+NC1 integrity invariants are preservation of the target multiset per target year,
+target missingness/null mask, feature matrix, row set, and canonical splits;
+permutation of both train and test years; and no test-only construction.
+
+NC0 integrity invariants are byte-identical target, fresh independent noise,
+one joint row permutation of the mask per feature year, the same joint
+permutation across all feature columns, preserved per-feature-year missingness
+counts, preserved row-wise co-missingness multiset, the frozen canonical
+rank-percentile transform after masking, and unchanged six models/splits.
+Diagnostic invariants are separate from confirmatory invariants.
+
+There is no integrity threshold on FPR, rejection count, IC, p-value
+uniformity, Wilson interval location, gate result, NC0/NC1 agreement,
+equivalence result, or degeneracy magnitude beyond completeness classification
+itself. High FPR is valid science, not an invalid run. Integrity is evaluated
+first; the scientific gate is evaluated only after integrity.
+
+#### Claim boundary and registration-only boundary
+
+Stage 2 may establish only apparatus behavior under the registered null
+constructions. It does not establish predictive edge, alpha, investment value,
+production readiness, absence of leakage, absence of predictability, universal
+FPR calibration, or naturally occurring IC calibration. Passing Stage 2 does not
+prove absence of feature-side PIT/alignment leakage; that belongs to later
+defect-injection stages. This remains research support only, not investment
+advice.
+
+The Stage 2 registration module makes no scientific draw and creates no result
+root. At registration time, the current artifact registry does not require a
+prospective Stage 2 generated-output contract because no output files exist.
+Before any future Stage 2 execution, its implementation task must add the
+runner, Makefile target, governed result root, and one ownership contract per
+emitted file before the run. No Stage 2 result root exists at this amendment
+time, and no Stage 1 or Stage 1b artifact is changed.
