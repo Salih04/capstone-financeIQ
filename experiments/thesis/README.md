@@ -2,9 +2,10 @@
 
 Prepared in Week 0/1. **Stage 1 (`positive_control`) is implemented and has
 run; Stage 1b (`positive_control_calibration`) is registered, implemented, and
-has completed its one governed run; the remaining slugs are still placeholders.** This directory
-holds the shared provenance helpers, the implemented stages, and the rules
-below.
+has completed its one governed run; Stage 2 (`negative_control`) is implemented
+and has completed its one governed run; the remaining three slugs are still
+placeholders.** This directory holds the shared provenance helpers, the
+implemented stages, and the rules below.
 
 ## Stage 1b — governed run complete; diagnostic/calibration only
 
@@ -60,6 +61,40 @@ Stage 1 stays frozen. The one governed run is complete, its closed integrity
 contract passes, and independent review passed; all Stage 2 unblock conditions
 are YES. Stage 2 design remains outside this task.
 
+## Stage 2 — governed run complete; apparatus result only
+
+The frozen registration is [`docs/thesis/STAGE_2_REGISTRATION.md`](../../docs/thesis/STAGE_2_REGISTRATION.md),
+with machine-checkable constants in [`stage2_registration.py`](stage2_registration.py)
+and the implementation in [`negative_control.py`](negative_control.py). The
+Stage 2 run completed **exactly once** through `make thesis-stage2`; its
+immutable result namespace is
+[`experiments/results_thesis/negative_control/`](../../experiments/results_thesis/negative_control/)
+and includes the human-readable
+[`negative_control_report.md`](../../experiments/results_thesis/negative_control/negative_control_report.md).
+The post-run audit passed and the Stage 2 scientific decision is **PASS**.
+
+| Control | Analyzable / registered | Invalid | Rejections | Rate / status |
+|---|---:|---:|---:|---|
+| `NC0_ROW_PERMUTED_MASK_RANK_GAUSSIAN` | 1000 / 1000 | 0 | 26 | 26/1000 = 0.026; PASS (`X < 65`) |
+| `NC1_TARGET_PERMUTATION` | 1000 / 1000 | 0 | 28 | 28/1000 = 0.028; PASS (`X < 65`) |
+
+The separate `NC0_MASK_ALIGNED_DIAGNOSTIC` produced 42 derived family
+rejections out of 1000, or **42/1000 = 0.042**. It is **NON-GATING**, outside
+the confirmatory family, and **NOT an FPR estimate**. Replay was not required
+and was not run.
+
+This PASS supports only the conclusion that, in this fixed dataset / pipeline
+context, the significance apparatus did not exhibit registered gross
+false-positive inflation under the two frozen null constructions. It does not
+establish absence of leakage, absence of all dependence, predictive edge,
+alpha, investment value, universal calibration, or production readiness.
+Interpretation remains limited by low power near true FPR 0.06 (registered
+power about 0.270), a descriptive/non-gating equivalence delta of 0.05, and an
+unresolved FinanceIQ SESOI. Stage 1 remains **FAILED AS WRITTEN — INFORMATIVE**;
+Stage 1b remains diagnostic/calibration only; historical Stage 1 and Stage 1b
+artifacts were not rerun or rewritten. Stage 3 and further model-development
+work must not reinterpret Stage 2 outside its registered scope.
+
 ## Output isolation
 
 Every thesis experiment writes to `experiments/results_thesis/<slug>/` and
@@ -78,7 +113,7 @@ that record null findings.
 |---|---|
 | `positive_control` | **Implemented** — `positive_control.py`, run via `make thesis-positive-control`. Injects a known-strength synthetic signal into one raw feature column before feature construction and measures how much survives each pipeline stage. Validates that the measurement apparatus responds to an effect that is provably present. |
 | `positive_control_calibration` | **Governed run complete — diagnostic/calibration only** — Stage 1b. `docs/thesis/STAGE_1B_REGISTRATION.md` + `stage1b_registration.py` + `positive_control_calibration.py`, run via `make thesis-stage1b`. Prospective (not blind) calibration/diagnostic re-scope of Stage 1: same carrier/model/splits/seed framework, adds the `0.35` grid rung, `R = 400` fresh repetitions (ids 200–599), Stage-1-operational-rule detection probability as the primary result, raw-p<0.05 detection probability as a secondary non-gating diagnostic, and no performance gate. Exactly one attempt (no rerun) completed the 6 × 400 matrix; integrity passed, replay was identical, and independent review was PASS. Stage 2 unblock conditions are all YES. |
-| `negative_control` | Expand the existing placebo/negative-control family. Confirms the apparatus reports nothing when nothing is there. |
+| `negative_control` | **Governed run complete — scientific decision PASS** — Stage 2. The two confirmatory controls were run exactly once with NC0 `26/1000 = 0.026` and NC1 `28/1000 = 0.028`, both below the registered critical count of 65; the separate diagnostic is `42/1000 = 0.042`, **NON-GATING** and **NOT an FPR estimate**. See the [frozen registration](../../docs/thesis/STAGE_2_REGISTRATION.md) and [immutable result report](../../experiments/results_thesis/negative_control/negative_control_report.md). The result is limited to the registered significance-apparatus claim in the fixed dataset / pipeline context and does not establish leakage absence, predictive edge, alpha, or investment value. Replay was not required and was not run. |
 | `defect_injection` | Deliberately introduce known defects (leakage, misalignment, look-ahead) and confirm the guards catch each one. |
 | `informativeness` | Map the power/informativeness frontier: what effect size this design could detect, as a function of n, years, and frequency. |
 | `monthly_panel` | Monthly-frequency redesign of the panel, subject to the data feasibility findings in `docs/thesis/DATA_FEASIBILITY.md`. |
@@ -117,9 +152,12 @@ entry. Consequently:
   present and owned by `entries[]`. The `prospective_entries[]` block was the
   pre-run ownership contract: it fixed ownership before the run, and the
   governed run moved those items verbatim into `entries[]`.
-- The remaining four slugs (`negative_control`, `defect_injection`,
-  `informativeness`, `monthly_panel`) have no registry entry of either kind, as
-  the `proposed_future` class prescribes.
+- Stage 2's root is in `governed_roots`, and its seven emitted files are now
+  present and owned by `entries[]`; the immutable result report and manifest
+  are under `experiments/results_thesis/negative_control/`.
+- The remaining three slugs (`defect_injection`, `informativeness`,
+  `monthly_panel`) have no registry entry of either kind, as the `proposed_future`
+  class prescribes.
 - When one of them is implemented, that task adds its output root to
   `governed_roots`, adds the Makefile target, and declares ownership — in
   `prospective_entries[]` if the registration requires ownership before the run,
