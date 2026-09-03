@@ -19,12 +19,13 @@
     "experiments/results_dimensionality",
     "experiments/results_thesis/positive_control",
     "experiments/results_thesis/positive_control_calibration",
+    "experiments/results_thesis/negative_control",
     "data/trusted_clean",
     "data/provenance",
     "docs/thesis/baseline"
   ],
   "coverage_rule": "Every file under a governed root, excluding experiments/results/runs/**, must be matched by exactly one entry below. An unmatched file (orphan) or a file matched by more than one entry (duplicate ownership) is a governance failure enforced by tests/test_artifact_registry.py.",
-  "prospective_entry_rule": "prospective_entries[] carries the frozen ownership contract for governed outputs whose registration requires ownership to be fixed before the run that creates them (docs/thesis/STAGE_1B_REGISTRATION.md, 'Governance wiring required before the first Stage 1b execution'). Each item has the same shape as an entries[] item and the same 'make <target>' generator_command rule, but is not yet subject to coverage_rule because its files do not exist yet and every entries[] entry must match at least one real file. When the governed run creates the files, that run's commit moves these items verbatim into entries[] and removes them from here; nothing about an item may change during that move.",
+  "prospective_entry_rule": "prospective_entries[] carries the frozen ownership contract for governed outputs whose registration requires ownership to be fixed before the run that creates them (docs/thesis/STAGE_1B_REGISTRATION.md, 'Governance wiring required before the first Stage 1b execution'; docs/thesis/STAGE_2_REGISTRATION.md, 'Implementation-time governance wiring — 2026-09-03'). Each item has the same shape as an entries[] item and the same 'make <target>' generator_command rule, but is not yet subject to coverage_rule because its files do not exist yet and every entries[] entry must match at least one real file. When the governed run creates the files, that run's commit moves these items verbatim into entries[] and removes them from here; nothing about an item may change during that move.",
   "coverage_exclusions": [
     {
       "glob": "experiments/results/runs/**",
@@ -53,7 +54,64 @@
     ]
   },
   "reproducibility_note": "Regeneration reproduces content in an environment-qualified sense only: byte identity requires matching Python, platform, and numerical-package versions (see METHODOLOGY 'Reproducibility and run provenance'). This registry does not claim universal byte reproducibility.",
-  "prospective_entries": [],
+  "prospective_entries": [
+    {
+      "path_or_glob": "experiments/results_thesis/negative_control/negative_control_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage2",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Prospective machine-readable Stage 2 report: the registered NC0 and NC1 confirmatory controls, the separately classified NC0 mask-aligned diagnostic, exact gate summary, and closed integrity evidence. Ownership is fixed before the one governed run; it does not certify predictive validity or investment merit."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/negative_control/negative_control_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage2",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Prospective human-readable rendering of the Stage 2 apparatus report, including the non-gating diagnostic boundary and research-support-only claim language. Generated only by the explicit governed Stage 2 target."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/negative_control/repetitions.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage2",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Prospective confirmatory repetition/model-cell table for NC0_ROW_PERMUTED_MASK_RANK_GAUSSIAN and NC1_TARGET_PERMUTATION: registered IDs, construction and significance seeds, six model results, degeneracy classifications, and mechanism invariants."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/negative_control/control_summary.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage2",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Prospective summary of the two confirmatory controls: strict denominator, rejection count, descriptive Wilson interval, exact critical-count classification, and non-gating equivalence metadata."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/negative_control/diagnostic_repetitions.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage2",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Prospective diagnostic-only repetition/model-cell table for NC0_MASK_ALIGNED_DIAGNOSTIC, IDs 3000-3999, with its explicit non-gating classification and real-mask alignment retained. It is outside the confirmatory family and gate."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/negative_control/artifact_manifest.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage2",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Prospective final completion manifest emitted last by experiments/thesis/provenance.py, recording the registered configuration, source and implementation hashes, exact output inventory, integrity verdict, and read-only source dataset."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/negative_control/attempt_provenance.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage2",
+      "inputs": [],
+      "hand_edit_forbidden": true,
+      "notes": "Prospective operational governance marker for initial and crash-recovery attempts, registered configuration and seed-schedule identity, and completion status. It is not a scientific emitted artifact; artifact_manifest.json remains the completion authority."
+    }
+  ],
   "entries": [
     {
       "path_or_glob": "experiments/results_thesis/positive_control/positive_control_report.json",

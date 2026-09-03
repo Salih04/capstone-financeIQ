@@ -584,3 +584,11 @@ does not waive that requirement.
 No Stage 2 result root exists, no Stage 2 scientific runner exists, no Stage 2
 repetition has been generated, and no Stage 1 or Stage 1b artifact is changed
 by this registration.
+
+### Implementation-time governance wiring — 2026-09-03
+
+Implementation has now frozen the seven future filenames. `artifact_registry.json`
+now contains prospective ownership contracts for those filenames. The Stage 2
+result root remains absent, and no Stage 2 run or scientific draw has occurred.
+This is the implementation-phase fulfillment of the pre-run obligation already
+anticipated by the registration. No scientific registration clause is changed.
