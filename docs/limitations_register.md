@@ -207,6 +207,15 @@ Registered through: `experiments/results_serving_eval/serving_eval_report.json`
 - The raw serving p-value belongs to one prespecified test outside the six-model Bonferroni family and is not family-corrected.
 - Research support only; not investment advice.
 
+### experiments/results_thesis/negative_control/negative_control_report.json
+
+Registered through: `experiments/results_thesis/negative_control/negative_control_report.json`
+
+- These controls characterize apparatus behavior under the registered constructions only.
+- The diagnostic uses a target-associated real mask and is not an exact null-FPR test.
+- Passing this stage would not establish absence of feature-side PIT or alignment leakage.
+- Research support only; not investment advice.
+
 ### experiments/results_thesis/positive_control/positive_control_report.json
 
 Registered through: `experiments/results_thesis/positive_control/positive_control_report.json`

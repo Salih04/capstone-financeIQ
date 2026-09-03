@@ -1,8 +1,8 @@
-"""Machine-checkable guards for the Stage 2 prospective registration.
+"""Machine-checkable guards for the Stage 2 registration and post-run state.
 
-These tests validate the registration contract only. They do not implement or
-run Stage 2, create its future result root, generate a repetition, or modify
-historical Stage 1/Stage 1b artifacts.
+These tests preserve the historical registration contract while checking the
+completed governed result namespace. They do not implement or run Stage 2 or
+modify historical Stage 1/Stage 1b artifacts.
 """
 
 from __future__ import annotations
@@ -32,6 +32,16 @@ RESULT_ROOT = REPO_ROOT / reg.RESULT_ROOT.rstrip("/")
 REGISTRY_PATH = REPO_ROOT / "artifact_registry.json"
 DATASET_PATH = REPO_ROOT / reg.DATASET_PATH
 SIGNIFICANCE_PATH = REPO_ROOT / "experiments/significance.py"
+STAGE2_RESULT_FILENAMES = (
+    "negative_control_report.json",
+    "negative_control_report.md",
+    "repetitions.csv",
+    "control_summary.csv",
+    "diagnostic_repetitions.csv",
+    "artifact_manifest.json",
+    "attempt_provenance.json",
+)
+STAGE2_RESULT_PATHS = tuple(RESULT_ROOT / name for name in STAGE2_RESULT_FILENAMES)
 
 
 def sha256(path: Path) -> str:
@@ -96,26 +106,61 @@ def test_authoritative_hashes_are_exact_and_current():
         assert sha256(REPO_ROOT / relative) == expected
 
 
-def test_result_root_and_scientific_artifacts_are_absent():
+def test_completed_result_root_and_historical_registration_absence_are_preserved(
+    registration_doc,
+):
     assert reg.RESULT_ROOT == "experiments/results_thesis/negative_control/"
     assert reg.RESULT_ROOT_EXISTS_AT_REGISTRATION is False
     assert reg.STAGE2_RESULT_EXISTS_AT_REGISTRATION is False
     assert reg.NO_STAGE2_SCIENTIFIC_DRAW_OR_OUTCOME is True
-    assert not RESULT_ROOT.exists()
-    assert not list(
-        (REPO_ROOT / "experiments/results_thesis").glob("negative_control*")
+    assert RESULT_ROOT.is_dir()
+    assert {path.name for path in RESULT_ROOT.iterdir()} == set(
+        STAGE2_RESULT_FILENAMES
+    )
+    assert (RESULT_ROOT / "artifact_manifest.json").is_file()
+    assert not (RESULT_ROOT / ".staging").exists()
+    assert "experiments/results_thesis/negative_control/ does not exist at registration time" in compact(
+        registration_doc
     )
 
 
-def test_stage2_registry_has_prospective_output_contracts_but_no_live_outputs():
+def test_stage2_registry_has_completed_output_contracts_and_no_prospective_outputs():
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+    root = reg.RESULT_ROOT.rstrip("/")
+    expected_paths = tuple(
+        f"{root}/{name}" for name in STAGE2_RESULT_FILENAMES
+    )
     assert "experiments/results_thesis/negative_control" in registry[
         "governed_roots"
     ]
+    completed = [
+        entry
+        for entry in registry["entries"]
+        if entry["path_or_glob"].startswith(root + "/")
+    ]
+    assert tuple(entry["path_or_glob"] for entry in completed) == expected_paths
+    assert registry["prospective_entries"] == []
+    assert len(completed) == len(STAGE2_RESULT_FILENAMES)
+    for entry in completed:
+        assert set(entry) == {
+            "path_or_glob",
+            "artifact_class",
+            "generator_command",
+            "inputs",
+            "hand_edit_forbidden",
+            "notes",
+        }
+        assert entry["artifact_class"] == "generated"
+        assert entry["generator_command"] == "make thesis-stage2"
+        assert entry["hand_edit_forbidden"] is True
+        if entry["path_or_glob"].endswith("attempt_provenance.json"):
+            assert entry["inputs"] == []
+        else:
+            assert entry["inputs"] == [reg.DATASET_PATH]
+        assert entry["notes"].strip()
     assert not any(
-        "experiments/results_thesis/negative_control"
-        in entry["path_or_glob"]
-        for entry in registry.get("entries", [])
+        entry["path_or_glob"].startswith(root + "/")
+        for entry in registry["prospective_entries"]
     )
     assert reg.PROSPECTIVE_ARTIFACT_CONTRACTS_REQUIRED_AT_REGISTRATION is False
     assert reg.PROSPECTIVE_ARTIFACT_CONTRACT_STATUS_AT_REGISTRATION == (
@@ -667,6 +712,18 @@ def test_registration_import_is_filesystem_inert():
         REPO_ROOT / "experiments/thesis/provenance.py",
     )
     before = {path: sha256(path) for path in tracked}
+    completed_before = {path: sha256(path) for path in STAGE2_RESULT_PATHS}
+    stage1_before = {
+        path: {
+            item.relative_to(REPO_ROOT).as_posix(): sha256(item)
+            for item in sorted(path.rglob("*"))
+            if item.is_file()
+        }
+        for path in (
+            REPO_ROOT / "experiments/results_thesis/positive_control",
+            REPO_ROOT / "experiments/results_thesis/positive_control_calibration",
+        )
+    }
     env = os.environ.copy()
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     subprocess.run(
@@ -681,7 +738,20 @@ def test_registration_import_is_filesystem_inert():
     )
     after = {path: sha256(path) for path in tracked}
     assert after == before
-    assert not RESULT_ROOT.exists()
+    assert {path: sha256(path) for path in STAGE2_RESULT_PATHS} == completed_before
+    assert stage1_before == {
+        path: {
+            item.relative_to(REPO_ROOT).as_posix(): sha256(item)
+            for item in sorted(path.rglob("*"))
+            if item.is_file()
+        }
+        for path in (
+            REPO_ROOT / "experiments/results_thesis/positive_control",
+            REPO_ROOT / "experiments/results_thesis/positive_control_calibration",
+        )
+    }
+    assert RESULT_ROOT.is_dir()
+    assert not (RESULT_ROOT / ".staging").exists()
 
 
 def test_historical_stage1_and_stage1b_artifacts_are_unchanged_by_registration():
@@ -703,6 +773,9 @@ def test_historical_stage1_and_stage1b_artifacts_are_unchanged_by_registration()
         }
 
     before = {path: inventory(path) for path in historical}
-    assert not RESULT_ROOT.exists()
     after = {path: inventory(path) for path in historical}
     assert after == before
+    assert RESULT_ROOT.is_dir()
+    assert {path.name for path in RESULT_ROOT.iterdir()} == set(
+        STAGE2_RESULT_FILENAMES
+    )
