@@ -4,7 +4,7 @@ REGISTRATION ONLY. Importing this module performs no scientific draw, reads no
 dataset, writes no result root, fits no model, and has no execution entry
 point. It contains the owner-locked Stage 2 design from
 docs/thesis/STAGE_2_REGISTRATION.md so registration tests can prove the
-machine-readable contract before a future runner exists.
+machine-readable contract independently of the separate implementation runner.
 
 The registration is prospective but not blind. Stage 1, the complete Stage 1b
 calibration outcome, the legacy dense-Gaussian placebo, pre-run mask diagnostics,
@@ -633,5 +633,10 @@ CLAIM_BOUNDARY = (
 )
 FUTURE_IMPLEMENTATION_MUST_REMAIN_REGISTRATION_SEPARATE = True
 FUTURE_RESULT_OWNERSHIP_WIRING_REQUIRED_BEFORE_RUN = True
-PROSPECTIVE_ARTIFACT_CONTRACTS_REQUIRED_NOW = False
-PROSPECTIVE_ARTIFACT_CONTRACT_STATUS = "NOT_REQUIRED_AT_REGISTRATION"
+PROSPECTIVE_ARTIFACT_CONTRACTS_REQUIRED_AT_REGISTRATION = False
+PROSPECTIVE_ARTIFACT_CONTRACT_STATUS_AT_REGISTRATION = (
+    "NOT_REQUIRED_AT_REGISTRATION"
+)
+IMPLEMENTATION_PROSPECTIVE_CONTRACTS_REQUIRED_BEFORE_RUN = True
+IMPLEMENTATION_PROSPECTIVE_CONTRACTS_WIRED = True
+IMPLEMENTATION_PROSPECTIVE_CONTRACT_STATUS = "WIRED_BEFORE_RUN"

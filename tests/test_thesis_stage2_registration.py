@@ -107,21 +107,53 @@ def test_result_root_and_scientific_artifacts_are_absent():
     )
 
 
-def test_current_registry_has_no_stage2_generated_output_contract():
+def test_stage2_registry_has_prospective_output_contracts_but_no_live_outputs():
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
-    assert "experiments/results_thesis/negative_control" not in registry[
+    assert "experiments/results_thesis/negative_control" in registry[
         "governed_roots"
     ]
-    for section in ("entries", "prospective_entries"):
-        assert not any(
-            "experiments/results_thesis/negative_control"
-            in entry["path_or_glob"]
-            for entry in registry.get(section, [])
-        )
-    assert reg.PROSPECTIVE_ARTIFACT_CONTRACTS_REQUIRED_NOW is False
-    assert reg.PROSPECTIVE_ARTIFACT_CONTRACT_STATUS == (
+    assert not any(
+        "experiments/results_thesis/negative_control"
+        in entry["path_or_glob"]
+        for entry in registry.get("entries", [])
+    )
+    assert reg.PROSPECTIVE_ARTIFACT_CONTRACTS_REQUIRED_AT_REGISTRATION is False
+    assert reg.PROSPECTIVE_ARTIFACT_CONTRACT_STATUS_AT_REGISTRATION == (
         "NOT_REQUIRED_AT_REGISTRATION"
     )
+    assert reg.IMPLEMENTATION_PROSPECTIVE_CONTRACTS_REQUIRED_BEFORE_RUN is True
+    assert reg.IMPLEMENTATION_PROSPECTIVE_CONTRACTS_WIRED is True
+    assert reg.IMPLEMENTATION_PROSPECTIVE_CONTRACT_STATUS == "WIRED_BEFORE_RUN"
+
+
+def test_registration_time_ownership_record_is_preserved_and_wiring_is_separate(
+    registration_doc,
+):
+    historical_record = """The current artifact registry remains unchanged at registration time:
+negative_control has no generated files, so it does not have an entries[]
+contract. Prospective artifact contracts are **NOT_REQUIRED_AT_REGISTRATION**
+under the current proposed_future rule. Before any future Stage 2 execution,
+the implementation task must add the runner, a real Makefile target, the Stage 2
+result root to artifact_registry.json governed roots, and one ownership contract
+for every emitted file in the same pre-run governance step. This registration
+does not waive that requirement.
+
+No Stage 2 result root exists, no Stage 2 scientific runner exists, no Stage 2
+repetition has been generated, and no Stage 1 or Stage 1b artifact is changed
+by this registration."""
+    assert historical_record in registration_doc
+    implementation_heading = "### Implementation-time governance wiring — 2026-09-03"
+    assert implementation_heading in registration_doc
+    implementation_record = registration_doc[registration_doc.index(implementation_heading) :]
+    for phrase in (
+        "seven future filenames",
+        "prospective ownership contracts",
+        "result root remains absent",
+        "no Stage 2 run or scientific draw has occurred",
+        "implementation-phase fulfillment of the pre-run obligation already",
+        "No scientific registration clause is changed",
+    ):
+        assert phrase in implementation_record
 
 
 def test_canonical_models_and_splits_are_pinned_to_repository_source():
