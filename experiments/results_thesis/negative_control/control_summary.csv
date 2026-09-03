@@ -1,0 +1,3 @@
+control,role,registered_denominator,analyzable_repetitions,invalid_repetitions,rejection_count,fpr_estimate,wilson_95_pointwise_low,wilson_95_pointwise_high,complete,fails_if_complete,gate_decision,equivalence_is_gating
+NC0_ROW_PERMUTED_MASK_RANK_GAUSSIAN,CONFIRMATORY / GATING,1000,1000,0,26,0.025999999999999999,0.01780393820161633,0.037823828842689922,True,False,PASS,False
+NC1_TARGET_PERMUTATION,CONFIRMATORY / GATING,1000,1000,0,28,0.028000000000000001,0.019442276812770928,0.040170183197593107,True,False,PASS,False

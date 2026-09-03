@@ -1,4 +1,4 @@
-"""Focused tests for the inert Stage 2 negative-control apparatus.
+"""Focused tests for the completed Stage 2 negative-control apparatus.
 
 All construction/model fixtures in this module are invented test data.  The
 tests never call the governed entry point, never use the frozen dataset for a
@@ -34,6 +34,23 @@ REGISTRY_PATH = REPO_ROOT / "artifact_registry.json"
 RUNNER_PATH = REPO_ROOT / "experiments/thesis/negative_control.py"
 STAGE2_ROOT = REPO_ROOT / reg.RESULT_ROOT.rstrip("/")
 FEATURE_COLUMNS = tuple(f"feature_{index:02d}" for index in range(40))
+STAGE2_RESULT_FILENAMES = (
+    "negative_control_report.json",
+    "negative_control_report.md",
+    "repetitions.csv",
+    "control_summary.csv",
+    "diagnostic_repetitions.csv",
+    "artifact_manifest.json",
+    "attempt_provenance.json",
+)
+STAGE2_RESULT_PATHS = tuple(STAGE2_ROOT / name for name in STAGE2_RESULT_FILENAMES)
+REGISTRATION_SOURCE = REPO_ROOT / "experiments/thesis/stage2_registration.py"
+EXPECTED_IMPLEMENTATION_SHA256 = (
+    "39a396630c6a753fb645d4315b274eaac8e928d3cbc500d059e0fd8d32224833"
+)
+EXPECTED_REGISTRATION_SHA256 = (
+    "295e69ee09c2d7f6900efbbd79ee2c224e05830ace3abf98170b3c5bea33faef"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -42,6 +59,18 @@ def _sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def _stage2_result_hashes() -> dict[Path, str]:
+    return {path: _sha256(path) for path in STAGE2_RESULT_PATHS}
+
+
+def _tree_hashes(path: Path) -> dict[str, str]:
+    return {
+        item.relative_to(REPO_ROOT).as_posix(): _sha256(item)
+        for item in sorted(path.rglob("*"))
+        if item.is_file()
+    }
 
 
 @pytest.fixture(scope="module")
@@ -271,18 +300,38 @@ def _integrity_kwargs(records: list[dict], **overrides) -> dict:
     return kwargs
 
 
-def test_import_and_default_plan_do_not_create_stage2_root():
-    assert not STAGE2_ROOT.exists()
+def test_import_and_default_plan_do_not_modify_completed_stage2_root():
+    before = _stage2_result_hashes()
+    historical_before = {
+        path: _tree_hashes(path)
+        for path in (
+            REPO_ROOT / "experiments/results_thesis/positive_control",
+            REPO_ROOT / "experiments/results_thesis/positive_control_calibration",
+        )
+    }
     plan = nc.registered_plan()
     assert plan["executed"] is False
     assert plan["result_root_created"] is False
     assert plan["scientific_draw_performed"] is False
-    assert not STAGE2_ROOT.exists()
+    assert _stage2_result_hashes() == before
+    assert historical_before == {
+        path: _tree_hashes(path)
+        for path in (
+            REPO_ROOT / "experiments/results_thesis/positive_control",
+            REPO_ROOT / "experiments/results_thesis/positive_control_calibration",
+        )
+    }
+    assert STAGE2_ROOT.is_dir()
+    assert {path.name for path in STAGE2_ROOT.iterdir()} == set(
+        STAGE2_RESULT_FILENAMES
+    )
+    assert not (STAGE2_ROOT / ".staging").exists()
 
 
 def test_subprocess_import_is_filesystem_inert():
     tracked = [DATASET_PATH, SIGNIFICANCE_PATH, RUNNER_PATH]
     before = {path: _sha256(path) for path in tracked}
+    completed_before = _stage2_result_hashes()
     environment = os.environ.copy()
     environment["PYTHONDONTWRITEBYTECODE"] = "1"
     subprocess.run(
@@ -292,26 +341,27 @@ def test_subprocess_import_is_filesystem_inert():
         check=True,
     )
     assert {path: _sha256(path) for path in tracked} == before
-    assert not STAGE2_ROOT.exists()
+    assert _stage2_result_hashes() == completed_before
+    assert STAGE2_ROOT.is_dir()
+    assert not (STAGE2_ROOT / ".staging").exists()
 
 
 def test_registered_result_namespace_and_prospective_contracts_are_exact():
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     root = reg.RESULT_ROOT.rstrip("/")
     assert root in registry["governed_roots"]
-    assert not any(
-        entry["path_or_glob"].startswith(root + "/")
-        for entry in registry["entries"]
+    expected_paths = tuple(
+        f"{root}/{name}" for name in STAGE2_RESULT_FILENAMES
     )
-    expected_names = set(nc.EMITTED_FILENAMES) | set(nc.OPERATIONAL_FILENAMES)
-    prospective = [
+    completed = [
         entry
-        for entry in registry["prospective_entries"]
+        for entry in registry["entries"]
         if entry["path_or_glob"].startswith(root + "/")
     ]
-    assert {entry["path_or_glob"].rsplit("/", 1)[-1] for entry in prospective} == expected_names
-    assert len(prospective) == len(expected_names)
-    for entry in prospective:
+    assert tuple(entry["path_or_glob"] for entry in completed) == expected_paths
+    assert len(completed) == len(STAGE2_RESULT_FILENAMES)
+    assert registry["prospective_entries"] == []
+    for entry in completed:
         assert set(entry) == {
             "path_or_glob",
             "artifact_class",
@@ -328,6 +378,11 @@ def test_registered_result_namespace_and_prospective_contracts_are_exact():
         else:
             assert entry["inputs"] == [reg.DATASET_PATH]
         assert entry["notes"].strip()
+    assert STAGE2_ROOT.is_dir()
+    assert {path.name for path in STAGE2_ROOT.iterdir()} == set(
+        STAGE2_RESULT_FILENAMES
+    )
+    assert not (STAGE2_ROOT / ".staging").exists()
 
 
 def test_make_target_and_runner_require_explicit_governed_flag():
@@ -819,8 +874,17 @@ def test_output_audit_rejects_nested_or_unexpected_files(tmp_path):
 
 def test_significance_source_sha_and_historical_roots_are_unchanged():
     assert _sha256(SIGNIFICANCE_PATH) == reg.SIGNIFICANCE_SHA256
+    assert _sha256(RUNNER_PATH) == EXPECTED_IMPLEMENTATION_SHA256
+    assert _sha256(REGISTRATION_SOURCE) == EXPECTED_REGISTRATION_SHA256
+    for relative, expected in reg.SOURCE_MODULE_HASHES.items():
+        assert _sha256(REPO_ROOT / relative) == expected
     assert _sha256(DATASET_PATH) == reg.DATASET_SHA256
-    assert not STAGE2_ROOT.exists()
+    assert STAGE2_ROOT.is_dir()
+    assert _stage2_result_hashes().keys() == set(STAGE2_RESULT_PATHS)
+    assert {path.name for path in STAGE2_ROOT.iterdir()} == set(
+        STAGE2_RESULT_FILENAMES
+    )
+    assert not (STAGE2_ROOT / ".staging").exists()
     for path in (
         REPO_ROOT / "experiments/results_thesis/positive_control",
         REPO_ROOT / "experiments/results_thesis/positive_control_calibration",
