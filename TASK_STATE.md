@@ -1564,3 +1564,37 @@ KAP cross-check recommended before claiming any result.
 - Historical Stage 1, Stage 1b, excess-basis, serving-eval, and contamination artifacts remain evidence under the old implementation and are not rewritten.
 - `contamination_lab`'s expected SHA is repinned only as a forward-run gate. No historical scientific rerun occurred, and no Stage 2 run occurred.
 - Stage 2 registration must pin the repaired SHA after this remediation merges.
+
+### FINANCEIQ-STAGE2-LEDGER-CLOSE (2026-09-03; append-only)
+
+| State item | Status |
+|---|---|
+| Stage 2 registration | `COMPLETED` |
+| Stage 2 implementation | `COMPLETED` |
+| Governed run | `COMPLETED EXACTLY ONCE` |
+| Post-run audit | `PASS` |
+| Scientific decision | `PASS` |
+| NC0_ROW_PERMUTED_MASK_RANK_GAUSSIAN | `1000/1000 analyzable; invalid 0; 26 family rejections; 26/1000 = 0.026; PASS; registered critical fail count >=65` |
+| NC1_TARGET_PERMUTATION | `1000/1000 analyzable; invalid 0; 28 family rejections; 28/1000 = 0.028; PASS; registered critical fail count >=65` |
+| NC0_MASK_ALIGNED_DIAGNOSTIC | `1000/1000 analyzable; 42 derived family rejections; 42/1000 = 0.042; NON-GATING; NOT an FPR estimate; outside confirmatory family` |
+| Result commit | `67f29dc19e2c45784d895b84f8f9c6b42c25899b` |
+| Merge / main SHA | `30ea68a5649d4ac8a847831426b02afa14171abe` |
+| Pull request | `#38` |
+| PR verification | `33778492352 — success; exact head 67f29dc19e2c45784d895b84f8f9c6b42c25899b` |
+| Post-merge verification | `33779508174 — success; event push; exact head 30ea68a5649d4ac8a847831426b02afa14171abe` |
+| Replay | `NOT REQUIRED / NOT RUN` |
+| Result artifacts | `IMMUTABLE — experiments/results_thesis/negative_control/ was not edited` |
+| Fixed context | `FROZEN DATASET / PIPELINE CONTEXT` |
+| Required limitations | `Low power near true FPR 0.06; registered power about 0.270. Equivalence delta 0.05 is descriptive / non-gating. FinanceIQ SESOI remains unresolved. Diagnostic is non-null, non-gating, and not an FPR estimate.` |
+| Historical Stage 1 / Stage 1b artifacts | `NOT RERUN OR REWRITTEN` |
+| Stage 1 status | `FAILED AS WRITTEN — INFORMATIVE` |
+| Stage 1b status | `DIAGNOSTIC / CALIBRATION ONLY` |
+| Stage 2 closure | `FULLY CLOSED` |
+
+Stage 2 PASS supports only the conclusion that the significance apparatus did
+not exhibit registered gross false-positive inflation under the two frozen null
+constructions in this frozen dataset / pipeline context. It does not establish
+absence of leakage, absence of all dependence, predictive edge, alpha,
+investment value, universal calibration, or production readiness. Stage 3 and
+further model-development work must not reinterpret Stage 2 outside its
+registered scope.
