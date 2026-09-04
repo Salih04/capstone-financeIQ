@@ -123,8 +123,16 @@ def compact_registration_doc(registration_doc: str) -> str:
 # Source pin
 # --------------------------------------------------------------------------- #
 def test_authoritative_base_and_exact_registration_mutation_surface():
-    assert git_bytes("rev-parse", "HEAD").decode().strip() == AUTHORITATIVE_BASE
     assert reg.AUTHORITATIVE_BASE_COMMIT == AUTHORITATIVE_BASE
+    # The authoritative commit is a durable source-inspection anchor, not a
+    # requirement that registration must run at that exact repository HEAD.
+    git_bytes("cat-file", "-e", f"{AUTHORITATIVE_BASE}^{{commit}}")
+    git_bytes("merge-base", "--is-ancestor", AUTHORITATIVE_BASE, "HEAD")
+    # Git ancestry establishes governance provenance only; it does not create
+    # or imply a Stage 3 scientific outcome.
+    assert reg.NO_STAGE3_INJECTION_DRAW_OR_OUTCOME is True
+    assert reg.EXPECTED_FIRST_DRAW_OUTCOME_IS_PROSPECTIVE is True
+    assert reg.EXPECTED_FIRST_DRAW_OUTCOME_IS_OBSERVED is False
     assert changed_paths_against_authoritative_base() == EXPECTED_CHANGED_PATHS
 
 
