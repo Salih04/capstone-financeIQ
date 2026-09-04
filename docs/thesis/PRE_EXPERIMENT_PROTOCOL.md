@@ -765,3 +765,176 @@ Before any future Stage 2 execution, its implementation task must add the
 runner, Makefile target, governed result root, and one ownership contract per
 emitted file before the run. No Stage 2 result root exists at this amendment
 time, and no Stage 1 or Stage 1b artifact is changed.
+
+### 2026-09-04 — Stage 3 dated amendment and registration
+
+**What changed.** The Stage 3 stage entry above is refined into a closed,
+machine-checkable registration. The old block is not silently rewritten; it
+remains above as written, and this amendment records the refinement
+prospectively before any Stage 3 injection or draw. The full registration is
+`docs/thesis/STAGE_3_REGISTRATION.md`, with machine-readable constants in
+`experiments/thesis/stage3_registration.py`.
+
+**What had already been observed.** Stage 1, Stage 1b, and the completed Stage 2
+governed run were all known, as were the current contents of the repository's
+protection surfaces. No Stage 3 injection has been constructed, no Stage 3 draw
+has been made, and no Stage 3 result exists at amendment time.
+
+**Closed first-draw family.** Exactly five defect classes, one injection each,
+no severity grid and no repeated performance experiment:
+`FUTURE_YEAR_FEATURE_LEAKAGE` (4000), `T_TPLUS1_MISALIGNMENT` (4001),
+`TARGET_LEAKAGE_INTO_FEATURES` (4002), `LOOKAHEAD_UNIVERSE_MEMBERSHIP` (4003),
+`DUPLICATE_ROW_INFLATION` (4004). The stage entry's "at minimum" enumeration is
+closed to exactly these five for the first governed draw.
+
+**Source pin.** Only
+`data/trusted_clean/modeling_dataset_training_2020_2025.csv`, SHA256
+`3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78`.
+FI-DATA-EXPAND outputs are not Stage 3 inputs; expanded or PIT-corrected
+datasets require a separate versioned path and separate prospective governance.
+
+**Guard definition.** For each defect class the guard is a closed preregistered
+mapping to an existing protection surface present on authoritative base
+`c418563f432f5b253fb3b0e69619c76608ea15ea` — a named validator condition or
+`issues[]` member, a named command failure or exit, a named existing test, or a
+named provenance/integrity guard. Detection counts only if a preregistered
+existing guard fires before any model or significance evaluation. No new guard
+may be added before the first governed draw to make the experiment pass. Where
+no applicable existing guard exists, the registration records `NONE_EXISTING`
+explicitly.
+
+**Registered guard gaps.** Three of the five defects are preregistered as
+`NOT_DETECTED`, because the authoritative base carries no reachable guard for
+them: for `FUTURE_YEAR_FEATURE_LEAKAGE` (4000) no surface compares a feature
+cell against its upstream year-of-record; for `T_TPLUS1_MISALIGNMENT` (4001) the
+only alignment surface checks the `target_year` column arithmetic rather than
+target value provenance; and for `LOOKAHEAD_UNIVERSE_MEMBERSHIP` (4003) no
+point-in-time universe-membership record exists anywhere in the repository. The
+expected first-draw guard gaps are therefore exactly 4000, 4001, and 4003. The
+expected first-draw outcome is **FAIL — INFORMATIVE**. This is a prospective
+expectation, not an observed scientific result. The family is not narrowed to
+the working guards, no gap is repaired before the draw, any later repair belongs
+to a separate remediation stage, and first-draw artifacts remain immutable.
+
+**Expected detections.** `TARGET_LEAKAGE_INTO_FEATURES` (4002) and
+`DUPLICATE_ROW_INFLATION` (4004) are preregistered as `DETECTED`, each by an
+existing surface found on the authoritative base and neither by a guard added or
+repaired here. The expected first-draw map is 4000 `NOT_DETECTED`, 4001
+`NOT_DETECTED`, 4002 `DETECTED`, 4003 `NOT_DETECTED`, 4004 `DETECTED`.
+
+**Provenance guard reachability.** `scripts/data_collection/build_cell_provenance.py`
+is a reachable provenance/integrity guard, not an input-blind one: `generate`,
+`resolve_input`, `open_checked_file`, and `prepare_output_dir` all take a
+caller-supplied `root` and evaluate every containment assertion against it, and
+only the *relative* input path is frozen. It is therefore reached by
+materializing the ten declared relative inputs under a private temporary root —
+the pattern `tests/test_cell_provenance.py::regenerated` already exercises on
+the authoritative base. Under that containment mode, `PRIVATE_PROVENANCE_ROOT`,
+the module freezes the dataset's column set twice (the `feature_passports.json`
+passport names inside `generate`, `COLUMN_SPECS` inside `build_records`) and
+fails closed on 4002's added `leaked_next_year_return_pct` column before it
+resolves a single cell; it also fails closed on 4004's duplicated
+`(ticker, year)` key. The named target-leakage validator condition for 4002
+remains `STRUCTURALLY_UNREACHABLE` and is recorded as a separate,
+existing-but-useless guard-surface fact; it is not repaired. The module's later
+lineage-closure condition fires identically on the clean comparator and on every
+injected frame for the pinned training source, whose per-ticker year grid is
+incomplete, so it is registered as a baseline terminal state — never a detection
+signal and never a containment failure.
+
+**Registration-test boundary.** The registration tests inspect source, read the
+frozen dataset read-only, verify frozen source facts and registration constants,
+prove source semantics structurally, and prove that no Stage 3 result root
+exists. They construct no injected frame: the 4000 transformation, the 4001
+rotation, the 4002 leak column, the 4003 membership selection, and the 4004
+duplication are all Stage 3 defect constructions and belong to the separate
+implementation tests. Every frozen injection count in the registration is
+consequently a prospective expectation.
+
+**Secondary consumer authority.** The secondary IC depends on
+`experiments/run_experiments.py`, which is pinned by full SHA256
+`265f58678d522eea0c48fbccba415ed30b3e20abc6bb7ae0a8e33857c5feb543` and is
+unchanged from the authoritative base. The registered split tuple must equal
+`experiments.run_experiments.SPLITS` exactly — same names, order,
+`train_target_years`, and `test_feature_year`; a subset is not sufficient.
+
+**4001 stale collateral.** The 4001 injection rotates observed
+`next_year_return_pct` within ticker and recomputes nothing, so the six other
+derived `next_year_*` target columns — `next_year_rank_by_return`,
+`next_year_return_percentile`, `next_year_top_10pct_returner`,
+`next_year_top_20pct_returner`, `next_year_excess_return_vs_bist100`,
+`next_year_outperform_bist100` — remain **stale collateral**. That is disclosed,
+not repaired. They are forbidden from influencing the Stage 3 estimand: 4001
+primary detection uses only the registered guard surfaces, 4001 secondary IC uses
+only the canonical predictor features plus `next_year_return_pct` as target, and
+no other `next_year_*` column may be a predictor, alternate target, alignment
+authority, detection signal, or secondary IC input. An implementation path that
+consumes one classifies 4001 **INCONCLUSIVE**. Repository authority makes this
+hold: `_feature_cols` excludes every `next_year_`-prefixed column, and the
+registered secondary target is the single literal `next_year_return_pct`.
+
+**Decision rule.** PASS requires all five completed registered defects to be
+detected by their preregistered existing guards; FAIL if at least one completed
+registered defect is not detected; INCONCLUSIVE if at least one registered
+defect cannot be evaluated exactly as preregistered due to integrity,
+containment, execution, or completeness failure. Integrity and INCONCLUSIVE take
+precedence over the scientific PASS/FAIL decision. The primary decision does not
+depend on model performance, an IC threshold, p-values, permutation
+significance, or multiplicity.
+
+**Secondary metric.** The stage entry's secondary "inflation in apparent IC" is
+made explicit and bounded: only for an undetected defect, apparent IC distortion
+is computed descriptively with Ridge, the existing canonical walk-forward
+splits, and the target and modeling semantics already frozen in the repository.
+For each canonical test split it is the signed difference
+`delta_ic(split) = injected_ic(split) - clean_ic(split)`, where each IC is the
+Spearman correlation between Ridge prediction and observed target. Values are
+not pooled across splits or defects and have no aggregate threshold. It is
+NON-GATING and DESCRIPTIVE ONLY — no p-value, no significance test, no
+multiplicity correction, no predictive-edge inference — and it is never
+computed for a detected or inconclusive defect.
+
+**Multiplicity.** Unchanged and none required: each defect is a separate
+prespecified binary check with an expected answer, not a search.
+
+**Seeds.** Base seed 42 from `provenance.SEEDS["defect_injection"]`;
+`injection_seed(defect_id) = BASE_SEED * 1_000_003 + defect_id`. IDs 4000–4004
+do not overlap Stage 1 (0–199), Stage 1b (200–599), the reserved band
+(600–999), or Stage 2 (1000–3999). All five injections are `NO_RNG`; RNG
+consumption in the first draw is an integrity failure.
+
+**Containment.** Every injection is built on a private in-memory copy of the
+pinned source. Where a registered surface requires a path, the frame is written
+to a private temporary directory outside `data/` and outside
+`experiments/results_thesis/`. Evaluating a validator-issue surface requires
+redirecting the four `validate()` report outputs to that private directory and
+restoring them on all exit paths; evaluating one by writing into
+`data/trusted_clean` is forbidden and makes the defect INCONCLUSIVE. Evaluating
+a cell-provenance surface requires the `PRIVATE_PROVENANCE_ROOT` mode described
+above, under which no canonical path and no `data/provenance` output is touched.
+Canonical digests are re-verified after every defect. An `INPUT_BLIND` surface —
+one that reads only canonical committed paths — staying silent is neither an
+evaluation nor a non-detection.
+
+**Stage 7 gate.** Stage 3 does not silently unlock Stage 7. The existing Stage 7
+wording — "Only after stages 1–3 pass" — remains authoritative and is not
+amended. Stage 1 remains FAILED AS WRITTEN — INFORMATIVE, so Stage 7 remains
+blocked under the current wording even if Stage 3 passes. Any future Stage 7
+reinterpretation or amendment requires separate prospective governance.
+
+**Claim boundary.** Stage 3 may establish only whether the preregistered
+existing guard map detects the five preregistered synthetic defects under the
+frozen construction. It does not establish absence of all leakage, universal
+pipeline safety, predictive edge, alpha, investment value, production readiness,
+correctness of expanded datasets, or correctness of future unknown defect
+classes. A FAIL is informative and expected if existing guard gaps are real.
+This remains research support only, not investment advice.
+
+**Registration-only boundary.** The Stage 3 registration module makes no
+injection, no scientific draw, and creates no result root. At registration time
+the artifact registry does not require a prospective Stage 3 generated-output
+contract, because no output files exist. Before any future Stage 3 execution,
+its implementation task must add the runner, Makefile target, governed result
+root, and one ownership contract per emitted file before the run. No Stage 3
+result root exists at this amendment time, and no Stage 1, Stage 1b, or Stage 2
+artifact is changed.

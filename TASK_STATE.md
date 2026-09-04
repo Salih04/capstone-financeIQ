@@ -1598,3 +1598,43 @@ absence of leakage, absence of all dependence, predictive edge, alpha,
 investment value, universal calibration, or production readiness. Stage 3 and
 further model-development work must not reinterpret Stage 2 outside its
 registered scope.
+
+### FINANCEIQ-THESIS-STAGE3-REGISTRATION-CLOSEOUT (2026-09-04; append-only)
+
+- Stage 3 is prospectively registered: **REGISTERED / NOT IMPLEMENTED / NOT
+  RUN**. This closeout records **NO STAGE 3 RUN**, **NO STAGE 3 RESULT**, and
+  **NO GUARD REPAIR**; implementation remains future work.
+- The closed first-draw family is exactly: `4000
+  FUTURE_YEAR_FEATURE_LEAKAGE`, `4001 T_TPLUS1_MISALIGNMENT`, `4002
+  TARGET_LEAKAGE_INTO_FEATURES`, `4003 LOOKAHEAD_UNIVERSE_MEMBERSHIP`, and
+  `4004 DUPLICATE_ROW_INFLATION`.
+- The only frozen source is
+  `data/trusted_clean/modeling_dataset_training_2020_2025.csv`, SHA256
+  `3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78`.
+- The expected guard gaps are exactly `4000`, `4001`, and `4003`
+  (`NOT_DETECTED`). `4002` and `4004` are expected `DETECTED`, each by an
+  existing surface found on the authoritative base: `4002` by the reachable
+  cell-provenance column-coverage guard (reached through a private provenance
+  root), `4004` by the duplicate-key guards. These are prospective expectations
+  only. The expected first-draw outcome **FAIL — INFORMATIVE** is not an
+  observed scientific outcome.
+- `scripts/data_collection/build_cell_provenance.py` is classified as a
+  reachable provenance/integrity guard, not input-blind: its root is a caller
+  parameter and only the relative input path is frozen. No guard was added or
+  repaired; the named target-leakage validator condition remains structurally
+  unreachable and is recorded as a separate existing-but-useless surface.
+- The registration tests construct no injected frame. Behavioral verification of
+  every frozen injection count belongs to the future Stage 3 implementation
+  tests.
+- `experiments/run_experiments.py` is pinned by full SHA256
+  `265f58678d522eea0c48fbccba415ed30b3e20abc6bb7ae0a8e33857c5feb543`, unchanged
+  from the authoritative base, and the registered secondary splits equal
+  `experiments.run_experiments.SPLITS` exactly. The six stale derived
+  `next_year_*` target columns are disclosed and fenced out of the Stage 3
+  estimand; consuming one classifies `4001` `INCONCLUSIVE`.
+- No Stage 3 result root, runner, Makefile target, or generated-output contract
+  exists. Stage 7 remains blocked under the existing “Only after stages 1–3
+  pass” wording because Stage 1 remains **FAILED AS WRITTEN — INFORMATIVE**.
+- Claim boundary: registration only; no predictive-edge, alpha, investment,
+  production-readiness, or universal-safety claim. Research support only, not
+  investment advice.
