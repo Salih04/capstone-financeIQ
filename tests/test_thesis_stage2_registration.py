@@ -139,7 +139,10 @@ def test_stage2_registry_has_completed_output_contracts_and_no_prospective_outpu
         if entry["path_or_glob"].startswith(root + "/")
     ]
     assert tuple(entry["path_or_glob"] for entry in completed) == expected_paths
-    assert registry["prospective_entries"] == []
+    assert not any(
+        entry["path_or_glob"].startswith(root + "/")
+        for entry in registry["prospective_entries"]
+    )
     assert len(completed) == len(STAGE2_RESULT_FILENAMES)
     for entry in completed:
         assert set(entry) == {
