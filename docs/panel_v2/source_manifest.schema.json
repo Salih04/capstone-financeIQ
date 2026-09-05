@@ -1,0 +1,877 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://financeiq.local/panel_v2_pit/source_manifest.schema.json",
+  "title": "panel_v2_pit source manifest",
+  "description": "Registration contract for every source later used by panel_v2_pit. It records first-public timing, retrieval, identity, version, access, and rights separately, and it freezes the governed feature-vector identity so a manifest carrying a different vector cannot masquerade as this registered panel version. The registration itself contacts no source and authorizes no acquisition.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version_id",
+    "protocol_id",
+    "registration_doc",
+    "generated_at",
+    "raw_root",
+    "generated_root",
+    "documents",
+    "price_series",
+    "benchmark_series",
+    "target_series",
+    "declared_acquisition_windows",
+    "source_feasibility",
+    "coverage",
+    "feature_resolution",
+    "limitations",
+    "legacy_quarantine"
+  ],
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "pattern": "^.*(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "rights_status": {
+      "type": "string",
+      "enum": [
+        "UNASSESSED",
+        "CLEARED",
+        "RESTRICTED",
+        "BLOCKED"
+      ]
+    },
+    "license_status": {
+      "type": "string",
+      "enum": [
+        "UNASSESSED",
+        "CLEARED",
+        "RESTRICTED",
+        "BLOCKED"
+      ]
+    },
+    "source_class": {
+      "type": "string",
+      "enum": [
+        "SC-1",
+        "SC-2",
+        "SC-3",
+        "SC-4",
+        "SC-5",
+        "SC-6",
+        "SC-7",
+        "SC-8",
+        "SC-9",
+        "SC-10"
+      ]
+    },
+    "declared_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start_year",
+        "end_year",
+        "declared_before_acquisition"
+      ],
+      "properties": {
+        "start_year": {
+          "type": "integer"
+        },
+        "end_year": {
+          "type": "integer"
+        },
+        "declared_before_acquisition": {
+          "const": true
+        }
+      }
+    },
+    "governed_feature": {
+      "type": "string",
+      "enum": [
+        "benchmark_same_year_return_pct",
+        "current_assets",
+        "current_ratio",
+        "ebitda",
+        "ebitda_growth_pct",
+        "ebitda_margin",
+        "enterprise_value",
+        "equity",
+        "ev_ebitda",
+        "financial_debt_ratio",
+        "gross_margin",
+        "gross_profit",
+        "gross_profit_growth_pct",
+        "leverage_ratio",
+        "long_term_liabilities",
+        "market_cap",
+        "net_debt",
+        "net_debt_to_ebitda",
+        "net_income",
+        "net_income_growth_pct",
+        "net_margin",
+        "non_current_assets",
+        "operating_income",
+        "operating_income_growth_pct",
+        "pb_ratio",
+        "pe_ratio",
+        "price_adjclose_t",
+        "price_data_available",
+        "price_drawdown_from_3y_high_pct",
+        "price_history_years_available",
+        "price_momentum_1y_pct",
+        "price_momentum_2y_pct",
+        "price_vs_bist100_1y_pct",
+        "revenue",
+        "revenue_growth_pct",
+        "roa",
+        "roe",
+        "short_term_liabilities",
+        "total_assets",
+        "working_capital"
+      ]
+    },
+    "legacy_feature": {
+      "type": "string",
+      "enum": [
+        "current_assets",
+        "current_ratio",
+        "ebitda_growth_pct",
+        "equity",
+        "financial_debt_ratio",
+        "gross_profit_growth_pct",
+        "leverage_ratio",
+        "long_term_liabilities",
+        "net_debt",
+        "net_debt_to_ebitda",
+        "net_income_growth_pct",
+        "non_current_assets",
+        "operating_income_growth_pct",
+        "revenue_growth_pct",
+        "short_term_liabilities",
+        "total_assets",
+        "working_capital"
+      ]
+    }
+  },
+  "properties": {
+    "version_id": {
+      "const": "panel_v2_pit"
+    },
+    "protocol_id": {
+      "const": "FI-PANEL-V2-PIT-v1"
+    },
+    "registration_doc": {
+      "const": "docs/PREREGISTERED_PANEL_V2_PIT.md"
+    },
+    "generated_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "generator_command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "raw_root": {
+      "const": "data/trusted_raw_pit_v2/"
+    },
+    "generated_root": {
+      "const": "data/panel_v2_pit/"
+    },
+    "documents": {
+      "type": "array",
+      "description": "Append-only retained source documents. A re-acquisition creates a new record; it never overwrites an earlier record.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_document_id",
+          "source_class",
+          "source_id",
+          "source_ref",
+          "first_publication_timestamp",
+          "retrieval_timestamp",
+          "document_sha256",
+          "stored_path",
+          "extraction_method",
+          "rights_status",
+          "license_status",
+          "class_metadata"
+        ],
+        "properties": {
+          "source_document_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_class": {
+            "$ref": "#/$defs/source_class"
+          },
+          "source_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "first_publication_timestamp": {
+            "$ref": "#/$defs/timestamp"
+          },
+          "retrieval_timestamp": {
+            "$ref": "#/$defs/timestamp"
+          },
+          "document_sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "stored_path": {
+            "type": "string",
+            "pattern": "^data/trusted_raw_pit_v2/"
+          },
+          "extraction_method": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rights_status": {
+            "$ref": "#/$defs/rights_status"
+          },
+          "license_status": {
+            "$ref": "#/$defs/license_status"
+          },
+          "class_metadata": {
+            "type": "object"
+          },
+          "reviewer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "review_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          }
+        }
+      }
+    },
+    "price_series": {
+      "type": "array",
+      "description": "Version pins for the append-only SC-6 security price ledger; the target-side SC-8 price inputs are declared separately.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "price_version_id",
+          "source_class",
+          "source_id",
+          "provider_id",
+          "endpoint",
+          "price_field",
+          "adjustment_basis",
+          "corporate_action_evidence_required",
+          "calendar_convention",
+          "declared_window",
+          "ledger_sha256",
+          "rights_status",
+          "license_status"
+        ],
+        "properties": {
+          "price_version_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_class": {
+            "const": "SC-6"
+          },
+          "source_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "provider_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "endpoint": {
+            "type": "string",
+            "minLength": 1
+          },
+          "price_field": {
+            "const": "ADJUSTED_CLOSE"
+          },
+          "adjustment_basis": {
+            "type": "string",
+            "minLength": 1
+          },
+          "corporate_action_evidence_required": {
+            "const": true
+          },
+          "calendar_convention": {
+            "type": "string",
+            "minLength": 1
+          },
+          "declared_window": {
+            "$ref": "#/$defs/declared_window"
+          },
+          "ledger_sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "rights_status": {
+            "$ref": "#/$defs/rights_status"
+          },
+          "license_status": {
+            "$ref": "#/$defs/license_status"
+          }
+        }
+      }
+    },
+    "benchmark_series": {
+      "type": "array",
+      "description": "One versioned entry per instrument variant. PRICE_INDEX and TOTAL_RETURN_INDEX are different series and cannot be silently joined.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "benchmark_version_id",
+          "source_class",
+          "source_id",
+          "provider_id",
+          "instrument_id",
+          "index_variant",
+          "endpoint",
+          "calendar_convention",
+          "annual_return_formula_id",
+          "annual_return_formula",
+          "declared_window",
+          "continuity_statement",
+          "series_sha256",
+          "rights_status",
+          "license_status"
+        ],
+        "properties": {
+          "benchmark_version_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_class": {
+            "const": "SC-7"
+          },
+          "source_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "provider_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "instrument_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "index_variant": {
+            "enum": [
+              "PRICE_INDEX",
+              "TOTAL_RETURN_INDEX"
+            ]
+          },
+          "endpoint": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calendar_convention": {
+            "type": "string",
+            "minLength": 1
+          },
+          "annual_return_formula_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "annual_return_formula": {
+            "type": "string",
+            "minLength": 1
+          },
+          "declared_window": {
+            "$ref": "#/$defs/declared_window"
+          },
+          "continuity_statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "series_sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "rights_status": {
+            "$ref": "#/$defs/rights_status"
+          },
+          "license_status": {
+            "$ref": "#/$defs/license_status"
+          }
+        }
+      }
+    },
+    "target_series": {
+      "type": "array",
+      "description": "SC-8 target-side inputs are physically separate from panel.csv and are used only for the registered TC-A target.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "target_version_id",
+          "source_class",
+          "source_id",
+          "provider_id",
+          "target_id",
+          "target_formula_id",
+          "target_formula",
+          "price_field",
+          "adjustment_basis",
+          "calendar_convention",
+          "declared_window",
+          "series_sha256",
+          "rights_status",
+          "license_status"
+        ],
+        "properties": {
+          "target_version_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_class": {
+            "const": "SC-8"
+          },
+          "source_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "provider_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_id": {
+            "const": "TC-A"
+          },
+          "target_formula_id": {
+            "const": "TC-A_YEAR_END_ADJUSTED_RETURN"
+          },
+          "target_formula": {
+            "const": "100 * (P_adj(T+1) / P_adj(T) - 1)"
+          },
+          "price_field": {
+            "const": "ADJUSTED_CLOSE"
+          },
+          "adjustment_basis": {
+            "type": "string",
+            "minLength": 1
+          },
+          "calendar_convention": {
+            "type": "string",
+            "minLength": 1
+          },
+          "declared_window": {
+            "$ref": "#/$defs/declared_window"
+          },
+          "series_sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "rights_status": {
+            "$ref": "#/$defs/rights_status"
+          },
+          "license_status": {
+            "$ref": "#/$defs/license_status"
+          }
+        }
+      }
+    },
+    "declared_acquisition_windows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "window_id",
+          "source_class",
+          "start_year",
+          "end_year",
+          "declared_at",
+          "declared_by",
+          "authorization_ref",
+          "declared_before_acquisition"
+        ],
+        "properties": {
+          "window_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_class": {
+            "$ref": "#/$defs/source_class"
+          },
+          "start_year": {
+            "type": "integer"
+          },
+          "end_year": {
+            "type": "integer"
+          },
+          "declared_at": {
+            "$ref": "#/$defs/timestamp"
+          },
+          "declared_by": {
+            "type": "string",
+            "minLength": 1
+          },
+          "authorization_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "declared_before_acquisition": {
+            "const": true
+          }
+        }
+      }
+    },
+    "source_feasibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "full_panel_feasible",
+        "confirmed",
+        "collection_ready",
+        "access_license_checks_required",
+        "blocker_source_classes"
+      ],
+      "properties": {
+        "full_panel_feasible": {
+          "enum": [
+            "CONDITIONAL",
+            "CONFIRMED",
+            "BLOCKED"
+          ]
+        },
+        "confirmed": {
+          "type": "boolean"
+        },
+        "collection_ready": {
+          "const": false
+        },
+        "access_license_checks_required": {
+          "const": true
+        },
+        "blocker_source_classes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_class"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feature_years",
+        "security_ids",
+        "candidate_row_count",
+        "confirmatory_row_count"
+      ],
+      "description": "Realized coverage is recorded here and nowhere in the version id or generated filenames.",
+      "properties": {
+        "feature_years": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "security_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "candidate_row_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "confirmatory_row_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "feature_resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Identity of the governed vector this manifest represents. The names, their order, the count, and both serialization hashes are frozen consts, so a manifest built over a different feature vector fails validation instead of silently claiming this version.",
+      "required": [
+        "resolved_features",
+        "count",
+        "newline_sha256",
+        "json_sha256",
+        "matches_registered_hash"
+      ],
+      "properties": {
+        "resolved_features": {
+          "type": "array",
+          "minItems": 40,
+          "maxItems": 40,
+          "uniqueItems": true,
+          "prefixItems": [
+            {
+              "const": "benchmark_same_year_return_pct"
+            },
+            {
+              "const": "current_assets"
+            },
+            {
+              "const": "current_ratio"
+            },
+            {
+              "const": "ebitda"
+            },
+            {
+              "const": "ebitda_growth_pct"
+            },
+            {
+              "const": "ebitda_margin"
+            },
+            {
+              "const": "enterprise_value"
+            },
+            {
+              "const": "equity"
+            },
+            {
+              "const": "ev_ebitda"
+            },
+            {
+              "const": "financial_debt_ratio"
+            },
+            {
+              "const": "gross_margin"
+            },
+            {
+              "const": "gross_profit"
+            },
+            {
+              "const": "gross_profit_growth_pct"
+            },
+            {
+              "const": "leverage_ratio"
+            },
+            {
+              "const": "long_term_liabilities"
+            },
+            {
+              "const": "market_cap"
+            },
+            {
+              "const": "net_debt"
+            },
+            {
+              "const": "net_debt_to_ebitda"
+            },
+            {
+              "const": "net_income"
+            },
+            {
+              "const": "net_income_growth_pct"
+            },
+            {
+              "const": "net_margin"
+            },
+            {
+              "const": "non_current_assets"
+            },
+            {
+              "const": "operating_income"
+            },
+            {
+              "const": "operating_income_growth_pct"
+            },
+            {
+              "const": "pb_ratio"
+            },
+            {
+              "const": "pe_ratio"
+            },
+            {
+              "const": "price_adjclose_t"
+            },
+            {
+              "const": "price_data_available"
+            },
+            {
+              "const": "price_drawdown_from_3y_high_pct"
+            },
+            {
+              "const": "price_history_years_available"
+            },
+            {
+              "const": "price_momentum_1y_pct"
+            },
+            {
+              "const": "price_momentum_2y_pct"
+            },
+            {
+              "const": "price_vs_bist100_1y_pct"
+            },
+            {
+              "const": "revenue"
+            },
+            {
+              "const": "revenue_growth_pct"
+            },
+            {
+              "const": "roa"
+            },
+            {
+              "const": "roe"
+            },
+            {
+              "const": "short_term_liabilities"
+            },
+            {
+              "const": "total_assets"
+            },
+            {
+              "const": "working_capital"
+            }
+          ],
+          "items": false
+        },
+        "count": {
+          "const": 40
+        },
+        "newline_sha256": {
+          "const": "041566fc685b043c8618af859c268aa736fa5ae87b0d2679a2b35df779659575"
+        },
+        "json_sha256": {
+          "const": "f8064f43ca5a446e21b2357fdafa4a9f6a1b7dfcbe7e79b8bc0835125c452543"
+        },
+        "matches_registered_hash": {
+          "const": true
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "legacy_quarantine": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "D5. The 17 legacy vendor-snapshot feature names, derived from repository provenance evidence (data/provenance/cell_provenance_public_2020_2025.csv, source_class 'vendor_xlsx'). They live only in the separate _legacy_unverified namespace. This manifest cannot declare a legacy vendor snapshot as the accepted value origin of any governed feature name; enforcing that at build time remains an implementation gate.",
+      "required": [
+        "legacy_features",
+        "count",
+        "namespace_suffix",
+        "physical_file",
+        "legacy_is_registered_source_class",
+        "governed_name_substitution_allowed",
+        "accepted_value_origin_for_governed_features"
+      ],
+      "properties": {
+        "legacy_features": {
+          "type": "array",
+          "minItems": 17,
+          "maxItems": 17,
+          "uniqueItems": true,
+          "prefixItems": [
+            {
+              "const": "current_assets"
+            },
+            {
+              "const": "current_ratio"
+            },
+            {
+              "const": "ebitda_growth_pct"
+            },
+            {
+              "const": "equity"
+            },
+            {
+              "const": "financial_debt_ratio"
+            },
+            {
+              "const": "gross_profit_growth_pct"
+            },
+            {
+              "const": "leverage_ratio"
+            },
+            {
+              "const": "long_term_liabilities"
+            },
+            {
+              "const": "net_debt"
+            },
+            {
+              "const": "net_debt_to_ebitda"
+            },
+            {
+              "const": "net_income_growth_pct"
+            },
+            {
+              "const": "non_current_assets"
+            },
+            {
+              "const": "operating_income_growth_pct"
+            },
+            {
+              "const": "revenue_growth_pct"
+            },
+            {
+              "const": "short_term_liabilities"
+            },
+            {
+              "const": "total_assets"
+            },
+            {
+              "const": "working_capital"
+            }
+          ],
+          "items": false
+        },
+        "count": {
+          "const": 17
+        },
+        "namespace_suffix": {
+          "const": "_legacy_unverified"
+        },
+        "physical_file": {
+          "const": "legacy_unverified.csv"
+        },
+        "legacy_is_registered_source_class": {
+          "const": false
+        },
+        "governed_name_substitution_allowed": {
+          "const": false
+        },
+        "accepted_value_origin_for_governed_features": {
+          "const": false
+        }
+      }
+    }
+  },
+  "x-registration-only": true,
+  "x-implementation-validator-contract": {
+    "status": "DEFERRED_TO_IMPLEMENTATION",
+    "not_yet_executed": true,
+    "note": "These controls are REGISTERED here and IMPLEMENTATION_REQUIRED. No writer, builder, or validator exists at this commit, so none of them is currently executed. A schema can pin the shape of a declaration; it cannot prove the runtime behaviour that produced it.",
+    "controls": [
+      "source rounding reconciliation",
+      "append-only acquisition writer behaviour",
+      "no-overwrite behaviour on the raw ledgers and document store",
+      "explicit acquisition status on every price observation",
+      "corporate-action adjustment validation",
+      "full PIT timestamp ordering",
+      "panel-wide financial_debt_ratio definition consistency",
+      "future transitive no-peek closure over readers that do not exist yet",
+      "B1-B8 runtime behaviour"
+    ]
+  }
+}
