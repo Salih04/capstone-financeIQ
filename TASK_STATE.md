@@ -1638,3 +1638,47 @@ registered scope.
 - Claim boundary: registration only; no predictive-edge, alpha, investment,
   production-readiness, or universal-safety claim. Research support only, not
   investment advice.
+
+### FINANCEIQ-THESIS-STAGE3-IMPLEMENTATION-ONLY (2026-09-05; append-only)
+
+- This is implementation-only work on authoritative main
+  `bed1178989f75ef95003d8b2ee3d5ed279481fa0`; the merged registration remains
+  frozen. Stage 3 is **IMPLEMENTED / NOT RUN**: **NO GOVERNED STAGE 3 DRAW**,
+  **NO STAGE 3 RUN**, **NO STAGE 3 RESULT**, and **NO GUARD REPAIR**.
+- The exact closed family remains `4000 FUTURE_YEAR_FEATURE_LEAKAGE`, `4001
+  T_TPLUS1_MISALIGNMENT`, `4002 TARGET_LEAKAGE_INTO_FEATURES`, `4003
+  LOOKAHEAD_UNIVERSE_MEMBERSHIP`, and `4004 DUPLICATE_ROW_INFLATION`. The
+  prospective map remains 4000 `NOT_DETECTED`, 4001 `NOT_DETECTED`, 4002
+  `DETECTED`, 4003 `NOT_DETECTED`, and 4004 `DETECTED`; the expected
+  **FAIL — INFORMATIVE** outcome is prospective expectations only and not an
+  observed scientific outcome.
+- The expected guard gaps are exactly 4000, 4001, and 4003; 4002 and 4004 are
+  expected `DETECTED`. `experiments/run_experiments.py` remains pinned by full
+  SHA256 `265f58678d522eea0c48fbccba415ed30b3e20abc6bb7ae0a8e33857c5feb543`.
+- The frozen source remains
+  `data/trusted_clean/modeling_dataset_training_2020_2025.csv` with SHA256
+  `3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78`.
+- `experiments/thesis/defect_injection.py` implements the explicit runner and
+  CLI, private in-memory/private-temp containment, private provenance root
+  reachability, restoration/cleanup proof, fail-closed `INCONCLUSIVE` behavior,
+  the 4001 stale-derived-target consumer boundary (consumption classifies 4001
+  `INCONCLUSIVE`), and the existing 4002/4004 guard surfaces. No new guard was
+  added and no existing guard was repaired. The secondary IC is descriptive,
+  exact-canonical-split, per-split Spearman with Ridge alpha 1.0 and
+  `delta_ic = injected - clean`; it is unpooled, non-gating, and has no
+  threshold or significance test.
+- `Makefile` exposes `make thesis-stage3`, the private replay probe, and the
+  identical-configuration crash-recovery target. `artifact_registry.json`
+  owns the exact result root prospectively; the
+  `experiments/results_thesis/defect_injection/` result root remains absent
+  until owner authorization. The result root remains absent. README status and
+  this ledger now record the implementation boundary. Stage 7 remains blocked.
+- Focused implementation tests: `tests/test_thesis_stage3_implementation.py`
+  passed 29 tests without calling the governed target or creating the result
+  root. The exact full-root command passed 1386 tests and had one failure only
+  at `tests/test_contamination_lab.py::test_changed_path_allowlist_is_exact`,
+  which correctly reports the new Stage 3/status files outside that existing
+  lab-specific dirty-worktree allowlist; that fail-closed guard was not
+  broadened. `make data-validate`, `make claims-lint`, `make docs-lint`, and
+  `git diff --check` passed. Owner decision remains required for the allowlist
+  versus clean-commit integration step before the readiness review is green.

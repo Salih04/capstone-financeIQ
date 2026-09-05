@@ -69,12 +69,6 @@ HISTORICAL_UNCHANGED_HASHES = {
     "docs/thesis/STAGE_2_REGISTRATION.md": (
         "6744e67d2a3c58e5ba7ad5f7c7794aa5e5f8487b65e765789e6fc2041ec701cc"
     ),
-    "artifact_registry.json": (
-        "ddf4404b2e38b2a4dbcee131085a1424eacf49f2ef877135ab6e8a3784414220"
-    ),
-    "Makefile": (
-        "6027ad61a5d366d60e9672241dbd052545e79ca826d85a182437a05f3f8463cc"
-    ),
 }
 
 REGISTERED_MUTATION_PATHS = (
@@ -1260,36 +1254,70 @@ def test_protocol_amendment_is_dated_and_appended_after_the_stage3_body(protocol
 
 
 # --------------------------------------------------------------------------- #
-# Registration-only inertness
+# Registration/implementation boundary
 # --------------------------------------------------------------------------- #
-def test_result_root_is_absent_and_no_run_surface_exists():
+def test_result_root_is_absent_and_implementation_run_surface_is_explicit():
     assert reg.RESULT_ROOT == "experiments/results_thesis/defect_injection/"
     assert reg.RESULT_ROOT_EXISTS_AT_REGISTRATION is False
     assert reg.STAGE3_RESULT_EXISTS_AT_REGISTRATION is False
     assert reg.NO_STAGE3_INJECTION_DRAW_OR_OUTCOME is True
     assert not RESULT_ROOT.exists()
-    stage3_modules = sorted(
-        REPO_ROOT.glob("experiments/thesis/stage3_*.py")
-    )
-    assert stage3_modules == [REGISTRATION_SOURCE]
+    assert sorted(REPO_ROOT.glob("experiments/thesis/stage3_*.py")) == [REGISTRATION_SOURCE]
+    implementation_source = REPO_ROOT / "experiments/thesis/defect_injection.py"
+    assert implementation_source.is_file()
+    assert REGISTRATION_SOURCE.is_file()
 
     makefile = MAKEFILE.read_text(encoding="utf-8")
-    assert "thesis-stage3" not in makefile
-    assert "defect_injection" not in makefile
+    for target in (
+        "thesis-stage3:",
+        "thesis-stage3-replay:",
+        "thesis-stage3-repeat-after-crash:",
+    ):
+        assert target in makefile
+    assert "defect_injection.py --run" in makefile
+    assert "defect_injection.py --replay-check" in makefile
+    assert "defect_injection.py --repeat-after-crash" in makefile
     assert reg.NO_MAKEFILE_RUN_TARGET_AT_REGISTRATION is True
 
     assert reg.STAGE3_SLUG in prov.EXPERIMENT_SLUGS
     assert not (prov.THESIS_RESULTS_ROOT / reg.STAGE3_SLUG).exists()
 
 
-def test_registry_has_no_stage3_governed_root_or_prospective_output():
+def test_registry_has_stage3_governance_wiring_but_no_resolved_output():
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     root = reg.RESULT_ROOT.rstrip("/")
-    assert root not in registry["governed_roots"]
-    assert not any(root in value for value in registry["governed_roots"])
-    assert registry["prospective_entries"] == []
+    assert root in registry["governed_roots"]
+    prospective = registry["prospective_entries"]
+    expected_paths = {
+        f"{root}/defect_injection_report.json",
+        f"{root}/defect_injection_report.md",
+        f"{root}/defect_results.csv",
+        f"{root}/artifact_manifest.json",
+        f"{root}/attempts/*.json",
+    }
+    assert {entry["path_or_glob"] for entry in prospective} == expected_paths
+    for entry in prospective:
+        assert set(entry) == {
+            "path_or_glob",
+            "artifact_class",
+            "generator_command",
+            "inputs",
+            "hand_edit_forbidden",
+            "notes",
+        }
+        assert entry["artifact_class"] in {"generated", "run_manifest"}
+        assert entry["generator_command"] == "make thesis-stage3"
+        assert entry["hand_edit_forbidden"] is True
+        assert entry["notes"].strip()
+        if entry["path_or_glob"].endswith("attempts/*.json"):
+            assert entry["inputs"] == []
+        else:
+            assert entry["inputs"] == [reg.DATASET_PATH]
     assert not any(
         entry["path_or_glob"].startswith(root) for entry in registry["entries"]
+    )
+    assert not any(
+        path.is_file() for path in RESULT_ROOT.glob("**/*")
     )
     assert reg.NO_GOVERNED_ROOT_OR_PROSPECTIVE_ENTRY_AT_REGISTRATION is True
     assert reg.PROSPECTIVE_ARTIFACT_CONTRACTS_REQUIRED_AT_REGISTRATION is False
@@ -1299,17 +1327,23 @@ def test_registry_has_no_stage3_governed_root_or_prospective_output():
     assert reg.IMPLEMENTATION_MUST_ADD_RUNNER_TARGET_AND_OWNERSHIP_BEFORE_RUN is True
 
 
-def test_readme_and_task_ledger_record_registration_only_state():
+def test_readme_and_task_ledger_record_implementation_only_state():
     readme = compact(THESIS_README.read_text(encoding="utf-8"))
     for phrase in (
-        "Stage 3 — registered; not implemented; not run",
+        "Stage 3 (defect_injection) is registered, implemented, and has not run",
+        "Stage 3 — implemented; not run",
         "five-class family is frozen",
         "prospective expectations only",
         "FAIL — INFORMATIVE",
         "not an observed scientific result",
         reg.DATASET_PATH,
         reg.DATASET_SHA256,
-        "no Stage 3 result root",
+        "No Stage 3 result root exists",
+        "defect_injection.py",
+        "make thesis-stage3",
+        "prospective_entries[]",
+        "private provenance root",
+        "4001",
         "Stage 7 remains blocked",
         "not investment advice",
         "expected guard gaps are exactly 4000, 4001, and 4003",
@@ -1322,11 +1356,15 @@ def test_readme_and_task_ledger_record_registration_only_state():
     assert "guard gaps for 4000–4003" not in readme
 
     ledger = compact(TASK_STATE.read_text(encoding="utf-8"))
-    marker = "FINANCEIQ-THESIS-STAGE3-REGISTRATION-CLOSEOUT"
-    assert marker in ledger
-    entry = ledger[ledger.rindex(marker) :]
+    registration_marker = "FINANCEIQ-THESIS-STAGE3-REGISTRATION-CLOSEOUT"
+    implementation_marker = "FINANCEIQ-THESIS-STAGE3-IMPLEMENTATION-ONLY"
+    assert registration_marker in ledger
+    assert implementation_marker in ledger
+    entry = ledger[ledger.rindex(implementation_marker) :]
     for phrase in (
-        "prospectively registered",
+        "implementation-only",
+        "IMPLEMENTED / NOT RUN",
+        "NO GOVERNED STAGE 3 DRAW",
         "NO STAGE 3 RUN",
         "NO STAGE 3 RESULT",
         "NO GUARD REPAIR",
@@ -1339,13 +1377,14 @@ def test_readme_and_task_ledger_record_registration_only_state():
         "prospective expectations only",
         "not an observed scientific outcome",
         "Stage 7 remains blocked",
-        "implementation remains future work",
+        "defect_injection.py",
+        "make thesis-stage3",
+        "private provenance root",
+        "classifies 4001 INCONCLUSIVE",
         "expected guard gaps are exactly 4000, 4001, and 4003",
         "4002 and 4004 are expected DETECTED",
-        "reachable provenance/integrity guard, not input-blind",
-        "The registration tests construct no injected frame",
         reg.RUN_EXPERIMENTS_SHA256,
-        "classifies 4001 INCONCLUSIVE",
+        "result root remains absent",
     ):
         assert phrase in entry, phrase
     assert "4000–4003 NOT_DETECTED" not in entry

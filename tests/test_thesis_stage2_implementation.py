@@ -360,7 +360,10 @@ def test_registered_result_namespace_and_prospective_contracts_are_exact():
     ]
     assert tuple(entry["path_or_glob"] for entry in completed) == expected_paths
     assert len(completed) == len(STAGE2_RESULT_FILENAMES)
-    assert registry["prospective_entries"] == []
+    assert not any(
+        entry["path_or_glob"].startswith(root + "/")
+        for entry in registry["prospective_entries"]
+    )
     for entry in completed:
         assert set(entry) == {
             "path_or_glob",

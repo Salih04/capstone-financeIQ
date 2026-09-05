@@ -20,12 +20,13 @@
     "experiments/results_thesis/positive_control",
     "experiments/results_thesis/positive_control_calibration",
     "experiments/results_thesis/negative_control",
+    "experiments/results_thesis/defect_injection",
     "data/trusted_clean",
     "data/provenance",
     "docs/thesis/baseline"
   ],
   "coverage_rule": "Every file under a governed root, excluding experiments/results/runs/**, must be matched by exactly one entry below. An unmatched file (orphan) or a file matched by more than one entry (duplicate ownership) is a governance failure enforced by tests/test_artifact_registry.py.",
-  "prospective_entry_rule": "prospective_entries[] carries the frozen ownership contract for governed outputs whose registration requires ownership to be fixed before the run that creates them (docs/thesis/STAGE_1B_REGISTRATION.md, 'Governance wiring required before the first Stage 1b execution'; docs/thesis/STAGE_2_REGISTRATION.md, 'Implementation-time governance wiring — 2026-09-03'). Each item has the same shape as an entries[] item and the same 'make <target>' generator_command rule, but is not yet subject to coverage_rule because its files do not exist yet and every entries[] entry must match at least one real file. When the governed run creates the files, that run's commit moves these items verbatim into entries[] and removes them from here; nothing about an item may change during that move.",
+  "prospective_entry_rule": "prospective_entries[] carries the frozen ownership contract for governed outputs whose registration requires ownership to be fixed before the run that creates them (docs/thesis/STAGE_1B_REGISTRATION.md, docs/thesis/STAGE_2_REGISTRATION.md, and docs/thesis/STAGE_3_REGISTRATION.md). Each item has the same shape as an entries[] item and the same 'make <target>' generator_command rule, but is not yet subject to coverage_rule because its files do not exist yet and every entries[] entry must match at least one real file. When the governed run creates the files, that run's commit moves these items verbatim into entries[] and removes them from here; nothing about an item may change during that move.",
   "coverage_exclusions": [
     {
       "glob": "experiments/results/runs/**",
@@ -54,7 +55,48 @@
     ]
   },
   "reproducibility_note": "Regeneration reproduces content in an environment-qualified sense only: byte identity requires matching Python, platform, and numerical-package versions (see METHODOLOGY 'Reproducibility and run provenance'). This registry does not claim universal byte reproducibility.",
-  "prospective_entries": [],
+  "prospective_entries": [
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection/defect_injection_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage3",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Machine-readable Stage 3 report: the exact five registered injections, existing-guard signals, containment/integrity evidence, binary PASS/FAIL/INCONCLUSIVE decision, and non-gating per-split IC diagnostics only for undetected defects. It does not certify predictive validity or investment merit."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection/defect_injection_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage3",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Human-readable Stage 3 rendering with the frozen guard map, prospective expectation boundary, containment result, and research-support-only claim language."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection/defect_results.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage3",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "One row per registered defect with observed status, exact guard-signal names, containment/invariant status, and whether the non-gating secondary IC was computed."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection/artifact_manifest.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage3",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Final Stage 3 completion authority, written last with source/implementation/configuration hashes, exact scientific output inventory, integrity verdict, and the prospective expectation explicitly separated from observed run status."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection/attempts/*.json",
+      "artifact_class": "run_manifest",
+      "generator_command": "make thesis-stage3",
+      "inputs": [],
+      "hand_edit_forbidden": true,
+      "notes": "Operational attempt provenance for initial and crash-recovery executions. It is not a scientific emitted artifact; the final artifact_manifest.json remains completion authority."
+    }
+  ],
   "entries": [
     {
       "path_or_glob": "experiments/results_thesis/positive_control/positive_control_report.json",
