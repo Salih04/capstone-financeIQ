@@ -3,7 +3,8 @@
 Prepared in Week 0/1. **Stage 1 (`positive_control`) is implemented and has
 run; Stage 1b (`positive_control_calibration`) is registered, implemented, and
 has completed its one governed run; Stage 2 (`negative_control`) is implemented
-and has completed its one governed run; the remaining three slugs are still
+and has completed its one governed run; Stage 3 (`defect_injection`) is
+registered but not implemented or run; the remaining two slugs are still
 placeholders.** This directory holds the shared provenance helpers, the
 implemented stages, and the rules below.
 
@@ -95,6 +96,31 @@ Stage 1b remains diagnostic/calibration only; historical Stage 1 and Stage 1b
 artifacts were not rerun or rewritten. Stage 3 and further model-development
 work must not reinterpret Stage 2 outside its registered scope.
 
+## Stage 3 — registered; not implemented; not run
+
+The [Stage 3 registration](../../docs/thesis/STAGE_3_REGISTRATION.md) is complete
+prospectively. Its five-class family is frozen as IDs 4000–4004: future-year
+feature leakage, T/T+1 misalignment, target leakage into features, look-ahead
+universe membership, and duplicate-row inflation. The expected guard gaps are
+exactly 4000, 4001, and 4003 (`NOT_DETECTED`); 4002 and 4004 are expected
+`DETECTED`, each by an existing surface found on the authoritative base — 4002
+by the reachable cell-provenance column-coverage guard, 4004 by the duplicate-key
+guards. These are prospective expectations only. The expected first-draw
+outcome, **FAIL — INFORMATIVE**, is prospective and not an observed scientific
+result.
+
+The only frozen source is
+`data/trusted_clean/modeling_dataset_training_2020_2025.csv`, SHA256
+`3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78`.
+There is no Stage 3 result root, runner, Makefile target, or generated-output
+contract. No guard was repaired: the named target-leakage validator condition
+stays structurally unreachable and is recorded as a separate
+existing-but-useless surface. The registration tests construct no injected
+frame, so every frozen injection count is a prospective expectation verified by
+the future implementation tests. Stage 7 remains blocked under its existing
+wording. This registration establishes no predictive or investment claim; it
+remains research support only, not investment advice.
+
 ## Output isolation
 
 Every thesis experiment writes to `experiments/results_thesis/<slug>/` and
@@ -114,7 +140,7 @@ that record null findings.
 | `positive_control` | **Implemented** — `positive_control.py`, run via `make thesis-positive-control`. Injects a known-strength synthetic signal into one raw feature column before feature construction and measures how much survives each pipeline stage. Validates that the measurement apparatus responds to an effect that is provably present. |
 | `positive_control_calibration` | **Governed run complete — diagnostic/calibration only** — Stage 1b. `docs/thesis/STAGE_1B_REGISTRATION.md` + `stage1b_registration.py` + `positive_control_calibration.py`, run via `make thesis-stage1b`. Prospective (not blind) calibration/diagnostic re-scope of Stage 1: same carrier/model/splits/seed framework, adds the `0.35` grid rung, `R = 400` fresh repetitions (ids 200–599), Stage-1-operational-rule detection probability as the primary result, raw-p<0.05 detection probability as a secondary non-gating diagnostic, and no performance gate. Exactly one attempt (no rerun) completed the 6 × 400 matrix; integrity passed, replay was identical, and independent review was PASS. Stage 2 unblock conditions are all YES. |
 | `negative_control` | **Governed run complete — scientific decision PASS** — Stage 2. The two confirmatory controls were run exactly once with NC0 `26/1000 = 0.026` and NC1 `28/1000 = 0.028`, both below the registered critical count of 65; the separate diagnostic is `42/1000 = 0.042`, **NON-GATING** and **NOT an FPR estimate**. See the [frozen registration](../../docs/thesis/STAGE_2_REGISTRATION.md) and [immutable result report](../../experiments/results_thesis/negative_control/negative_control_report.md). The result is limited to the registered significance-apparatus claim in the fixed dataset / pipeline context and does not establish leakage absence, predictive edge, alpha, or investment value. Replay was not required and was not run. |
-| `defect_injection` | Deliberately introduce known defects (leakage, misalignment, look-ahead) and confirm the guards catch each one. |
+| `defect_injection` | **REGISTERED / NOT IMPLEMENTED / NOT RUN** — frozen five-class Stage 3 family with prospective guard gaps at 4000, 4001 and 4003, prospective detections at 4002 and 4004, and a prospective expected first-draw outcome of **FAIL — INFORMATIVE**, not an observed scientific result. The frozen source is pinned in the [registration](../../docs/thesis/STAGE_3_REGISTRATION.md); no result root exists and Stage 7 remains blocked. Research support only, not investment advice. |
 | `informativeness` | Map the power/informativeness frontier: what effect size this design could detect, as a function of n, years, and frequency. |
 | `monthly_panel` | Monthly-frequency redesign of the panel, subject to the data feasibility findings in `docs/thesis/DATA_FEASIBILITY.md`. |
 
@@ -155,9 +181,11 @@ entry. Consequently:
 - Stage 2's root is in `governed_roots`, and its seven emitted files are now
   present and owned by `entries[]`; the immutable result report and manifest
   are under `experiments/results_thesis/negative_control/`.
-- The remaining three slugs (`defect_injection`, `informativeness`,
-  `monthly_panel`) have no registry entry of either kind, as the `proposed_future`
-  class prescribes.
+- Registered Stage 3 (`defect_injection`) has no result root and no registry
+  entry of either kind; implementation and pre-run output governance remain
+  future work.
+- The remaining two placeholder slugs (`informativeness`, `monthly_panel`) have
+  no registry entry of either kind, as the `proposed_future` class prescribes.
 - When one of them is implemented, that task adds its output root to
   `governed_roots`, adds the Makefile target, and declares ownership — in
   `prospective_entries[]` if the registration requires ownership before the run,
