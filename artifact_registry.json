@@ -55,48 +55,7 @@
     ]
   },
   "reproducibility_note": "Regeneration reproduces content in an environment-qualified sense only: byte identity requires matching Python, platform, and numerical-package versions (see METHODOLOGY 'Reproducibility and run provenance'). This registry does not claim universal byte reproducibility.",
-  "prospective_entries": [
-    {
-      "path_or_glob": "experiments/results_thesis/defect_injection/defect_injection_report.json",
-      "artifact_class": "generated",
-      "generator_command": "make thesis-stage3",
-      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
-      "hand_edit_forbidden": true,
-      "notes": "Machine-readable Stage 3 report: the exact five registered injections, existing-guard signals, containment/integrity evidence, binary PASS/FAIL/INCONCLUSIVE decision, and non-gating per-split IC diagnostics only for undetected defects. It does not certify predictive validity or investment merit."
-    },
-    {
-      "path_or_glob": "experiments/results_thesis/defect_injection/defect_injection_report.md",
-      "artifact_class": "generated",
-      "generator_command": "make thesis-stage3",
-      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
-      "hand_edit_forbidden": true,
-      "notes": "Human-readable Stage 3 rendering with the frozen guard map, prospective expectation boundary, containment result, and research-support-only claim language."
-    },
-    {
-      "path_or_glob": "experiments/results_thesis/defect_injection/defect_results.csv",
-      "artifact_class": "generated",
-      "generator_command": "make thesis-stage3",
-      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
-      "hand_edit_forbidden": true,
-      "notes": "One row per registered defect with observed status, exact guard-signal names, containment/invariant status, and whether the non-gating secondary IC was computed."
-    },
-    {
-      "path_or_glob": "experiments/results_thesis/defect_injection/artifact_manifest.json",
-      "artifact_class": "generated",
-      "generator_command": "make thesis-stage3",
-      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
-      "hand_edit_forbidden": true,
-      "notes": "Final Stage 3 completion authority, written last with source/implementation/configuration hashes, exact scientific output inventory, integrity verdict, and the prospective expectation explicitly separated from observed run status."
-    },
-    {
-      "path_or_glob": "experiments/results_thesis/defect_injection/attempts/*.json",
-      "artifact_class": "run_manifest",
-      "generator_command": "make thesis-stage3",
-      "inputs": [],
-      "hand_edit_forbidden": true,
-      "notes": "Operational attempt provenance for initial and crash-recovery executions. It is not a scientific emitted artifact; the final artifact_manifest.json remains completion authority."
-    }
-  ],
+  "prospective_entries": [],
   "entries": [
     {
       "path_or_glob": "experiments/results_thesis/positive_control/positive_control_report.json",
@@ -1269,6 +1228,46 @@
       "inputs": [],
       "hand_edit_forbidden": true,
       "notes": "Prospective operational governance marker for initial and crash-recovery attempts, registered configuration and seed-schedule identity, and completion status. It is not a scientific emitted artifact; artifact_manifest.json remains the completion authority."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection/defect_injection_report.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage3",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Machine-readable Stage 3 report: the exact five registered injections, existing-guard signals, containment/integrity evidence, binary PASS/FAIL/INCONCLUSIVE decision, and non-gating per-split IC diagnostics only for undetected defects. It does not certify predictive validity or investment merit."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection/defect_injection_report.md",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage3",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Human-readable Stage 3 rendering with the frozen guard map, prospective expectation boundary, containment result, and research-support-only claim language."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection/defect_results.csv",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage3",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "One row per registered defect with observed status, exact guard-signal names, containment/invariant status, and whether the non-gating secondary IC was computed."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection/artifact_manifest.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage3",
+      "inputs": ["data/trusted_clean/modeling_dataset_training_2020_2025.csv"],
+      "hand_edit_forbidden": true,
+      "notes": "Final Stage 3 completion authority, written last with source/implementation/configuration hashes, exact scientific output inventory, integrity verdict, and the prospective expectation explicitly separated from observed run status."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection/attempts/*.json",
+      "artifact_class": "run_manifest",
+      "generator_command": "make thesis-stage3",
+      "inputs": [],
+      "hand_edit_forbidden": true,
+      "notes": "Operational attempt provenance for initial and crash-recovery executions. It is not a scientific emitted artifact; the final artifact_manifest.json remains completion authority."
     }
   ]
 }

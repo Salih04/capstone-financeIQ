@@ -1,9 +1,9 @@
-"""Behavioral tests for the implementation-only Stage 3 apparatus.
+"""Behavioral tests for the completed Stage 3 apparatus.
 
 These tests exercise private/in-memory constructions and private temporary
 guard inputs.  They deliberately do not call ``run()``, ``replay_check()``, a
-Stage 3 Makefile target, or any governed result writer.  The governed first
-draw remains an owner-controlled action after this implementation is reviewed.
+Stage 3 Makefile target, or any governed result writer.  The completed
+attempt-1 result namespace is treated as immutable post-run evidence.
 """
 
 from __future__ import annotations
@@ -18,6 +18,37 @@ from experiments.thesis import defect_injection as stage3
 from experiments.thesis import stage3_registration as reg
 
 canonical = stage3.canonical
+STAGE3_RESULT_FILENAMES = (*stage3.SCIENTIFIC_EMITTED_FILENAMES, stage3.MANIFEST_FILENAME)
+
+
+def _assert_completed_result_namespace() -> None:
+    result_root = stage3.RESULT_ROOT
+    assert result_root.is_dir()
+    assert {
+        path.name for path in result_root.iterdir() if path.is_file()
+    } == set(STAGE3_RESULT_FILENAMES)
+    attempts = result_root / stage3.ATTEMPTS_DIRNAME
+    assert attempts.is_dir()
+    assert sorted(path.name for path in attempts.glob("attempt-*.json")) == [
+        "attempt-1.json"
+    ]
+    assert not (result_root / stage3.STAGING_DIRNAME).exists()
+
+    manifest = json.loads(
+        (result_root / stage3.MANIFEST_FILENAME).read_text(encoding="utf-8")
+    )
+    assert manifest["completion_status"] == "complete"
+    assert manifest["completion_authority"] == stage3.MANIFEST_FILENAME
+    assert manifest["decision"] == reg.INCONCLUSIVE
+    assert manifest["integrity_passed"] is False
+
+    attempt = json.loads(
+        (attempts / "attempt-1.json").read_text(encoding="utf-8")
+    )
+    assert attempt["attempt_number"] == 1
+    assert attempt["attempt_type"] == "initial"
+    assert attempt["status"] == "complete"
+    assert attempt["prior_incomplete_attempt"] is False
 
 
 @pytest.fixture(scope="module")
@@ -32,9 +63,11 @@ def test_registered_configuration_and_plan_are_exact_and_inert():
     assert configuration["registered_guard_contract"]
     assert configuration["secondary_metric"]["model"] == "ridge"
     assert configuration["secondary_metric"]["parameters"] == {"alpha": 1.0}
-    assert stage3.registered_plan()["executed"] is False
-    assert stage3.registered_plan()["scientific_draw_performed"] is False
-    assert not stage3.RESULT_ROOT.exists()
+    plan = stage3.registered_plan()
+    assert plan["executed"] is False
+    assert plan["scientific_draw_performed"] is False
+    assert plan["result_root_created"] is True
+    _assert_completed_result_namespace()
 
 
 @pytest.mark.parametrize("defect_name", reg.DEFECT_FAMILY)
@@ -172,7 +205,7 @@ def test_private_evaluation_does_not_mutate_canonical_data_or_redirected_attribu
         stage3.validator.FEATURE_JSON,
         stage3.validator.FEATURE_MD,
     )
-    assert not stage3.RESULT_ROOT.exists()
+    _assert_completed_result_namespace()
 
 
 def test_containment_failure_is_inconclusive_and_restores_validator_state(
@@ -285,7 +318,7 @@ def test_secondary_metric_is_not_run_for_detected_defects(
     assert result["secondary_ic_computed"] is False
 
 
-def test_output_schema_is_explicit_without_writing_a_result(tmp_path):
+def test_output_schema_is_explicit_without_writing_to_governed_result(tmp_path):
     matrix = {
         "defects": [],
         "decision": reg.INCONCLUSIVE,
@@ -342,7 +375,7 @@ def test_output_schema_is_explicit_without_writing_a_result(tmp_path):
         "containment_passed",
         "mechanism_invariants_passed",
     }
-    assert not stage3.RESULT_ROOT.exists()
+    _assert_completed_result_namespace()
 
 
 def test_crash_recovery_only_cleans_known_private_namespace(tmp_path, monkeypatch):
@@ -374,5 +407,5 @@ def test_crash_recovery_only_cleans_known_private_namespace(tmp_path, monkeypatc
     assert (result_root / "attempts" / "attempt-2.json").is_file()
 
 
-def test_result_root_remains_absent_after_ordinary_implementation_tests():
-    assert not stage3.RESULT_ROOT.exists()
+def test_completed_result_root_remains_unchanged_after_ordinary_implementation_tests():
+    _assert_completed_result_namespace()

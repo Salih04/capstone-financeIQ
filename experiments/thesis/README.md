@@ -4,7 +4,8 @@ Prepared in Week 0/1. **Stage 1 (`positive_control`) is implemented and has
 run; Stage 1b (`positive_control_calibration`) is registered, implemented, and
 has completed its one governed run; Stage 2 (`negative_control`) is implemented
 and has completed its one governed run; Stage 3 (`defect_injection`) is
-registered, implemented, and has not run; the remaining two slugs are still
+registered, implemented, and has completed exactly one governed first draw with
+an authoritative **INCONCLUSIVE** decision; the remaining two slugs are still
 placeholders.** This directory holds the shared provenance helpers, the
 implemented stages, and the rules below.
 
@@ -96,18 +97,31 @@ Stage 1b remains diagnostic/calibration only; historical Stage 1 and Stage 1b
 artifacts were not rerun or rewritten. Stage 3 and further model-development
 work must not reinterpret Stage 2 outside its registered scope.
 
-## Stage 3 — implemented; not run
+## Stage 3 — first governed draw complete; integrity INCONCLUSIVE
 
 The [Stage 3 registration](../../docs/thesis/STAGE_3_REGISTRATION.md) is complete
-prospectively, and its five-class family is frozen as IDs 4000–4004: future-year
-feature leakage, T/T+1 misalignment, target leakage into features, look-ahead
-universe membership, and duplicate-row inflation. The expected guard gaps are
-exactly 4000, 4001, and 4003 (`NOT_DETECTED`); 4002 and 4004 are expected
-`DETECTED`, each by an existing surface found on the authoritative base — 4002
-by the reachable cell-provenance column-coverage guard, 4004 by the duplicate-key
-guards. These remain prospective expectations only. The expected first-draw
-outcome, **FAIL — INFORMATIVE**, is prospective and not an observed scientific
-result.
+prospectively, and its five-class family remains frozen as IDs 4000–4004:
+future-year feature leakage, T/T+1 misalignment, target leakage into features,
+look-ahead universe membership, and duplicate-row inflation. The first governed
+draw occurred exactly once; attempt-1 is complete and no guard was repaired.
+
+The authoritative observed matrix is:
+
+| Defect | Observed status |
+|---|---|
+| 4000 FUTURE_YEAR_FEATURE_LEAKAGE | `NOT_DETECTED` |
+| 4001 T_TPLUS1_MISALIGNMENT | `NOT_DETECTED` |
+| 4002 TARGET_LEAKAGE_INTO_FEATURES | `DETECTED` |
+| 4003 LOOKAHEAD_UNIVERSE_MEMBERSHIP | `NOT_DETECTED` |
+| 4004 DUPLICATE_ROW_INFLATION | `DETECTED` |
+
+The observed matrix matches the prospective expectations, but that agreement does
+not override integrity precedence. The original authoritative decision is
+**INCONCLUSIVE** because the sole failed integrity condition was
+`clean_comparator_byte_and_logical_identity`. The forensic root cause is the
+`fingerprint/accounting chained-comparison defect`. The prospective expected
+first-draw outcome, **FAIL — INFORMATIVE**, remains a prospective expectation and
+does not relabel attempt-1.
 
 The only frozen source is
 `data/trusted_clean/modeling_dataset_training_2020_2025.csv`, SHA256
@@ -119,14 +133,16 @@ uses private temporary CSV/provenance roots when a guard requires files. The
 private provenance root is populated with the registered relative inputs before
 `generate(root=<private root>)` runs.
 The registration tests construct no injected frame; only the implementation tests
-perform behavioral injection checks. No Stage 3 result root exists yet: the
-validator's output paths are redirected and restored on every exit path; any
-containment, restoration, execution, or completeness failure becomes
-`INCONCLUSIVE`. The 4001 secondary consumer boundary rejects any stale derived
-`next_year_*` target-column consumption as `INCONCLUSIVE`. The 4002 provenance
-column-coverage signal is reached through `generate(root=<private root>)`, and
-the 4004 duplicate checks remain the existing alternative-target, validator,
-and provenance guards.
+perform behavioral injection checks. The completed result namespace is
+`experiments/results_thesis/defect_injection/`, with attempt-1's five artifacts
+frozen byte-for-byte at commit
+`31643f19d58639b6aa4575625b4460dbdb4ab9b8`. The validator's output paths are
+redirected and restored on every exit path; any containment, restoration,
+execution, or completeness failure becomes `INCONCLUSIVE`. The 4001 secondary
+consumer boundary rejects any stale derived `next_year_*` target-column
+consumption as `INCONCLUSIVE`. The 4002 provenance column-coverage signal is
+reached through `generate(root=<private root>)`, and the 4004 duplicate checks
+remain the existing alternative-target, validator, and provenance guards.
 
 The primary result is binary detection (`PASS` only if all five defects are
 detected; otherwise `FAIL`, with `INCONCLUSIVE` taking precedence). The
@@ -139,12 +155,11 @@ guard map and all five injections remain unchanged, and no guard is repaired.
 `make thesis-stage3-replay` is a private deterministic implementation probe;
 `make thesis-stage3-repeat-after-crash` is the identical-configuration recovery
 path. Ordinary imports and implementation tests do not call these targets. The
-exact result root `experiments/results_thesis/defect_injection/` remains absent
-until the owner authorizes the governed draw. Its five output contracts are
-owned prospectively in `artifact_registry.json` under `prospective_entries[]`;
-no observed Stage 3 result exists. Stage 7 remains blocked under its existing
-wording. This implementation establishes no predictive or investment claim; it
-remains research support only, not investment advice.
+second governed draw is forbidden, and `--repeat-after-crash` is forbidden
+pending remediation. R2 accounting-only remediation is planned but **NOT YET
+REGISTERED**; no R2 result is claimed. Stage 7 remains blocked under its
+existing wording. This implementation establishes no predictive or investment
+claim; it remains research support only, not investment advice.
 
 ## Output isolation
 
@@ -213,9 +228,9 @@ entry. Consequently:
   present and owned by `entries[]`; the immutable result report and manifest
   are under `experiments/results_thesis/negative_control/`.
 - Stage 3's exact result root is in `governed_roots`, and its five output
-  contracts are fixed in `prospective_entries[]` before the first draw. They
-  move verbatim into `entries[]` only in the governed run commit that creates
-  the files; the root is currently absent and there is no observed result.
+  contracts were fixed in `prospective_entries[]` before the first draw. The
+  completed attempt-1 moved those contracts verbatim into `entries[]`; no
+  Stage 3 contract remains prospective, and the result namespace is frozen.
 - The remaining two placeholder slugs (`informativeness`, `monthly_panel`) have
   no registry entry of either kind, as the `proposed_future` class prescribes.
 - When one of them is implemented, that task adds its output root to
