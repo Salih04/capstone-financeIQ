@@ -1,0 +1,14 @@
+{
+  "attempt_number": 1,
+  "attempt_type": "initial",
+  "completion_authority": "artifact_manifest.json",
+  "experiment": "defect_injection",
+  "finished_at_utc": "2026-09-05T22:48:48.885274Z",
+  "governance_class": "operational_attempt_provenance",
+  "prior_incomplete_attempt": false,
+  "registered_configuration_sha256": "4594521fde98c92a52400c9a02139c570b3d5241a2abfbd0d6006c213b51c677",
+  "schema_version": 1,
+  "seed_schedule_sha256": "affffe4f694d426e92d6f100cf0e21e44858295b0ff4a1f2b490c63e2dfc4125",
+  "started_at_utc": "2026-09-05T22:48:41.656044Z",
+  "status": "complete"
+}

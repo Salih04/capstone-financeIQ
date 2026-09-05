@@ -1,0 +1,241 @@
+{
+  "artifacts": [
+    {
+      "path": "experiments/results_thesis/defect_injection/defect_injection_report.json",
+      "sha256": "877f9367e768ce93c888bf0fec1dd5e7a9caa19369a9bfb5d47a818d2dd43a15",
+      "size_bytes": 73053
+    },
+    {
+      "path": "experiments/results_thesis/defect_injection/defect_injection_report.md",
+      "sha256": "d96be144a8ce7ccef37d2daee7a45179aa557002d4faa8262b947d0695109b7c",
+      "size_bytes": 1427
+    },
+    {
+      "path": "experiments/results_thesis/defect_injection/defect_results.csv",
+      "sha256": "bde017fa38af1f1446f1cada3c1d2973c5c5b797aa1bfefa2f6dc7dad113b852",
+      "size_bytes": 743
+    }
+  ],
+  "attempt_provenance": {
+    "attempt_number": 1,
+    "attempt_type": "initial",
+    "completion_authority": "artifact_manifest.json",
+    "experiment": "defect_injection",
+    "finished_at_utc": "2026-09-05T22:48:48.885274Z",
+    "governance_class": "operational_attempt_provenance",
+    "prior_incomplete_attempt": false,
+    "registered_configuration_sha256": "4594521fde98c92a52400c9a02139c570b3d5241a2abfbd0d6006c213b51c677",
+    "schema_version": 1,
+    "seed_schedule_sha256": "affffe4f694d426e92d6f100cf0e21e44858295b0ff4a1f2b490c63e2dfc4125",
+    "started_at_utc": "2026-09-05T22:48:41.656044Z",
+    "status": "complete"
+  },
+  "completion_authority": "artifact_manifest.json",
+  "completion_status": "complete",
+  "decision": "INCONCLUSIVE",
+  "expected_first_draw_outcome": "FAIL \u2014 INFORMATIVE",
+  "expected_first_draw_outcome_is_prospective": true,
+  "experiment": "defect_injection",
+  "guard_repaired": false,
+  "implementation_sha256": "ba47915122b27a0841ad64583dd1d8ea6a2770a4fd46fbcd0ac150748c450879",
+  "integrity_passed": false,
+  "operational_attempt_provenance": {
+    "classification": "operational provenance; not a scientific emitted artifact",
+    "path": "experiments/results_thesis/defect_injection/attempts/attempt-1.json",
+    "sha256": "657d1c777782ed41ec985073cfbf902b9398e56e63f1ae6b88b3fc8d8edb287e"
+  },
+  "registered_configuration": {
+    "base_seed": 42,
+    "defect_family": [
+      "FUTURE_YEAR_FEATURE_LEAKAGE",
+      "T_TPLUS1_MISALIGNMENT",
+      "TARGET_LEAKAGE_INTO_FEATURES",
+      "LOOKAHEAD_UNIVERSE_MEMBERSHIP",
+      "DUPLICATE_ROW_INFLATION"
+    ],
+    "defect_ids": {
+      "DUPLICATE_ROW_INFLATION": 4004,
+      "FUTURE_YEAR_FEATURE_LEAKAGE": 4000,
+      "LOOKAHEAD_UNIVERSE_MEMBERSHIP": 4003,
+      "TARGET_LEAKAGE_INTO_FEATURES": 4002,
+      "T_TPLUS1_MISALIGNMENT": 4001
+    },
+    "experiment": "defect_injection",
+    "registered_guard_contract": [
+      {
+        "defect_id": 4000,
+        "defect_name": "FUTURE_YEAR_FEATURE_LEAKAGE",
+        "evaluated_surfaces": [
+          "GS_REQUIRED_COLUMNS_ALT_TARGETS",
+          "GS_DUP_ALT_TARGETS",
+          "GS_ALIGNMENT_ALT_TARGETS",
+          "GS_DUP_VALIDATE_ISSUE",
+          "GS_TARGET_LEAK_VALIDATE_ISSUE",
+          "GS_SAME_YEAR_LEAK_VALIDATE_ISSUE",
+          "GS_CELL_PROVENANCE_COLUMN_COVERAGE",
+          "GS_CELL_PROVENANCE_DUP_KEY"
+        ],
+        "expected_guard": "NONE_EXISTING",
+        "expected_result": "NOT_DETECTED",
+        "secondary_ic_applicable": true
+      },
+      {
+        "defect_id": 4001,
+        "defect_name": "T_TPLUS1_MISALIGNMENT",
+        "evaluated_surfaces": [
+          "GS_REQUIRED_COLUMNS_ALT_TARGETS",
+          "GS_DUP_ALT_TARGETS",
+          "GS_ALIGNMENT_ALT_TARGETS",
+          "GS_DUP_VALIDATE_ISSUE",
+          "GS_TARGET_LEAK_VALIDATE_ISSUE",
+          "GS_SAME_YEAR_LEAK_VALIDATE_ISSUE",
+          "GS_CELL_PROVENANCE_COLUMN_COVERAGE",
+          "GS_CELL_PROVENANCE_DUP_KEY"
+        ],
+        "expected_guard": "NONE_EXISTING",
+        "expected_result": "NOT_DETECTED",
+        "secondary_ic_applicable": true
+      },
+      {
+        "defect_id": 4002,
+        "defect_name": "TARGET_LEAKAGE_INTO_FEATURES",
+        "evaluated_surfaces": [
+          "GS_TARGET_LEAK_VALIDATE_ISSUE",
+          "GS_SAME_YEAR_LEAK_VALIDATE_ISSUE",
+          "GS_DUP_VALIDATE_ISSUE",
+          "GS_REQUIRED_COLUMNS_ALT_TARGETS",
+          "GS_DUP_ALT_TARGETS",
+          "GS_ALIGNMENT_ALT_TARGETS",
+          "GS_CELL_PROVENANCE_COLUMN_COVERAGE",
+          "GS_CELL_PROVENANCE_DUP_KEY"
+        ],
+        "expected_guard": "GS_CELL_PROVENANCE_COLUMN_COVERAGE",
+        "expected_result": "DETECTED",
+        "secondary_ic_applicable": false
+      },
+      {
+        "defect_id": 4003,
+        "defect_name": "LOOKAHEAD_UNIVERSE_MEMBERSHIP",
+        "evaluated_surfaces": [
+          "GS_REQUIRED_COLUMNS_ALT_TARGETS",
+          "GS_DUP_ALT_TARGETS",
+          "GS_ALIGNMENT_ALT_TARGETS",
+          "GS_DUP_VALIDATE_ISSUE",
+          "GS_TARGET_LEAK_VALIDATE_ISSUE",
+          "GS_SAME_YEAR_LEAK_VALIDATE_ISSUE",
+          "GS_CELL_PROVENANCE_COLUMN_COVERAGE",
+          "GS_CELL_PROVENANCE_DUP_KEY"
+        ],
+        "expected_guard": "NONE_EXISTING",
+        "expected_result": "NOT_DETECTED",
+        "secondary_ic_applicable": true
+      },
+      {
+        "defect_id": 4004,
+        "defect_name": "DUPLICATE_ROW_INFLATION",
+        "evaluated_surfaces": [
+          "GS_REQUIRED_COLUMNS_ALT_TARGETS",
+          "GS_DUP_ALT_TARGETS",
+          "GS_DUP_VALIDATE_ISSUE",
+          "GS_TARGET_LEAK_VALIDATE_ISSUE",
+          "GS_SAME_YEAR_LEAK_VALIDATE_ISSUE",
+          "GS_CELL_PROVENANCE_COLUMN_COVERAGE",
+          "GS_CELL_PROVENANCE_DUP_KEY"
+        ],
+        "expected_guard": "GS_DUP_ALT_TARGETS",
+        "expected_result": "DETECTED",
+        "secondary_ic_applicable": false
+      }
+    ],
+    "registration_doc_sha256": "8153dfe0428faf902a01e83cd2d4c9b66a2c74da1a364dd76cea5f4682a2c621",
+    "registration_module_sha256": "839c6b8679b703508e0d50f36dde3a0de9861bf9706250138d75ab63f0549f1b",
+    "result_root": "experiments/results_thesis/defect_injection/",
+    "rng_usage": {
+      "DUPLICATE_ROW_INFLATION": "NO_RNG",
+      "FUTURE_YEAR_FEATURE_LEAKAGE": "NO_RNG",
+      "LOOKAHEAD_UNIVERSE_MEMBERSHIP": "NO_RNG",
+      "TARGET_LEAKAGE_INTO_FEATURES": "NO_RNG",
+      "T_TPLUS1_MISALIGNMENT": "NO_RNG"
+    },
+    "secondary_metric": {
+      "model": "ridge",
+      "parameters": {
+        "alpha": 1.0
+      },
+      "splits": [
+        {
+          "name": "test_2023",
+          "test_feature_year": 2022,
+          "train_target_years": [
+            2021,
+            2022
+          ]
+        },
+        {
+          "name": "test_2024",
+          "test_feature_year": 2023,
+          "train_target_years": [
+            2021,
+            2022,
+            2023
+          ]
+        },
+        {
+          "name": "test_2025",
+          "test_feature_year": 2024,
+          "train_target_years": [
+            2021,
+            2022,
+            2023,
+            2024
+          ]
+        }
+      ],
+      "target": "next_year_return_pct"
+    },
+    "seed_schedule": [
+      {
+        "defect_id": 4000,
+        "injection_seed": 42004126
+      },
+      {
+        "defect_id": 4001,
+        "injection_seed": 42004127
+      },
+      {
+        "defect_id": 4002,
+        "injection_seed": 42004128
+      },
+      {
+        "defect_id": 4003,
+        "injection_seed": 42004129
+      },
+      {
+        "defect_id": 4004,
+        "injection_seed": 42004130
+      }
+    ],
+    "seed_schedule_sha256": "affffe4f694d426e92d6f100cf0e21e44858295b0ff4a1f2b490c63e2dfc4125",
+    "source_dataset": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+    "source_sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+  },
+  "registered_configuration_sha256": "4594521fde98c92a52400c9a02139c570b3d5241a2abfbd0d6006c213b51c677",
+  "registration": "docs/thesis/STAGE_3_REGISTRATION.md",
+  "registration_module_sha256": "839c6b8679b703508e0d50f36dde3a0de9861bf9706250138d75ab63f0549f1b",
+  "result_root": "experiments/results_thesis/defect_injection/",
+  "schema_version": 1,
+  "scientific_emitted_files": [
+    "defect_injection_report.json",
+    "defect_injection_report.md",
+    "defect_results.csv"
+  ],
+  "source_artifacts": [
+    {
+      "path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+      "role": "frozen modeling dataset; read-only",
+      "sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+      "size_bytes": 256050
+    }
+  ],
+  "stage": "Stage 3 \u2014 defect-injection matrix"
+}
