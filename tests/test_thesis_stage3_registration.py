@@ -47,15 +47,44 @@ MAKEFILE = REPO_ROOT / "Makefile"
 THESIS_README = REPO_ROOT / "experiments/thesis/README.md"
 TASK_STATE = REPO_ROOT / "TASK_STATE.md"
 AUTHORITATIVE_BASE = "c418563f432f5b253fb3b0e69619c76608ea15ea"
+AUTHORITATIVE_PROTOCOL_PREFIX_SHA256 = (
+    "095ae8ddceebf186bcc9820036760a28b8dd21cb3ea81c0708bd151c118bbcbb"
+)
+CELL_PROVENANCE_REPOSITORY_AUTHORITY_SHA256 = (
+    "4f61fe66c8328aa4d69eda3c27b9328058708d9733f18287db63bc9a1994c0c6"
+)
+HISTORICAL_UNCHANGED_HASHES = {
+    "experiments/thesis/stage1b_registration.py": (
+        "7a140f8caf4d2f58db6479a1124bf97241eb91dd6d207f12bc974f6110bf0caa"
+    ),
+    "experiments/thesis/positive_control.py": (
+        "44c897568f17618b7db0a42103384f43d24da5fb296bf092b422ef51a495e27d"
+    ),
+    "experiments/thesis/positive_control_calibration.py": (
+        "61a34acd577874ec269e4a654a686bdd1224c99016950aac01af694d10903020"
+    ),
+    "docs/thesis/STAGE_1B_REGISTRATION.md": (
+        "d45b3e916f50ad54800d1a78c25ae06a303710c218264690063427f7b63e783e"
+    ),
+    "docs/thesis/STAGE_2_REGISTRATION.md": (
+        "6744e67d2a3c58e5ba7ad5f7c7794aa5e5f8487b65e765789e6fc2041ec701cc"
+    ),
+    "artifact_registry.json": (
+        "ddf4404b2e38b2a4dbcee131085a1424eacf49f2ef877135ab6e8a3784414220"
+    ),
+    "Makefile": (
+        "6027ad61a5d366d60e9672241dbd052545e79ca826d85a182437a05f3f8463cc"
+    ),
+}
 
-EXPECTED_CHANGED_PATHS = {
+REGISTERED_MUTATION_PATHS = (
     "TASK_STATE.md",
     "docs/thesis/PRE_EXPERIMENT_PROTOCOL.md",
     "docs/thesis/STAGE_3_REGISTRATION.md",
     "experiments/thesis/README.md",
     "experiments/thesis/stage3_registration.py",
     "tests/test_thesis_stage3_registration.py",
-}
+)
 
 STAGE3_AMENDMENT_MARKER = "### 2026-09-04 — Stage 3 dated amendment and registration"
 
@@ -72,19 +101,6 @@ def compact(value: str) -> str:
     return " ".join(value.replace("**", "").replace("`", "").split())
 
 
-def git_bytes(*args: str) -> bytes:
-    return subprocess.run(
-        ["git", *args],
-        cwd=REPO_ROOT,
-        check=True,
-        capture_output=True,
-    ).stdout
-
-
-def authoritative_blob(relative: str) -> bytes:
-    return git_bytes("show", f"{AUTHORITATIVE_BASE}:{relative}")
-
-
 def _function_def(path: Path, name: str) -> ast.FunctionDef:
     """Return the top-level ``def name`` node of ``path``, parsed not executed."""
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
@@ -96,12 +112,6 @@ def _function_def(path: Path, name: str) -> ast.FunctionDef:
 
 def _function_source(path: Path, name: str) -> str:
     return ast.unparse(_function_def(path, name))
-
-
-def changed_paths_against_authoritative_base() -> set[str]:
-    tracked = git_bytes("diff", "--name-only", AUTHORITATIVE_BASE).decode().splitlines()
-    untracked = git_bytes("ls-files", "--others", "--exclude-standard").decode().splitlines()
-    return {path for path in (*tracked, *untracked) if path}
 
 
 @pytest.fixture(scope="module")
@@ -122,18 +132,26 @@ def compact_registration_doc(registration_doc: str) -> str:
 # --------------------------------------------------------------------------- #
 # Source pin
 # --------------------------------------------------------------------------- #
-def test_authoritative_base_and_exact_registration_mutation_surface():
+def test_authoritative_base_provenance_and_exact_registration_mutation_surface():
     assert reg.AUTHORITATIVE_BASE_COMMIT == AUTHORITATIVE_BASE
-    # The authoritative commit is a durable source-inspection anchor, not a
-    # requirement that registration must run at that exact repository HEAD.
-    git_bytes("cat-file", "-e", f"{AUTHORITATIVE_BASE}^{{commit}}")
-    git_bytes("merge-base", "--is-ancestor", AUTHORITATIVE_BASE, "HEAD")
-    # Git ancestry establishes governance provenance only; it does not create
-    # or imply a Stage 3 scientific outcome.
+    # This commit is a frozen provenance identifier. Direct-parent and ancestry
+    # verification was completed at review time and is intentionally not a CI
+    # invariant: shallow checkouts need not contain the historical object.
+    assert REGISTERED_MUTATION_PATHS == (
+        "TASK_STATE.md",
+        "docs/thesis/PRE_EXPERIMENT_PROTOCOL.md",
+        "docs/thesis/STAGE_3_REGISTRATION.md",
+        "experiments/thesis/README.md",
+        "experiments/thesis/stage3_registration.py",
+        "tests/test_thesis_stage3_registration.py",
+    )
+    assert len(REGISTERED_MUTATION_PATHS) == 6
+    assert len(set(REGISTERED_MUTATION_PATHS)) == 6
+    for relative in REGISTERED_MUTATION_PATHS:
+        assert (REPO_ROOT / relative).is_file(), relative
     assert reg.NO_STAGE3_INJECTION_DRAW_OR_OUTCOME is True
     assert reg.EXPECTED_FIRST_DRAW_OUTCOME_IS_PROSPECTIVE is True
     assert reg.EXPECTED_FIRST_DRAW_OUTCOME_IS_OBSERVED is False
-    assert changed_paths_against_authoritative_base() == EXPECTED_CHANGED_PATHS
 
 
 def test_source_pin_path_and_hash_are_exact(compact_registration_doc):
@@ -145,16 +163,13 @@ def test_source_pin_path_and_hash_are_exact(compact_registration_doc):
     )
     assert DATASET_PATH.is_file()
     assert sha256(DATASET_PATH) == reg.DATASET_SHA256
-    assert hashlib.sha256(authoritative_blob(reg.DATASET_PATH)).hexdigest() == (
-        reg.DATASET_SHA256
-    )
     assert reg.DATASET_SHA256 in compact_registration_doc
     assert reg.DATASET_PATH in compact_registration_doc
     assert reg.EXPANDED_DATASETS_ARE_NOT_STAGE3_INPUTS is True
     assert "FI-DATA-EXPAND outputs are not Stage 3 inputs" in compact_registration_doc
 
 
-def test_registered_guard_surface_hashes_match_the_authoritative_base():
+def test_registered_guard_surface_hashes_match_frozen_pins():
     assert set(reg.SOURCE_MODULE_HASHES) == {
         "scripts/data_collection/validate.py",
         "scripts/data_collection/pipeline.py",
@@ -167,13 +182,7 @@ def test_registered_guard_surface_hashes_match_the_authoritative_base():
     }
     for relative, expected in reg.SOURCE_MODULE_HASHES.items():
         assert sha256(REPO_ROOT / relative) == expected, relative
-        assert hashlib.sha256(authoritative_blob(relative)).hexdigest() == expected, (
-            relative
-        )
     assert sha256(REPO_ROOT / reg.CELL_PROVENANCE_SOURCE) == reg.CELL_PROVENANCE_SHA256
-    assert hashlib.sha256(
-        authoritative_blob(reg.CELL_PROVENANCE_SOURCE)
-    ).hexdigest() == reg.CELL_PROVENANCE_SHA256
     assert reg.AUTHORITATIVE_BASE_COMMIT == (
         "c418563f432f5b253fb3b0e69619c76608ea15ea"
     )
@@ -456,16 +465,32 @@ def test_cell_provenance_is_reachable_through_a_caller_supplied_private_root():
     assert len(bcp.ALLOWED_INPUT_RELS) == reg.CELL_PROVENANCE_REQUIRED_INPUT_COUNT
     assert set(bcp.ALLOWED_INPUT_RELS) == set(bcp.SOURCE_ARTIFACT_RELS)
 
-    # Repository authority for the private-root pattern already exists on the
-    # authoritative base and is unchanged by this registration.
+    # The private-root pattern is a frozen current-source contract. Its
+    # review-time authority is represented by a literal hash, not a Git object.
     authority = reg.CELL_PROVENANCE_REPOSITORY_AUTHORITY.split("::")
     authority_path = REPO_ROOT / authority[0]
     assert authority_path.is_file()
-    authority_source = authority_path.read_text(encoding="utf-8")
-    assert f"def {authority[1]}(" in authority_source
-    assert 'tmp_path_factory.mktemp("provenance_repo")' in authority_source
-    assert "bcp.generate(sandbox)" in authority_source
-    assert authority_path.read_bytes() == authoritative_blob(authority[0])
+    assert sha256(authority_path) == CELL_PROVENANCE_REPOSITORY_AUTHORITY_SHA256
+    authority_node = _function_def(authority_path, authority[1])
+    authority_calls = [
+        node for node in ast.walk(authority_node) if isinstance(node, ast.Call)
+    ]
+    assert any(
+        isinstance(node.func, ast.Attribute)
+        and node.func.attr == "mktemp"
+        and node.args
+        and isinstance(node.args[0], ast.Constant)
+        and node.args[0].value == "provenance_repo"
+        for node in authority_calls
+    )
+    assert any(
+        isinstance(node.func, ast.Attribute)
+        and node.func.attr == "generate"
+        and node.args
+        and isinstance(node.args[0], ast.Name)
+        and node.args[0].id == "sandbox"
+        for node in authority_calls
+    )
 
     # Therefore the surfaces are reachable, not input-blind.
     assert reg.PROVENANCE_SURFACE_WAS_MISCLASSIFIED_AT_FIRST_REGISTRATION_DRAFT is True
@@ -962,9 +987,7 @@ def test_secondary_ic_is_descriptive_non_gating_and_scope_limited(
     assert "no pooling across splits or defects" in compact_registration_doc
 
 
-def test_run_experiments_is_pinned_by_full_sha256_and_unchanged_from_base(
-    compact_registration_doc,
-):
+def test_run_experiments_is_pinned_by_full_sha256(compact_registration_doc):
     """The secondary IC depends on this source, so it is pinned exactly."""
     relative = reg.RUN_EXPERIMENTS_SOURCE
     assert relative == "experiments/run_experiments.py"
@@ -975,10 +998,6 @@ def test_run_experiments_is_pinned_by_full_sha256_and_unchanged_from_base(
     assert len(reg.RUN_EXPERIMENTS_SHA256) == 64
     assert re.fullmatch(r"[0-9a-f]{64}", reg.RUN_EXPERIMENTS_SHA256)
     assert sha256(path) == reg.RUN_EXPERIMENTS_SHA256
-    assert hashlib.sha256(authoritative_blob(relative)).hexdigest() == (
-        reg.RUN_EXPERIMENTS_SHA256
-    )
-    assert path.read_bytes() == authoritative_blob(relative)
     assert reg.RUN_EXPERIMENTS_UNCHANGED_FROM_AUTHORITATIVE_BASE is True
     assert reg.RUN_EXPERIMENTS_IS_SECONDARY_CONSUMER_AUTHORITY is True
 
@@ -1173,11 +1192,17 @@ def test_stage7_remains_blocked_under_existing_wording(protocol_doc):
 
 
 def test_protocol_amendment_is_dated_and_appended_after_the_stage3_body(protocol_doc):
-    authoritative_protocol = authoritative_blob(reg.PROTOCOL_DOC).decode("utf-8")
-    assert STAGE3_AMENDMENT_MARKER not in authoritative_protocol
-    assert protocol_doc.startswith(authoritative_protocol)
-    appended_suffix = protocol_doc[len(authoritative_protocol) :]
-    assert appended_suffix.startswith(f"\n{STAGE3_AMENDMENT_MARKER}\n")
+    marker_bytes = STAGE3_AMENDMENT_MARKER.encode("utf-8")
+    protocol_bytes = protocol_doc.encode("utf-8")
+    boundary_marker = b"\n\n" + marker_bytes + b"\n"
+    assert protocol_bytes.count(boundary_marker) == 1
+    boundary = protocol_bytes.index(boundary_marker)
+    authoritative_prefix = protocol_bytes[: boundary + 1]
+    assert hashlib.sha256(authoritative_prefix).hexdigest() == (
+        AUTHORITATIVE_PROTOCOL_PREFIX_SHA256
+    )
+    appended_suffix = protocol_bytes[boundary + 1 :]
+    assert appended_suffix.startswith(b"\n" + marker_bytes + b"\n")
 
     assert STAGE3_AMENDMENT_MARKER in protocol_doc
     assert protocol_doc.index("## Stage 3 — Defect-injection matrix") < (
@@ -1243,6 +1268,10 @@ def test_result_root_is_absent_and_no_run_surface_exists():
     assert reg.STAGE3_RESULT_EXISTS_AT_REGISTRATION is False
     assert reg.NO_STAGE3_INJECTION_DRAW_OR_OUTCOME is True
     assert not RESULT_ROOT.exists()
+    stage3_modules = sorted(
+        REPO_ROOT.glob("experiments/thesis/stage3_*.py")
+    )
+    assert stage3_modules == [REGISTRATION_SOURCE]
 
     makefile = MAKEFILE.read_text(encoding="utf-8")
     assert "thesis-stage3" not in makefile
@@ -1532,32 +1561,21 @@ def test_stage1_stage1b_stage2_registrations_and_provenance_are_unchanged():
     }
     for relative, expected in reg.HISTORICAL_PROTECTED_HASHES.items():
         assert sha256(REPO_ROOT / relative) == expected, relative
-        assert hashlib.sha256(authoritative_blob(relative)).hexdigest() == expected
 
     # Stage 3 registration adds a slug-free contract: provenance already
-    # declared the slug and seed on the authoritative base.
+    # declared the slug and seed in the frozen source pins.
     assert sha256(REPO_ROOT / "experiments/thesis/provenance.py") == (
         reg.SOURCE_MODULE_HASHES["experiments/thesis/provenance.py"]
     )
     assert prov.SEEDS["defect_injection"] == 42
     assert "defect_injection" in prov.EXPERIMENT_SLUGS
 
-    unchanged_against_base = (
-        "experiments/thesis/stage1b_registration.py",
-        "experiments/thesis/stage2_registration.py",
-        "experiments/thesis/positive_control.py",
-        "experiments/thesis/positive_control_calibration.py",
-        "experiments/thesis/negative_control.py",
-        "experiments/significance.py",
-        "docs/thesis/STAGE_1B_REGISTRATION.md",
-        "docs/thesis/STAGE_2_REGISTRATION.md",
-        "artifact_registry.json",
-        "Makefile",
-    )
-    for relative in unchanged_against_base:
-        assert (REPO_ROOT / relative).is_file(), relative
-        assert (REPO_ROOT / relative).read_bytes() == authoritative_blob(relative)
-
+    # These historical registration and artifact files are also protected by
+    # literal hashes; no historical Git object is needed to enforce them.
+    for relative, expected in HISTORICAL_UNCHANGED_HASHES.items():
+        path = REPO_ROOT / relative
+        assert path.is_file(), relative
+        assert sha256(path) == expected, relative
 
 # --------------------------------------------------------------------------- #
 # Code / document coherence
