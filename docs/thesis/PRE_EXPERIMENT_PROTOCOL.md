@@ -938,3 +938,42 @@ its implementation task must add the runner, Makefile target, governed result
 root, and one ownership contract per emitted file before the run. No Stage 3
 result root exists at this amendment time, and no Stage 1, Stage 1b, or Stage 2
 artifact is changed.
+
+### 2026-09-06 — Stage 3 R2 integrity-accounting amendment
+
+**What changed.** A separate, operative registration was added at
+`docs/thesis/STAGE_3_R2_AMENDMENT.md`, with inert machine-readable constants in
+`experiments/thesis/stage3_r2_amendment.py`. It registers R2 Option A for a
+retrospective accounting-only re-adjudication of the existing frozen Stage 3
+attempt-1 and prospectively names its separate two-file result namespace.
+
+**Why.** Attempt-1 is complete but `INCONCLUSIVE` because the clean comparator
+gate used the structurally false-positive chained predicate
+`len(clean_fingerprints) == len(set(clean_fingerprints)) == 1` for five identical
+fingerprints. The fingerprint values themselves were not persisted. Option A
+therefore permits a tightly bounded semantic derivation from existing frozen
+evidence, explicitly labelled **DERIVED**, rather than claiming observed
+fingerprint equality.
+
+**What had already been observed.** The first governed Stage 3 draw had already
+completed exactly once. Its original decision is permanently `INCONCLUSIVE`; the
+sole failed integrity condition is
+`clean_comparator_byte_and_logical_identity`; its five artifact hashes and
+observed per-defect matrix are frozen. The matrix's agreement with the
+prospective expectation map is not R2 evidence. The operator's pre-run shell
+gate proved a clean worktree immediately before execution; later
+`git.dirty=true` is not evidence of dirty-at-start.
+
+**R2 boundary.** R2 reads only existing frozen attempt-1 evidence, applies the
+four registered A0–A3 accounting clauses, and fails closed on missing or
+mismatched inputs. It does not inject defects, reevaluate guards, load the
+dataset, reconstruct fingerprints, refit Ridge, recompute secondary IC, alter
+per-defect statuses or invariants, or perform a second draw. The original
+artifacts are immutable, the original decision remains `INCONCLUSIVE`, and the
+future `readjudicated_decision` value is not preregistered.
+
+**Parameters and multiplicity.** No scientific parameter, defect family,
+injection, model, split, target, estimand, decision family, or multiplicity
+correction changed. The forward runner predicate and per-defect fingerprint
+persistence requirement are registered separately for future code repair only;
+they are not exercised by R2. Stage 7 remains blocked.

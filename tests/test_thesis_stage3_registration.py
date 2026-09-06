@@ -1289,7 +1289,10 @@ def test_completed_result_root_and_historical_registration_absence_are_preserved
         "experiments/results_thesis/defect_injection/ does not exist at registration time"
         in compact(registration_doc)
     )
-    assert sorted(REPO_ROOT.glob("experiments/thesis/stage3_*.py")) == [REGISTRATION_SOURCE]
+    assert sorted(REPO_ROOT.glob("experiments/thesis/stage3_*.py")) == [
+        REPO_ROOT / "experiments/thesis/stage3_r2_amendment.py",
+        REGISTRATION_SOURCE,
+    ]
     implementation_source = REPO_ROOT / "experiments/thesis/defect_injection.py"
     assert implementation_source.is_file()
     assert REGISTRATION_SOURCE.is_file()
@@ -1327,7 +1330,10 @@ def test_registry_has_stage3_completed_output_contracts_and_no_prospective_outpu
         if entry["path_or_glob"].startswith(root + "/")
     ]
     assert tuple(entry["path_or_glob"] for entry in completed) == expected_paths
-    assert registry["prospective_entries"] == []
+    assert not any(
+        entry["path_or_glob"].startswith(root + "/")
+        for entry in registry["prospective_entries"]
+    )
     assert len(completed) == len(expected_paths)
     for entry in completed:
         assert set(entry) == {
@@ -1387,7 +1393,7 @@ def test_readme_and_task_ledger_record_post_run_state():
         "Stage 7 remains blocked",
         "not investment advice",
         "second governed draw is forbidden",
-        "R2 accounting-only remediation is planned but NOT YET REGISTERED",
+        "R2 accounting-only remediation is REGISTERED / NOT IMPLEMENTED / NOT ADJUDICATED",
         "The registration tests construct no injected frame",
     ):
         assert phrase in readme, phrase

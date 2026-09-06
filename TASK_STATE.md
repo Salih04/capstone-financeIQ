@@ -1715,3 +1715,30 @@ registered scope.
 - R2 accounting-only remediation is planned but **NOT YET REGISTERED**. No R2
   implementation, result, or adjudication is claimed. Stage 7 remains
   **BLOCKED**.
+
+### FINANCEIQ-THESIS-STAGE3-R2-REGISTRATION (2026-09-06; append-only)
+
+- Stage 3 R2 integrity-accounting amendment is **REGISTERED / NOT IMPLEMENTED /
+  NOT ADJUDICATED** under owner-locked Option A. It is a retrospective,
+  accounting-only contract over the existing frozen attempt-1; no adjudicator,
+  runner repair, or scientific execution was added.
+- Attempt-1 remains byte-identical with original authoritative decision
+  **INCONCLUSIVE**. The five frozen artifact SHA256 values, the registered Stage
+  3 configuration, and the Stage 3 registration module/document hashes are
+  pinned for a future fail-closed R2 check.
+- R2 registers A0 cardinality, A1 pinned clean-source evidence, A2 zero clean
+  detection signals, and A3 **DERIVED** clean logical identity. A3 is not
+  `OBSERVED_FINGERPRINT_EQUALITY`: attempt-1 did not persist fingerprint values.
+  The expectation-matching observed matrix is not used as evidence, and no
+  `readjudicated_decision` value is preregistered.
+- R2 must not load the dataset, reconstruct fingerprints, reinject or
+  reevaluate defects, recompute models/IC, alter frozen statuses or invariants,
+  recompute the other sixteen integrity conditions, perform a second governed
+  draw, or execute repeat-after-crash. The forward fingerprint predicate is
+  registered separately for future code repair only.
+- The known recovery repair is **REGISTERED / NOT IMPLEMENTED**: separate
+  completion from integrity, refuse repeat-after-crash and cleanup when any
+  complete attempt exists, and remove the misleading operator direction.
+- The separate R2 result root registered in `artifact_registry.json` is
+  prospective only and absent, with exactly two registered artifact contracts.
+  Stage 7 remains **BLOCKED**; R2 registration does not unlock it.
