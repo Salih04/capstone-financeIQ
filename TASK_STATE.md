@@ -1682,3 +1682,36 @@ registered scope.
   broadened. `make data-validate`, `make claims-lint`, `make docs-lint`, and
   `git diff --check` passed. Owner decision remains required for the allowlist
   versus clean-commit integration step before the readiness review is green.
+
+### FINANCEIQ-THESIS-STAGE3-POST-RUN-GOVERNANCE-TRANSITION (2026-09-06; append-only)
+
+- The first governed Stage 3 draw occurred **exactly once**. Attempt-1 is
+  `attempt_number=1`, `attempt_type=initial`, `status=complete`, and
+  `prior_incomplete_attempt=false`. No second governed draw is authorized, and
+  `--repeat-after-crash` remains forbidden pending remediation.
+- The original authoritative decision is **INCONCLUSIVE**. The sole failed
+  integrity condition is
+  `clean_comparator_byte_and_logical_identity`; integrity precedence therefore
+  controls the decision.
+- The observed per-defect matrix is:
+
+  | Defect | Observed status |
+  |---|---|
+  | 4000 `FUTURE_YEAR_FEATURE_LEAKAGE` | `NOT_DETECTED` |
+  | 4001 `T_TPLUS1_MISALIGNMENT` | `NOT_DETECTED` |
+  | 4002 `TARGET_LEAKAGE_INTO_FEATURES` | `DETECTED` |
+  | 4003 `LOOKAHEAD_UNIVERSE_MEMBERSHIP` | `NOT_DETECTED` |
+  | 4004 `DUPLICATE_ROW_INFLATION` | `DETECTED` |
+
+- The observed matrix matches the prospective expectation map, but that match
+  does not override the failed integrity condition or relabel attempt-1 as
+  `FAIL`. The forensic root cause is the
+  **fingerprint/accounting chained-comparison defect**.
+- The frozen Stage 3 source remains
+  `data/trusted_clean/modeling_dataset_training_2020_2025.csv` with SHA256
+  `3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78`.
+- The five attempt-1 artifacts are frozen byte-for-byte at evidence commit
+  `31643f19d58639b6aa4575625b4460dbdb4ab9b8`. No Stage 3 guard was repaired.
+- R2 accounting-only remediation is planned but **NOT YET REGISTERED**. No R2
+  implementation, result, or adjudication is claimed. Stage 7 remains
+  **BLOCKED**.

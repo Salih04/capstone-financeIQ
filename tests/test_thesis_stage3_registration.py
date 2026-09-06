@@ -1,16 +1,17 @@
-"""Machine-checkable guards for the Stage 3 registration.
+"""Machine-checkable guards for the Stage 3 registration and post-run state.
 
-These tests prove the registration contract only. They do not implement Stage 3,
-inject any defect, run any guard against an injected frame, create the Stage 3
-result root, or modify Stage 1 / Stage 1b / Stage 2 artifacts.
+These tests preserve the historical registration contract while checking the
+completed attempt-1 result namespace. They do not implement Stage 3, inject any
+defect, run any guard against an injected frame, or modify Stage 1 / Stage 1b /
+Stage 2 artifacts.
 
 Registration-test boundary — enforced here and by
 ``test_registration_tests_construct_no_injected_frame``:
 
 * allowed — inspect repository source, read the frozen dataset read-only,
   verify frozen source facts, verify registration constants, prove source
-  semantics structurally (AST / function contract), and prove that no Stage 3
-  result root exists;
+  semantics structurally (AST / function contract), and prove that importing
+  registration leaves the completed Stage 3 result root unchanged;
 * forbidden — construct the 4000 transformation, the 4001 rotation, the 4002
   added leak column, the 4003 membership selection, or the 4004 duplication.
 
@@ -46,6 +47,12 @@ DATASET_PATH = REPO_ROOT / reg.DATASET_PATH
 MAKEFILE = REPO_ROOT / "Makefile"
 THESIS_README = REPO_ROOT / "experiments/thesis/README.md"
 TASK_STATE = REPO_ROOT / "TASK_STATE.md"
+STAGE3_RESULT_FILENAMES = (
+    "defect_injection_report.json",
+    "defect_injection_report.md",
+    "defect_results.csv",
+    "artifact_manifest.json",
+)
 AUTHORITATIVE_BASE = "c418563f432f5b253fb3b0e69619c76608ea15ea"
 AUTHORITATIVE_PROTOCOL_PREFIX_SHA256 = (
     "095ae8ddceebf186bcc9820036760a28b8dd21cb3ea81c0708bd151c118bbcbb"
@@ -93,6 +100,14 @@ def sha256(path: Path) -> str:
 
 def compact(value: str) -> str:
     return " ".join(value.replace("**", "").replace("`", "").split())
+
+
+def result_tree_hashes() -> dict[str, str]:
+    return {
+        item.relative_to(REPO_ROOT).as_posix(): sha256(item)
+        for item in sorted(RESULT_ROOT.rglob("*"))
+        if item.is_file()
+    }
 
 
 def _function_def(path: Path, name: str) -> ast.FunctionDef:
@@ -1256,12 +1271,24 @@ def test_protocol_amendment_is_dated_and_appended_after_the_stage3_body(protocol
 # --------------------------------------------------------------------------- #
 # Registration/implementation boundary
 # --------------------------------------------------------------------------- #
-def test_result_root_is_absent_and_implementation_run_surface_is_explicit():
+def test_completed_result_root_and_historical_registration_absence_are_preserved(
+    registration_doc,
+):
     assert reg.RESULT_ROOT == "experiments/results_thesis/defect_injection/"
     assert reg.RESULT_ROOT_EXISTS_AT_REGISTRATION is False
     assert reg.STAGE3_RESULT_EXISTS_AT_REGISTRATION is False
     assert reg.NO_STAGE3_INJECTION_DRAW_OR_OUTCOME is True
-    assert not RESULT_ROOT.exists()
+    assert RESULT_ROOT.is_dir()
+    assert {path.name for path in RESULT_ROOT.iterdir()} == {
+        *STAGE3_RESULT_FILENAMES,
+        "attempts",
+    }
+    assert (RESULT_ROOT / "attempts" / "attempt-1.json").is_file()
+    assert not (RESULT_ROOT / ".staging").exists()
+    assert (
+        "experiments/results_thesis/defect_injection/ does not exist at registration time"
+        in compact(registration_doc)
+    )
     assert sorted(REPO_ROOT.glob("experiments/thesis/stage3_*.py")) == [REGISTRATION_SOURCE]
     implementation_source = REPO_ROOT / "experiments/thesis/defect_injection.py"
     assert implementation_source.is_file()
@@ -1280,23 +1307,29 @@ def test_result_root_is_absent_and_implementation_run_surface_is_explicit():
     assert reg.NO_MAKEFILE_RUN_TARGET_AT_REGISTRATION is True
 
     assert reg.STAGE3_SLUG in prov.EXPERIMENT_SLUGS
-    assert not (prov.THESIS_RESULTS_ROOT / reg.STAGE3_SLUG).exists()
+    assert (prov.THESIS_RESULTS_ROOT / reg.STAGE3_SLUG).is_dir()
 
 
-def test_registry_has_stage3_governance_wiring_but_no_resolved_output():
+def test_registry_has_stage3_completed_output_contracts_and_no_prospective_outputs():
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     root = reg.RESULT_ROOT.rstrip("/")
     assert root in registry["governed_roots"]
-    prospective = registry["prospective_entries"]
-    expected_paths = {
+    expected_paths = (
         f"{root}/defect_injection_report.json",
         f"{root}/defect_injection_report.md",
         f"{root}/defect_results.csv",
         f"{root}/artifact_manifest.json",
         f"{root}/attempts/*.json",
-    }
-    assert {entry["path_or_glob"] for entry in prospective} == expected_paths
-    for entry in prospective:
+    )
+    completed = [
+        entry
+        for entry in registry["entries"]
+        if entry["path_or_glob"].startswith(root + "/")
+    ]
+    assert tuple(entry["path_or_glob"] for entry in completed) == expected_paths
+    assert registry["prospective_entries"] == []
+    assert len(completed) == len(expected_paths)
+    for entry in completed:
         assert set(entry) == {
             "path_or_glob",
             "artifact_class",
@@ -1305,7 +1338,10 @@ def test_registry_has_stage3_governance_wiring_but_no_resolved_output():
             "hand_edit_forbidden",
             "notes",
         }
-        assert entry["artifact_class"] in {"generated", "run_manifest"}
+        if entry["path_or_glob"].endswith("attempts/*.json"):
+            assert entry["artifact_class"] == "run_manifest"
+        else:
+            assert entry["artifact_class"] == "generated"
         assert entry["generator_command"] == "make thesis-stage3"
         assert entry["hand_edit_forbidden"] is True
         assert entry["notes"].strip()
@@ -1313,12 +1349,12 @@ def test_registry_has_stage3_governance_wiring_but_no_resolved_output():
             assert entry["inputs"] == []
         else:
             assert entry["inputs"] == [reg.DATASET_PATH]
-    assert not any(
-        entry["path_or_glob"].startswith(root) for entry in registry["entries"]
-    )
-    assert not any(
-        path.is_file() for path in RESULT_ROOT.glob("**/*")
-    )
+    assert RESULT_ROOT.is_dir()
+    assert {
+        path.name for path in RESULT_ROOT.iterdir() if path.is_file()
+    } == set(STAGE3_RESULT_FILENAMES)
+    assert (RESULT_ROOT / "attempts" / "attempt-1.json").is_file()
+    assert not (RESULT_ROOT / ".staging").exists()
     assert reg.NO_GOVERNED_ROOT_OR_PROSPECTIVE_ENTRY_AT_REGISTRATION is True
     assert reg.PROSPECTIVE_ARTIFACT_CONTRACTS_REQUIRED_AT_REGISTRATION is False
     assert reg.PROSPECTIVE_ARTIFACT_CONTRACT_STATUS_AT_REGISTRATION == (
@@ -1327,18 +1363,22 @@ def test_registry_has_stage3_governance_wiring_but_no_resolved_output():
     assert reg.IMPLEMENTATION_MUST_ADD_RUNNER_TARGET_AND_OWNERSHIP_BEFORE_RUN is True
 
 
-def test_readme_and_task_ledger_record_implementation_only_state():
+def test_readme_and_task_ledger_record_post_run_state():
     readme = compact(THESIS_README.read_text(encoding="utf-8"))
     for phrase in (
-        "Stage 3 (defect_injection) is registered, implemented, and has not run",
-        "Stage 3 — implemented; not run",
-        "five-class family is frozen",
-        "prospective expectations only",
+        "Stage 3 (defect_injection) is registered, implemented, and has completed exactly one governed first draw",
+        "Stage 3 — first governed draw complete; integrity INCONCLUSIVE",
+        "five-class family remains frozen",
+        "first governed draw occurred exactly once",
+        "attempt-1 is complete",
+        "original authoritative decision is INCONCLUSIVE",
+        "clean_comparator_byte_and_logical_identity",
+        "fingerprint/accounting chained-comparison defect",
+        "31643f19d58639b6aa4575625b4460dbdb4ab9b8",
         "FAIL — INFORMATIVE",
-        "not an observed scientific result",
         reg.DATASET_PATH,
         reg.DATASET_SHA256,
-        "No Stage 3 result root exists",
+        "completed result namespace",
         "defect_injection.py",
         "make thesis-stage3",
         "prospective_entries[]",
@@ -1346,8 +1386,8 @@ def test_readme_and_task_ledger_record_implementation_only_state():
         "4001",
         "Stage 7 remains blocked",
         "not investment advice",
-        "expected guard gaps are exactly 4000, 4001, and 4003",
-        "4002 and 4004 are expected DETECTED",
+        "second governed draw is forbidden",
+        "R2 accounting-only remediation is planned but NOT YET REGISTERED",
         "The registration tests construct no injected frame",
     ):
         assert phrase in readme, phrase
@@ -1358,33 +1398,33 @@ def test_readme_and_task_ledger_record_implementation_only_state():
     ledger = compact(TASK_STATE.read_text(encoding="utf-8"))
     registration_marker = "FINANCEIQ-THESIS-STAGE3-REGISTRATION-CLOSEOUT"
     implementation_marker = "FINANCEIQ-THESIS-STAGE3-IMPLEMENTATION-ONLY"
+    post_run_marker = "FINANCEIQ-THESIS-STAGE3-POST-RUN-GOVERNANCE-TRANSITION"
     assert registration_marker in ledger
     assert implementation_marker in ledger
-    entry = ledger[ledger.rindex(implementation_marker) :]
+    assert post_run_marker in ledger
+    entry = ledger[ledger.rindex(post_run_marker) :]
     for phrase in (
-        "implementation-only",
-        "IMPLEMENTED / NOT RUN",
-        "NO GOVERNED STAGE 3 DRAW",
-        "NO STAGE 3 RUN",
-        "NO STAGE 3 RESULT",
-        "NO GUARD REPAIR",
+        "first governed Stage 3 draw occurred exactly once",
+        "attempt_number=1",
+        "attempt_type=initial",
+        "status=complete",
+        "prior_incomplete_attempt=false",
+        "original authoritative decision is INCONCLUSIVE",
+        "clean_comparator_byte_and_logical_identity",
         "4000 FUTURE_YEAR_FEATURE_LEAKAGE",
         "4001 T_TPLUS1_MISALIGNMENT",
         "4002 TARGET_LEAKAGE_INTO_FEATURES",
         "4003 LOOKAHEAD_UNIVERSE_MEMBERSHIP",
         "4004 DUPLICATE_ROW_INFLATION",
         reg.DATASET_SHA256,
-        "prospective expectations only",
-        "not an observed scientific outcome",
-        "Stage 7 remains blocked",
-        "defect_injection.py",
-        "make thesis-stage3",
-        "private provenance root",
-        "classifies 4001 INCONCLUSIVE",
-        "expected guard gaps are exactly 4000, 4001, and 4003",
-        "4002 and 4004 are expected DETECTED",
-        reg.RUN_EXPERIMENTS_SHA256,
-        "result root remains absent",
+        "observed matrix matches the prospective expectation map",
+        "does not override the failed integrity condition",
+        "fingerprint/accounting chained-comparison defect",
+        "31643f19d58639b6aa4575625b4460dbdb4ab9b8",
+        "No second governed draw is authorized",
+        "--repeat-after-crash remains forbidden",
+        "R2 accounting-only remediation is planned but NOT YET REGISTERED",
+        "Stage 7 remains BLOCKED",
     ):
         assert phrase in entry, phrase
     assert "4000–4003 NOT_DETECTED" not in entry
@@ -1571,6 +1611,7 @@ def test_registration_import_is_filesystem_inert():
 
     historical_before = inventory()
     assert historical_before
+    completed_before = result_tree_hashes()
 
     env = os.environ.copy()
     env["PYTHONDONTWRITEBYTECODE"] = "1"
@@ -1583,7 +1624,8 @@ def test_registration_import_is_filesystem_inert():
 
     assert {path: sha256(path) for path in tracked} == before
     assert inventory() == historical_before
-    assert not RESULT_ROOT.exists()
+    assert result_tree_hashes() == completed_before
+    assert RESULT_ROOT.is_dir()
 
 
 def test_stage1_stage1b_stage2_registrations_and_provenance_are_unchanged():
