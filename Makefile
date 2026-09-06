@@ -10,7 +10,7 @@
 	freeze-forward-2026 evaluate-forward-2026 research-missingness claims-lint docs-lint cell-provenance research-contamination \
 	test-root-portable thesis-baseline thesis-positive-control thesis-positive-control-replay \
 	thesis-stage1b thesis-stage1b-replay thesis-stage2 thesis-stage2-replay \
-	thesis-stage3 thesis-stage3-replay thesis-stage3-repeat-after-crash
+	thesis-stage3 thesis-stage3-replay thesis-stage3-repeat-after-crash thesis-stage3-r2-adjudication
 
 FINANCEIQ_API_URL ?= http://127.0.0.1:8000
 RESEARCH_MANIFEST ?= $(shell ls -1t experiments/results/runs/*/manifest.json 2>/dev/null | head -n 1)
@@ -294,6 +294,14 @@ thesis-stage3-replay:
 # attempt provenance; it is never a scientific-parameter override.
 thesis-stage3-repeat-after-crash:
 	PYTHONPATH=. python experiments/thesis/defect_injection.py --repeat-after-crash
+
+# Stage 3 R2 accounting-only adjudicator. Inert without --adjudicate: it reads
+# only the frozen attempt-1 evidence, performs no scientific computation, and
+# writes only the two registered artifacts under
+# experiments/results_thesis/defect_injection_r2_adjudication/. It is NOT run by
+# this implementation task and authorizes no second governed draw.
+thesis-stage3-r2-adjudication:
+	PYTHONPATH=. python experiments/thesis/stage3_r2_adjudication.py --adjudicate
 
 # Fetch/cache year-end TRY-per-USD quotes for the parallel return-basis audit.
 fetch-usdtry:

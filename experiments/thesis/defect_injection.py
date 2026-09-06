@@ -1445,6 +1445,34 @@ def _load_attempt_records(root: Path) -> list[tuple[Path, dict[str, object]]]:
     return records
 
 
+def _durably_complete_attempt_exists(root: Path) -> bool:
+    """True if any attempt record durably records ``status == "complete"``.
+
+    Completion is a durability fact about the run lifecycle. It is deliberately
+    independent of the scientific/integrity verdict: a complete-but-INCONCLUSIVE
+    attempt is still complete. This scan is lenient (it never raises) so it can
+    gate destructive recovery paths even when a record is otherwise unreadable.
+    """
+    attempts_dir = root / ATTEMPTS_DIRNAME
+    if not attempts_dir.is_dir() or attempts_dir.is_symlink():
+        return False
+    for path in sorted(attempts_dir.glob("attempt-*.json")):
+        if path.is_symlink():
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if (
+            isinstance(payload, dict)
+            and payload.get("governance_class") == "operational_attempt_provenance"
+            and payload.get("experiment") == SLUG
+            and payload.get("status") == "complete"
+        ):
+            return True
+    return False
+
+
 def _is_complete_run(root: Path) -> bool:
     manifest = root / MANIFEST_FILENAME
     if not root.is_dir() or not manifest.is_file() or manifest.is_symlink():
@@ -1456,11 +1484,13 @@ def _is_complete_run(root: Path) -> bool:
         return False
     direct = {path.name for path in root.iterdir() if path.is_file()}
     expected = set(EMITTED_FILENAMES) | {MANIFEST_FILENAME}
+    # Completion/durability only. The integrity verdict (``integrity_passed``) is
+    # recorded but is NOT a completion criterion: a complete-but-INCONCLUSIVE run
+    # is a complete run and its scientific artifacts are durable evidence.
     return bool(
         payload.get("experiment") == SLUG
         and payload.get("completion_status") == "complete"
         and payload.get("completion_authority") == MANIFEST_FILENAME
-        and payload.get("integrity_passed") is True
         and payload.get("registered_configuration_sha256") == registered_configuration_digest()
         and direct == expected
         and not (root / STAGING_DIRNAME).exists()
@@ -1471,6 +1501,10 @@ def _is_complete_run(root: Path) -> bool:
 def _cleanup_incomplete_root(root: Path) -> None:
     if not root.is_dir() or root.is_symlink():
         raise Stage3Error("incomplete Stage 3 root is not a safe directory")
+    if _durably_complete_attempt_exists(root):
+        raise Stage3Error(
+            "refusing to unlink Stage 3 scientific artifacts: a complete attempt record exists"
+        )
     _load_attempt_records(root)
     allowed_direct = set(SCIENTIFIC_EMITTED_FILENAMES) | {MANIFEST_FILENAME}
     for child in sorted(root.iterdir()):
@@ -1495,9 +1529,15 @@ def _prepare_attempt(*, repeat_after_crash: bool) -> tuple[Path, Path, dict[str,
         raise Stage3Error("Stage 3 result root is not a safe directory")
     if not repeat_after_crash:
         if root.exists() and any(root.iterdir()):
-            if _is_complete_run(root):
-                raise Stage3Error("a complete Stage 3 run already exists; --run refuses overwrite")
-            raise Stage3Error("a pre-existing non-empty Stage 3 result root exists; use --repeat-after-crash")
+            if _is_complete_run(root) or _durably_complete_attempt_exists(root):
+                # A complete run's artifacts are durable evidence. Do not steer
+                # the operator toward --repeat-after-crash for a complete run.
+                raise Stage3Error(
+                    "a complete Stage 3 run already exists; overwrite is refused"
+                )
+            raise Stage3Error(
+                "a pre-existing incomplete Stage 3 result root exists; use --repeat-after-crash"
+            )
         root.mkdir(parents=True, exist_ok=True)
         record = _new_attempt_record(1, "initial", False)
         marker = _attempt_path(root, 1)
@@ -1505,8 +1545,10 @@ def _prepare_attempt(*, repeat_after_crash: bool) -> tuple[Path, Path, dict[str,
         return root, marker, record, 1
     if not root.is_dir() or not any(root.iterdir()):
         raise Stage3Error("--repeat-after-crash requires a non-empty incomplete Stage 3 root")
-    if _is_complete_run(root):
-        raise Stage3Error("--repeat-after-crash refuses a complete Stage 3 run")
+    if _is_complete_run(root) or _durably_complete_attempt_exists(root):
+        raise Stage3Error(
+            "--repeat-after-crash refuses a result root with a complete attempt record"
+        )
     records = _load_attempt_records(root)
     _cleanup_incomplete_root(root)
     number = max(int(record["attempt_number"]) for _, record in records) + 1
@@ -1694,8 +1736,14 @@ def _integrity_result(
         and result.get("injected_guard_evaluation", {}).get("cleanup_proven") is True
         for result in results
     )
+    # Forward clean-fingerprint predicate (registered in stage3_r2_amendment as
+    # FORWARD_RUNNER_PREDICATE): one fingerprint per registered defect, all
+    # identical, and no clean comparator emitted a detection signal. The earlier
+    # ``len(x) == len(set(x)) == 1`` chained comparison was unsatisfiable for the
+    # five-defect family (``5 == 1`` is always False).
     conditions["clean_comparator_byte_and_logical_identity"] = (
-        len(clean_fingerprints) == len(set(clean_fingerprints)) == 1
+        len(clean_fingerprints) == reg.DEFECT_FAMILY_SIZE
+        and len(set(clean_fingerprints)) == 1
         and all(not result.get("clean_comparator", {}).get("detection_signals") for result in results)
     )
     conditions["expected_guard_mapping_evaluated_exactly_once"] = all(
@@ -1725,6 +1773,9 @@ def _integrity_result(
         "passed": not failures,
         "conditions": conditions,
         "failures": failures,
+        # Persist the per-defect clean fingerprints so the forward predicate's
+        # equality is retrospectively auditable in any future Stage 3 report.
+        "clean_fingerprints": list(clean_fingerprints),
     }
 
 
@@ -1740,7 +1791,8 @@ def execute_registered_matrix(*, progress: bool = False) -> dict[str, object]:
         source_before = _sha256_path(DATASET_PATH)
         source_hashes.append(source_before)
         clean = load_clean_frame()
-        clean_fingerprints.append(_frame_fingerprint(clean))
+        clean_fingerprint = _frame_fingerprint(clean)
+        clean_fingerprints.append(clean_fingerprint)
         injected = inject_defect(clean, defect_name)
         if progress:
             print(f"[stage3] evaluating {reg.DEFECT_IDS[defect_name]} {defect_name}")
@@ -1749,6 +1801,9 @@ def execute_registered_matrix(*, progress: bool = False) -> dict[str, object]:
         source_hashes.append(source_after)
         result["source_sha256_before"] = source_before
         result["source_sha256_after"] = source_after
+        # Persist each per-defect clean fingerprint so five-identical equality is
+        # retrospectively auditable (forward-only; not exercised by R2 attempt-1).
+        result["clean_fingerprint"] = clean_fingerprint
         if source_before != reg.DATASET_SHA256 or source_after != reg.DATASET_SHA256:
             result["status"] = reg.INCONCLUSIVE
             result.setdefault("failure_reasons", []).append("source SHA changed")

@@ -1742,3 +1742,42 @@ registered scope.
 - The separate R2 result root registered in `artifact_registry.json` is
   prospective only and absent, with exactly two registered artifact contracts.
   Stage 7 remains **BLOCKED**; R2 registration does not unlock it.
+
+### FINANCEIQ-THESIS-STAGE3-R2-INTEGRITY-ACCOUNTING (2026-09-06; append-only)
+
+- Amendment `FINANCEIQ-THESIS-STAGE3-R2-INTEGRITY-ACCOUNTING` is now
+  **R2 IMPLEMENTED / NOT ADJUDICATED**. No adjudication was executed; the
+  separate R2 result root registered in `artifact_registry.json` remains
+  **absent**.
+- `experiments/thesis/stage3_r2_adjudication.py` is a read-only,
+  **inert-by-default** adjudicator: import or bare CLI emits no artifact, creates
+  no result root, and performs no scientific computation. Only the explicit
+  `--adjudicate` path (Makefile `thesis-stage3-r2-adjudication`) runs, and only
+  after hard-verifying all five frozen attempt-1 SHA256 values and the registered
+  R2 contract. It evaluates A0–A3 over the frozen attempt-1 evidence only, labels
+  A3 evidence **DERIVED** (never observed fingerprint equality), carries the
+  other sixteen frozen integrity conditions and every frozen per-defect status
+  and `detected_by` value unchanged, reapplies the existing Stage 3 decision
+  rule, excludes expectation-match from the evidence chain, and writes only
+  `stage3_r2_adjudication.json` and `stage3_r2_adjudication.md`. It never loads
+  the dataset, reconstructs `_frame_fingerprint`, reinjects a defect, evaluates a
+  guard, fits Ridge, or recomputes an IC; there is no attempts directory or
+  scientific-run manifest.
+- Recovery repair implemented in `experiments/thesis/defect_injection.py`:
+  run completion now derives from durable completion state, not the
+  integrity verdict, so a **complete-but-`INCONCLUSIVE`** attempt is complete;
+  `--repeat-after-crash` and the incomplete-root cleanup primitive both refuse
+  whenever any attempt record has `status == "complete"` (proven byte-for-byte
+  against a complete-but-`INCONCLUSIVE` fixture); and a normal `--run` against a
+  completed result root refuses overwrite without directing the operator toward
+  `--repeat-after-crash`.
+- Forward clean-fingerprint predicate corrected to
+  `len(clean_fingerprints) == DEFECT_FAMILY_SIZE and
+  len(set(clean_fingerprints)) == 1 and all clean detection signals empty`, using
+  the registered `DEFECT_FAMILY_SIZE` constant; any future Stage 3 run now
+  persists each per-defect clean fingerprint so equality is retrospectively
+  auditable. This authorizes no future draw and was not executed scientifically.
+- The original attempt-1 decision is **INCONCLUSIVE**. A second Stage 3 governed
+  draw is forbidden. `--repeat-after-crash` against attempt-1 is forbidden.
+  No R2 result has been produced. Stage 7 remains **BLOCKED**. No readjudicated
+  decision is claimed.
