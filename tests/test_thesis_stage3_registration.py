@@ -1290,6 +1290,7 @@ def test_completed_result_root_and_historical_registration_absence_are_preserved
         in compact(registration_doc)
     )
     assert sorted(REPO_ROOT.glob("experiments/thesis/stage3_*.py")) == [
+        REPO_ROOT / "experiments/thesis/stage3_r2_adjudication.py",
         REPO_ROOT / "experiments/thesis/stage3_r2_amendment.py",
         REGISTRATION_SOURCE,
     ]

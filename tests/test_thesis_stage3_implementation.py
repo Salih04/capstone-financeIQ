@@ -8,7 +8,9 @@ attempt-1 result namespace is treated as immutable post-run evidence.
 
 from __future__ import annotations
 
+import hashlib
 import json
+import shutil
 from pathlib import Path
 
 import pandas as pd
@@ -408,4 +410,191 @@ def test_crash_recovery_only_cleans_known_private_namespace(tmp_path, monkeypatc
 
 
 def test_completed_result_root_remains_unchanged_after_ordinary_implementation_tests():
+    _assert_completed_result_namespace()
+
+
+# --------------------------------------------------------------------------- #
+# Recovery repair: completion/durability is separate from the integrity verdict
+# --------------------------------------------------------------------------- #
+def _hash_tree(root: Path) -> dict[str, str]:
+    digests: dict[str, str] = {}
+    for path in sorted(root.rglob("*")):
+        if path.is_file():
+            digests[path.relative_to(root).as_posix()] = hashlib.sha256(
+                path.read_bytes()
+            ).hexdigest()
+    return digests
+
+
+@pytest.fixture
+def complete_but_inconclusive_root(tmp_path, monkeypatch) -> Path:
+    """A byte-for-byte copy of the frozen complete-but-INCONCLUSIVE attempt-1."""
+    destination = tmp_path / "defect_injection"
+    shutil.copytree(stage3.REGISTERED_RESULT_ROOT, destination)
+    manifest = json.loads((destination / stage3.MANIFEST_FILENAME).read_text("utf-8"))
+    assert manifest["completion_status"] == "complete"
+    assert manifest["integrity_passed"] is False
+    assert manifest["decision"] == reg.INCONCLUSIVE
+    monkeypatch.setattr(stage3, "RESULT_ROOT", destination)
+    return destination
+
+
+def test_complete_but_inconclusive_run_is_classified_complete(complete_but_inconclusive_root):
+    root = complete_but_inconclusive_root
+    assert stage3._is_complete_run(root) is True
+    assert stage3._durably_complete_attempt_exists(root) is True
+
+
+def test_repeat_after_crash_refuses_a_complete_but_inconclusive_run_byte_for_byte(
+    complete_but_inconclusive_root,
+):
+    root = complete_but_inconclusive_root
+    before = _hash_tree(root)
+    with pytest.raises(stage3.Stage3Error):
+        stage3._prepare_attempt(repeat_after_crash=True)
+    assert _hash_tree(root) == before
+    for name in stage3.SCIENTIFIC_EMITTED_FILENAMES:
+        assert (root / name).is_file()
+
+
+def test_cleanup_primitive_refuses_when_a_complete_attempt_exists(
+    complete_but_inconclusive_root,
+):
+    root = complete_but_inconclusive_root
+    before = _hash_tree(root)
+    with pytest.raises(stage3.Stage3Error, match="complete attempt record"):
+        stage3._cleanup_incomplete_root(root)
+    assert _hash_tree(root) == before
+
+
+def test_normal_run_against_a_complete_root_does_not_steer_to_repeat_after_crash(
+    complete_but_inconclusive_root,
+):
+    with pytest.raises(stage3.Stage3Error) as excinfo:
+        stage3._prepare_attempt(repeat_after_crash=False)
+    message = str(excinfo.value)
+    assert "complete Stage 3 run already exists" in message
+    assert "overwrite is refused" in message
+    assert "repeat-after-crash" not in message
+
+
+def test_incomplete_root_recovery_still_works_and_survives_the_repair(tmp_path, monkeypatch):
+    root = tmp_path / "defect_injection"
+    monkeypatch.setattr(stage3, "RESULT_ROOT", root)
+    stage3._prepare_attempt(repeat_after_crash=False)
+    marker = root / stage3.ATTEMPTS_DIRNAME / "attempt-1.json"
+    record = json.loads(marker.read_text("utf-8"))
+    (root / stage3.REPORT_JSON_FILENAME).write_text("{}\n", encoding="utf-8")
+    stage3._set_attempt_status(marker, record, "incomplete")
+
+    recovered_root, _, recovered, number = stage3._prepare_attempt(repeat_after_crash=True)
+    assert recovered_root == root
+    assert number == 2
+    assert recovered["attempt_type"] == "crash_recovery"
+    assert not (root / stage3.REPORT_JSON_FILENAME).exists()
+
+
+# --------------------------------------------------------------------------- #
+# Forward clean-fingerprint predicate + per-defect fingerprint persistence
+# --------------------------------------------------------------------------- #
+def _integrity_conditions_for(fingerprints, *, clean_signals=None):
+    clean_signals = clean_signals or [[] for _ in reg.DEFECT_FAMILY]
+    results = [
+        {
+            "defect_id": 4000 + index,
+            "defect_name": name,
+            "status": reg.NOT_DETECTED,
+            "secondary_ic": None,
+            "failure_reasons": [],
+            "containment_passed": True,
+            "clean_comparator": {
+                "detection_signals": clean_signals[index],
+                "cleanup_proven": True,
+                "invocation_accounting_passed": True,
+            },
+            "injected_guard_evaluation": {
+                "cleanup_proven": True,
+                "invocation_accounting_passed": True,
+            },
+        }
+        for index, name in enumerate(reg.DEFECT_FAMILY)
+    ]
+    return stage3._integrity_result(
+        before_protected={},
+        after_protected={},
+        before_modules={},
+        after_modules={},
+        results=results,
+        source_hashes=[reg.DATASET_SHA256],
+        clean_fingerprints=fingerprints,
+    )
+
+
+def test_forward_fingerprint_predicate_can_pass_for_five_identical_fingerprints():
+    result = _integrity_conditions_for(["fp"] * reg.DEFECT_FAMILY_SIZE)
+    assert result["conditions"]["clean_comparator_byte_and_logical_identity"] is True
+    assert result["clean_fingerprints"] == ["fp"] * reg.DEFECT_FAMILY_SIZE
+
+
+def test_forward_fingerprint_predicate_fails_for_differing_fingerprints():
+    differing = ["fp", "fp", "other", "fp", "fp"]
+    result = _integrity_conditions_for(differing)
+    assert result["conditions"]["clean_comparator_byte_and_logical_identity"] is False
+
+
+def test_forward_fingerprint_predicate_fails_on_wrong_cardinality_or_clean_signal():
+    assert (
+        _integrity_conditions_for(["fp"])["conditions"][
+            "clean_comparator_byte_and_logical_identity"
+        ]
+        is False
+    )
+    signals = [[], [], [{"surface": "GS_X"}], [], []]
+    assert (
+        _integrity_conditions_for(["fp"] * 5, clean_signals=signals)["conditions"][
+            "clean_comparator_byte_and_logical_identity"
+        ]
+        is False
+    )
+
+
+def test_per_defect_clean_fingerprint_is_persisted_in_matrix_accounting(clean_frame, monkeypatch):
+    """execute_registered_matrix attaches each per-defect clean fingerprint.
+
+    Guard evaluation is stubbed so this stays a private in-memory accounting
+    check and never touches a governed result root.
+    """
+    monkeypatch.setattr(
+        stage3,
+        "evaluate_defect",
+        lambda name, clean, injected: {
+            "defect_id": int(reg.DEFECT_IDS[name]),
+            "defect_name": name,
+            "status": reg.NOT_DETECTED,
+            "detected_by": [],
+            "clean_comparator": {
+                "detection_signals": [],
+                "cleanup_proven": True,
+                "containment_passed": True,
+                "invocation_accounting_passed": True,
+            },
+            "injected_guard_evaluation": {
+                "detection_signals": [],
+                "cleanup_proven": True,
+                "containment_passed": True,
+                "invocation_accounting_passed": True,
+            },
+            "mechanism_invariants": {"passed": True, "checks": {"source_shape_clean": True}},
+            "secondary_ic": None,
+            "secondary_ic_computed": False,
+            "containment_passed": True,
+            "failure_reasons": [],
+        },
+    )
+    matrix = stage3.execute_registered_matrix(progress=False)
+    fingerprints = [record["clean_fingerprint"] for record in matrix["defects"]]
+    assert len(fingerprints) == reg.DEFECT_FAMILY_SIZE
+    assert len(set(fingerprints)) == 1
+    assert matrix["integrity"]["clean_fingerprints"] == fingerprints
+    assert not stage3.RESULT_ROOT.exists() or stage3.RESULT_ROOT.is_dir()
     _assert_completed_result_namespace()

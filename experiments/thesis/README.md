@@ -5,8 +5,9 @@ run; Stage 1b (`positive_control_calibration`) is registered, implemented, and
 has completed its one governed run; Stage 2 (`negative_control`) is implemented
 and has completed its one governed run; Stage 3 (`defect_injection`) is
 registered, implemented, and has completed exactly one governed first draw with
-an authoritative **INCONCLUSIVE** decision; Stage 3 R2 is registered, not
-implemented, and not adjudicated; the remaining two slugs are still
+an authoritative **INCONCLUSIVE** decision; the Stage 3 R2 accounting-only
+remediation is registered and its read-only adjudicator is implemented but **NOT
+ADJUDICATED** (no R2 result exists); the remaining two slugs are still
 placeholders.** This directory holds the shared provenance helpers, the
 implemented stages, and the rules below.
 
@@ -160,24 +161,55 @@ second governed draw is forbidden, and `--repeat-after-crash` is forbidden
 pending remediation. R2 accounting-only remediation is **REGISTERED / NOT
 IMPLEMENTED / NOT ADJUDICATED** in
 [`STAGE_3_R2_AMENDMENT.md`](../../docs/thesis/STAGE_3_R2_AMENDMENT.md), using
-Option A's derived-evidence contract; no R2 result is claimed. Stage 7 remains blocked under its
+Option A's derived-evidence contract; no R2 result is claimed. The read-only
+adjudicator module `stage3_r2_adjudication.py` and its
+`make thesis-stage3-r2-adjudication` target are now in place, inert by default,
+and have not been run: the R2 result root is still absent and attempt-1's
+`INCONCLUSIVE` decision is unchanged. Stage 7 remains blocked under its
 existing wording. This implementation establishes no predictive or investment
 claim; it remains research support only, not investment advice.
 
-## Stage 3 R2 — accounting-only amendment registered
+## Stage 3 R2 — accounting-only amendment: R2 IMPLEMENTED / NOT ADJUDICATED
 
 The [R2 amendment](../../docs/thesis/STAGE_3_R2_AMENDMENT.md) is a prospective,
-inert registration for the existing frozen attempt-1. It is **REGISTERED / NOT
-IMPLEMENTED / NOT ADJUDICATED**. The original attempt-1 decision remains
-`INCONCLUSIVE`; no `readjudicated_decision` value is preregistered. The R2
-predicate has four clauses (A0 cardinality, A1 pinned clean-source evidence, A2
-zero clean detection signals, and A3 derived clean logical identity). A3 is
-explicitly **DERIVED**, not `OBSERVED_FINGERPRINT_EQUALITY`, because attempt-1
-did not persist fingerprint values.
+inert registration for the existing frozen attempt-1. The original attempt-1
+decision remains `INCONCLUSIVE`; no `readjudicated_decision` value is
+preregistered. The R2 predicate has four clauses (A0 cardinality, A1 pinned
+clean-source evidence, A2 zero clean detection signals, and A3 derived clean
+logical identity). A3 is explicitly **DERIVED**, not
+`OBSERVED_FINGERPRINT_EQUALITY`, because attempt-1 did not persist fingerprint
+values.
 
-The separate R2 result root and its two prospective artifacts are absent. No
-second Stage 3 draw and no repeat-after-crash execution is authorized. The known
-recovery repair is registered but not implemented. Stage 7 remains blocked.
+`experiments/thesis/stage3_r2_adjudication.py` is the read-only adjudicator. It
+is **inert by default**: importing it or running it with no arguments performs
+no scientific computation, creates no result root, and writes no artifact. Only
+the explicit `--adjudicate` path (via `make thesis-stage3-r2-adjudication`)
+hard-verifies the five frozen attempt-1 hashes and the registered R2 contract,
+evaluates A0–A3 over the frozen evidence only, labels A3 evidence **DERIVED**,
+carries the other sixteen frozen integrity conditions and every frozen per-defect
+status unchanged, reapplies the existing Stage 3 decision rule, and writes only
+`stage3_r2_adjudication.json` and `stage3_r2_adjudication.md`. It never loads the
+dataset, reconstructs a fingerprint, reinjects a defect, re-evaluates a guard,
+fits a model, or recomputes an IC, and it excludes expectation-match from the
+evidence chain.
+
+**State: R2 IMPLEMENTED / NOT ADJUDICATED.** The adjudicator has not been run.
+The separate R2 result root and its two prospective artifacts are absent. The
+original attempt-1 decision is `INCONCLUSIVE`, a second Stage 3 governed draw is
+forbidden, `--repeat-after-crash` against attempt-1 is forbidden, no R2 result
+has been produced, and Stage 7 remains **BLOCKED**.
+
+The known recovery repair is now implemented in `defect_injection.py`: run
+completion is derived from durable completion state rather than the integrity
+verdict, so a complete-but-`INCONCLUSIVE` attempt is complete;
+`--repeat-after-crash` and the incomplete-root cleanup primitive both refuse
+whenever any attempt record has `status == "complete"`; and a normal `--run`
+against a completed result root refuses overwrite without directing the operator
+toward `--repeat-after-crash`. The forward clean-fingerprint predicate in the
+integrity accounting is corrected to `len(clean_fingerprints) ==
+DEFECT_FAMILY_SIZE and len(set(clean_fingerprints)) == 1 and all(clean detection
+signals empty)`, and any future run persists each per-defect clean fingerprint.
+These repairs authorize no new draw and were not executed scientifically.
 
 ## Output isolation
 
