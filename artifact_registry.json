@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "task": "R3-REL-01",
   "purpose": "Ownership and regeneration provenance for the generated artifacts under the governed roots. Each entry records which existing Makefile command regenerates a file (or class of files) and whether the file may be hand-edited. This registry records ownership and regeneration provenance only; it does not certify statistical validity, methodology, or predictive value, and asserts no investment merit. The no-reliable-predictive-edge conclusion and the research-support-only boundary are unchanged.",
-  "curation": "Hand-curated and reviewed input, like model_confidence_contract.json. NOT a generated file. Every generator_command below cites an existing Makefile target confirmed against the writer in scripts/ or experiments/ (writers were read, not inferred from filenames). Regenerate artifacts only through their owning command; never hand-edit a generated file.",
+  "curation": "Hand-curated and reviewed input, like model_confidence_contract.json. NOT a generated file. Every generator_command in entries[] cites an existing Makefile target confirmed against the writer in scripts/ or experiments/ (writers were read, not inferred from filenames). Prospective contracts may name the future target that must be wired before execution. Regenerate artifacts only through their owning command; never hand-edit a generated file.",
   "governed_roots": [
     "experiments/results",
     "experiments/results_contamination",
@@ -21,12 +21,13 @@
     "experiments/results_thesis/positive_control_calibration",
     "experiments/results_thesis/negative_control",
     "experiments/results_thesis/defect_injection",
+    "experiments/results_thesis/defect_injection_r2_adjudication",
     "data/trusted_clean",
     "data/provenance",
     "docs/thesis/baseline"
   ],
   "coverage_rule": "Every file under a governed root, excluding experiments/results/runs/**, must be matched by exactly one entry below. An unmatched file (orphan) or a file matched by more than one entry (duplicate ownership) is a governance failure enforced by tests/test_artifact_registry.py.",
-  "prospective_entry_rule": "prospective_entries[] carries the frozen ownership contract for governed outputs whose registration requires ownership to be fixed before the run that creates them (docs/thesis/STAGE_1B_REGISTRATION.md, docs/thesis/STAGE_2_REGISTRATION.md, and docs/thesis/STAGE_3_REGISTRATION.md). Each item has the same shape as an entries[] item and the same 'make <target>' generator_command rule, but is not yet subject to coverage_rule because its files do not exist yet and every entries[] entry must match at least one real file. When the governed run creates the files, that run's commit moves these items verbatim into entries[] and removes them from here; nothing about an item may change during that move.",
+  "prospective_entry_rule": "prospective_entries[] carries the frozen ownership contract for governed outputs whose registration requires ownership to be fixed before the run that creates them (docs/thesis/STAGE_1B_REGISTRATION.md, docs/thesis/STAGE_2_REGISTRATION.md, docs/thesis/STAGE_3_REGISTRATION.md, and docs/thesis/STAGE_3_R2_AMENDMENT.md). Each item has the same shape as an entries[] item and a 'make <target>' generator_command; for a registration-only future implementation, the named target may not exist yet and must be wired before execution. Prospective files are not yet subject to coverage_rule because they do not exist and every entries[] entry must match at least one real file. When the governed run creates the files, that run's commit moves these items verbatim into entries[] and removes them from here; nothing about an item may change during that move.",
   "coverage_exclusions": [
     {
       "glob": "experiments/results/runs/**",
@@ -55,7 +56,36 @@
     ]
   },
   "reproducibility_note": "Regeneration reproduces content in an environment-qualified sense only: byte identity requires matching Python, platform, and numerical-package versions (see METHODOLOGY 'Reproducibility and run provenance'). This registry does not claim universal byte reproducibility.",
-  "prospective_entries": [],
+  "prospective_entries": [
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection_r2_adjudication/stage3_r2_adjudication.json",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage3-r2-adjudication",
+      "inputs": [
+        "experiments/results_thesis/defect_injection/artifact_manifest.json",
+        "experiments/results_thesis/defect_injection/attempts/attempt-1.json",
+        "experiments/results_thesis/defect_injection/defect_injection_report.json",
+        "experiments/results_thesis/defect_injection/defect_injection_report.md",
+        "experiments/results_thesis/defect_injection/defect_results.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Future authoritative Stage 3 R2 accounting-only adjudication record. It may read only the existing frozen attempt-1 evidence and must fail closed on any registered mismatch; the future adjudicator and Makefile target are not implemented by the registration task. No dataset loading, scientific recomputation, second draw, or readjudicated decision value is created here."
+    },
+    {
+      "path_or_glob": "experiments/results_thesis/defect_injection_r2_adjudication/stage3_r2_adjudication.md",
+      "artifact_class": "generated",
+      "generator_command": "make thesis-stage3-r2-adjudication",
+      "inputs": [
+        "experiments/results_thesis/defect_injection/artifact_manifest.json",
+        "experiments/results_thesis/defect_injection/attempts/attempt-1.json",
+        "experiments/results_thesis/defect_injection/defect_injection_report.json",
+        "experiments/results_thesis/defect_injection/defect_injection_report.md",
+        "experiments/results_thesis/defect_injection/defect_results.csv"
+      ],
+      "hand_edit_forbidden": true,
+      "notes": "Future human-readable rendering of the same Stage 3 R2 accounting-only adjudication record. It is prospective only; no R2 root, attempt directory, scientific-run manifest, adjudication, or new observation exists at registration time."
+    }
+  ],
   "entries": [
     {
       "path_or_glob": "experiments/results_thesis/positive_control/positive_control_report.json",

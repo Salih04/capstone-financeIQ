@@ -245,24 +245,39 @@ def test_protected_results_roots_are_refused(monkeypatch):
 def test_every_governed_results_root_is_protected():
     """The registry's governed roots under experiments/ must all be refused.
 
-    A thesis experiment's OWN output root is the single exception: that is where
-    the experiment writes, so it cannot also be refused. The exception set is
-    derived from the declared slugs rather than hardcoded, so registering a
-    second governed thesis root (Stage 1b) cannot silently exempt an unrelated
-    root, and a governed thesis root with no declared slug fails here.
+    A thesis experiment's OWN output root is the exception: that is where the
+    experiment writes, so it cannot also be refused. A prospective governed
+    root is a second lifecycle exception until its future runner is wired; its
+    prospective ownership contract must still be explicit. The exception sets
+    are derived from declared slugs and prospective contracts rather than
+    hardcoded.
     """
     registry = json.loads((REPO_ROOT / "artifact_registry.json").read_text(encoding="utf-8"))
     thesis_owned = {f"experiments/results_thesis/{slug}" for slug in prov.EXPERIMENT_SLUGS}
+    prospective_thesis = {
+        root
+        for root in registry["governed_roots"]
+        if root.startswith("experiments/results_thesis/")
+        and root not in thesis_owned
+        and any(
+            entry["path_or_glob"].startswith(root + "/")
+            for entry in registry.get("prospective_entries", [])
+        )
+    }
     governed = [
         root
         for root in registry["governed_roots"]
-        if root.startswith("experiments/") and root not in thesis_owned
+        if root.startswith("experiments/")
+        and root not in thesis_owned
+        and root not in prospective_thesis
     ]
     missing = sorted(set(governed) - set(prov.PROTECTED_RESULTS_ROOTS))
     assert missing == [], f"governed roots not protected from thesis writes: {missing}"
     for root in registry["governed_roots"]:
         if root.startswith("experiments/results_thesis/"):
-            assert root in thesis_owned, f"governed thesis root has no declared slug: {root}"
+            assert root in thesis_owned or root in prospective_thesis, (
+                f"governed thesis root has no declared slug or prospective contract: {root}"
+            )
             assert root not in prov.PROTECTED_RESULTS_ROOTS
 
 

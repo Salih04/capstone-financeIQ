@@ -5,7 +5,8 @@ run; Stage 1b (`positive_control_calibration`) is registered, implemented, and
 has completed its one governed run; Stage 2 (`negative_control`) is implemented
 and has completed its one governed run; Stage 3 (`defect_injection`) is
 registered, implemented, and has completed exactly one governed first draw with
-an authoritative **INCONCLUSIVE** decision; the remaining two slugs are still
+an authoritative **INCONCLUSIVE** decision; Stage 3 R2 is registered, not
+implemented, and not adjudicated; the remaining two slugs are still
 placeholders.** This directory holds the shared provenance helpers, the
 implemented stages, and the rules below.
 
@@ -156,10 +157,27 @@ guard map and all five injections remain unchanged, and no guard is repaired.
 `make thesis-stage3-repeat-after-crash` is the identical-configuration recovery
 path. Ordinary imports and implementation tests do not call these targets. The
 second governed draw is forbidden, and `--repeat-after-crash` is forbidden
-pending remediation. R2 accounting-only remediation is planned but **NOT YET
-REGISTERED**; no R2 result is claimed. Stage 7 remains blocked under its
+pending remediation. R2 accounting-only remediation is **REGISTERED / NOT
+IMPLEMENTED / NOT ADJUDICATED** in
+[`STAGE_3_R2_AMENDMENT.md`](../../docs/thesis/STAGE_3_R2_AMENDMENT.md), using
+Option A's derived-evidence contract; no R2 result is claimed. Stage 7 remains blocked under its
 existing wording. This implementation establishes no predictive or investment
 claim; it remains research support only, not investment advice.
+
+## Stage 3 R2 — accounting-only amendment registered
+
+The [R2 amendment](../../docs/thesis/STAGE_3_R2_AMENDMENT.md) is a prospective,
+inert registration for the existing frozen attempt-1. It is **REGISTERED / NOT
+IMPLEMENTED / NOT ADJUDICATED**. The original attempt-1 decision remains
+`INCONCLUSIVE`; no `readjudicated_decision` value is preregistered. The R2
+predicate has four clauses (A0 cardinality, A1 pinned clean-source evidence, A2
+zero clean detection signals, and A3 derived clean logical identity). A3 is
+explicitly **DERIVED**, not `OBSERVED_FINGERPRINT_EQUALITY`, because attempt-1
+did not persist fingerprint values.
+
+The separate R2 result root and its two prospective artifacts are absent. No
+second Stage 3 draw and no repeat-after-crash execution is authorized. The known
+recovery repair is registered but not implemented. Stage 7 remains blocked.
 
 ## Output isolation
 
@@ -231,6 +249,10 @@ entry. Consequently:
   contracts were fixed in `prospective_entries[]` before the first draw. The
   completed attempt-1 moved those contracts verbatim into `entries[]`; no
   Stage 3 contract remains prospective, and the result namespace is frozen.
+- Stage 3 R2's separate result root is in `governed_roots` with exactly two
+  prospective generated-artifact contracts. The root is intentionally absent;
+  the future adjudicator and its Makefile target are not implemented by the
+  registration task.
 - The remaining two placeholder slugs (`informativeness`, `monthly_panel`) have
   no registry entry of either kind, as the `proposed_future` class prescribes.
 - When one of them is implemented, that task adds its output root to
