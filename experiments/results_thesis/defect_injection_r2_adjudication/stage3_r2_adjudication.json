@@ -1,0 +1,258 @@
+{
+  "a3_evidence_label": "DERIVED",
+  "a3_is_derived_not_observed": true,
+  "amendment_date": "2026-09-06",
+  "amendment_id": "FINANCEIQ-THESIS-STAGE3-R2-INTEGRITY-ACCOUNTING",
+  "attempt1_fingerprint_values_persisted": false,
+  "claim_boundary": [
+    "R2 is accounting-only and retrospective over existing frozen attempt-1 evidence.",
+    "R2 establishes no new scientific observation.",
+    "R2 establishes no predictive edge, alpha, investment value, or production readiness.",
+    "Research support only; not investment advice."
+  ],
+  "expectation_match_consumed": false,
+  "frozen_attempt1_artifact_sha256": {
+    "experiments/results_thesis/defect_injection/artifact_manifest.json": "eeb25c9dd9cc0310679dc36470d3a7a913e8595de26649288e23d491db10ed4f",
+    "experiments/results_thesis/defect_injection/attempts/attempt-1.json": "657d1c777782ed41ec985073cfbf902b9398e56e63f1ae6b88b3fc8d8edb287e",
+    "experiments/results_thesis/defect_injection/defect_injection_report.json": "877f9367e768ce93c888bf0fec1dd5e7a9caa19369a9bfb5d47a818d2dd43a15",
+    "experiments/results_thesis/defect_injection/defect_injection_report.md": "d96be144a8ce7ccef37d2daee7a45179aa557002d4faa8262b947d0695109b7c",
+    "experiments/results_thesis/defect_injection/defect_results.csv": "bde017fa38af1f1446f1cada3c1d2973c5c5b797aa1bfefa2f6dc7dad113b852"
+  },
+  "generated_at_utc": "2026-09-07T13:00:53.741578Z",
+  "original_decision": "INCONCLUSIVE",
+  "original_decision_is_permanent": true,
+  "r2_option": "A",
+  "r2_predicate": {
+    "a3_evidence_label": "DERIVED",
+    "carried_frozen_integrity_condition_count": 16,
+    "carried_frozen_integrity_conditions": {
+      "correct_seed_schedule": true,
+      "deterministic_replay_contract": true,
+      "exactly_five_registered_defect_ids": true,
+      "expected_guard_mapping_evaluated_exactly_once": true,
+      "frozen_source_dataset_path_and_sha_match": true,
+      "injection_containment_restored_after_each_defect": true,
+      "no_defect_silently_omitted": true,
+      "no_duplicate_defect_ids_or_defect_names": true,
+      "no_forbidden_id_overlap": true,
+      "no_invalid_evaluation_converted_to_non_detection": true,
+      "no_source_module_mutation": true,
+      "no_trusted_data_or_config_mutation": true,
+      "registered_stage3_module_hashes_match": true,
+      "secondary_ic_only_on_undetected_defects": true,
+      "stage1_stage1b_stage2_result_roots_untouched": true,
+      "writes_confined_to_stage3_result_namespace": true
+    },
+    "carried_frozen_integrity_conditions_all_true": true,
+    "carried_frozen_integrity_conditions_recomputed": false,
+    "corrected_condition": "clean_comparator_byte_and_logical_identity",
+    "corrected_condition_evidence": "DERIVED",
+    "corrected_condition_value": true,
+    "expectation_match_consumed": false,
+    "expectation_match_excluded_from_evidence_chain": true,
+    "frozen_per_defect_detected_by": {
+      "4000": [],
+      "4001": [],
+      "4002": [
+        "GS_CELL_PROVENANCE_COLUMN_COVERAGE"
+      ],
+      "4003": [],
+      "4004": [
+        "GS_DUP_VALIDATE_ISSUE",
+        "GS_DUP_ALT_TARGETS",
+        "GS_CELL_PROVENANCE_DUP_KEY"
+      ]
+    },
+    "frozen_per_defect_detected_by_recomputed": false,
+    "frozen_per_defect_statuses": {
+      "4000": "NOT_DETECTED",
+      "4001": "NOT_DETECTED",
+      "4002": "DETECTED",
+      "4003": "NOT_DETECTED",
+      "4004": "DETECTED"
+    },
+    "frozen_per_defect_statuses_recomputed": false,
+    "original_decision": "INCONCLUSIVE",
+    "original_decision_is_permanent": true,
+    "predicate_clauses": [
+      {
+        "clause": "A0_CARDINALITY",
+        "defect_ids": [
+          4000,
+          4001,
+          4002,
+          4003,
+          4004
+        ],
+        "passed": true
+      },
+      {
+        "clause": "A1_PINNED_CLEAN_SOURCE_RE_READ",
+        "load_time_source_integrity_gates_completed": true,
+        "passed": true,
+        "per_defect": [
+          {
+            "defect_id": 4000,
+            "matches_registered_pin": true,
+            "source_sha256_after": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+            "source_sha256_before": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+          },
+          {
+            "defect_id": 4001,
+            "matches_registered_pin": true,
+            "source_sha256_after": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+            "source_sha256_before": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+          },
+          {
+            "defect_id": 4002,
+            "matches_registered_pin": true,
+            "source_sha256_after": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+            "source_sha256_before": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+          },
+          {
+            "defect_id": 4003,
+            "matches_registered_pin": true,
+            "source_sha256_after": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+            "source_sha256_before": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+          },
+          {
+            "defect_id": 4004,
+            "matches_registered_pin": true,
+            "source_sha256_after": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+            "source_sha256_before": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+          }
+        ]
+      },
+      {
+        "clause": "A2_ZERO_CLEAN_DETECTION_SIGNALS",
+        "passed": true,
+        "per_defect": [
+          {
+            "clean_detection_signals": [],
+            "defect_id": 4000,
+            "is_empty_list": true
+          },
+          {
+            "clean_detection_signals": [],
+            "defect_id": 4001,
+            "is_empty_list": true
+          },
+          {
+            "clean_detection_signals": [],
+            "defect_id": 4002,
+            "is_empty_list": true
+          },
+          {
+            "clean_detection_signals": [],
+            "defect_id": 4003,
+            "is_empty_list": true
+          },
+          {
+            "clean_detection_signals": [],
+            "defect_id": 4004,
+            "is_empty_list": true
+          }
+        ]
+      },
+      {
+        "attempt1_fingerprint_values_persisted": false,
+        "clause": "A3_DERIVED_CLEAN_LOGICAL_IDENTITY",
+        "evidence_label": "DERIVED",
+        "forbidden_observation_label": "OBSERVED_FINGERPRINT_EQUALITY",
+        "is_derived_not_observed": true,
+        "passed": true,
+        "per_defect": [
+          {
+            "defect_id": 4000,
+            "derived_logical_identity": true,
+            "evidence": {
+              "clean_comparator.cleanup_proven": true,
+              "clean_comparator.containment_passed": true,
+              "clean_comparator.invocation_accounting_passed": true,
+              "mechanism_invariants.checks.source_shape_clean": true,
+              "mechanism_invariants.passed": true,
+              "source_sha256_after": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+              "source_sha256_before": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+            }
+          },
+          {
+            "defect_id": 4001,
+            "derived_logical_identity": true,
+            "evidence": {
+              "clean_comparator.cleanup_proven": true,
+              "clean_comparator.containment_passed": true,
+              "clean_comparator.invocation_accounting_passed": true,
+              "mechanism_invariants.checks.source_shape_clean": true,
+              "mechanism_invariants.passed": true,
+              "source_sha256_after": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+              "source_sha256_before": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+            }
+          },
+          {
+            "defect_id": 4002,
+            "derived_logical_identity": true,
+            "evidence": {
+              "clean_comparator.cleanup_proven": true,
+              "clean_comparator.containment_passed": true,
+              "clean_comparator.invocation_accounting_passed": true,
+              "mechanism_invariants.checks.source_shape_clean": true,
+              "mechanism_invariants.passed": true,
+              "source_sha256_after": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+              "source_sha256_before": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+            }
+          },
+          {
+            "defect_id": 4003,
+            "derived_logical_identity": true,
+            "evidence": {
+              "clean_comparator.cleanup_proven": true,
+              "clean_comparator.containment_passed": true,
+              "clean_comparator.invocation_accounting_passed": true,
+              "mechanism_invariants.checks.source_shape_clean": true,
+              "mechanism_invariants.passed": true,
+              "source_sha256_after": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+              "source_sha256_before": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+            }
+          },
+          {
+            "defect_id": 4004,
+            "derived_logical_identity": true,
+            "evidence": {
+              "clean_comparator.cleanup_proven": true,
+              "clean_comparator.containment_passed": true,
+              "clean_comparator.invocation_accounting_passed": true,
+              "mechanism_invariants.checks.source_shape_clean": true,
+              "mechanism_invariants.passed": true,
+              "source_sha256_after": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+              "source_sha256_before": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78"
+            }
+          }
+        ]
+      }
+    ],
+    "predicate_passed": true,
+    "r2_integrity_passed": true,
+    "readjudicated_decision": "FAIL",
+    "readjudicated_decision_value_preregistered": false
+  },
+  "readjudicated_decision": "FAIL",
+  "readjudicated_decision_value_preregistered": false,
+  "registered_contract_verification": {
+    "dataset_path": "data/trusted_clean/modeling_dataset_training_2020_2025.csv",
+    "dataset_sha256": "3923888b548e6195b07e37b10efb38d0cd3e005a55070bc798139cda670eda78",
+    "frozen_integrity_condition_count": 17,
+    "registered_configuration_sha256": "4594521fde98c92a52400c9a02139c570b3d5241a2abfbd0d6006c213b51c677",
+    "registration_doc_sha256": "8153dfe0428faf902a01e83cd2d4c9b66a2c74da1a364dd76cea5f4682a2c621",
+    "registration_module_sha256": "839c6b8679b703508e0d50f36dde3a0de9861bf9706250138d75ab63f0549f1b"
+  },
+  "repeat_after_crash_authorized": false,
+  "result_root": "experiments/results_thesis/defect_injection_r2_adjudication",
+  "schema_version": "1.0.0",
+  "scientific_recomputation_performed": false,
+  "scope": "accounting-only retrospective re-adjudication",
+  "second_stage3_draw_authorized": false,
+  "sole_failed_integrity_condition": "clean_comparator_byte_and_logical_identity",
+  "source_root": "experiments/results_thesis/defect_injection",
+  "stage": "Stage 3 R2 - accounting-only retrospective re-adjudication",
+  "stage7_unlocked": false
+}
