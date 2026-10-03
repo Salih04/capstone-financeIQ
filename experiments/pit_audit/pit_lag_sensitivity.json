@@ -1,0 +1,653 @@
+{
+  "seed": 20261004,
+  "n_permutations": 10000,
+  "pit_safe_features": [
+    "price_adjclose_t",
+    "price_data_available",
+    "price_drawdown_from_3y_high_pct",
+    "price_history_years_available",
+    "price_momentum_1y_pct",
+    "price_momentum_2y_pct",
+    "price_vs_bist100_1y_pct",
+    "benchmark_same_year_return_pct",
+    "market_cap"
+  ],
+  "specs": {
+    "original": {
+      "n_features": 40,
+      "features": [
+        "benchmark_same_year_return_pct",
+        "current_assets",
+        "current_ratio",
+        "ebitda",
+        "ebitda_growth_pct",
+        "ebitda_margin",
+        "enterprise_value",
+        "equity",
+        "ev_ebitda",
+        "financial_debt_ratio",
+        "gross_margin",
+        "gross_profit",
+        "gross_profit_growth_pct",
+        "leverage_ratio",
+        "long_term_liabilities",
+        "market_cap",
+        "net_debt",
+        "net_debt_to_ebitda",
+        "net_income",
+        "net_income_growth_pct",
+        "net_margin",
+        "non_current_assets",
+        "operating_income",
+        "operating_income_growth_pct",
+        "pb_ratio",
+        "pe_ratio",
+        "price_adjclose_t",
+        "price_data_available",
+        "price_drawdown_from_3y_high_pct",
+        "price_history_years_available",
+        "price_momentum_1y_pct",
+        "price_momentum_2y_pct",
+        "price_vs_bist100_1y_pct",
+        "revenue",
+        "revenue_growth_pct",
+        "roa",
+        "roe",
+        "short_term_liabilities",
+        "total_assets",
+        "working_capital"
+      ],
+      "pooled": {
+        "baseline_equal_weight": {
+          "pooled_ic": 0.15,
+          "perm_p_two_sided": 0.0186
+        },
+        "baseline_rank_score": {
+          "pooled_ic": 0.15,
+          "perm_p_two_sided": 0.0188
+        },
+        "robust_rank_aggregation": {
+          "pooled_ic": 0.128,
+          "perm_p_two_sided": 0.05
+        },
+        "linear_regression": {
+          "pooled_ic": 0.047,
+          "perm_p_two_sided": 0.4751
+        },
+        "ridge": {
+          "pooled_ic": 0.093,
+          "perm_p_two_sided": 0.1617
+        },
+        "lasso": {
+          "pooled_ic": 0.09,
+          "perm_p_two_sided": 0.163
+        },
+        "elasticnet": {
+          "pooled_ic": -0.02,
+          "perm_p_two_sided": 0.7593
+        },
+        "random_forest": {
+          "pooled_ic": -0.153,
+          "perm_p_two_sided": 0.017
+        },
+        "gradient_boosting": {
+          "pooled_ic": -0.105,
+          "perm_p_two_sided": 0.1096
+        }
+      }
+    },
+    "pit_price_only": {
+      "n_features": 9,
+      "features": [
+        "benchmark_same_year_return_pct",
+        "market_cap",
+        "price_adjclose_t",
+        "price_data_available",
+        "price_drawdown_from_3y_high_pct",
+        "price_history_years_available",
+        "price_momentum_1y_pct",
+        "price_momentum_2y_pct",
+        "price_vs_bist100_1y_pct"
+      ],
+      "pooled": {
+        "baseline_equal_weight": {
+          "pooled_ic": 0.006,
+          "perm_p_two_sided": 0.9258
+        },
+        "baseline_rank_score": {
+          "pooled_ic": 0.006,
+          "perm_p_two_sided": 0.9207
+        },
+        "robust_rank_aggregation": {
+          "pooled_ic": 0.021,
+          "perm_p_two_sided": 0.7504
+        },
+        "linear_regression": {
+          "pooled_ic": -0.027,
+          "perm_p_two_sided": 0.6836
+        },
+        "ridge": {
+          "pooled_ic": 0.022,
+          "perm_p_two_sided": 0.7347
+        },
+        "lasso": {
+          "pooled_ic": -0.007,
+          "perm_p_two_sided": 0.9051
+        },
+        "elasticnet": {
+          "pooled_ic": 0.046,
+          "perm_p_two_sided": 0.478
+        },
+        "random_forest": {
+          "pooled_ic": 0.063,
+          "perm_p_two_sided": 0.3287
+        },
+        "gradient_boosting": {
+          "pooled_ic": 0.002,
+          "perm_p_two_sided": 0.9802
+        }
+      }
+    },
+    "pit_strict": {
+      "n_features": 7,
+      "features": [
+        "benchmark_same_year_return_pct",
+        "price_data_available",
+        "price_drawdown_from_3y_high_pct",
+        "price_history_years_available",
+        "price_momentum_1y_pct",
+        "price_momentum_2y_pct",
+        "price_vs_bist100_1y_pct"
+      ],
+      "pooled": {
+        "baseline_equal_weight": {
+          "pooled_ic": 0.031,
+          "perm_p_two_sided": 0.6312
+        },
+        "baseline_rank_score": {
+          "pooled_ic": 0.031,
+          "perm_p_two_sided": 0.639
+        },
+        "robust_rank_aggregation": {
+          "pooled_ic": 0.048,
+          "perm_p_two_sided": 0.4685
+        },
+        "linear_regression": {
+          "pooled_ic": -0.031,
+          "perm_p_two_sided": 0.641
+        },
+        "ridge": {
+          "pooled_ic": 0.028,
+          "perm_p_two_sided": 0.6589
+        },
+        "lasso": {
+          "pooled_ic": 0.011,
+          "perm_p_two_sided": 0.8609
+        },
+        "elasticnet": {
+          "pooled_ic": 0.06,
+          "perm_p_two_sided": 0.3506
+        },
+        "random_forest": {
+          "pooled_ic": -0.027,
+          "perm_p_two_sided": 0.6796
+        },
+        "gradient_boosting": {
+          "pooled_ic": 0.032,
+          "perm_p_two_sided": 0.619
+        }
+      }
+    },
+    "pit_lagged_fund": {
+      "n_features": 40,
+      "features": [
+        "benchmark_same_year_return_pct",
+        "current_assets",
+        "current_ratio",
+        "ebitda",
+        "ebitda_growth_pct",
+        "ebitda_margin",
+        "enterprise_value",
+        "equity",
+        "ev_ebitda",
+        "financial_debt_ratio",
+        "gross_margin",
+        "gross_profit",
+        "gross_profit_growth_pct",
+        "leverage_ratio",
+        "long_term_liabilities",
+        "market_cap",
+        "net_debt",
+        "net_debt_to_ebitda",
+        "net_income",
+        "net_income_growth_pct",
+        "net_margin",
+        "non_current_assets",
+        "operating_income",
+        "operating_income_growth_pct",
+        "pb_ratio",
+        "pe_ratio",
+        "price_adjclose_t",
+        "price_data_available",
+        "price_drawdown_from_3y_high_pct",
+        "price_history_years_available",
+        "price_momentum_1y_pct",
+        "price_momentum_2y_pct",
+        "price_vs_bist100_1y_pct",
+        "revenue",
+        "revenue_growth_pct",
+        "roa",
+        "roe",
+        "short_term_liabilities",
+        "total_assets",
+        "working_capital"
+      ],
+      "pooled": {
+        "baseline_equal_weight": {
+          "pooled_ic": 0.005,
+          "perm_p_two_sided": 0.9338
+        },
+        "baseline_rank_score": {
+          "pooled_ic": 0.005,
+          "perm_p_two_sided": 0.9327
+        },
+        "robust_rank_aggregation": {
+          "pooled_ic": -0.018,
+          "perm_p_two_sided": 0.7763
+        },
+        "linear_regression": {
+          "pooled_ic": -0.043,
+          "perm_p_two_sided": 0.5129
+        },
+        "ridge": {
+          "pooled_ic": -0.064,
+          "perm_p_two_sided": 0.3237
+        },
+        "lasso": {
+          "pooled_ic": -0.013,
+          "perm_p_two_sided": 0.8429
+        },
+        "elasticnet": {
+          "pooled_ic": -0.097,
+          "perm_p_two_sided": 0.1371
+        },
+        "random_forest": {
+          "pooled_ic": -0.007,
+          "perm_p_two_sided": 0.9124
+        },
+        "gradient_boosting": {
+          "pooled_ic": -0.005,
+          "perm_p_two_sided": 0.9422
+        }
+      }
+    },
+    "diag_fy_t_statements": {
+      "n_features": 31,
+      "features": [
+        "current_assets",
+        "current_ratio",
+        "ebitda",
+        "ebitda_growth_pct",
+        "ebitda_margin",
+        "enterprise_value",
+        "equity",
+        "ev_ebitda",
+        "financial_debt_ratio",
+        "gross_margin",
+        "gross_profit",
+        "gross_profit_growth_pct",
+        "leverage_ratio",
+        "long_term_liabilities",
+        "net_debt",
+        "net_debt_to_ebitda",
+        "net_income",
+        "net_income_growth_pct",
+        "net_margin",
+        "non_current_assets",
+        "operating_income",
+        "operating_income_growth_pct",
+        "pb_ratio",
+        "pe_ratio",
+        "revenue",
+        "revenue_growth_pct",
+        "roa",
+        "roe",
+        "short_term_liabilities",
+        "total_assets",
+        "working_capital"
+      ],
+      "pooled": {
+        "baseline_equal_weight": {
+          "pooled_ic": 0.193,
+          "perm_p_two_sided": 0.0023
+        },
+        "baseline_rank_score": {
+          "pooled_ic": 0.193,
+          "perm_p_two_sided": 0.0026
+        },
+        "robust_rank_aggregation": {
+          "pooled_ic": 0.173,
+          "perm_p_two_sided": 0.0076
+        },
+        "linear_regression": {
+          "pooled_ic": 0.115,
+          "perm_p_two_sided": 0.075
+        },
+        "ridge": {
+          "pooled_ic": 0.131,
+          "perm_p_two_sided": 0.0441
+        },
+        "lasso": {
+          "pooled_ic": 0.161,
+          "perm_p_two_sided": 0.0132
+        },
+        "elasticnet": {
+          "pooled_ic": -0.024,
+          "perm_p_two_sided": 0.7081
+        },
+        "random_forest": {
+          "pooled_ic": -0.105,
+          "perm_p_two_sided": 0.111
+        },
+        "gradient_boosting": {
+          "pooled_ic": -0.055,
+          "perm_p_two_sided": 0.4051
+        }
+      }
+    },
+    "original__listed_only": {
+      "n_features": 40,
+      "features": [
+        "benchmark_same_year_return_pct",
+        "current_assets",
+        "current_ratio",
+        "ebitda",
+        "ebitda_growth_pct",
+        "ebitda_margin",
+        "enterprise_value",
+        "equity",
+        "ev_ebitda",
+        "financial_debt_ratio",
+        "gross_margin",
+        "gross_profit",
+        "gross_profit_growth_pct",
+        "leverage_ratio",
+        "long_term_liabilities",
+        "market_cap",
+        "net_debt",
+        "net_debt_to_ebitda",
+        "net_income",
+        "net_income_growth_pct",
+        "net_margin",
+        "non_current_assets",
+        "operating_income",
+        "operating_income_growth_pct",
+        "pb_ratio",
+        "pe_ratio",
+        "price_adjclose_t",
+        "price_data_available",
+        "price_drawdown_from_3y_high_pct",
+        "price_history_years_available",
+        "price_momentum_1y_pct",
+        "price_momentum_2y_pct",
+        "price_vs_bist100_1y_pct",
+        "revenue",
+        "revenue_growth_pct",
+        "roa",
+        "roe",
+        "short_term_liabilities",
+        "total_assets",
+        "working_capital"
+      ],
+      "pooled": {
+        "baseline_equal_weight": {
+          "pooled_ic": 0.164,
+          "perm_p_two_sided": 0.0125
+        },
+        "baseline_rank_score": {
+          "pooled_ic": 0.164,
+          "perm_p_two_sided": 0.0142
+        },
+        "robust_rank_aggregation": {
+          "pooled_ic": 0.146,
+          "perm_p_two_sided": 0.0263
+        },
+        "linear_regression": {
+          "pooled_ic": 0.106,
+          "perm_p_two_sided": 0.1069
+        },
+        "ridge": {
+          "pooled_ic": 0.055,
+          "perm_p_two_sided": 0.4037
+        },
+        "lasso": {
+          "pooled_ic": 0.1,
+          "perm_p_two_sided": 0.1282
+        },
+        "elasticnet": {
+          "pooled_ic": -0.057,
+          "perm_p_two_sided": 0.3884
+        },
+        "random_forest": {
+          "pooled_ic": -0.184,
+          "perm_p_two_sided": 0.0051
+        },
+        "gradient_boosting": {
+          "pooled_ic": -0.08,
+          "perm_p_two_sided": 0.2212
+        }
+      }
+    },
+    "pit_strict__listed_only": {
+      "n_features": 7,
+      "features": [
+        "benchmark_same_year_return_pct",
+        "price_data_available",
+        "price_drawdown_from_3y_high_pct",
+        "price_history_years_available",
+        "price_momentum_1y_pct",
+        "price_momentum_2y_pct",
+        "price_vs_bist100_1y_pct"
+      ],
+      "pooled": {
+        "baseline_equal_weight": {
+          "pooled_ic": 0.031,
+          "perm_p_two_sided": 0.6312
+        },
+        "baseline_rank_score": {
+          "pooled_ic": 0.031,
+          "perm_p_two_sided": 0.639
+        },
+        "robust_rank_aggregation": {
+          "pooled_ic": 0.048,
+          "perm_p_two_sided": 0.4685
+        },
+        "linear_regression": {
+          "pooled_ic": -0.036,
+          "perm_p_two_sided": 0.5922
+        },
+        "ridge": {
+          "pooled_ic": 0.028,
+          "perm_p_two_sided": 0.6674
+        },
+        "lasso": {
+          "pooled_ic": 0.018,
+          "perm_p_two_sided": 0.777
+        },
+        "elasticnet": {
+          "pooled_ic": 0.062,
+          "perm_p_two_sided": 0.3456
+        },
+        "random_forest": {
+          "pooled_ic": 0.006,
+          "perm_p_two_sided": 0.9309
+        },
+        "gradient_boosting": {
+          "pooled_ic": 0.019,
+          "perm_p_two_sided": 0.776
+        }
+      }
+    },
+    "pit_lagged_fund__listed_only": {
+      "n_features": 40,
+      "features": [
+        "benchmark_same_year_return_pct",
+        "current_assets",
+        "current_ratio",
+        "ebitda",
+        "ebitda_growth_pct",
+        "ebitda_margin",
+        "enterprise_value",
+        "equity",
+        "ev_ebitda",
+        "financial_debt_ratio",
+        "gross_margin",
+        "gross_profit",
+        "gross_profit_growth_pct",
+        "leverage_ratio",
+        "long_term_liabilities",
+        "market_cap",
+        "net_debt",
+        "net_debt_to_ebitda",
+        "net_income",
+        "net_income_growth_pct",
+        "net_margin",
+        "non_current_assets",
+        "operating_income",
+        "operating_income_growth_pct",
+        "pb_ratio",
+        "pe_ratio",
+        "price_adjclose_t",
+        "price_data_available",
+        "price_drawdown_from_3y_high_pct",
+        "price_history_years_available",
+        "price_momentum_1y_pct",
+        "price_momentum_2y_pct",
+        "price_vs_bist100_1y_pct",
+        "revenue",
+        "revenue_growth_pct",
+        "roa",
+        "roe",
+        "short_term_liabilities",
+        "total_assets",
+        "working_capital"
+      ],
+      "pooled": {
+        "baseline_equal_weight": {
+          "pooled_ic": 0.015,
+          "perm_p_two_sided": 0.8179
+        },
+        "baseline_rank_score": {
+          "pooled_ic": 0.015,
+          "perm_p_two_sided": 0.8317
+        },
+        "robust_rank_aggregation": {
+          "pooled_ic": -0.004,
+          "perm_p_two_sided": 0.9498
+        },
+        "linear_regression": {
+          "pooled_ic": -0.002,
+          "perm_p_two_sided": 0.9797
+        },
+        "ridge": {
+          "pooled_ic": -0.071,
+          "perm_p_two_sided": 0.2852
+        },
+        "lasso": {
+          "pooled_ic": -0.02,
+          "perm_p_two_sided": 0.7654
+        },
+        "elasticnet": {
+          "pooled_ic": -0.123,
+          "perm_p_two_sided": 0.0581
+        },
+        "random_forest": {
+          "pooled_ic": -0.002,
+          "perm_p_two_sided": 0.9767
+        },
+        "gradient_boosting": {
+          "pooled_ic": -0.032,
+          "perm_p_two_sided": 0.6224
+        }
+      }
+    },
+    "diag_fy_t_statements__listed_only": {
+      "n_features": 31,
+      "features": [
+        "current_assets",
+        "current_ratio",
+        "ebitda",
+        "ebitda_growth_pct",
+        "ebitda_margin",
+        "enterprise_value",
+        "equity",
+        "ev_ebitda",
+        "financial_debt_ratio",
+        "gross_margin",
+        "gross_profit",
+        "gross_profit_growth_pct",
+        "leverage_ratio",
+        "long_term_liabilities",
+        "net_debt",
+        "net_debt_to_ebitda",
+        "net_income",
+        "net_income_growth_pct",
+        "net_margin",
+        "non_current_assets",
+        "operating_income",
+        "operating_income_growth_pct",
+        "pb_ratio",
+        "pe_ratio",
+        "revenue",
+        "revenue_growth_pct",
+        "roa",
+        "roe",
+        "short_term_liabilities",
+        "total_assets",
+        "working_capital"
+      ],
+      "pooled": {
+        "baseline_equal_weight": {
+          "pooled_ic": 0.208,
+          "perm_p_two_sided": 0.0014
+        },
+        "baseline_rank_score": {
+          "pooled_ic": 0.208,
+          "perm_p_two_sided": 0.002
+        },
+        "robust_rank_aggregation": {
+          "pooled_ic": 0.19,
+          "perm_p_two_sided": 0.0033
+        },
+        "linear_regression": {
+          "pooled_ic": 0.092,
+          "perm_p_two_sided": 0.1626
+        },
+        "ridge": {
+          "pooled_ic": 0.07,
+          "perm_p_two_sided": 0.2886
+        },
+        "lasso": {
+          "pooled_ic": 0.097,
+          "perm_p_two_sided": 0.1394
+        },
+        "elasticnet": {
+          "pooled_ic": -0.07,
+          "perm_p_two_sided": 0.2866
+        },
+        "random_forest": {
+          "pooled_ic": -0.128,
+          "perm_p_two_sided": 0.052
+        },
+        "gradient_boosting": {
+          "pooled_ic": -0.091,
+          "perm_p_two_sided": 0.1675
+        }
+      }
+    }
+  },
+  "reproduction_max_abs_delta_ic": {
+    "linear_regression": 0.003,
+    "all_other_models": 0.0
+  }
+}
