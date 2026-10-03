@@ -5,8 +5,9 @@ for the public repository.
 
 ## Secrets
 
-- **No secrets are committed.** `.gitignore` excludes `.env` / `.env.*` (the only
-  tracked env file is `backend/.env.example`, which holds placeholders).
+- **No secrets are present in the current tree.** `.gitignore` excludes `.env` /
+  `.env.*` (the only tracked env file is `backend/.env.example`, which holds
+  placeholders). History is not clean: see "Credential incident 2026-05" below.
 - Docker images exclude secrets via `.dockerignore` / `frontend/.dockerignore`
   (`.env*`, `.git`, virtualenvs, caches, `node_modules`). Never bake a real
   `.env` into an image.
@@ -16,6 +17,31 @@ for the public repository.
   dev-only `SECRET_KEY` fallback that must be overridden for any deployment.
 - If a key is ever exposed, rotate it (OpenRouter dashboard, Supabase Project
   Settings → API/Database, regenerate `SECRET_KEY`).
+- Secret scanning: `.github/workflows/secret-scan.yml` runs gitleaks with
+  `.gitleaks.toml` on the working tree and on every commit a PR or push adds.
+  Run locally with `gitleaks dir . --config .gitleaks.toml --redact` and
+  `gitleaks git . --config .gitleaks.toml --redact --log-opts="origin/main..HEAD"`.
+
+## Credential incident 2026-05
+
+- **What:** commit `d753ac6a` (2026-05-06) added a Finnhub API token for a
+  since-removed news feature. It appeared as a hard-coded settings default in
+  `2.backend/app/config.py` and inside two pasted AI-assistant prompt/transcript
+  files (`new.txt`, `yapılacaklar.txt`). `503fadf7` and `ad23e1ed` (2026-06-04)
+  removed it from the tree; the Finnhub integration itself was later quarantined
+  and is now forbidden by `backend/scripts/validate_trusted_data.py`.
+- **Exposure:** the repository is public, so the token must be treated as
+  compromised from 2026-05-06 onward, regardless of later removal.
+- **Remediation:** the fix is revocation of the token at the provider, not
+  history editing. Rotation status: **PENDING — owner action in the Finnhub
+  dashboard; update this line with the revocation date.** No code path reads a
+  Finnhub token today, so nothing needs a replacement value.
+- **History:** not rewritten. Commit SHAs after `d753ac6a` are pinned by the
+  preregistration and evidence records; a rewrite would break that provenance
+  while protecting nothing once the token is revoked.
+- **Prevention:** the default gitleaks rules did not flag the
+  `NAME: str = "<value>"` form, so `.gitleaks.toml` adds a rule for it and the
+  secret-scan workflow gates new commits.
 
 ## Access modes (demo vs private)
 
