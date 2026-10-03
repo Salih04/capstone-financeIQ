@@ -26,7 +26,8 @@ for the public repository.
 
 - **What:** commit `d753ac6a` (2026-05-06) added a Finnhub API token for a
   since-removed news feature. It appeared as a hard-coded settings default in
-  `2.backend/app/config.py` and inside two pasted AI-assistant prompt/transcript
+  the backend config module of the pre-restructure "2.backend" tree (path no
+  longer exists) and inside two pasted AI-assistant prompt/transcript
   files (`new.txt`, `yapılacaklar.txt`). `503fadf7` and `ad23e1ed` (2026-06-04)
   removed it from the tree; the Finnhub integration itself was later quarantined
   and is now forbidden by `backend/scripts/validate_trusted_data.py`.
