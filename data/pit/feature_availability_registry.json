@@ -1,0 +1,590 @@
+{
+  "schema_version": 1,
+  "registry": "feature_availability_registry",
+  "about": "Machine-readable availability record for every model feature of the PIT evaluation (docs/PIT_PROTOCOL.md). experiments/pit/guard.py refuses any feature that is absent here, marked excluded, or whose computed availability timestamp is later than the row's prediction time. Naming conventions are never used to infer availability.",
+  "timestamps": {
+    "timezone": "Europe/Istanbul",
+    "statement_available_at": "23:59:59 on the filing (ACTUAL) or statutory-deadline (STANDARDIZED) date: KAP financial reports are filed after the session close (MKK General Letter 1000, item 6)",
+    "price_close_available_at": "18:10 on the quote date",
+    "prediction_time": "18:00 on the prediction (entry) date; the position is entered at that day's close"
+  },
+  "modes": {
+    "ACTUAL_FILING_DATE": "statement availability = verified public date per ticker and fiscal year (data/pit/filing_dates_sample.csv); rows without one are unavailable",
+    "STANDARDIZED_CONSERVATIVE_CUTOFF": "statement availability = statutory deadline per fiscal year (data/pit/reporting_deadlines.csv; ticker rows override the general row); the cutoff must be on or after it"
+  },
+  "features": [
+    {
+      "name": "revenue",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: net sales, income statement; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "gross_profit",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: gross profit, income statement; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "operating_income",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: operating profit, income statement; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "ebitda",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: EBITDA as reported by the vendor file; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "net_income",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: net profit for the period, income statement; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "total_assets",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: balance sheet; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "current_assets",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: balance sheet; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "non_current_assets",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: balance sheet; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "equity",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: balance sheet; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "short_term_liabilities",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: balance sheet; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "long_term_liabilities",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: balance sheet; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "net_debt",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: balance sheet (financial debt minus cash); rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "working_capital",
+      "feature_class": "financial_statement_level",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T (1 Jan T - 31 Dec T; balance-sheet items at 31 Dec T)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "value as reported: current assets minus short-term liabilities; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "gross_margin",
+      "feature_class": "financial_statement_ratio",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "gross_profit / revenue; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "ebitda_margin",
+      "feature_class": "financial_statement_ratio",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "ebitda / revenue; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "net_margin",
+      "feature_class": "financial_statement_ratio",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "net_income / revenue; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "roa",
+      "feature_class": "financial_statement_ratio",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "net_income / total_assets; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "roe",
+      "feature_class": "financial_statement_ratio",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "net_income / equity; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "current_ratio",
+      "feature_class": "financial_statement_ratio",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "current_assets / short_term_liabilities; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "leverage_ratio",
+      "feature_class": "financial_statement_ratio",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "liabilities / equity (vendor definition); rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "financial_debt_ratio",
+      "feature_class": "financial_statement_ratio",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "financial debt / total assets (vendor definition); rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "net_debt_to_ebitda",
+      "feature_class": "financial_statement_ratio",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal year T",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "net_debt / ebitda; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "revenue_growth_pct",
+      "feature_class": "financial_statement_growth",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal years T-1 and T (T-1 is public a year earlier, so T binds)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "percent change of revenue from fiscal year T-1 to T; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "gross_profit_growth_pct",
+      "feature_class": "financial_statement_growth",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal years T-1 and T (T-1 is public a year earlier, so T binds)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "percent change of gross_profit from fiscal year T-1 to T; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "operating_income_growth_pct",
+      "feature_class": "financial_statement_growth",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal years T-1 and T (T-1 is public a year earlier, so T binds)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "percent change of operating_income from fiscal year T-1 to T; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "ebitda_growth_pct",
+      "feature_class": "financial_statement_growth",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal years T-1 and T (T-1 is public a year earlier, so T binds)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "percent change of ebitda from fiscal year T-1 to T; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "net_income_growth_pct",
+      "feature_class": "financial_statement_growth",
+      "status": "admitted",
+      "source": "data/trusted_raw/financials_corrected_yearly/{FY}stocks.xlsx via scripts/data_collection (modeling_dataset_training_2020_2025.csv)",
+      "observation_period": "fiscal years T-1 and T (T-1 is public a year earlier, so T binds)",
+      "availability": {
+        "rule": "statement_publication",
+        "fiscal_year_offset": 0
+      },
+      "transformation": "percent change of net_income from fiscal year T-1 to T; rank-normalised to a percentile within the cross-section",
+      "adjustment_basis": "accounting values in nominal TRY as reported (FY2023 onward under TMS 29 inflation accounting)",
+      "earliest_usable_prediction": "first trading day strictly after the fiscal-year-T annual report is public (ACTUAL mode: filing date; STANDARDIZED mode: statutory deadline, which the cutoff must not precede)"
+    },
+    {
+      "name": "market_cap",
+      "feature_class": "market_value",
+      "status": "admitted",
+      "source": "Yahoo Chart API daily close and split events (data/pit/derived/price_panel_<spec>.csv, market_value_pit) x data/trusted_raw/shares_outstanding_manual.csv",
+      "observation_period": "close of the last quote on or before the cutoff",
+      "availability": {
+        "rule": "price_close",
+        "asof_field": "feature_asof_date"
+      },
+      "transformation": "quoted close at the reference date x year-end-T share count, both on the as-quoted basis (close x F(31 Dec T) x shares(31 Dec T)); excluded when the share record disagrees with Yahoo split history or the close series has an unexplained jump after 31 Dec T",
+      "adjustment_basis": "unadjusted (as quoted) price x historical share count; replaces the published back-adjusted price x historical share count",
+      "earliest_usable_prediction": "first trading day after the reference close"
+    },
+    {
+      "name": "pe_ratio",
+      "feature_class": "market_value_ratio",
+      "status": "admitted",
+      "source": "market_cap (PIT) and fiscal-year-T statements",
+      "observation_period": "price at the reference close; statements of fiscal year T",
+      "availability": {
+        "rule": "max_of",
+        "depends_on": [
+          "market_cap",
+          "net_income"
+        ]
+      },
+      "transformation": "market_cap / net_income (net_income > 0; |P/E| <= 1000); computed only where the published dataset had a value (inherits its rejection rules) and market_cap is PIT-valid",
+      "adjustment_basis": "as-quoted market value over nominal accounting values",
+      "earliest_usable_prediction": "later of the statement availability and the reference close"
+    },
+    {
+      "name": "pb_ratio",
+      "feature_class": "market_value_ratio",
+      "status": "admitted",
+      "source": "market_cap (PIT) and fiscal-year-T statements",
+      "observation_period": "price at the reference close; statements of fiscal year T",
+      "availability": {
+        "rule": "max_of",
+        "depends_on": [
+          "market_cap",
+          "equity"
+        ]
+      },
+      "transformation": "market_cap / equity (equity > 0; |P/B| <= 100; 2024 balance-sheet rejections inherited); computed only where the published dataset had a value (inherits its rejection rules) and market_cap is PIT-valid",
+      "adjustment_basis": "as-quoted market value over nominal accounting values",
+      "earliest_usable_prediction": "later of the statement availability and the reference close"
+    },
+    {
+      "name": "enterprise_value",
+      "feature_class": "market_value_ratio",
+      "status": "admitted",
+      "source": "market_cap (PIT) and fiscal-year-T statements",
+      "observation_period": "price at the reference close; statements of fiscal year T",
+      "availability": {
+        "rule": "max_of",
+        "depends_on": [
+          "market_cap",
+          "net_debt"
+        ]
+      },
+      "transformation": "market_cap + net_debt (2024 balance-sheet rejections inherited); computed only where the published dataset had a value (inherits its rejection rules) and market_cap is PIT-valid",
+      "adjustment_basis": "as-quoted market value over nominal accounting values",
+      "earliest_usable_prediction": "later of the statement availability and the reference close"
+    },
+    {
+      "name": "ev_ebitda",
+      "feature_class": "market_value_ratio",
+      "status": "admitted",
+      "source": "market_cap (PIT) and fiscal-year-T statements",
+      "observation_period": "price at the reference close; statements of fiscal year T",
+      "availability": {
+        "rule": "max_of",
+        "depends_on": [
+          "market_cap",
+          "net_debt",
+          "ebitda"
+        ]
+      },
+      "transformation": "enterprise_value / ebitda (ebitda > 0; |EV/EBITDA| <= 500); computed only where the published dataset had a value (inherits its rejection rules) and market_cap is PIT-valid",
+      "adjustment_basis": "as-quoted market value over nominal accounting values",
+      "earliest_usable_prediction": "later of the statement availability and the reference close"
+    },
+    {
+      "name": "price_momentum_1y_pct",
+      "feature_class": "price",
+      "status": "admitted",
+      "source": "Yahoo Chart API daily adjclose (data/pit/derived/price_panel_<spec>.csv)",
+      "observation_period": "365 days ending at the reference close",
+      "availability": {
+        "rule": "price_close",
+        "asof_field": "feature_asof_date"
+      },
+      "transformation": "adjclose(asof)/adjclose(asof-365d)-1, in %; set to null when an unexplained >25% one-day move lies inside the look-back",
+      "adjustment_basis": "ratios of split- and dividend-adjusted closes (basis-invariant)",
+      "earliest_usable_prediction": "first trading day after the reference close"
+    },
+    {
+      "name": "price_momentum_2y_pct",
+      "feature_class": "price",
+      "status": "admitted",
+      "source": "Yahoo Chart API daily adjclose (data/pit/derived/price_panel_<spec>.csv)",
+      "observation_period": "730 days ending at the reference close",
+      "availability": {
+        "rule": "price_close",
+        "asof_field": "feature_asof_date"
+      },
+      "transformation": "adjclose(asof)/adjclose(asof-730d)-1, in %; set to null when an unexplained >25% one-day move lies inside the look-back",
+      "adjustment_basis": "ratios of split- and dividend-adjusted closes (basis-invariant)",
+      "earliest_usable_prediction": "first trading day after the reference close"
+    },
+    {
+      "name": "price_drawdown_from_3y_high_pct",
+      "feature_class": "price",
+      "status": "admitted",
+      "source": "Yahoo Chart API daily adjclose (data/pit/derived/price_panel_<spec>.csv)",
+      "observation_period": "3 years ending at the reference close",
+      "availability": {
+        "rule": "price_close",
+        "asof_field": "feature_asof_date"
+      },
+      "transformation": "adjclose(asof)/max adjclose over 3 years - 1, in %; set to null when an unexplained >25% one-day move lies inside the look-back",
+      "adjustment_basis": "ratios of split- and dividend-adjusted closes (basis-invariant)",
+      "earliest_usable_prediction": "first trading day after the reference close"
+    },
+    {
+      "name": "price_vs_bist100_1y_pct",
+      "feature_class": "price",
+      "status": "admitted",
+      "source": "Yahoo Chart API daily adjclose (data/pit/derived/price_panel_<spec>.csv)",
+      "observation_period": "365 days ending at the reference close",
+      "availability": {
+        "rule": "price_close",
+        "asof_field": "feature_asof_date"
+      },
+      "transformation": "price_momentum_1y_pct minus XU100 1-year return over the same dates; set to null when an unexplained >25% one-day move lies inside the look-back",
+      "adjustment_basis": "ratios of split- and dividend-adjusted closes (basis-invariant)",
+      "earliest_usable_prediction": "first trading day after the reference close"
+    },
+    {
+      "name": "price_history_years_available",
+      "feature_class": "price",
+      "status": "admitted",
+      "source": "Yahoo Chart API daily adjclose (data/pit/derived/price_panel_<spec>.csv)",
+      "observation_period": "listing history up to the cutoff",
+      "availability": {
+        "rule": "price_close",
+        "asof_field": "feature_asof_date"
+      },
+      "transformation": "years between the first Yahoo quote and the cutoff; set to null when an unexplained >25% one-day move lies inside the look-back",
+      "adjustment_basis": "ratios of split- and dividend-adjusted closes (basis-invariant)",
+      "earliest_usable_prediction": "first trading day after the reference close"
+    },
+    {
+      "name": "price_data_available",
+      "feature_class": "price",
+      "status": "admitted",
+      "source": "Yahoo Chart API daily adjclose (data/pit/derived/price_panel_<spec>.csv)",
+      "observation_period": "reference date",
+      "availability": {
+        "rule": "price_close",
+        "asof_field": "feature_asof_date"
+      },
+      "transformation": "1 if a non-stale quote exists at the reference date; set to null when an unexplained >25% one-day move lies inside the look-back",
+      "adjustment_basis": "ratios of split- and dividend-adjusted closes (basis-invariant)",
+      "earliest_usable_prediction": "first trading day after the reference close"
+    },
+    {
+      "name": "price_adjclose_t",
+      "feature_class": "excluded",
+      "status": "excluded",
+      "exclusion_reason": "A level of a back-adjusted series depends on corporate actions after T; as-quoted price levels carry no cross-sectional meaning",
+      "source": "published modeling dataset",
+      "observation_period": "calendar year T",
+      "availability": {
+        "rule": "never"
+      },
+      "transformation": "n/a",
+      "adjustment_basis": "n/a",
+      "earliest_usable_prediction": "never (excluded)"
+    },
+    {
+      "name": "benchmark_same_year_return_pct",
+      "feature_class": "excluded",
+      "status": "excluded",
+      "exclusion_reason": "Identical for every company in a cross-section: no ranking information; replaced by price_vs_bist100_1y_pct",
+      "source": "published modeling dataset",
+      "observation_period": "calendar year T",
+      "availability": {
+        "rule": "never"
+      },
+      "transformation": "n/a",
+      "adjustment_basis": "n/a",
+      "earliest_usable_prediction": "never (excluded)"
+    }
+  ]
+}
