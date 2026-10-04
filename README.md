@@ -78,7 +78,9 @@ the [amendment](docs/PREREGISTRATION_AMENDMENT_2026-10-04.md).
 | Same FY-T statements alone | +0.193 used before publication | +0.041 used after it |
 
 The last row is the clearest evidence: the statements carried the signal only
-while they were used before they were public.
+while they were used before they were public. The corrected design also changes
+the return window and source, so this is consistent with look-ahead rather than
+an isolated test of it.
 [Full report](experiments/results_pit_v2/REPORT.md).
 
 ## 6. Power

@@ -64,7 +64,10 @@ observation only, not a contrarian signal.
 The audit could not separate look-ahead from staleness, because lagging the
 statements by a year also aged them. PIT-v2 uses the *same* fiscal-year-T
 statements, only timed after publication, and the signal is gone (+0.193 →
-+0.041). That pattern is what look-ahead predicts. It does not prove the
++0.041). That pattern is what look-ahead predicts. It is not an isolated test:
+PIT-v2 also changes the return window (June–May instead of the calendar year),
+the return source (Yahoo `adjclose` instead of the vendor return) and the rows
+evaluated. It does not prove the
 statements are uninformative: a window that starts at the statutory deadline
 rather than at 31 May (S1, +0.102, p = 0.12) is closer to publication, and the
 study cannot detect effects of that size.
@@ -81,6 +84,10 @@ study cannot detect effects of that size.
 | Market value excluded: unexplained close jump after year-end | 5 |
 | Market value unavailable: no share count (training-only companies) | 123 |
 | Statement values masked as not yet public (primary / S1) | 0 / 31 (SASA FY2022) |
+
+`price_history_years_available` counts years of quotes in the fetched history,
+which starts on 2 January 2017; for companies listed earlier it is a capped
+value, not listing age.
 
 ## Reproduce
 

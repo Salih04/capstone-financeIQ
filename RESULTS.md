@@ -97,8 +97,10 @@ known.
 
 Test years FY2022–FY2024 (78, 78, 79 companies). The same fiscal-year-T
 statements that carried IC +0.193 when used before publication carry +0.041
-(p = 0.54) when used after it, which points to look-ahead rather than stale
-data as the source of the original signal. Registered sensitivities and the
+(p = 0.54) when used after it. That is consistent with look-ahead, and not with
+stale data, as the source of the original signal; the corrected design also
+changes the return window and source and the rows evaluated, so it is evidence
+rather than an isolated test. Registered sensitivities and the
 negative random-forest IC in the statements-only sensitivity (−0.176,
 Bonferroni-within-specification 0.041, not significant over all 24
 sensitivity tests) are in the [full report](experiments/results_pit_v2/REPORT.md).
