@@ -34,9 +34,9 @@ for the public repository.
 - **Exposure:** the repository is public, so the token must be treated as
   compromised from 2026-05-06 onward, regardless of later removal.
 - **Remediation:** the fix is revocation of the token at the provider, not
-  history editing. Rotation status: **PENDING — owner action in the Finnhub
-  dashboard; update this line with the revocation date.** No code path reads a
-  Finnhub token today, so nothing needs a replacement value.
+  history editing. Rotation status: **Owner-confirmed revoked/rotated on
+  2026-10-04; not independently verified in the provider dashboard.** No code
+  path reads a Finnhub token today, so nothing needs a replacement value.
 - **History:** not rewritten. Commit SHAs after `d753ac6a` are pinned by the
   preregistration and evidence records; a rewrite would break that provenance
   while protecting nothing once the token is revoked.
