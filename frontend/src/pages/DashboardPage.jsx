@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import ScientificRecord from '../components/ScientificRecord'
 
 // ---------------------------------------------------------------------------
 // FinanceIQ Dashboard — "Signal from noise"
@@ -446,12 +447,12 @@ export default function DashboardPage() {
           <div className="fiq-head-title">
             <div className="fiq-kicker">FINANCEIQ · BIST EQUITY RESEARCH INSTRUMENT</div>
             <h1>
-              A weak signal, reported <em>honestly</em>.
+              An apparent signal, <em>audited away</em>.
             </h1>
             <p>
-              T→T+1 historical evaluation over {MOCK.dataset.tickers} selected BIST stocks. The model ranks;
-              the walk-forward test shows no reliable predictive edge. This page tunes that weak signal into
-              view instead of hiding it.
+              Historical evaluation over {MOCK.dataset.tickers} selected BIST stocks. The published baseline
+              signal used annual statements before they were public; scored point-in-time it disappears.
+              Rankings below are diagnostics of historical data, not predictions.
             </p>
           </div>
           <SignalMeter icValue={MEAN_IC + icDrift} />
@@ -464,6 +465,8 @@ export default function DashboardPage() {
           <span role="listitem"><strong>{MOCK.dataset.inferenceYear}</strong> inference-only</span>
           <span role="listitem" className="fiq-strip-flag">historical evaluation · diagnostic only</span>
         </div>
+
+        <ScientificRecord compact />
 
         <div className="fiq-main">
           <section className="fiq-field">

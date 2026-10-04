@@ -160,3 +160,16 @@ methodology decision for the owner (options in §6).
    statements and removes the lag without staleness.
 3. Rebuild `market_cap` from unadjusted closes and dated share counts.
 4. Amend the 2026 pre-registration with a secondary, genuinely forward window.
+
+## 8. Update (2026-10-04, later the same day)
+
+The owner chose availability-aware point-in-time evaluation as the canonical
+methodology (not option 1 above). It is registered in
+[`../PREREGISTRATION_AMENDMENT_2026-10-04.md`](../PREREGISTRATION_AMENDMENT_2026-10-04.md),
+specified in [`../PIT_PROTOCOL.md`](../PIT_PROTOCOL.md) and reported in
+[`../../experiments/results_pit_v2/REPORT.md`](../../experiments/results_pit_v2/REPORT.md):
+equal-weight baseline IC +0.031 (p = 0.63) with the window starting after
+publication. It resolves the look-ahead/staleness ambiguity of §4 (same FY-T
+statements: +0.193 before publication, +0.041 after), rebuilds market value on
+one adjustment basis (§2), and excludes pre-listing rows. Sections 1–7 above
+are left as written.

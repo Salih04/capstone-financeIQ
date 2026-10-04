@@ -408,7 +408,7 @@ export default function DataQualityPage() {
               </div>
             ))}
           </div>
-          <div className="spx-ic-note">Equal-weight baseline beats all ML models · IC ≈ 0 across folds</div>
+          <div className="spx-ic-note">Published pre-audit folds · baseline +0.150 withdrawn; point-in-time +0.031 (p = 0.63)</div>
         </div>
       </section>
 

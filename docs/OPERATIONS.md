@@ -28,8 +28,10 @@ with the restraint of a scientific instrument. It uses deep ink surfaces, subtle
 grain/scanline texture, muted emerald for signal/positive states, oxidized
 copper/amber for weak or warning states, monospace data typography, tracked caps
 section labels, persistent right-side Signal Readout panels where applicable,
-and bottom caveat strips. The core product stance is: **"A weak signal, reported
-honestly."** Walk-forward IC ≈ 0 is shown as a core finding, not hidden.
+and bottom caveat strips. The core product stance is: **"An apparent signal, audited
+away."** The dashboard and experiments pages show the published result, the
+point-in-time audit, the correction and the revised conclusion
+(`frontend/src/components/ScientificRecord.jsx`).
 
 Implemented research surfaces:
 

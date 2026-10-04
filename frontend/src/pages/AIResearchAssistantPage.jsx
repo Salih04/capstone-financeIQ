@@ -17,7 +17,7 @@ const RESEARCH_MOCK = {
       ml_score: 0.81, confidence: 0.74, llm_score: 0.68,
       coverage: 0.94,
       top_features: ['ROE', 'FCF_margin', 'revenue_growth'],
-      verdict: 'Strong ranking signal — low predictive certainty',
+      verdict: 'High diagnostic score — no predictive certainty',
       inference_only: false,
     },
     {
@@ -26,7 +26,7 @@ const RESEARCH_MOCK = {
       ml_score: 0.68, confidence: 0.79, llm_score: 0.61,
       coverage: 0.97,
       top_features: ['operating_margin', 'asset_turnover', 'net_debt_ebitda'],
-      verdict: 'Strong ranking signal — low predictive certainty',
+      verdict: 'High diagnostic score — no predictive certainty',
       inference_only: false,
     },
     {
@@ -35,7 +35,7 @@ const RESEARCH_MOCK = {
       ml_score: 0.72, confidence: 0.65, llm_score: 0.55,
       coverage: 0.89,
       top_features: ['pb_ratio', 'ebitda_margin', 'working_capital'],
-      verdict: 'Moderate signal — data gaps present',
+      verdict: 'Mid diagnostic score — data gaps present',
       inference_only: false,
     },
     {
@@ -44,7 +44,7 @@ const RESEARCH_MOCK = {
       ml_score: 0.61, confidence: 0.71, llm_score: 0.49,
       coverage: 0.92,
       top_features: ['current_ratio', 'equity_growth', 'gross_margin'],
-      verdict: 'Moderate signal',
+      verdict: 'Mid diagnostic score',
       inference_only: false,
     },
     {
@@ -53,7 +53,7 @@ const RESEARCH_MOCK = {
       ml_score: 0.24, confidence: 0.31, llm_score: 0.21,
       coverage: 0.61,
       top_features: ['leverage_ratio', 'net_debt_ebitda'],
-      verdict: 'Weak signal — partial coverage',
+      verdict: 'Low diagnostic score — partial coverage',
       inference_only: false,
     },
     {

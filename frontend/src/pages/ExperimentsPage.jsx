@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import ScientificRecord from '../components/ScientificRecord'
 import { useCachedResource, CACHE_TTL } from '../api/useCachedResource'
 import { apiErrorText } from '../api/errorText'
 import CacheTag from '../components/CacheTag'
@@ -6,8 +7,7 @@ import RegimeStrip from '../components/RegimeStrip'
 
 // ---------------------------------------------------------------------------
 // Experiments — THE SEISMOGRAPH.
-// Each walk-forward fold is a horizontal trace hovering around zero.
-// The flat line is the finding: IC ≈ 0, baseline wins, sample too small.
+// Published (pre-audit) folds as traces; ScientificRecord shows the PIT-corrected result.
 // Real API data (researchApi.experiments); mock is fallback only.
 // ---------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ const EXPERIMENTS_MOCK = {
     { id: 'Baseline_2020-2022→2023', model: 'Equal-weight', train: '2020-2022', test: '2023', ic: 0.05, baseline_ic: 0.05, top10_overlap: 5 },
     { id: 'Baseline_2021-2023→2024', model: 'Equal-weight', train: '2021-2023', test: '2024', ic: 0.09, baseline_ic: 0.09, top10_overlap: 5 },
   ],
-  verdict: 'No ML model consistently beats the equal-weight baseline. Sample too small for reliable ML edge.',
+  verdict: 'Published walk-forward (pre-audit). Superseded by the point-in-time evaluation: no evidence of a large reproducible predictive edge.',
   mean_ic_all_models: 0.033,
   mean_ic_baseline: 0.070,
 }
@@ -219,7 +219,7 @@ function TraceBand({ trace, years, hovered, onHover }) {
         <span className="xp-band-meta">
           {trace.points.map((p) => `${p.train}→${p.year}`).join(' · ')}
         </span>
-        {trace.baseline && <span className="xp-band-flag">BASELINE · WINS</span>}
+        {trace.baseline && <span className="xp-band-flag">BASELINE · PRE-AUDIT</span>}
       </div>
       <svg className="xp-band-svg" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
         <line x1={0} y1={MID} x2={W} y2={MID} stroke="rgba(232,236,230,0.3)" strokeWidth="1" />
@@ -286,7 +286,7 @@ export default function ExperimentsPage() {
 
       <header className="xp-head">
         <div>
-          <div className="xp-kicker">FINANCEIQ · WALK-FORWARD SEISMOGRAPH</div>
+          <div className="xp-kicker">FINANCEIQ · PUBLISHED WALK-FORWARD (PRE-AUDIT)</div>
           <h1>The trace is flat. <em>That is the finding.</em></h1>
           <p>
             Each band is one model under walk-forward evaluation: train on years 1…N, predict year N+1,
@@ -315,6 +315,8 @@ export default function ExperimentsPage() {
           <CacheTag fromCache={fromCache} refreshing={refreshing} savedAt={savedAt} onRefresh={refresh} />
         </div>
       </header>
+
+      <ScientificRecord />
 
       <div className="xp-main">
         <main className="xp-drum">
@@ -365,8 +367,10 @@ export default function ExperimentsPage() {
       <section className="xp-verdict">
         <div className="xp-verdict-label">EXPERIMENT VERDICT</div>
         <p>
-          Equal-weight baseline outperforms all ML models on rank correlation. With ~40 stocks/year,
-          this is the correct and defensible result.
+          Superseded. In this published walk-forward the equal-weight baseline had the highest rank
+          correlation (pooled IC +0.150). The point-in-time audit showed that number used annual
+          statements before they were public; scored after publication it is +0.031 (p = 0.63).
+          Current verdict: no evidence of a large reproducible predictive edge.
         </p>
         <p className="xp-verdict-api">{String(verdict)}</p>
       </section>
@@ -375,7 +379,7 @@ export default function ExperimentsPage() {
 
       <footer className="xp-caveat">
         <span className="xp-caveat-pulse" aria-hidden="true" />
-        Walk-forward IC ≈ 0 · range −0.17 to +0.22 · each indistinguishable from zero at n≈40 ·
+        Point-in-time IC +0.031 (p = 0.63) · published pre-audit traces shown for the record ·
         Research only · Not investment advice
       </footer>
     </div>
