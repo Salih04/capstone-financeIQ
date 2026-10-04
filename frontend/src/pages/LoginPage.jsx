@@ -163,7 +163,7 @@ export default function LoginPage() {
         <div className="fiq-kicker">FINANCEIQ · AUTH GATE</div>
         <h1>Research Terminal</h1>
         <p>
-          Leakage-safe BIST research workspace. Weak signals stay visible.
+          Leakage-audited BIST research workspace. Null results and their audits stay visible.
           Authentication is real; conclusions remain research support only.
         </p>
         <div className="fiq-readout">

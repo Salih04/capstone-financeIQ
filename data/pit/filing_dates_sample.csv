@@ -1,0 +1,7 @@
+ticker,fiscal_year,public_on_or_before,evidence_kind,source_url,source_published_at,note
+EREGL,2021,2022-02-10,press_report,,,"From docs/audit/PUBLICATION_LAG_AUDIT.md section 1 (KAP filing reported that evening)"
+BIMAS,2021,2022-03-02,press_report,,,"From docs/audit/PUBLICATION_LAG_AUDIT.md section 1"
+THYAO,2022,2023-03-02,press_report,,,"From docs/audit/PUBLICATION_LAG_AUDIT.md section 1"
+TUPRS,2023,2024-03-04,press_report,https://rotaborsa.com/tupras-tuprs-2023-yili-4-ceyrek-bilancosunu-acikladi-iste-detaylar/,2024-03-04T19:35:15+03:00,"FY2023 (first TMS 29 year) report covered the same evening"
+SASA,2023,2024-03-06,press_report,https://www.hurriyet.com.tr/ekonomi/sasa-bilancosunu-acikladi-42417620,2024-03-06T07:42:00+03:00,"Report published before the next session; filing on or before 2024-03-05 evening"
+ASELS,2023,2024-03-26,press_report,https://www.bloomberght.com/aselsan-dan-7-4-milyar-lira-net-kr-2350094,2024-03-26T21:03:55+03:00,"Same-day wire item on foreks.com carries an ObjectId timestamp of 2024-03-26 15:47 UTC"

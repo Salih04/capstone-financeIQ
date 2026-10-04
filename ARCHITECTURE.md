@@ -177,7 +177,7 @@ signal should be hidden.
 
 ### Research Terminal pages
 
-- `/dashboard` — "A weak signal, reported honestly."; particle/noise overview,
+- `/dashboard` — "An apparent signal, audited away."; scientific record, particle/noise overview,
   BIST100 vs model comparison, feature intake, data quality, and visible IC ≈ 0.
 - `/research-agent` — "Query the signal. Distrust the answer."; five intent
   selectors (Benchmark Outperformers, Top Ranked, Data Quality Overview,

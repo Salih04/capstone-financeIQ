@@ -3,6 +3,16 @@
 How FinanceIQ scores BIST stocks and validates those scores against realized
 performance. Written to be honest about what the scores can and cannot do.
 
+> **Update 2026-10-04 — canonical methodology changed.** The canonical
+> evaluation is now availability-aware point-in-time
+> ([`docs/PIT_PROTOCOL.md`](docs/PIT_PROTOCOL.md)): features are timestamped
+> by when their information became public, and returns start after that.
+> This document describes the published T→T+1 harness, which used
+> fiscal-year-T statements from 1 January T+1, weeks before they were filed.
+> It is kept as the historical record. Its equal-weight baseline IC (0.150)
+> is withdrawn as evidence; point-in-time it is 0.031 (p = 0.63)
+> ([`RESULTS.md`](RESULTS.md)).
+
 > **Honest result (2026-06):** with 40 validated features and an expanded
 > 81-ticker internal training universe, the walk-forward signal is still
 > **weak/unstable** — overall Spearman remains close to zero and ML does not
@@ -500,7 +510,8 @@ from the within-year null after correction, so the results do not support a
 reliable predictive edge. The equal-weight baseline has pooled IC **0.150**,
 unadjusted **p=0.0168**, and bootstrap 95% CI **[0.024, 0.267]**; it is reported
 as descriptive baseline context outside the six-model ML correction family, not
-as a validated edge.
+as a validated edge. (Withdrawn 2026-10-04: it depends on statements used before
+publication; see [`docs/PIT_PROTOCOL.md`](docs/PIT_PROTOCOL.md).)
 
 The current harness uses the internal training universe and has **n=80**
 evaluated rows per model in each split, rather than the public-40 shorthand in

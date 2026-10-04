@@ -160,7 +160,7 @@ Raw p-values, negative IC signs, baseline comparisons, effective-rank values, an
 
 ## Compact source map and restart checklist
 
-Start with [`PRD.md`](../PRD.md), [`REPO_MAP.md`](../REPO_MAP.md), and [`AGENTS.md`](../AGENTS.md) for project boundaries. Then consult:
+Start with [`RESULTS.md`](../RESULTS.md) for the current scientific state, then [`PRD.md`](process/PRD.md), [`REPO_MAP.md`](process/REPO_MAP.md), and [`AGENTS.md`](process/AGENTS.md) for project boundaries. Then consult:
 
 - Headline walk-forward evidence: [`experiments/results/significance_report.md`](../experiments/results/significance_report.md).
 - DIM canonical family: [`experiments/results_dimensionality/dimensionality_report.md`](../experiments/results_dimensionality/dimensionality_report.md), its JSON and CSV companions, and [`experiments/feature_dimensionality.py`](../experiments/feature_dimensionality.py).

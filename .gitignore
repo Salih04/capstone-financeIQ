@@ -80,3 +80,6 @@ experiments/runtime/
 coverage-root.xml
 coverage-backend.xml
 htmlcov/
+
+# Daily Yahoo history for the PIT evaluation (PRIVATE_LOCAL_RAW; provenance in data/pit/)
+data/trusted_raw/prices/yahoo_daily_raw/

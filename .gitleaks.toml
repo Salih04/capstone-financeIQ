@@ -1,0 +1,31 @@
+# Secret-scanning policy for FinanceIQ (used by .github/workflows/secret-scan.yml
+# and by `gitleaks git` / `gitleaks dir` locally).
+#
+# Extends the upstream default ruleset. The extra rule exists because the
+# default `generic-api-key` rule did not flag a typed settings default of the
+# form `SOME_API_KEY: str = "<value>"`, which is exactly how a Finnhub key was
+# committed in May 2026 (see SECURITY.md, "Credential incident 2026-05").
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "settings-default-api-key"
+description = "Hard-coded default value for an *_API_KEY / *_TOKEN / *_SECRET setting"
+regex = '''(?i)\b[A-Z0-9_]*(?:API_KEY|TOKEN|SECRET)\b\s*(?::\s*[A-Za-z_\[\]| ]+)?\s*=\s*["']([A-Za-z0-9_\-]{20,})["']'''
+secretGroup = 1
+entropy = 3.0
+keywords = ["api_key", "token", "secret"]
+
+  # Readable placeholders such as "legacy-shared-secret" in test fixtures are
+  # not credentials; real keys are not hyphenated lowercase words.
+  [[rules.allowlists]]
+  regexes = ['''^[a-z]+(?:-[a-z]+)+$''']
+
+[[rules]]
+id = "finnhub-api-key"
+description = "Finnhub API token (query parameter or env assignment)"
+regex = '''(?i)(?:finnhub[^\n]{0,40}|[?&]token=)([a-z0-9]{20,40})\b'''
+secretGroup = 1
+entropy = 3.0
+keywords = ["finnhub", "token="]
