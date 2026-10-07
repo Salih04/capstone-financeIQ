@@ -14,6 +14,13 @@ Full account: [`RESULTS.md`](RESULTS.md).
 
 Research support only; not investment advice.
 
+**Status (2026-10-07).** The capstone study described on this page is
+complete and frozen as a historical record. FinanceIQ continues as an open
+research program: a rule-based point-in-time universe in place of the fixed
+cohort, quarterly data at publication time, any model family, with every
+trial logged and confirmatory analyses pre-registered. See
+[`docs/process/RESEARCH_CHARTER.md`](docs/process/RESEARCH_CHARTER.md).
+
 ## 1. Hypothesis
 
 Can one year's public data about a BIST company — financial statements,
