@@ -209,6 +209,9 @@ Kritik bağımlılık zincirleri:
 
 ## 11. Doğrulanması gerekenler
 
+- 40 şirketlik public kohortun seçim kuralı. `data/raw/README.md` yıllık dosyaları "winner
+  cohort" diye tanımlıyor; kohort getiriye göre seçildiyse bu, hayatta kalmadan ayrı ve daha
+  ağır bir seçim yanlılığı (görev kartı O-11, FIQ-8).
 - Fintables ve Yahoo kullanım koşulları (A3, A4).
 - Stage-A "351 üye" sınırının tam tanımı.
 - EVDS'de gösterge tahvil faizi serisinin varlığı.

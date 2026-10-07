@@ -38,7 +38,7 @@ koşar, çünkü üçü de `temporal.py` ve şemalara dokunuyor.
 
 | Dalga | Paralel başlatılabilir | Ön koşul |
 |---|---|---|
-| 1 | O-1, O-2, O-3, O-4, O-5, O-8 · FIQ-2 (yalnız rapor), FIQ-3, FIQ-4, FIQ-9, FIQ-10 · KER-0 | — |
+| 1 | O-1, O-2, O-3, O-4, O-5, O-8, O-11 · FIQ-2 (yalnız rapor), FIQ-3, FIQ-4, FIQ-9, FIQ-10 · KER-0 | — |
 | 2 | KER-1 → KER-2 → KER-3 · KER-5 · KER-4 · KER-6 → O-9 · FIQ-1 · FIQ-5 · FIQ-8 | KER-0 bitti; KER-4 için O-1; FIQ-1 için O-4 |
 | 3 | KER-7, KER-8, KER-11 · KER-9 · FIQ-7 · O-6 · O-7 | KER-9 için O-9; FIQ-7 için KER-1; O-6 için FIQ-5 taslağı; O-7 için bütün branch'ler push edilmiş |
 | 4 | KER-10a–d · KER-12 · FIQ-6 · P2-A | KER-10 için O-9, O-5, KER-11; FIQ-6 için KER-10a |
@@ -126,6 +126,7 @@ The work is research support, not investment advice.
 | O-8 | Bu branch'i (`local/financeiq-data-correlation-3c159d`) PR ile main'e al | A5 ve plan dokümanları main'e girsin | PR merge edildi; CI yeşil | 1 |
 | O-9 | KER-6'daki rights karar taslaklarını onayla ya da düzelt | Gerçek veri ingest'inin kapısı | Beş karar `APPROVED` ya da gerekçeli `DENIED` | 2 |
 | O-10 | OSF hesabı aç; Paper 2 ön kaydını gönder (P2-A/B/C bittikten sonra) | Zaman damgalı, public ön kayıt | OSF kaydı ve DOI | 5 |
+| O-11 | 40 şirketlik public kohortun **nasıl seçildiğini** yaz: `data/raw/yearly_xlsx/` dosyaları ("winner cohort") hangi üründen, hangi ekranla, hangi filtreyle indirildi? Liste getiriye göre mi sıralanmıştı? | `docs/universe_audit.md` seçim kuralının belgelenmediğini kaydediyor. Kohort getiriye göre seçildiyse bu, hayatta kalmadan daha ağır bir seçim yanlılığı. Paper 1'de hakemin ilk sorusu olur | Kısa beyan: kaynak, tarih, filtre, sıralama ölçütü (hatırlanmayan kısım "bilinmiyor" diye yazılır). FIQ-8'in girdisi | 1 |
 
 ---
 
@@ -272,14 +273,18 @@ snapshot configured, behaviour must stay byte-identical (prove it with a test). 
 writes to the Kernel.
 ```
 
-### FIQ-8 · Hayatta kalma yanlılığını nicelleştir (F5, K15)
-Dalga 2
+### FIQ-8 · Hayatta kalma ve seçim yanlılığını nicelleştir (F5, K15)
+Dalga 2 · Ön koşul: O-11 (kohort seçim beyanı)
 
 Bitti ölçütü: Paper 1 limitler bölümüne girecek bir paragraf + tablo; kanıtı olmayan hiçbir
-şey sayılmamış.
+şey sayılmamış; kohortun seçim kuralı (ya da bilinmediği) açıkça yazılmış.
 
 ```text
-Task FIQ-8. Using only evidenced membership sources in docs/evidence/bist_membership_*.csv and
+Task FIQ-8. First, record how the public 40-company cohort was selected, using only the
+owner's statement (O-11) and repository evidence (docs/universe_audit.md; data/raw/README.md
+calls the yearly files a "winner cohort"). If the cohort was ranked or filtered on returns,
+say so plainly as an outcome-selection limitation distinct from survivorship; if unknown, say
+unknown. Then, using only evidenced membership sources in docs/evidence/bist_membership_*.csv and
 the BIST membership audit documents in docs/, count for each year 2020–2025: index members with
 evidence, how many are in the 81-company universe (data/config/), how many are not, and how many
 of those are delisted or merged where evidenced. Unknown stays unknown (report it as a separate
