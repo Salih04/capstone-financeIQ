@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
+import PreAuditNotice from '../PreAuditNotice'
 
 export default function AppShell({ children }) {
   const [collapsed, setCollapsed] = useState(false)
@@ -16,6 +17,7 @@ export default function AppShell({ children }) {
           minHeight: 'calc(100vh - var(--topbar-h))',
           padding: '30px clamp(18px, 2.4vw, 38px) 56px',
         }}>
+          <PreAuditNotice />
           {children}
         </main>
       </div>

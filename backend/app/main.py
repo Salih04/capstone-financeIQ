@@ -1,11 +1,17 @@
 import time
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
 from app.config import settings
+from app.core.evidence_status import (
+    EVIDENCE_NOTE_HEADER,
+    EVIDENCE_STATUS_HEADER,
+    WITHDRAWN_PRE_PIT_NOTE,
+    evidence_status_for,
+)
 from app.database import engine
 from app.models import *  # noqa: F401,F403 – registers all models with Base
 from app.database import Base
@@ -74,7 +80,19 @@ app.add_middleware(
     allow_credentials=not _cors_wildcard,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=[EVIDENCE_STATUS_HEADER, EVIDENCE_NOTE_HEADER],
 )
+
+
+# Responses built on the pre-audit T->T+1 design say so (app/core/evidence_status.py).
+@app.middleware("http")
+async def mark_evidence_status(request: Request, call_next):
+    response = await call_next(request)
+    status = evidence_status_for(request.url.path)
+    if status is not None:
+        response.headers[EVIDENCE_STATUS_HEADER] = status
+        response.headers[EVIDENCE_NOTE_HEADER] = WITHDRAWN_PRE_PIT_NOTE
+    return response
 
 app.include_router(auth.router)
 app.include_router(companies.router)
