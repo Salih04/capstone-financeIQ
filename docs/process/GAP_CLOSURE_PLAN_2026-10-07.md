@@ -8,6 +8,13 @@ Data Science yüksek lisansı süresince savunulabilir bir araştırma ve paper.
 
 Bu bir araştırma planıdır; yatırım tavsiyesi değildir.
 
+> **Durum ve görev dağılımı:** yapılanlar ve sırayla başlatılacak görev kartları
+> `docs/process/TASK_CARDS_2026-10-07.md` içinde. A1, A2, A5, A6 yapıldı; A3 kendi kartına
+> (FIQ-1) taşındı.
+>
+> **Kernel oturumlarına bu dosyayı verme:** sonuç sayıları içeriyor. Kernel'e yalnızca kart
+> prompt'ları gider.
+
 ---
 
 ## 0. Özet
