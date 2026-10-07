@@ -1,5 +1,7 @@
 # TASK_STATE.md — FinanceIQ
 
+> **Research pointer:** The legacy ledger is frozen as of 2026-10-07; new research uses [study record template](docs/process/STUDY_RECORD_TEMPLATE.md); current authority is [research charter](docs/process/RESEARCH_CHARTER.md).
+
 Last updated: 2026-07-13 (rev 14)
 
 ## Status legend
