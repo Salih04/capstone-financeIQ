@@ -8,12 +8,14 @@ Data Science yüksek lisansı süresince savunulabilir bir araştırma ve paper.
 
 Bu bir araştırma planıdır; yatırım tavsiyesi değildir.
 
-> **Durum ve görev dağılımı:** yapılanlar ve sırayla başlatılacak görev kartları
-> `docs/process/TASK_CARDS_2026-10-07.md` içinde. A1, A2, A5, A6 yapıldı; A3 kendi kartına
-> (FIQ-1) taşındı.
+> **Kapsam değişikliği (2026-10-07, aynı gün):** FinanceIQ artık açık bir araştırma programı;
+> kapsam `docs/process/RESEARCH_CHARTER.md`'de ve bu planla çeliştiği yerde o geçerli. Geçersiz
+> kalan kararlar: K1, K4, K6, K8, K15 (charter §8). Görev kartları iki dosyada:
+> `docs/process/TASKS_FINANCEIQ_2026-10-07.md` ve `docs/process/TASKS_PIT_KERNEL_2026-10-07.md`.
+> A1, A2, A5, A6 yapıldı; A3 FIQ-09 kartına taşındı.
 >
-> **Kernel oturumlarına bu dosyayı verme:** sonuç sayıları içeriyor. Kernel'e yalnızca kart
-> prompt'ları gider.
+> **Kernel oturumlarına bu dosyayı verme:** sonuç sayıları içeriyor. Kernel'e yalnızca kernel
+> görev dosyasındaki preamble ve kart prompt'ları gider.
 
 ---
 
@@ -211,7 +213,7 @@ Kritik bağımlılık zincirleri:
 
 - 40 şirketlik public kohortun seçim kuralı. `data/raw/README.md` yıllık dosyaları "winner
   cohort" diye tanımlıyor; kohort getiriye göre seçildiyse bu, hayatta kalmadan ayrı ve daha
-  ağır bir seçim yanlılığı (görev kartı O-11, FIQ-8).
+  ağır bir seçim yanlılığı (görev kartı FO-1, FIQ-16).
 - Fintables ve Yahoo kullanım koşulları (A3, A4).
 - Stage-A "351 üye" sınırının tam tanımı.
 - EVDS'de gösterge tahvil faizi serisinin varlığı.

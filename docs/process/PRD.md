@@ -1,8 +1,14 @@
 # PRD.md
 
+> **Status (2026-10-07).** FinanceIQ is now an open research program on Borsa Istanbul
+> equities aimed at peer-reviewed papers. Its scope, the capstone constraints it lifts and the
+> discipline that replaces them are defined in [`RESEARCH_CHARTER.md`](RESEARCH_CHARTER.md),
+> which wins wherever this document conflicts with it. Everything below describes the
+> **Capstone v1 record**: complete, frozen, kept reproducible.
+
 ## Project Definition
 
-**FinanceIQ** is a completed university capstone: an honest, leakage-safe **T→T+1 equity-research system** for 40 public BIST (Borsa Istanbul) companies, 2020–2025, with an 81-ticker internal training universe. It combines:
+**FinanceIQ (Capstone v1)** is a completed university capstone: an honest, leakage-safe **T→T+1 equity-research system** for 40 public BIST (Borsa Istanbul) companies, 2020–2025, with an 81-ticker internal training universe. It combines:
 
 - a validated no-fabrication data pipeline (yearly XLSX + free Yahoo prices + manual shares/corrections → T→T+1 modeling dataset),
 - walk-forward ML experiments against a BIST100 benchmark,
@@ -40,16 +46,28 @@ Can free, validated, leakage-safe fundamentals predict next-year BIST stock retu
 
 ## Intended Direction
 
+Superseded 2026-10-07 by [`RESEARCH_CHARTER.md`](RESEARCH_CHARTER.md) §6 (Paper 1 audit, Paper 2
+disclosure event study, Study 3 open modeling on a rule-based point-in-time universe). The
+paragraph below is the pre-charter record.
+
 Beyond-capstone options only (from `TASK_STATE.md`, all optional): expand the training universe via the ready yfinance workflow, obtain genuine quarterly fundamentals, optionally fine-tune a local model per `research_agent_training/mlx_training_plan.md`. No committed roadmap; a **candidate** roadmap (assessment, staged ideas, execution queue) was documented 2026-07-12 in `FINANCEIQ_MOONSHOT_ROADMAP.md` + `FINANCEIQ_AGENT_TASK_QUEUE.md` Phase 2 — its theme is "instrument the negative result" (significance testing, reproducibility manifests, claim-gating, adversarial self-checks), never manufacturing predictive-edge claims.
 
 ## Non-Goals
 
-- Producing investment advice or claiming predictive edge.
-- Real-time/intraday data, paid data vendors, web scraping.
-- Fabricating or imputing missing values.
-- Making the LLM a numerical model or letting it write into the dataset.
+Program-wide (charter §5):
+
+- Producing investment advice, or claiming predictive ability without a confirmatory,
+  pre-registered result on the locked holdout.
+- Paid data vendors; collection that breaks a source's terms or bypasses access controls.
+- Fabricating data or imputing stored values.
+- Storing LLM output as a source fact or writing it into the modeling dataset.
+
+Capstone v1 only (lifted for new research by charter §3): intraday data, web scraping in this
+repository, the LLM as a numerical model.
 
 ## Constraints
+
+Capstone v1 record; new research follows charter §3–§5.
 
 - Free data sources only; shares outstanding is manual (capital-event CSV) — derived valuation stays null until supplied.
 - Yearly granularity; quarterly exports are frozen and excluded.

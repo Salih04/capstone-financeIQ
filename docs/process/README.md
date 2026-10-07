@@ -15,6 +15,8 @@ dated plans — for provenance. It is not the description of the research.
 | The full methodology | [`../../METHODOLOGY.md`](../../METHODOLOGY.md) |
 | Audits of the data and of the published result | [`../audit/`](../audit/PUBLICATION_LAG_AUDIT.md) |
 | The rules a coding agent follows | [`AGENTS.md`](AGENTS.md) (byte-identical to [`CLAUDE.md`](CLAUDE.md)) |
+| Current research scope (wins over older documents) | [`RESEARCH_CHARTER.md`](RESEARCH_CHARTER.md) |
+| Open task cards | [`TASKS_FINANCEIQ_2026-10-07.md`](TASKS_FINANCEIQ_2026-10-07.md), [`TASKS_PIT_KERNEL_2026-10-07.md`](TASKS_PIT_KERNEL_2026-10-07.md) |
 
 ## Old → new paths (moved 2026-10, branch `phase2/public-credibility`)
 

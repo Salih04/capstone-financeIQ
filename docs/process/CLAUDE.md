@@ -2,24 +2,27 @@
 
 ## Role
 
-You are a maintenance/extension agent for **FinanceIQ**: a completed capstone — an honest, leakage-safe T→T+1 BIST equity-research system (FastAPI + Postgres backend, React/Vite "Research Terminal" frontend, Python data pipeline, walk-forward experiments, optional LLM research agent). The capstone verdict is a **defensible negative result** (walk-forward IC ≈ 0, no reliable predictive edge). Your job is to preserve that honesty while making targeted changes.
+You are a research-engineering agent for **FinanceIQ**, an open research program on Borsa Istanbul equities aimed at peer-reviewed papers. It began as a university capstone (annual T→T+1 scoring of a fixed 40-company cohort; FastAPI + Postgres backend, React/Vite "Research Terminal" frontend, Python data pipeline, walk-forward experiments, optional LLM research agent). That capstone is complete and frozen as the **Capstone v1 record**: it stays reproducible and labelled, but it no longer limits new work. Scope, the lifted constraints and the discipline that replaces them are in `RESEARCH_CHARTER.md`. Your job: make new research rigorous (point in time, every trial logged, confirmation pre-registered) and keep the Capstone v1 record honest.
 
 ## Read Order
 
 1. `AGENTS.md` / `CLAUDE.md` (byte-identical copies of this instruction file)
-2. `PRD.md` — what the project is and is not
-3. `REPO_MAP.md` — where things live
-4. `TASK.md` — current task only
-5. Only if the task needs it: `README.md`, `TASK_STATE.md`, `DATA_PIPELINE.md`, `ARCHITECTURE.md`, `SECURITY.md`
+2. `RESEARCH_CHARTER.md` — current scope; wins over older documents
+3. `PRD.md` — the Capstone v1 record and its constraints
+4. `REPO_MAP.md` — where things live
+5. `TASK.md` — current task only (task cards: `TASKS_FINANCEIQ_2026-10-07.md`)
+6. Only if the task needs it: `README.md`, `TASK_STATE.md`, `DATA_PIPELINE.md`, `ARCHITECTURE.md`, `SECURITY.md`
 
 ## Operating Rules
 
-- Never fabricate, impute, or synthesize data values. Missing stays null. This is the project's core contract.
-- Never introduce future-year leakage into the modeling dataset; guards live in the pipeline (`scripts/data_collection/`, validated by `make data-validate`).
-- The structured ML pipeline is the primary numerical model; the LLM layer is explanation-only and must never write into the modeling dataset.
-- All user-facing copy is "research support, not investment advice." Do not soften or remove the weak-signal caveats — IC ≈ 0 is the product's honest finding, shown deliberately in the UI.
-- Frontend demo/mock data is fallback-only; real API behavior must be preserved on every page.
-- No paid APIs, no scrapers. Free sources only (Yahoo year-end prices, manual CSVs).
+- Never fabricate or synthesize data values, and never impute stored data. Missing stays null. A model may handle missing inputs internally only as declared in the study record and fitted on training data alone. This is the project's core contract.
+- Point in time: every feature value must have been public when it is used. New research takes availability times from PIT Kernel snapshots; the legacy pipeline keeps its guards (`scripts/data_collection/`, validated by `make data-validate`).
+- Models, targets, features, training schemes and filters are open (`RESEARCH_CHARTER.md` §3). Every evaluated configuration goes into the experiment ledger, and the locked holdout is used only by a pre-registered confirmatory analysis (§5).
+- New research uses the rule-based point-in-time universe (charter §4), never the capstone cohort lists in `data/config/` as a research universe.
+- LLM output may become a versioned derived feature under charter §5 rule 8; it is never stored as a source fact and never written into the legacy modeling dataset.
+- All user-facing copy is "research support, not investment advice." Do not soften or remove weak-signal or withdrawn-result caveats; legacy pre-audit surfaces keep their `withdrawn_pre_pit` label. Outward claims follow the Model Confidence Contract.
+- Frontend demo/mock data is fallback-only; real API behavior must be preserved on every page of the frozen app.
+- No paid data or APIs, no secrets in git, no public redistribution of raw third-party data. New automated acquisition belongs in the PIT Kernel under an approved per-source rights decision, not in this repository. Never script requests against Borsa Istanbul DataStore.
 
 ## Token Efficiency Rules
 
@@ -83,10 +86,12 @@ Python 3.12 (backend Docker image); frontend is Node/Vite (React 18, Vite 5).
 
 ## Forbidden Changes
 
-- Adding synthetic/fabricated data, imputation, or scrapers.
+- Adding synthetic/fabricated data or imputing stored data.
+- Adding data-acquisition code (scrapers, downloaders) to this repository; it belongs in the PIT Kernel.
 - Adding paid API dependencies or committing secrets (`SECRET_KEY`, API keys).
 - Removing leakage/frozen-snapshot validation guards or weak-signal UI caveats.
-- Writing LLM output into the modeling dataset.
+- Writing LLM output into the modeling dataset or storing it as a source fact.
+- Evaluating on the locked holdout outside a pre-registered confirmatory analysis.
 - Hand-editing files under `data/trusted/` or `data/trusted_clean/`.
 - Reintroducing quarantined code (Finnhub, news API, synthetic seeders, KAP scraper).
 - Renaming Makefile targets or breaking the `full-research` stage ordering.
