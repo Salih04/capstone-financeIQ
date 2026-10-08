@@ -1,5 +1,7 @@
 # FINANCEIQ_AGENT_TASK_QUEUE.md
 
+> **Research pointer:** The legacy ledger is frozen as of 2026-10-07; new research uses [study record template](docs/process/STUDY_RECORD_TEMPLATE.md); current authority is [research charter](docs/process/RESEARCH_CHARTER.md).
+
 Sequenced task queue for future coding agents. Grounded in the 2026-07-08 audit (`FINANCEIQ_MODEL_VALIDITY_AUDIT.md`, `OPERATING_LAYER_VALIDATION.md`) and re-planned 2026-07-12 from direct repo inspection after the Stage-0/Stage-1/Stage-2 completions below. Every agent: read `CLAUDE.md` → `PRD.md` → `REPO_MAP.md` → `FINANCEIQ_SMALL_MODEL_RULES.md` first, then only the task's listed files.
 
 **Universal verification:** current observed suite counts and data-validation output live in `docs/VERIFICATION_BASELINE.md`; re-run the applicable command and compare with that dated baseline rather than copying counts into new task text. After backend edits run `PYTHONPATH=backend python -m pytest backend/tests`; after pipeline/test edits run `PYTHONPATH=. python -m pytest tests/`; after data edits also run `make data-validate`; after any user-facing copy or response-constant change run `make claims-lint`. Rollback for all tasks: `git checkout -- <files>` before commit, `git revert` after — no task below has irreversible side effects unless its rollback note says otherwise.
