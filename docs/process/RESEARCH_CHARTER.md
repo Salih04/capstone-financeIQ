@@ -4,6 +4,18 @@ Adopted 2026-10-07 by the project owner. In force. Where an older rule, plan or
 document conflicts with this charter, this charter wins; older documents are
 not edited and stay as dated records.
 
+Owner approval (FO-0), 2026-10-09: FO-0 is approved. The project owner
+approved both FO-0 decisions without modification: the **U1 universe rule**
+(§4: point-in-time BIST 100 membership at every BIST index-period start, from
+DataStore Product 3184 cross-checked against the periodic review
+announcements; any disagreement or evidence gap fails closed; survivor-inclusive
+through the holding or event window; intra-quarter entries join at the next
+review, intra-quarter exits stay in the formation sample) and the **holdout
+boundaries** (§5 rule 7: development up to 2022-12-31; locked holdout
+2023-01-01 to 2025-12-31; forward holdout = data published after the OSF
+registration). The §4 and §5 text adopted on 2026-10-07 already matched and is
+unchanged.
+
 Research support only; not investment advice.
 
 ---
