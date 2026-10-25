@@ -1,0 +1,21 @@
+{
+  "contract_version": "4.0.0",
+  "as_of": "2024-05-10T14:59:59.000000Z",
+  "valid_at": "2024-02-01T00:00:00.000000Z",
+  "system_as_of": "2026-04-01T00:00:00.000000Z",
+  "hash_algorithm": "sha256:financeiq-pit-snapshot-v4",
+  "dimension_key": [
+    "entity_id",
+    "security_id",
+    "field",
+    "period_type",
+    "period_basis",
+    "currency",
+    "unit",
+    "scale",
+    "consolidation",
+    "accounting_basis"
+  ],
+  "content_hash": "4043402e9c05002b669cca2281905f40e1641bfb087b6c91965b40133c75d539",
+  "facts": []
+}
