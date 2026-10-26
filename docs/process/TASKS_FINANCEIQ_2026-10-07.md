@@ -212,6 +212,10 @@ charter) but do not create or push it.
 #### FIQ-06 · U1/U2 evren kuralı tasarımı
 Dalga 2 · Ön koşul: FO-0 · Sonuç hesaplamaz
 
+2026-10-26 sahip kararı: [v1.0.0 PARTIAL/SCOPED ADOPTION](../research/OWNER_DECISION_ADDENDUM.md)
+yalnız ekteki onaylı kuralları kapsar; R14 bütünü onaylanmadı, kart tamamlanmadı.
+U2, uygulanabilir pencere, EV-3 ve kalan seçimler OPEN/BLOCKED; eksikler kapalı kalır.
+
 Bitti ölçütü: `docs/research/UNIVERSE_RULE.md` (proposed) sürüm numaralı, sonuçtan bağımsız ve
 kernel verisinin nasıl kullanılacağını adım adım tanımlıyor.
 
@@ -336,6 +340,10 @@ Record feature definitions with a version in docs/research/FEATURES.md.
 
 #### FIQ-11 · Araştırma protokolü
 Dalga 2 · Ön koşul: FO-0
+
+2026-10-26 sahip kararı: [sınırlı karar eki](../research/OWNER_DECISION_ADDENDUM.md)
+OD-1–8 dispositions ve tek tek I-1–I-16 durumlarını kaydeder; R7 bütünü benimsenmedi.
+Çalışma kaydı, korunan erişim/açılış ve uygulama kapıları ayrıca geçerlidir.
 
 Bitti ölçütü: `docs/research/PROTOCOL.md` (proposed) bütün çalışmaların uyacağı ortak kuralları
 tanımlıyor; FIQ-12 bunu koda döküyor.
