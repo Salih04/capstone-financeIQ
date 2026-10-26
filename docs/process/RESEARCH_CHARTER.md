@@ -133,6 +133,12 @@ Kept from the capstone:
    The Model Confidence Contract (`model_confidence_contract.json`) governs
    outward claims. A claim that a model has predictive ability needs a
    confirmatory, pre-registered result on the locked holdout (rule 7).
+   Owner clarification (2026-10-26, [decision addendum](../research/OWNER_DECISION_ADDENDUM.md)):
+   a properly pre-registered confirmatory result on a forward holdout under
+   rule 7 may also support a predictive-ability claim despite historical
+   locked-holdout contamination, provided its explicitly documented status
+   establishes cleanliness through prior-exposure and cross-study checks
+   rather than publication dates alone.
 5. **Rights.** No paid data, no secrets in git, no public redistribution of
    raw third-party data, no bypassing authentication, CAPTCHAs, WAFs or rate
    limits. Borsa Istanbul DataStore is manual-download only.
