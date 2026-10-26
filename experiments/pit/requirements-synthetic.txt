@@ -1,0 +1,2 @@
+# Optional isolated synthetic consumer/test dependency; no legacy dependency.
+jsonschema==4.25.1

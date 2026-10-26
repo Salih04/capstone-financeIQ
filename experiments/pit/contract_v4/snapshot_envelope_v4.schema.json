@@ -1,0 +1,426 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://financeiq.local/schemas/snapshot_envelope_v4.schema.json",
+  "title": "Internal FinanceIQ PIT snapshot envelope v4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "as_of",
+    "valid_at",
+    "system_as_of",
+    "hash_algorithm",
+    "dimension_key",
+    "content_hash",
+    "facts"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "4.0.0"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "system_as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hash_algorithm": {
+      "const": "sha256:financeiq-pit-snapshot-v4"
+    },
+    "dimension_key": {
+      "const": [
+        "entity_id",
+        "security_id",
+        "field",
+        "period_type",
+        "period_basis",
+        "currency",
+        "unit",
+        "scale",
+        "consolidation",
+        "accounting_basis"
+      ]
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fact"
+      }
+    }
+  },
+  "$defs": {
+    "fact": {
+      "title": "Structured fact version v4",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "fact_version_id",
+        "entity_id",
+        "security_id",
+        "field",
+        "period_type",
+        "period_basis",
+        "currency",
+        "unit",
+        "scale",
+        "consolidation",
+        "accounting_basis",
+        "measuring_unit_date",
+        "value",
+        "value_type",
+        "valid_from",
+        "known_at_lower",
+        "known_at_upper",
+        "known_at_precision",
+        "source_doc_id",
+        "source_hash",
+        "source_locator",
+        "extraction_method",
+        "extraction_version",
+        "review_status",
+        "recorded_at"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "4.0.0"
+        },
+        "fact_version_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entity_id": {
+          "type": "string",
+          "minLength": 1,
+          "not": {
+            "const": "NOT_APPLICABLE"
+          },
+          "description": "Durable issuer key; always applicable."
+        },
+        "security_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Durable instrument key, or NOT_APPLICABLE for an entity-level fact. Null is not accepted."
+        },
+        "field": {
+          "type": "string",
+          "minLength": 1,
+          "not": {
+            "const": "NOT_APPLICABLE"
+          },
+          "description": "Canonical field name; always applicable."
+        },
+        "period_type": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*(?![\\s\\S])",
+          "description": "Key coordinate for the declared reporting period, or NOT_APPLICABLE. KER-03 defines Q1, Q2, Q3, Q4 (fiscal quarters), H1 (first six months), M9 (first nine months) and FY (fiscal year), each relative to the source-declared fiscal year whose start is valid_from; the period is declared, never inferred from calendar month lengths or a calendar-year assumption. Independent of period_basis. Other uppercase tokens remain structurally valid with no KER-03 semantics."
+        },
+        "period_basis": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*(?![\\s\\S])",
+          "description": "Key coordinate for how the declared period is measured, or NOT_APPLICABLE. KER-03 defines CUMULATIVE (accumulated from the declared fiscal-year start valid_from to the end of the named period valid_to, as Turkish interim statements publish 3M/6M/9M/12M amounts) and DISCRETE (the named period alone). period_type and period_basis are independent coordinates: a published fact keeps exactly the pair its source declares (for example FY/DISCRETE or Q2/CUMULATIVE). A discrete quarter computed from the canonical CUMULATIVE pair is a derivative, not a fact version."
+        },
+        "currency": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Z]{3}(?![\\s\\S])"
+            },
+            {
+              "const": "NOT_APPLICABLE"
+            }
+          ],
+          "description": "Uppercase three-letter currency code exactly for monetary units; otherwise NOT_APPLICABLE. Syntax only: membership in a currency registry is not checked."
+        },
+        "unit": {
+          "enum": [
+            "MONETARY",
+            "MONETARY_PER_SHARE",
+            "SHARES",
+            "PURE",
+            "PERCENT",
+            "COUNT",
+            "NOT_APPLICABLE"
+          ],
+          "description": "Measurement unit; NOT_APPLICABLE for STRING/BOOLEAN values."
+        },
+        "scale": {
+          "enum": [
+            "UNIT",
+            "THOUSAND",
+            "MILLION",
+            "BILLION",
+            "NOT_APPLICABLE"
+          ],
+          "description": "Reported multiplier; NOT_APPLICABLE exactly when unit is NOT_APPLICABLE."
+        },
+        "consolidation": {
+          "enum": [
+            "CONSOLIDATED",
+            "SOLO",
+            "NOT_APPLICABLE"
+          ],
+          "description": "Reporting perimeter; an independent key coordinate, not tied to accounting_basis applicability."
+        },
+        "accounting_basis": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*(?![\\s\\S])",
+          "description": "Key coordinate for the accounting/measurement basis, or NOT_APPLICABLE. KER-02 defines TFRS_HISTORICAL (amount as originally published) and IAS29_RESTATED (amount republished in the measuring unit current at a later balance-sheet date); other uppercase tokens stay structurally valid."
+        },
+        "measuring_unit_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}(?![\\s\\S])",
+          "format": "date",
+          "description": "Recorded IAS 29 measuring-unit date (YYYY-MM-DD) for IAS29_RESTATED; null for every other accounting_basis. Always present so missing and null are never conflated. Measurement metadata only: not a canonical key component or selection coordinate, and never inferred from valid_from, valid_to, known_at or recorded_at."
+        },
+        "value": {
+          "type": [
+            "string",
+            "number",
+            "integer",
+            "boolean"
+          ]
+        },
+        "value_type": {
+          "enum": [
+            "DECIMAL_STRING",
+            "STRING",
+            "INTEGER",
+            "BOOLEAN"
+          ]
+        },
+        "valid_from": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,6})?(Z|[+-](0[0-9]|1[0-5]):[0-5][0-9])(?![\\s\\S])"
+        },
+        "valid_to": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,6})?(Z|[+-](0[0-9]|1[0-5]):[0-5][0-9])(?![\\s\\S])"
+        },
+        "known_at_lower": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,6})?(Z|[+-](0[0-9]|1[0-5]):[0-5][0-9])(?![\\s\\S])"
+        },
+        "known_at_upper": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,6})?(Z|[+-](0[0-9]|1[0-5]):[0-5][0-9])(?![\\s\\S])"
+        },
+        "known_at_precision": {
+          "enum": [
+            "EXACT_TIMESTAMP",
+            "DATE_ONLY",
+            "INTERVAL",
+            "UNKNOWN"
+          ]
+        },
+        "source_doc_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "source_locator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extraction_method": {
+          "enum": [
+            "MANUAL_REVIEWED",
+            "PARSER",
+            "OCR_PARSER",
+            "LLM_CANDIDATE",
+            "SYNTHETIC"
+          ]
+        },
+        "extraction_model_or_parser": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "extraction_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_status": {
+          "enum": [
+            "UNREVIEWED",
+            "REVIEWED",
+            "REJECTED"
+          ]
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,6})?(Z|[+-](0[0-9]|1[0-5]):[0-5][0-9])(?![\\s\\S])"
+        },
+        "supersedes_fact_version_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "publication_timezone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "IANA timezone for DATE_ONLY evidence; required for conservative UTC bounds."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "unit"
+            ],
+            "properties": {
+              "unit": {
+                "enum": [
+                  "MONETARY",
+                  "MONETARY_PER_SHARE"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "currency": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}(?![\\s\\S])"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "currency": {
+                "const": "NOT_APPLICABLE"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "unit"
+            ],
+            "properties": {
+              "unit": {
+                "const": "NOT_APPLICABLE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "scale": {
+                "const": "NOT_APPLICABLE"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "scale": {
+                "not": {
+                  "const": "NOT_APPLICABLE"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "value_type"
+            ],
+            "properties": {
+              "value_type": {
+                "enum": [
+                  "STRING",
+                  "BOOLEAN"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "NOT_APPLICABLE"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "accounting_basis"
+            ],
+            "properties": {
+              "accounting_basis": {
+                "const": "IAS29_RESTATED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "measuring_unit_date": {
+                "type": "string"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "measuring_unit_date": {
+                "const": null
+              }
+            }
+          }
+        }
+      ],
+      "$comment": "Canonical fact dimension key, in order: entity_id, security_id, field, period_type, period_basis, currency, unit, scale, consolidation, accounting_basis. Every component is required and non-null; NOT_APPLICABLE is an explicit assertion, never inferred from a missing, null or empty value. measuring_unit_date is required KER-02 metadata outside the key. KER-03 period vocabulary: Q1, Q2, Q3, Q4, H1, M9, FY and CUMULATIVE, DISCRETE, with no coupling between period_type and period_basis. Patterns end with (?![\\s\\S]) so they match the whole string in every regex engine (a trailing newline never matches). Instants use the Kernel RFC 3339 grammar shared with Python and PostgreSQL: \"T\", 0-6 fractional digits, \"Z\" or an offset up to +-15:59.",
+      "description": "PIT fact version v4 (KER-03); a published source fact under its published period basis. UNKNOWN public time has null bounds and is never query-eligible. An IAS29_RESTATED comparative is a separate fact from the TFRS_HISTORICAL amount and never supersedes it. Discrete quarters derived from cumulative facts are derivative records, never v4 facts. Cross-field time and interval invariants are enforced by code/storage. Fact v3 remains historical in structured_fact_v3.schema.json and carries no KER-03 period semantics."
+    }
+  },
+  "description": "Contract 4.0.0. At most one published source fact per canonical dimension key; every fact states measuring_unit_date and keeps its source-declared period_type and period_basis. Derived discrete quarters are not exchanged. content_hash is SHA-256 of canonical {contract_version, dimension_key, facts}. Contracts 3.0.0, 2.0.0 and 1.0.0 remain historical in snapshot_envelope_v3.schema.json, snapshot_envelope_v2.schema.json and snapshot_envelope.schema.json."
+}

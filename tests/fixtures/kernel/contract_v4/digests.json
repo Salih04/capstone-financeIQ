@@ -1,0 +1,50 @@
+{
+  "contract_version": "4.0.0",
+  "hash_algorithm": "sha256:financeiq-pit-snapshot-v4",
+  "dimension_key": [
+    "entity_id",
+    "security_id",
+    "field",
+    "period_type",
+    "period_basis",
+    "currency",
+    "unit",
+    "scale",
+    "consolidation",
+    "accounting_basis"
+  ],
+  "note": "Synthetic invented facts only. content_hash = SHA-256 of canonical UTF-8 JSON {contract_version, dimension_key, facts}; every v4 fact states measuring_unit_date and carries KER-03 period semantics (published Q1/H1/M9/FY CUMULATIVE source facts; derived discrete quarters are not exchanged); canonical bytes = serialized envelope.",
+  "snapshots": {
+    "expected_snapshot.json": {
+      "content_hash": "96aae6defad9399df75a1dd20dd6aefbc8ebd8f0d7e2ca3da05769d3fd7ccf5c",
+      "canonical_bytes_file": "expected_snapshot.canonical.json",
+      "canonical_bytes_length": 5386,
+      "canonical_bytes_sha256": "ce151089c873355b840eda42177e99d2052f52bfc2e55a92892659b2bf1c71a6",
+      "fact_version_ids": [
+        "SYN-P24-FY",
+        "SYN-P24-FY-IAS29",
+        "SYN-P24-H1",
+        "SYN-P24-M9",
+        "SYN-P24-Q1"
+      ]
+    },
+    "expected_pre_annual_snapshot.json": {
+      "content_hash": "d6b1560e5cc1b6802fdd789feea28cf202ba4b629775ae9719ad1818b16b191f",
+      "canonical_bytes_file": "expected_pre_annual_snapshot.canonical.json",
+      "canonical_bytes_length": 3364,
+      "canonical_bytes_sha256": "6575b45303e97c2e853ea990a43495aed6dfb1006fd86836e15cc7ff1959d152",
+      "fact_version_ids": [
+        "SYN-P24-H1",
+        "SYN-P24-M9",
+        "SYN-P24-Q1"
+      ]
+    },
+    "expected_empty_snapshot.json": {
+      "content_hash": "4043402e9c05002b669cca2281905f40e1641bfb087b6c91965b40133c75d539",
+      "canonical_bytes_file": "expected_empty_snapshot.canonical.json",
+      "canonical_bytes_length": 439,
+      "canonical_bytes_sha256": "8b9a77ad6c1a56d1c3e7eb08b4c51d28131c07bbf221423b0fc80cfe75f671cb",
+      "fact_version_ids": []
+    }
+  }
+}
