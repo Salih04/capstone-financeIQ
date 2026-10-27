@@ -76,3 +76,81 @@ reconstruction occurred. Existing Capstone code/data/results were not changed.
 One local documentation commit is intended; no push, PR, merge or OSF action
 is authorized by this delivery. Local verification is not scientific validity
 or owner acceptance of a paper.
+
+## FIQ-15 manuscript delivery — 2026-10-27
+
+This entry appends the next authorized task; the preparation record above is
+preserved as history. Freshly fetched `origin/main` remains
+`efe3ed32ca958074c01ee9488f1f768a9d812c61`. The accessible preparation commit
+`7b444a35298f7b04012d818ff70fcbc57b85d6b3` has that main as its immediate
+parent and is not merged. Its changed paths and the named source documents
+were inspected before starting the isolated FIQ-15 branch
+`codex/fiq-15-manuscript-20261027` from it. The candidate therefore includes
+the unmerged preparation as an explicit local prerequisite, not as main truth.
+No unrelated checkout or branch was changed.
+
+| Artifact | Purpose and status |
+| --- | --- |
+| [draft.md](draft.md) | Complete bounded English working manuscript, approximately 4,000 words including reference/link text. Publication-time audit findings, selection placeholder, controls, exposure and limitations; no new analysis. |
+| [draft.pdf](draft.pdf) | 11-page reading layout, including references, verified against the editable text. A4, 11-point body, 15.4-point leading, 72-point side margins; not a BIR/JAM submission template or verified double-spaced journal layout. |
+| [evidence_crosswalk.md](evidence_crosswalk.md) | Human-readable mapping of all numerical claims and scoped non-numeric evidence to full commits, paths and source line ranges; literature-access limits and open items. |
+| [evidence_crosswalk.json](evidence_crosswalk.json) | 38 evidence records, exact source excerpts, source-byte digests, published-source permalinks and local prerequisite locators. |
+
+The only outcome-number inputs opened were frozen `RESULTS.md` and the exact
+`experiments/results_pit_v2/REPORT.md`. Methods/chronology came from the
+protocol/amendment and scoped guard source/test descriptions; no outcome
+manifest, data row, new report, model output or other outcome file was read.
+The authorized cohort and single-date overlap use the existing FIQ-16
+disclosure/count record. They are not return evidence or annual membership.
+All unknown annual counts remain null. No new count, return calculation,
+simulation, model evaluation, protected-data opening, FIQ-17 or FIQ-18 run,
+Kernel inspection, cross-project packaging, message or external action occurred.
+
+### FIQ-15 verification actually performed
+
+- `make docs-lint` — PASS.
+- `make claims-lint` — PASS, existing Model Confidence Contract unchanged.
+- `python3 /tmp/financeiq-fiq15-20261027/check_draft.py` — PASS. External
+  session-scratch static checker verified all 38 source records against their
+  exact Git bytes/line excerpts, all cited numeric paragraphs for source-token
+  coverage, every secondary-model table cell including sign and precision,
+  ten used bibliography DOI/year identities, and scoped local links/anchors.
+  Manual semantic review additionally checked numeric associations, written-out
+  counts and the distinct denominator/scoping issues. The scratch helper is
+  not part of the research implementation or a scientific test.
+- PDF extraction/layout review — PASS: 11 pages; text parity against Markdown
+  after removing markup/link destinations, headers/footers and normalizing
+  layout punctuation; all pages rendered and visually inspected, including
+  the model table and separate reference entries.
+- `git diff --check` and explicit-path staged diff check — PASS.
+
+The canonical linters do not fully cover nested paper prose. Static numerical
+checks prove transcription, not identification, calibrated inference, complete
+historical trial accounting, an independent review or a fresh reproduction.
+Existing timestamp-guard tests were inspected as methods evidence, not run.
+No application/data/model suites were needed for this documentation-only task.
+
+### Open scientific and editorial items
+
+FIQ-17's frozen-design source/selection comparisons are NOT RUN; no effect
+size, sign, interval or performance bound is available. Additional
+realised-return selection is UNKNOWN; complete FO-1 selection provenance and
+annual FIQ-16 evidence remain incomplete. Exact-filing sensitivity and
+independent scientific review remain outstanding. The adopted addendum keeps
+protected replication behind both confirmatory openings and its own applicable
+OSF/specification/ledger/access gates; this manuscript grants no access.
+
+The used references avoid the unresolved PBO page range. That discrepancy
+remains open in FIQ-13, and OpenAlex dossier self-reports remain unverified.
+Hansen's identity/title is verified in FIQ-13; current publisher full text was
+inaccessible, so no detailed claim about its implementation/results is made.
+BIR/JAM remain candidate positioning only. Final author instructions, fees,
+double-spacing and word-count conventions require checking before submission;
+no acceptance probability or proven journal-limit compliance is claimed.
+The broader-program company/sector/model statement stays in README/Charter,
+outside the manuscript's scientific prose.
+
+The FIQ-15 deliverable is ready for owner/scientific review as a local commit,
+not submission. No push, PR, merge, historical-results edit or Capstone v1
+change is included. Next standing-queue preparation is FIQ-09 phase 1 under
+its separate scope; nothing in this delivery starts it.
