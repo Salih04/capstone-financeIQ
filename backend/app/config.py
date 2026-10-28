@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     SUPABASE_AUTO_CREATE_USERS: bool = True
     SUPABASE_URL: str | None = None
     SUPABASE_JWKS_URL: str | None = None
+    # Deployment attestation, not a token claim: set true only after confirming
+    # the Supabase project issues sessions solely for confirmed email addresses
+    # (Auth > Email "Confirm email" on, and every enabled provider verifies
+    # email). Until then a Supabase email never satisfies APPROVED_EMAILS
+    # (fail closed). user_metadata.email_verified is user-writable and ignored.
+    SUPABASE_EMAIL_CONFIRMATION_ENFORCED: bool = False
 
     def supabase_jwks_url(self) -> str | None:
         if self.SUPABASE_JWKS_URL:

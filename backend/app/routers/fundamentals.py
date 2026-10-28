@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user
+from app.core.dependencies import require_shared_data_writer
 from app.database import get_db
 from app.models.user import User
 from app.schemas.forecasting import FundamentalsUploadResponse
@@ -14,7 +14,7 @@ router = APIRouter(tags=["fundamentals"])
 async def upload_fundamentals_csv(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_shared_data_writer),
 ):
     if not file.filename.lower().endswith(".csv"):
         raise HTTPException(status_code=422, detail="Please upload a CSV file.")

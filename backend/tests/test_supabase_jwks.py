@@ -51,6 +51,7 @@ def _rs256_token(email: str, *, iss: str = _ISS, exp_delta: int = 3600) -> str:
 _DEFAULTS = dict(
     PUBLIC_DEMO_MODE=True, REQUIRE_APPROVED_USER=False, APPROVED_EMAILS="",
     SUPABASE_URL=None, SUPABASE_JWKS_URL=None, SUPABASE_JWT_SECRET=None,
+    SUPABASE_EMAIL_CONFIRMATION_ENFORCED=False,
 )
 
 
@@ -111,6 +112,7 @@ class SupabaseJwksTests(unittest.TestCase):
     # ── endpoint: private mode + JWKS ──
     def test_private_approved_jwks_user_200(self):
         self._private(approved="user@x.com")
+        settings.SUPABASE_EMAIL_CONFIRMATION_ENFORCED = True  # deployment attests confirmed emails
         r = self.client.get("/research/summary",
                             headers={"Authorization": f"Bearer {_rs256_token('User@X.com')}"})
         self.assertEqual(r.status_code, 200)

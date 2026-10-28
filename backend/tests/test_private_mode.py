@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import os
+import time
 import unittest
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from jose import jwt
 
 os.environ.setdefault("DATABASE_URL", "sqlite+pysqlite:///:memory:")
 os.environ.setdefault("SECRET_KEY", "test-secret-key")
@@ -17,7 +19,15 @@ from app.main import app  # noqa: E402
 _DEFAULTS = dict(
     PUBLIC_DEMO_MODE=True, REQUIRE_APPROVED_USER=False, APPROVED_EMAILS="",
     RATE_LIMIT_ENABLED=False, RATE_LIMIT_REQUESTS_PER_MINUTE=60,
+    SUPABASE_JWT_SECRET=None, SUPABASE_EMAIL_CONFIRMATION_ENFORCED=False,
 )
+_SUPABASE_SECRET = "private-mode-test-secret"
+
+
+def _supabase_token(email: str) -> str:
+    now = int(time.time())
+    return jwt.encode({"sub": "uid-owner", "email": email, "aud": "authenticated",
+                       "iat": now, "exp": now + 3600}, _SUPABASE_SECRET, algorithm="HS256")
 
 
 def _reset():
@@ -68,10 +78,16 @@ class PrivateModeTests(unittest.TestCase):
         self.assertEqual(r.status_code, 403)
 
     def test_private_approved_email_ok_case_insensitive(self):
+        # Only a proven email can satisfy the allowlist: a Supabase session under
+        # the deployment's email-confirmation attestation (legacy self-registered
+        # emails never qualify; see test_auth_hardening.py).
         settings.PUBLIC_DEMO_MODE = False
         settings.REQUIRE_APPROVED_USER = True
         settings.APPROVED_EMAILS = "owner@test.com"  # token email is Owner@Test.com
-        r = self.client.get("/research/summary", headers=self.auth)
+        settings.SUPABASE_JWT_SECRET = _SUPABASE_SECRET
+        settings.SUPABASE_EMAIL_CONFIRMATION_ENFORCED = True
+        auth = {"Authorization": f"Bearer {_supabase_token('Owner@Test.com')}"}
+        r = self.client.get("/research/summary", headers=auth)
         self.assertEqual(r.status_code, 200)
 
     def test_private_unapproved_email_403(self):

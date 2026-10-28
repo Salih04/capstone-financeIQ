@@ -20,7 +20,10 @@ Do not use the Supabase service-role key in frontend env.
 
 1. Create a Supabase project.
 2. Authentication -> Providers -> Email: enable email/password. Enable email
-   confirmations if reviewers should verify accounts before entry.
+   confirmations if reviewers should verify accounts before entry. The backend
+   cannot see this setting: a private deployment with `APPROVED_EMAILS` admits
+   Supabase users only after you confirm it is on and set
+   `SUPABASE_EMAIL_CONFIRMATION_ENFORCED=true` (see `SECURITY.md`).
 3. Authentication -> Providers -> Google: enable provider, add Google OAuth
    client ID and client secret.
 4. Authentication -> URL Configuration:

@@ -25,6 +25,7 @@ from app.models.forecasting import (
     WinnerCohortRow,
     QuarterlyFundamental,
 )
+from app.core.numeric import finite_or_none
 from app.core.paths import resolve_repo_root
 
 
@@ -81,7 +82,7 @@ def _to_float(v: Any) -> float | None:
     if v is None:
         return None
     if isinstance(v, (int, float)):
-        return float(v)
+        return finite_or_none(v)
 
     s = _normalize_text(v)
     if not s:
@@ -106,7 +107,7 @@ def _to_float(v: Any) -> float | None:
         return None
 
     try:
-        return float(s)
+        return finite_or_none(s)
     except ValueError:
         return None
 
@@ -190,13 +191,7 @@ def import_winner_excel_preset(db: Session, file_name: str) -> dict[str, Any]:
     if not cmap["stock_code"] or not cmap["sector"]:
         raise ValueError("File must include company code and sector columns.")
 
-    # Apply median imputation per numeric feature column across the whole dataset
-    feature_cols = {src_key: cmap.get(src_key) for src_key in _FEATURE_COLUMNS if cmap.get(src_key)}
-    for col in feature_cols.values():
-        if col in df.columns:
-            numeric = pd.to_numeric(df[col], errors="coerce")
-            col_median = numeric.median()
-            df[col] = numeric.fillna(col_median)
+    # Missing cells stay null in WinnerCohortRow: stored data is never imputed.
 
     imported = 0
     skipped = 0
@@ -306,7 +301,7 @@ def _build_sector_dataframe(rows: list[WinnerCohortRow], sector: str) -> pd.Data
 
 def _safe_div(a: pd.Series, b: pd.Series) -> pd.Series:
     b2 = b.replace(0, np.nan)
-    return a / b2
+    return (a / b2).replace([np.inf, -np.inf], np.nan)
 
 def _fundamentals_to_exact_ratios(fdf: pd.DataFrame) -> pd.DataFrame:
     df = fdf.copy()
@@ -324,8 +319,9 @@ def _fundamentals_to_exact_ratios(fdf: pd.DataFrame) -> pd.DataFrame:
     df["OCF"] = df["ocf"]
     df["OCF Marji"] = _safe_div(df["ocf"], df["revenue"])
 
-    df["Net Kar Buyumesi"] = df.groupby("stock_code")["net_income"].pct_change()
-    df["Ciro Buyumesi"] = df.groupby("stock_code")["revenue"].pct_change()
+    # Growth from a zero base is undefined (missing), not infinite.
+    df["Net Kar Buyumesi"] = df.groupby("stock_code")["net_income"].pct_change().replace([np.inf, -np.inf], np.nan)
+    df["Ciro Buyumesi"] = df.groupby("stock_code")["revenue"].pct_change().replace([np.inf, -np.inf], np.nan)
 
     df["Borc / Ozsermaye"] = _safe_div(df["total_debt"], df["equity"])
     df["Borc / Varlik"] = _safe_div(df["total_debt"], df["total_assets"])

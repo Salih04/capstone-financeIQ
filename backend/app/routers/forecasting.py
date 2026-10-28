@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 logger = logging.getLogger("forecasting")
 
-from app.core.dependencies import get_current_user, require_access
+from app.core.dependencies import get_current_user, require_access, require_shared_data_writer
 from app.core.rate_limit import rate_limit
 from app.database import get_db
 from app.models.user import User
@@ -55,7 +55,7 @@ router = APIRouter(tags=["forecasting"])
 def upload_data(
     body: UploadPresetRequest,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_shared_data_writer),
 ):
     try:
         return import_winner_excel_preset(db, body.file_name)
@@ -69,7 +69,7 @@ def upload_data(
 def train_model(
     body: TrainModelRequest,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_shared_data_writer),
 ):
     try:
         return train_sector_success_model(

@@ -7,6 +7,7 @@ from typing import Any
 import pandas as pd
 from sqlalchemy.orm import Session
 
+from app.core.numeric import finite_or_none
 from app.models.forecasting import QuarterlyFundamental
 
 
@@ -14,7 +15,7 @@ def _to_float(v: Any) -> float | None:
     if v is None:
         return None
     if isinstance(v, (int, float)):
-        return float(v)
+        return finite_or_none(v)
 
     s = str(v).strip().replace("%", "").replace(" ", "")
     if not s:
@@ -33,7 +34,7 @@ def _to_float(v: Any) -> float | None:
         return None
 
     try:
-        return float(s)
+        return finite_or_none(s)
     except ValueError:
         return None
 
