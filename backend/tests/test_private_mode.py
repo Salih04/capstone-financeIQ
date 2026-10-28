@@ -7,7 +7,7 @@ import unittest
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from jose import jwt
+import jwt
 
 os.environ.setdefault("DATABASE_URL", "sqlite+pysqlite:///:memory:")
 os.environ.setdefault("SECRET_KEY", "test-secret-key")

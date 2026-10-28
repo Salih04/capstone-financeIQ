@@ -23,7 +23,7 @@ _PG_URL = os.environ.get("FIQ_TEST_POSTGRES_URL")
 pytestmark = pytest.mark.skipif(not _PG_URL, reason="FIQ_TEST_POSTGRES_URL not set; PostgreSQL checks not run")
 
 from fastapi.testclient import TestClient  # noqa: E402
-from jose import jwt  # noqa: E402
+import jwt  # noqa: E402
 from sqlalchemy import create_engine, inspect, text  # noqa: E402
 from sqlalchemy.orm import sessionmaker  # noqa: E402
 

@@ -2,7 +2,7 @@ import secrets
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import JWTError
+from jwt import PyJWTError
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -90,7 +90,7 @@ def _authenticate(token: str, db: Session) -> tuple[User, bool]:
     """
     try:
         return _legacy_user(token, db), False
-    except (JWTError, TypeError, ValueError, HTTPException):
+    except (PyJWTError, TypeError, ValueError, HTTPException):
         pass
     return _supabase_user(token, db)
 
@@ -107,7 +107,7 @@ def get_current_user(
 ) -> User:
     try:
         user, _ = _authenticate(credentials.credentials, db)
-    except (JWTError, TypeError, ValueError):
+    except (PyJWTError, TypeError, ValueError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
@@ -154,7 +154,7 @@ def _resolve_identity_or_none(
         db = SessionLocal()
         try:
             user, email_verified = _authenticate(token, db)
-        except (JWTError, TypeError, ValueError, HTTPException):
+        except (PyJWTError, TypeError, ValueError, HTTPException):
             return None
         if not user.is_active:
             return None

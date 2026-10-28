@@ -14,7 +14,7 @@ os.environ["RESEARCH_LLM_PROVIDER"] = "none"
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
-from jose import jwt  # noqa: E402
+import jwt  # noqa: E402
 
 from app.config import settings  # noqa: E402
 from app.core.security import create_access_token, hash_password  # noqa: E402
