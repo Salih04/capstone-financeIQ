@@ -1,6 +1,7 @@
 import secrets
+from typing import Annotated
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -34,7 +35,12 @@ class Settings(BaseSettings):
     # via JWKS: set SUPABASE_URL (JWKS URL is derived) or SUPABASE_JWKS_URL.
     SUPABASE_JWT_SECRET: str | None = None
     SUPABASE_JWT_AUDIENCE: str = "authenticated"
-    SUPABASE_AUTO_CREATE_USERS: bool = True
+    # Compatibility setting only: implicit email-based provisioning is disabled.
+    SUPABASE_AUTO_CREATE_USERS: bool = False
+    # Explicit subject -> existing local id bindings, scoped to SUPABASE_URL's
+    # verified issuer. Empty means no Supabase principal is locally provisioned.
+    # This is an operator-reviewed bridge, not an account migration mechanism.
+    SUPABASE_IDENTITY_BINDINGS: dict[str, Annotated[int, Field(strict=True, gt=0)]] = Field(default_factory=dict)
     SUPABASE_URL: str | None = None
     SUPABASE_JWKS_URL: str | None = None
     # Deployment attestation, not a token claim: set true only after confirming
@@ -43,6 +49,15 @@ class Settings(BaseSettings):
     # email). Until then a Supabase email never satisfies APPROVED_EMAILS
     # (fail closed). user_metadata.email_verified is user-writable and ignored.
     SUPABASE_EMAIL_CONFIRMATION_ENFORCED: bool = False
+
+    @field_validator("SUPABASE_IDENTITY_BINDINGS")
+    @classmethod
+    def validate_identity_bindings(cls, bindings: dict[str, int]) -> dict[str, int]:
+        if any(not subject or subject != subject.strip() for subject in bindings):
+            raise ValueError("Identity bindings require nonempty exact subjects")
+        if len(set(bindings.values())) != len(bindings):
+            raise ValueError("Multiple subjects cannot silently share a local account")
+        return bindings
 
     def supabase_jwks_url(self) -> str | None:
         if self.SUPABASE_JWKS_URL:

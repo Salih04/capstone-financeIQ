@@ -1,12 +1,10 @@
-import secrets
-
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import PyJWTError
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.core.security import decode_supabase_token, decode_token, hash_password
+from app.core.security import decode_supabase_token, decode_token
 from app.database import SessionLocal, get_db
 from app.models.user import User
 
@@ -49,37 +47,37 @@ def _legacy_user(token: str, db: Session) -> User:
 
 
 def _supabase_user(token: str, db: Session) -> tuple[User, bool]:
-    """Return the user for a verified Supabase token and whether its email is proven."""
-    payload = decode_supabase_token(token)
-    email = payload.get("email")
-    if not email:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Supabase token missing email")
+    """Resolve only an explicitly bound (verified issuer, immutable subject).
 
-    user = db.query(User).filter(User.email == email).first()
-    role = _role_from_supabase(payload)
-    if not user:
-        if not settings.SUPABASE_AUTO_CREATE_USERS:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Supabase user is not provisioned")
-        user = User(
-            email=email,
-            password_hash=hash_password(secrets.token_urlsafe(32)),
-            role=role,
-            is_active=True,
-        )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-        return user, _supabase_email_verified(payload)
+    Email is mutable contact/allowlist data, never an account lookup key. No
+    request may create/link a local account or bootstrap a role from a token.
+    """
+    payload = decode_supabase_token(token)
+    issuer = settings.supabase_issuer()
+    subject = payload.get("sub")
+    if (not issuer or payload.get("iss") != issuer
+            or not isinstance(subject, str) or not subject.strip()
+            or payload.get("is_anonymous") is True):
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    user_id = settings.SUPABASE_IDENTITY_BINDINGS.get(subject)
+    user = db.get(User, user_id) if user_id is not None else None
+    if user is None:
+        raise HTTPException(status_code=401, detail="Supabase user is not provisioned")
+    _ensure_active(user)
 
     # The stored role is authoritative for an existing user. A token claim may
     # only lower it, so a stale or out-of-sync token never restores or grants
     # a privilege that FinanceIQ has revoked.
+    role = _role_from_supabase(payload)
     if _ROLE_RANK[role] < _ROLE_RANK.get(user.role, _ROLE_RANK["investor"]):
         user.role = role
         db.add(user)
         db.commit()
         db.refresh(user)
-    return user, _supabase_email_verified(payload)
+    email = payload.get("email")
+    email_matches = (isinstance(email, str) and bool(email.strip())
+                     and email.strip().lower() == (user.email or "").strip().lower())
+    return user, email_matches and _supabase_email_verified(payload)
 
 
 def _authenticate(token: str, db: Session) -> tuple[User, bool]:
@@ -194,10 +192,9 @@ def require_access(
           and in APPROVED_EMAILS; empty allowlist denies everyone (fail closed);
           unproven or unapproved → 403.
 
-    Verification relies on token signatures only. In private mode the backend must
-    be able to verify Supabase sessions, i.e. SUPABASE_JWT_SECRET must be set;
-    without it every Supabase token fails to verify and access is denied (fail
-    closed). Never leaks the allowlist or token claims in error responses.
+    Supabase authentication requires a signature verifier (JWKS or HS256), a
+    configured issuer and an explicit subject-to-local-id binding. Missing
+    configuration denies access. Never leaks the allowlist or token claims.
     """
     if settings.PUBLIC_DEMO_MODE:
         return _resolve_user_or_none(credentials)

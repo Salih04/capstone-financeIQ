@@ -78,8 +78,25 @@ which rejects disabled accounts (`is_active=false`, also refused at
 `/upload-data`, `/train-model`) additionally require the `admin` role; public
 demo mode never relaxes them. For an existing user the stored FinanceIQ role is
 authoritative: a Supabase `app_metadata.role` claim may lower it but never raise
-it, so a stale or out-of-sync token cannot restore a revoked role. A new
-Supabase user is still provisioned with the role in its signed claim.
+it, so a stale or out-of-sync token cannot restore a revoked role. Implicit
+Supabase account provisioning is disabled; no signed claim bootstraps an admin.
+
+Supabase principals resolve exclusively through an explicit
+`SUPABASE_IDENTITY_BINDINGS` subject-to-local-id map scoped to the verified
+`SUPABASE_URL` issuer. Email equality never links accounts. Missing bindings,
+missing local accounts, anonymous subjects, or missing subject/expiry deny
+access; even `SUPABASE_AUTO_CREATE_USERS=true` cannot provision a user or admin.
+The mapping defaults empty. Its rollout requires owner-approved identity proof;
+see the [security candidate runbook](docs/SECURITY_REMEDIATION_2026-10-28.md).
+Changing a token email never changes its local account; allowlist admission
+additionally requires that its proven email still matches the local contact.
+
+Persisted `/score-runs/{id}` reads and CSV/JSON/PDF exports require the owner or
+an active admin. Shared service checks re-read the local account's current role
+and active status; direct export calls without a caller are refused. The
+`/users/me/score-runs` list remains owner-scoped. Demo mode does not open these
+owned records; the established public research gate remains open in demo mode.
+
 `/health` is always public. The frontend (`ProtectedRoute` + `isApproved`) mirrors
 this for UX, but is **not** the security boundary — the backend is.
 

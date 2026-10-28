@@ -60,7 +60,7 @@ def _verify_kwargs() -> dict:
     """Common claim-validation options. exp/nbf/iat always verified; aud/iss only
     when configured (so local/test tokens without an issuer still work)."""
     kwargs: dict = {}
-    options = {"verify_aud": False}
+    options = {"verify_aud": False, "require": ["sub", "exp"]}
     if settings.SUPABASE_JWT_AUDIENCE:
         kwargs["audience"] = settings.SUPABASE_JWT_AUDIENCE
         options["verify_aud"] = True

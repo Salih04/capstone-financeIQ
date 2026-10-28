@@ -67,10 +67,14 @@ def client(pg_session_factory):
 
 @pytest.fixture(autouse=True)
 def _supabase_secret():
-    saved = settings.SUPABASE_JWT_SECRET
+    names = ("SUPABASE_JWT_SECRET", "SUPABASE_URL", "SUPABASE_IDENTITY_BINDINGS")
+    saved = {name: getattr(settings, name) for name in names}
     settings.SUPABASE_JWT_SECRET = _SUPABASE_SECRET
+    settings.SUPABASE_URL = "https://pg-test.supabase.co"
+    settings.SUPABASE_IDENTITY_BINDINGS = {}
     yield
-    settings.SUPABASE_JWT_SECRET = saved
+    for name, value in saved.items():
+        setattr(settings, name, value)
 
 
 def _user(factory, role: str, *, active: bool = True) -> tuple[int, str]:
@@ -217,7 +221,8 @@ def test_pg_inactive_account_rejected(client, pg_session_factory):
 def test_pg_stale_supabase_admin_claim_does_not_restore_role(client, pg_session_factory):
     user_id, email = _user(pg_session_factory, "investor")  # admin already revoked
     now = int(time.time())
-    stale = jwt.encode({"sub": "uid-pg", "email": email, "aud": "authenticated", "iat": now,
+    settings.SUPABASE_IDENTITY_BINDINGS = {"uid-pg": user_id}
+    stale = jwt.encode({"sub": "uid-pg", "iss": "https://pg-test.supabase.co/auth/v1", "email": email, "aud": "authenticated", "iat": now,
                         "exp": now + 3600, "app_metadata": {"role": "admin"}},
                        _SUPABASE_SECRET, algorithm="HS256")
     assert client.get("/admin/users", headers={"Authorization": f"Bearer {stale}"}).status_code == 403

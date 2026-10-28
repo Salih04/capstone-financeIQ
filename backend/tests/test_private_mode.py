@@ -15,18 +15,21 @@ os.environ["RESEARCH_LLM_PROVIDER"] = "none"
 
 from app.config import settings  # noqa: E402
 from app.main import app  # noqa: E402
+from app.database import SessionLocal  # noqa: E402
+from app.models.user import User  # noqa: E402
 
 _DEFAULTS = dict(
     PUBLIC_DEMO_MODE=True, REQUIRE_APPROVED_USER=False, APPROVED_EMAILS="",
     RATE_LIMIT_ENABLED=False, RATE_LIMIT_REQUESTS_PER_MINUTE=60,
     SUPABASE_JWT_SECRET=None, SUPABASE_EMAIL_CONFIRMATION_ENFORCED=False,
+    SUPABASE_URL=None, SUPABASE_IDENTITY_BINDINGS={},
 )
 _SUPABASE_SECRET = "private-mode-test-secret"
 
 
 def _supabase_token(email: str) -> str:
     now = int(time.time())
-    return jwt.encode({"sub": "uid-owner", "email": email, "aud": "authenticated",
+    return jwt.encode({"sub": "uid-owner", "iss": "https://private-test.supabase.co/auth/v1", "email": email, "aud": "authenticated",
                        "iat": now, "exp": now + 3600}, _SUPABASE_SECRET, algorithm="HS256")
 
 
@@ -86,6 +89,10 @@ class PrivateModeTests(unittest.TestCase):
         settings.APPROVED_EMAILS = "owner@test.com"  # token email is Owner@Test.com
         settings.SUPABASE_JWT_SECRET = _SUPABASE_SECRET
         settings.SUPABASE_EMAIL_CONFIRMATION_ENFORCED = True
+        settings.SUPABASE_URL = "https://private-test.supabase.co"
+        with SessionLocal() as db:
+            user = db.query(User).filter(User.email == "Owner@Test.com").one()
+            settings.SUPABASE_IDENTITY_BINDINGS = {"uid-owner": user.id}
         auth = {"Authorization": f"Bearer {_supabase_token('Owner@Test.com')}"}
         r = self.client.get("/research/summary", headers=auth)
         self.assertEqual(r.status_code, 200)

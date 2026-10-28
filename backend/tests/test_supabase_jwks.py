@@ -25,6 +25,8 @@ from jwt.algorithms import RSAAlgorithm  # noqa: E402
 from app.config import settings  # noqa: E402
 from app.core import security as SEC  # noqa: E402
 from app.main import app  # noqa: E402
+from app.database import SessionLocal  # noqa: E402
+from app.models.user import User  # noqa: E402
 
 _PRIV = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 _PRIV_PEM = _PRIV.private_bytes(
@@ -57,6 +59,7 @@ _DEFAULTS = dict(
     PUBLIC_DEMO_MODE=True, REQUIRE_APPROVED_USER=False, APPROVED_EMAILS="",
     SUPABASE_URL=None, SUPABASE_JWKS_URL=None, SUPABASE_JWT_SECRET=None,
     SUPABASE_EMAIL_CONFIRMATION_ENFORCED=False,
+    SUPABASE_IDENTITY_BINDINGS={},
 )
 
 
@@ -81,6 +84,14 @@ class SupabaseJwksTests(unittest.TestCase):
         settings.REQUIRE_APPROVED_USER = True
         settings.APPROVED_EMAILS = approved
         settings.SUPABASE_URL = _SUPA_URL
+        with SessionLocal() as db:
+            user = db.query(User).filter(User.email == "User@X.com").first()
+            if user is None:
+                user = User(email="User@X.com", password_hash=SEC.hash_password("Synthetic1!"),
+                            role="investor", is_active=True)
+                db.add(user)
+                db.commit()
+            settings.SUPABASE_IDENTITY_BINDINGS = {"uid-123": user.id}
 
     # ── unit: verification ──
     def test_jwks_verifies_and_returns_claims(self):

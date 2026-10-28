@@ -52,17 +52,29 @@ JWTs continue to work for tests. To let Supabase-authenticated frontend sessions
 call protected backend endpoints, set backend env:
 
 ```bash
-SUPABASE_JWT_SECRET=your-supabase-jwt-secret
+SUPABASE_URL=https://your-project-ref.supabase.co
+# SUPABASE_JWT_SECRET=your-supabase-jwt-secret  # only for legacy HS256 tokens
 SUPABASE_JWT_AUDIENCE=authenticated
-SUPABASE_AUTO_CREATE_USERS=true
+SUPABASE_AUTO_CREATE_USERS=false
+SUPABASE_IDENTITY_BINDINGS={}
 ```
 
 `SUPABASE_JWT_SECRET` belongs only on the backend. Do not expose it in Vite or
 Vercel frontend variables.
 
-Current verifier supports Supabase symmetric JWT secrets. If a project uses
-asymmetric signing keys, add JWKS verification before relying on backend API
-protection.
+The verifier supports asymmetric signing keys through the configured project's
+JWKS and legacy HS256 secrets. Both signatures and the configured issuer must
+verify before an exact immutable subject resolves through the explicit local
+binding map. An empty map denies Supabase backend authentication. Email equality
+never links users, and the deprecated auto-create flag has no effect. Existing
+local accounts and their roles are not migrated or promoted by requests.
+
+Before rollout, the owner must approve proof of each issuer/subject/local-id
+binding and provisioning/first-admin arrangements. Do not populate mappings
+from email matches, user-editable metadata, or unverified browser claims.
+The [candidate runbook](SECURITY_REMEDIATION_2026-10-28.md) describes collision,
+legacy-account, revocation and rollback constraints. No live mappings were
+created by this change.
 
 ## Local Run
 

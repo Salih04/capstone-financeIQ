@@ -24,10 +24,12 @@ from app.models.user import User  # noqa: E402
 
 _SUPABASE_SECRET = "audit-remediation-supabase-test-secret"
 _PASSWORD = "Passw0rd!"
+_SUPABASE_URL = "https://synthetic-auth.supabase.co"
 _SETTINGS = (
     "PUBLIC_DEMO_MODE", "REQUIRE_APPROVED_USER", "APPROVED_EMAILS",
     "SUPABASE_JWT_SECRET", "SUPABASE_URL", "SUPABASE_JWKS_URL",
     "SUPABASE_AUTO_CREATE_USERS", "SUPABASE_EMAIL_CONFIRMATION_ENFORCED",
+    "SUPABASE_IDENTITY_BINDINGS",
 )
 
 
@@ -35,7 +37,8 @@ _SETTINGS = (
 def _isolated_settings():
     saved = {k: getattr(settings, k) for k in _SETTINGS}
     settings.SUPABASE_JWT_SECRET = _SUPABASE_SECRET
-    settings.SUPABASE_URL = None
+    settings.SUPABASE_URL = _SUPABASE_URL
+    settings.SUPABASE_IDENTITY_BINDINGS = {}
     settings.SUPABASE_JWKS_URL = None
     settings.SUPABASE_AUTO_CREATE_USERS = True
     settings.SUPABASE_EMAIL_CONFIRMATION_ENFORCED = False
@@ -59,6 +62,7 @@ def _make_user(email: str, *, role: str = "investor", active: bool = True) -> in
         user = User(email=email, password_hash=hash_password(_PASSWORD), role=role, is_active=active)
         db.add(user)
         db.commit()
+        settings.SUPABASE_IDENTITY_BINDINGS[f"uid-{email}"] = user.id
         return user.id
     finally:
         db.close()
@@ -89,7 +93,7 @@ def _legacy_token(user_id: int) -> str:
 
 def _supabase_token(email: str, *, role: str | None = None, **extra) -> str:
     now = int(time.time())
-    claims = {"sub": f"uid-{email}", "email": email, "aud": "authenticated",
+    claims = {"sub": f"uid-{email}", "iss": _SUPABASE_URL + "/auth/v1", "email": email, "aud": "authenticated",
               "iat": now, "exp": now + 3600, **extra}
     if role is not None:
         claims["app_metadata"] = {"provider": "email", "role": role}
@@ -122,6 +126,7 @@ def test_a01_self_registered_legacy_account_cannot_claim_allowlisted_email(clien
 
 def test_a01_supabase_email_without_confirmation_attestation_is_denied(client):
     email = _email("a01-supa")
+    _make_user(email)
     _private_allowlist(email)
     r = client.get("/research/summary", headers=_bearer(_supabase_token(email)))
     assert r.status_code == 403
@@ -129,6 +134,7 @@ def test_a01_supabase_email_without_confirmation_attestation_is_denied(client):
 
 def test_a01_user_writable_email_verified_metadata_is_not_trusted(client):
     email = _email("a01-meta")
+    _make_user(email)
     _private_allowlist(email)
     token = _supabase_token(email, user_metadata={"email_verified": True})
     assert client.get("/research/summary", headers=_bearer(token)).status_code == 403
@@ -136,6 +142,7 @@ def test_a01_user_writable_email_verified_metadata_is_not_trusted(client):
 
 def test_a01_attested_supabase_email_on_allowlist_is_admitted(client):
     email = _email("a01-ok")
+    _make_user(email)
     _private_allowlist(email.upper())  # allowlist stays case-insensitive
     settings.SUPABASE_EMAIL_CONFIRMATION_ENFORCED = True
     assert client.get("/research/summary", headers=_bearer(_supabase_token(email))).status_code == 200
@@ -144,16 +151,19 @@ def test_a01_attested_supabase_email_on_allowlist_is_admitted(client):
 def test_a01_attested_but_unlisted_email_is_still_denied(client):
     _private_allowlist(_email("a01-other"))
     settings.SUPABASE_EMAIL_CONFIRMATION_ENFORCED = True
-    r = client.get("/research/summary", headers=_bearer(_supabase_token(_email("a01-unlisted"))))
+    email = _email("a01-unlisted")
+    _make_user(email)
+    r = client.get("/research/summary", headers=_bearer(_supabase_token(email)))
     assert r.status_code == 403
 
 
 def test_a01_anonymous_supabase_session_never_verified(client):
     email = _email("a01-anon")
+    _make_user(email)
     _private_allowlist(email)
     settings.SUPABASE_EMAIL_CONFIRMATION_ENFORCED = True
     token = _supabase_token(email, is_anonymous=True)
-    assert client.get("/research/summary", headers=_bearer(token)).status_code == 403
+    assert client.get("/research/summary", headers=_bearer(token)).status_code == 401
 
 
 def test_a01_private_mode_without_allowlist_keeps_legacy_access(client):
@@ -245,11 +255,15 @@ def test_a08_matching_supabase_admin_keeps_access(client):
     assert client.get("/admin/users", headers=_bearer(_supabase_token(email, role="admin"))).status_code == 200
 
 
-def test_a08_new_supabase_user_is_provisioned_from_signed_claim(client):
+def test_a08_unbound_supabase_user_is_not_provisioned_from_signed_claim(client):
     email = _email("a08-new")
     r = client.get("/auth/me", headers=_bearer(_supabase_token(email, role="analyst")))
-    assert r.status_code == 200
-    assert r.json()["role"] == "analyst"
+    assert r.status_code == 401
+    db = SessionLocal()
+    try:
+        assert db.query(User).filter(User.email == email).count() == 0
+    finally:
+        db.close()
 
 
 def test_a08_legacy_role_revocation_applies_to_existing_token(client):
