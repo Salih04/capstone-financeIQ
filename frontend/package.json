@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "test:unit": "node --test src/utils/heatmapCell.test.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",
