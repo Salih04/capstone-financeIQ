@@ -40,7 +40,7 @@ jobs:
       # No Postgres service: the backend suite runs on sqlite and no committed
       # .env exists in CI, so app/config.py defaults apply.
       # The two test steps are the documented baseline commands plus coverage
-      # reporting flags. Coverage is measured and archived, never enforced:
+      # and JUnit reporting flags. Coverage is measured and archived, never enforced:
       # no threshold gates a run.
       # The deselect list is environment-qualified, not optional work: every id in
       # it must still pass on the machine of record. This step fails if an id no
@@ -74,18 +74,45 @@ jobs:
               sys.exit(1)
           PY
 
+      # JUnit reports go outside the worktree for the same git-status reason.
+      # They feed the count gate below; see docs/CI_TEST_GATES.md.
       - name: Root pipeline tests
         run: |
           mapfile -t ids < <(grep -vE '^\s*(#|$)' .github/ci-deselect.txt)
           PYTHONPATH=. python -m pytest tests/ -q \
             "${ids[@]/#/--deselect=}" \
             --cov=scripts --cov=experiments --cov=research_agent_training \
-            --cov-report=xml:coverage-root.xml
+            --cov-report=xml:coverage-root.xml \
+            --junitxml="$RUNNER_TEMP/test-gate/root-portable.xml"
 
       - name: Backend tests
         run: >
           PYTHONPATH=backend python -m pytest backend/tests -q
           --cov=backend/app --cov-report=xml:coverage-backend.xml
+          --junitxml="$RUNNER_TEMP/test-gate/backend.xml"
+
+      # Collected/executed/skipped/deselected must match the dated baseline:
+      # any skip, unexpected deselection, unrun collected test or shrunken
+      # collection fails the job. The baseline document is read, never edited.
+      - name: Test-count gate (root + backend vs dated baseline)
+        if: ${{ !cancelled() }}
+        run: |
+          gate="$RUNNER_TEMP/test-gate"
+          python -B .github/scripts/ci_test_gate.py junit --suite root-portable \
+            --junit "$gate/root-portable.xml" \
+            --collected-ids "$RUNNER_TEMP/collected-node-ids.txt" --out "$gate/counts"
+          python -B .github/scripts/ci_test_gate.py junit --suite backend \
+            --junit "$gate/backend.xml" --out "$gate/counts"
+          python -B .github/scripts/ci_test_gate.py compare \
+            --suite root-portable --suite backend --counts "$gate/counts"
+
+      - name: Archive test-gate counts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-gate-counts-verify
+          path: ${{ runner.temp }}/test-gate/counts/
+          if-no-files-found: error
 
       - name: Data validation (validate-only, never regenerates)
         run: make data-validate
@@ -134,3 +161,151 @@ jobs:
           name: backend-suite
           disable_search: true
           fail_ci_if_error: false
+
+  # Synthetic-only boundary suites that live outside tests/ and so are not
+  # collected by the root gate. The sparse checkout materializes only the paths
+  # below (actions/checkout fetches sparse checkouts with a blob:none filter),
+  # so data/, experiment results and raw vendor workbooks are never on the
+  # runner to be opened or recreated. A workspace check before and after the
+  # tests proves it. See docs/CI_TEST_GATES.md.
+  synthetic-boundary:
+    name: synthetic boundary suites (PIT consumer + research core)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/
+            /docs/VERIFICATION_BASELINE.md
+            /experiments/pit/
+            /experiments/research_core/
+            /tests/fixtures/kernel/
+            /requirements-root.txt
+            /backend/requirements.txt
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements-root.txt
+            backend/requirements.txt
+            experiments/pit/requirements-synthetic.txt
+
+      # Same pinned environment as the root gate, plus the PIT consumer's
+      # optional pinned jsonschema.
+      - name: Install verification environment
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-root.txt -r experiments/pit/requirements-synthetic.txt
+          pip freeze
+
+      # The allowed paths are synthetic_workspace in .github/ci-test-gates.json.
+      - name: Workspace holds only the synthetic scope (before)
+        run: python -B .github/scripts/ci_test_gate.py check-workspace
+
+      - name: Test-gate self-test
+        run: python -B .github/scripts/selftest_ci_test_gate.py -v
+
+      - name: PIT synthetic consumer suite
+        run: >
+          PYTHONPATH=. python -B .github/scripts/ci_test_gate.py run-unittest
+          --suite pit-synthetic --name experiments.pit.test_kernel_snapshot
+          --out "$RUNNER_TEMP/test-gate/counts"
+
+      - name: Research-core synthetic suite
+        if: ${{ !cancelled() }}
+        run: >
+          python -B .github/scripts/ci_test_gate.py run-unittest
+          --suite research-core-synthetic --discover experiments/research_core/tests
+          --pattern 'test_*.py' --out "$RUNNER_TEMP/test-gate/counts"
+
+      - name: Workspace holds only the synthetic scope (after)
+        if: ${{ !cancelled() }}
+        run: python -B .github/scripts/ci_test_gate.py check-workspace
+
+      - name: Test-count gate (synthetic suites vs approved counts)
+        if: ${{ !cancelled() }}
+        run: >
+          python -B .github/scripts/ci_test_gate.py compare
+          --suite pit-synthetic --suite research-core-synthetic --counts "$RUNNER_TEMP/test-gate/counts"
+
+      - name: Archive test-gate counts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-gate-counts-synthetic
+          path: ${{ runner.temp }}/test-gate/counts/
+          if-no-files-found: error
+
+  # Production build of the frozen frontend from the committed lockfile. It
+  # proves the bundle compiles; it is not the Playwright e2e suite, which CI
+  # does not run (docs/CI_TEST_GATES.md lists it as NOT RUN, never PASS).
+  frontend-build:
+    name: frontend production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /frontend/
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install from lockfile
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build (output outside the workspace)
+        working-directory: frontend
+        run: npm run build -- --outDir "$RUNNER_TEMP/frontend-dist" --emptyOutDir
+
+  # One place that lists every gate, its counts and job result, and the gates
+  # CI does not run. Any missing counts file or non-success job fails it.
+  test-gate-summary:
+    name: test-gate summary
+    needs: [verify, synthetic-boundary, frontend-build]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/
+            /docs/VERIFICATION_BASELINE.md
+
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: test-gate-counts-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/test-gate-counts
+
+      - name: Summarize gates
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: >
+          python -B .github/scripts/ci_test_gate.py summarize
+          --counts "$RUNNER_TEMP/test-gate-counts" --needs-json "$NEEDS"
