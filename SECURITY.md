@@ -81,6 +81,18 @@ authoritative: a Supabase `app_metadata.role` claim may lower it but never raise
 it, so a stale or out-of-sync token cannot restore a revoked role. Implicit
 Supabase account provisioning is disabled; no signed claim bootstraps an admin.
 
+DB forecasting parameter reads never train or replace shared rankings.
+`/get-parameters` returns an empty parameter list when none have been trained;
+`/get-stocks`, `/predict` and `/get-portfolio-analysis` then return 422 and
+require an explicit admin `/train-model` action first. `/predict/evaluate`
+also requires admin because it intentionally retrains shared parameters.
+The training, preset-import and time-CV services independently require a caller
+and re-read the current active local admin role, including for direct callers.
+Offline scripts without that principal now fail closed; this is not permission
+to run them or to open protected study data. Forecast detail, explanation and
+history sharing remains an unresolved owner policy; see the
+[technical remediation record](docs/SECURITY_REMEDIATION_2026-10-29.md).
+
 Supabase principals resolve exclusively through an explicit
 `SUPABASE_IDENTITY_BINDINGS` subject-to-local-id map scoped to the verified
 `SUPABASE_URL` issuer. Email equality never links accounts. Missing bindings,

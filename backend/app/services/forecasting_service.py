@@ -27,6 +27,8 @@ from app.models.forecasting import (
 )
 from app.core.numeric import finite_or_none
 from app.core.paths import resolve_repo_root
+from app.models.user import User
+from app.services.shared_data_access import require_shared_writer
 
 
 _ALLOWED_PRESET_PREFIXES = ("2020", "2021", "2022", "2023", "2024", "2025")
@@ -181,7 +183,8 @@ def _col_map(df: pd.DataFrame, year: int) -> dict[str, str | None]:
     }
 
 
-def import_winner_excel_preset(db: Session, file_name: str) -> dict[str, Any]:
+def import_winner_excel_preset(db: Session, file_name: str, *, current_user: User | None = None) -> dict[str, Any]:
+    require_shared_writer(db, current_user)
     file_path = _resolve_preset_file(file_name)
     year = _infer_year_from_file_name(file_name)
 
@@ -300,8 +303,11 @@ def _build_sector_dataframe(rows: list[WinnerCohortRow], sector: str) -> pd.Data
 
 
 def _safe_div(a: pd.Series, b: pd.Series) -> pd.Series:
-    b2 = b.replace(0, np.nan)
-    return (a / b2).replace([np.inf, -np.inf], np.nan)
+    a = pd.to_numeric(a, errors="coerce")
+    b = pd.to_numeric(b, errors="coerce")
+    a2 = a.where(np.isfinite(a), np.nan)
+    b2 = b.where(np.isfinite(b) & (b != 0), np.nan)
+    return (a2 / b2).replace([np.inf, -np.inf], np.nan)
 
 def _fundamentals_to_exact_ratios(fdf: pd.DataFrame) -> pd.DataFrame:
     df = fdf.copy()
@@ -320,8 +326,10 @@ def _fundamentals_to_exact_ratios(fdf: pd.DataFrame) -> pd.DataFrame:
     df["OCF Marji"] = _safe_div(df["ocf"], df["revenue"])
 
     # Growth from a zero base is undefined (missing), not infinite.
-    df["Net Kar Buyumesi"] = df.groupby("stock_code")["net_income"].pct_change().replace([np.inf, -np.inf], np.nan)
-    df["Ciro Buyumesi"] = df.groupby("stock_code")["revenue"].pct_change().replace([np.inf, -np.inf], np.nan)
+    for source, growth in (("net_income", "Net Kar Buyumesi"), ("revenue", "Ciro Buyumesi")):
+        values = pd.to_numeric(df[source], errors="coerce")
+        values = values.where(np.isfinite(values), np.nan)
+        df[growth] = values.groupby(df["stock_code"]).pct_change(fill_method=None).replace([np.inf, -np.inf], np.nan)
 
     df["Borc / Ozsermaye"] = _safe_div(df["total_debt"], df["equity"])
     df["Borc / Varlik"] = _safe_div(df["total_debt"], df["total_assets"])
@@ -635,7 +643,10 @@ def train_sector_success_model(
     year: int,
     sector: str,
     top_n_parameters: int = 8,
+    *,
+    current_user: User | None = None,
 ) -> dict[str, Any]:
+    require_shared_writer(db, current_user)
     ranked = _parameter_scores(db, year=year, sector=sector)
     top = ranked[:max(1, top_n_parameters)]
 
@@ -716,8 +727,7 @@ def run_forecast_for_sector(
 
     params = get_ranked_parameters(db, year=year, sector=sector)
     if not params:
-        trained = train_sector_success_model(db, year=year, sector=sector)
-        params = trained["top_parameters"]
+        raise ValueError("No trained parameters. An admin must call /train-model first.")
 
     selected_params = [p["parameter_name"] for p in params]
     weights = {p["parameter_name"]: p["score"] for p in params}
@@ -909,9 +919,6 @@ def run_forecast_for_sector(
 
 def get_parameters_for_sector(db: Session, year: int, sector: str) -> dict[str, Any]:
     params = get_ranked_parameters(db, year=year, sector=sector)
-    if not params:
-        train_sector_success_model(db, year=year, sector=sector)
-        params = get_ranked_parameters(db, year=year, sector=sector)
     return {"year": year, "sector": sector, "parameters": params}
 
 
@@ -946,7 +953,10 @@ def run_time_cv_evaluation(
     model_type: str = "scoring",
     window_size: int = 2,
     created_by_user_id: int | None = None,
+    *,
+    current_user: User | None = None,
 ) -> dict[str, Any]:
+    require_shared_writer(db, current_user)
     years = sorted({r[0] for r in db.query(WinnerCohortRow.year).filter(WinnerCohortRow.sector == sector).distinct().all()})
     years = [y for y in years if 2020 <= int(y) <= 2025]
     if len(years) < max(3, window_size + 1):
@@ -971,9 +981,13 @@ def run_time_cv_evaluation(
         test_year = years[idx]
 
         for ty in train_years:
-            train_sector_success_model(db, year=ty, sector=sector, top_n_parameters=8)
+            train_sector_success_model(db, year=ty, sector=sector, top_n_parameters=8, current_user=current_user)
 
         prev_year = years[idx - 1]
+        # Evaluation is an explicit admin write path. Preserve its previous
+        # missing-test-year training here, never inside forecast/read services.
+        if not get_ranked_parameters(db, year=test_year, sector=sector):
+            train_sector_success_model(db, year=test_year, sector=sector, current_user=current_user)
         prev_pred = run_forecast_for_sector(
             db,
             year=prev_year,

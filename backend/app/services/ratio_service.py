@@ -45,6 +45,7 @@ def compute_ratios(stmt: FinancialStatement) -> dict:
 
 def upsert_computed_metrics(db, company_id: int, period: str, ratios: dict) -> ComputedMetric:
     from sqlalchemy import select
+    ratios = {k: finite_or_none(v) for k, v in ratios.items() if hasattr(ComputedMetric, k)}
     existing = db.execute(
         select(ComputedMetric).where(
             ComputedMetric.company_id == company_id,

@@ -245,7 +245,11 @@ def test_a06_cohort_preset_import_does_not_impute_medians(tmp_path, monkeypatch)
     monkeypatch.setenv("RESEARCH_REPO_ROOT", str(tmp_path))
     db = SessionLocal()
     try:
-        result = forecasting_service.import_winner_excel_preset(db, "2021 a06 synthetic.xlsx")
+        admin = User(email=f"preset-admin-{uuid.uuid4().hex}@example.org",
+                     password_hash="unused-synthetic", role="admin", is_active=True)
+        db.add(admin)
+        db.commit()
+        result = forecasting_service.import_winner_excel_preset(db, "2021 a06 synthetic.xlsx", current_user=admin)
         assert result["imported_rows"] == 3
         rows = {r.stock_code: r for r in db.query(WinnerCohortRow).filter(WinnerCohortRow.stock_code.in_(codes))}
         assert rows[codes[1]].period_return is None  # was imputed to the 20.0 median
