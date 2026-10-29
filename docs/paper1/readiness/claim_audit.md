@@ -6,6 +6,12 @@ Checked **2026-10-29**, Europe/Zurich. Draft under review:
 Research support only; not investment advice. This is a documentation audit,
 not independent scientific approval.
 
+**Delivery boundary (2026-10-29).** The checks below are the inherited audit
+at local commit `87093cba`; the candidate and its prerequisites are absent
+from this main-based delivery. They were not imported or re-audited here.
+A04/A05 remain open scientific blockers, as recorded in [README.md](README.md).
+Matching frozen report text and timestamps does not establish PIT validity.
+
 ## Sources and access boundary
 
 Outcome numbers were checked only against the two expressly authorized frozen

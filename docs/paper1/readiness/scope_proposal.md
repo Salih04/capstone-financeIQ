@@ -1,9 +1,14 @@
 # Paper 1 publication-scope options
 
 Prepared **2026-10-29**, Europe/Zurich. **Owner publication-scope choice:
-UNSET.** This document proposes options; it adopts none, registers nothing and
-authorizes no data access, analysis, FIQ-17 run or submission. Research support
-only; not investment advice.
+A — approved 2026-10-29.** The owner's continuation instruction authorizes
+recording the existing-evidence bounded audit scope. B/C below remain
+alternatives, not adopted decisions. This record registers nothing and
+authorizes no data access, new analysis, FIQ-17 run or submission. Research
+support only; not investment advice.
+
+Scope approval does not apply E1-E11, approve the manuscript or close the
+open A04/A05 scientific blockers described in [README.md](README.md).
 
 ## Why a choice is needed
 
@@ -16,7 +21,7 @@ specification, ledger and access gates. FIQ-17 also needs FIQ-07, FIQ-10 and
 FIQ-12. A paper that waits for the selection measurement therefore waits for
 most of the research program.
 
-## Option A — existing-evidence bounded audit (proposed for owner consideration)
+## Option A — existing-evidence bounded audit (owner approved)
 
 **Question.** In a completed BIST equity-ranking study, what did an
 availability-aware re-evaluation change, what can the bundled correction and
@@ -35,7 +40,8 @@ not a selection-effect estimate.
 - Methods and chronology from the protocol, amendment, charter and addendum.
 - FIQ-16 disclosure: structural survivor conditioning; realised-return
   selection UNKNOWN; the single-date literal-code overlap.
-- The draft's corrections E1-E11, which add disclosure, not estimates.
+- The draft's proposed corrections E1-E11, which remain unapplied; this scope
+  decision does not authorize changing the draft or PDF.
 
 **Out of scope.** Any selection-effect number, sign or bound; exact-filing
 sensitivity (FIQ-18); dependence-robust re-inference; decomposition of the
@@ -55,6 +61,8 @@ is not measured in this paper; its direction and size are unknown."
    [submission_readiness.md](submission_readiness.md)).
 5. Independent scientific review (charter §5 rule 9: analyses that enter a
    paper need independent review). This audit is not that review.
+6. Address the open A04/A05 scientific blockers and manuscript caveats through
+   the applicable owner/study gates; this delivery makes no scientific choice.
 
 **Risk.** Referees may judge a single-panel, bundled, post-hoc null with
 unmeasured selection as too thin (objections R1, R5, R7, R8). The answer must
@@ -91,4 +99,5 @@ first must not pre-announce the second's sign or size.
 | Owner decision | Scope + venue | Scope | Scope + split |
 
 Any of these is consistent with the charter only if the paper states plainly
-what was and was not measured. The choice is the owner's.
+what was and was not measured. The owner chose A on 2026-10-29; the other
+options grant no additional authority.
