@@ -1118,9 +1118,17 @@ def get_sector_heatmap_data(db: Session, year: int) -> dict[str, Any]:
     heatmap = []
     for sector, items in sector_map.items():
         for f in feature_keys:
-            vals = [getattr(i, f) for i in items if getattr(i, f) is not None]
-            avg = float(np.mean(vals)) if vals else 0.0
-            heatmap.append({"sector": sector, "feature": f, "value": round(avg, 4)})
+            # A06: null, NaN and +/-Infinity are missing. They are not averaged,
+            # and a cell with no finite value is null, never 0.0.
+            vals = [v for v in (finite_or_none(getattr(i, f)) for i in items) if v is not None]
+            avg = round(float(np.mean(vals)), 4) if vals else None
+            heatmap.append({
+                "sector": sector,
+                "feature": f,
+                "value": avg,
+                "n_observed": len(vals),
+                "n_missing": len(items) - len(vals),
+            })
     return {"year": year, "heatmap": heatmap}
 
 
