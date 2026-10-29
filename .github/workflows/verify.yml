@@ -74,35 +74,44 @@ jobs:
               sys.exit(1)
           PY
 
-      # JUnit reports go outside the worktree for the same git-status reason.
-      # They feed the count gate below; see docs/CI_TEST_GATES.md.
+      # JUnit reports and pytest ledgers go outside the worktree for the same
+      # git-status reason. They feed the count gate below. The ledger plugin
+      # (.github/scripts/ci_pytest_ledger.py, put on PYTHONPATH for `-p`) is
+      # passive: it records what pytest collected, deselected and reported,
+      # which JUnit cannot show (an XPASS reads as a pass there, and a
+      # deselection is absent). See docs/CI_TEST_GATES.md.
       - name: Root pipeline tests
+        env:
+          CI_TEST_GATE_LEDGER: ${{ runner.temp }}/test-gate/root-portable.ledger.json
         run: |
           mapfile -t ids < <(grep -vE '^\s*(#|$)' .github/ci-deselect.txt)
-          PYTHONPATH=. python -m pytest tests/ -q \
+          PYTHONPATH=.:.github/scripts python -m pytest tests/ -q -p ci_pytest_ledger \
             "${ids[@]/#/--deselect=}" \
             --cov=scripts --cov=experiments --cov=research_agent_training \
             --cov-report=xml:coverage-root.xml \
             --junitxml="$RUNNER_TEMP/test-gate/root-portable.xml"
 
       - name: Backend tests
+        env:
+          CI_TEST_GATE_LEDGER: ${{ runner.temp }}/test-gate/backend.ledger.json
         run: >
-          PYTHONPATH=backend python -m pytest backend/tests -q
+          PYTHONPATH=backend:.github/scripts python -m pytest backend/tests -q -p ci_pytest_ledger
           --cov=backend/app --cov-report=xml:coverage-backend.xml
           --junitxml="$RUNNER_TEMP/test-gate/backend.xml"
 
       # Collected/executed/skipped/deselected must match the dated baseline:
-      # any skip, unexpected deselection, unrun collected test or shrunken
-      # collection fails the job. The baseline document is read, never edited.
+      # any skip, XFAIL or XPASS, a deselected id outside .github/ci-deselect.txt,
+      # a dropped or unrun collected test, a missing or malformed report or a
+      # shrunken collection fails the job. The baseline document is read, never edited.
       - name: Test-count gate (root + backend vs dated baseline)
         if: ${{ !cancelled() }}
         run: |
           gate="$RUNNER_TEMP/test-gate"
           python -B .github/scripts/ci_test_gate.py junit --suite root-portable \
-            --junit "$gate/root-portable.xml" \
+            --junit "$gate/root-portable.xml" --ledger "$gate/root-portable.ledger.json" \
             --collected-ids "$RUNNER_TEMP/collected-node-ids.txt" --out "$gate/counts"
           python -B .github/scripts/ci_test_gate.py junit --suite backend \
-            --junit "$gate/backend.xml" --out "$gate/counts"
+            --junit "$gate/backend.xml" --ledger "$gate/backend.ledger.json" --out "$gate/counts"
           python -B .github/scripts/ci_test_gate.py compare \
             --suite root-portable --suite backend --counts "$gate/counts"
 

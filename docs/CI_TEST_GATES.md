@@ -21,7 +21,7 @@ Evidence: GitHub Actions run `40335043386` on `main` at `efe3ed32` (2026-10-26).
 
 ## Gates
 
-The workflow is `.github/workflows/verify.yml`. The expected counts and the list of gates CI does not run are in `.github/ci-test-gates.json`. The checker is `.github/scripts/ci_test_gate.py`, which is standard library only, and its self-test is `.github/scripts/selftest_ci_test_gate.py`.
+The workflow is `.github/workflows/verify.yml`. The expected counts and the list of gates CI does not run are in `.github/ci-test-gates.json`. The checker is `.github/scripts/ci_test_gate.py`, which is standard library only, and its self-test is `.github/scripts/selftest_ci_test_gate.py`. The pytest gates also load `.github/scripts/ci_pytest_ledger.py`, a passive pytest plugin (`-p ci_pytest_ledger`, with `.github/scripts` on `PYTHONPATH`). It records every collected, deselected and reported node id and each test's outcome, including XFAIL and XPASS.
 
 | Job | Gate | Expected collected count comes from |
 |---|---|---|
@@ -32,16 +32,20 @@ The workflow is `.github/workflows/verify.yml`. The expected counts and the list
 | `frontend-build` | `npm ci` then `npm run build` from the committed lockfile | Build success, not a test count |
 | `test-gate-summary` | Re-checks every counts file and the result of every job | — |
 
-Each gate records collected, executed, passed, skipped and deselected counts in a JSON file. Those files are kept as the `test-gate-counts-*` artifacts. The checker writes one table per job to the step summary.
+Each gate records collected, executed, passed, skipped and deselected counts in a JSON file. A pytest gate builds that file from the ledger and checks the ledger test by test against the JUnit report from the same run. JUnit alone is not enough: pytest writes a non-strict XPASS as a plain pass and records no deselection at all. A run checked only against JUnit could therefore collect 580 tests, deselect one outside the governed list, pass 579, and still match a 579-test baseline. Those files are kept as the `test-gate-counts-*` artifacts. The checker writes one table per job to the step summary.
 
 ### Comparison rules (fail closed)
 
 A gate **fails** when any of these holds:
 
-- a test fails or errors, or is an expected failure or unexpected success;
+- a test fails or errors, or is an expected failure or unexpected success (XFAIL or XPASS, strict or not);
 - any test is skipped, because a skip is not a pass;
-- the deselected count differs from `.github/ci-deselect.txt`, which is empty for every suite except the root portable suite, or a listed id is no longer collected;
-- for the root suite, the run accounts for a different number of tests than collect-only found (for example, an added `-k` filter);
+- a pytest gate has no ledger, or its JUnit report or ledger is missing, unparseable, of the wrong schema, internally inconsistent, or disagrees with the other about which tests ran or passed;
+- the counts file is unreadable, names another suite or runner, or holds a count that is not a non-negative integer;
+- the set of deselected ids differs from `.github/ci-deselect.txt`, which is empty for every suite except the root portable suite. A deselection by `--deselect`, `-k`, `-m` or a conftest hook outside the list fails, even when the total count still matches. A listed id that is no longer deselected also fails;
+- a collected test is removed from the run without a deselection record, or a selected test never reports an outcome;
+- pytest exits non-zero or reports a collection error;
+- for the root suite, the set of ids the run collected differs from the separate collect-only step;
 - a collected test neither ran, nor skipped, nor was deselected;
 - the collected count is below the approved count, which means tests were removed or silently reverted;
 - the baseline row is missing, duplicated, or is not a full pass (collected equal to passed);
@@ -59,7 +63,14 @@ The `synthetic-boundary` job uses a non-cone sparse checkout. Only the paths in 
 - the copied Kernel fixtures
 - the two requirements files
 
-For sparse checkouts, `actions/checkout` fetches with a `blob:none` filter. This was checked in the action's source on 2026-10-29, not in a run log. So `data/`, experiment results and the vendor workbooks are not on the runner to be opened or recreated. A workspace check runs before and after the tests and fails on any path outside that list. The same check catches a test that writes into the workspace.
+For sparse checkouts, `actions/checkout` fetches with a `blob:none` filter. This was checked in the action's source on 2026-10-29, not in a run log. So `data/`, experiment results and the vendor workbooks are not on the runner to be opened or recreated. A workspace check runs before and after the tests and fails on:
+
+- any file outside that list;
+- any directory outside it that is not an ancestor of an allowed path, even an empty one;
+- every symlink anywhere, `.git` included, since the repository tracks none and a link inside an allowed directory could reach a forbidden path;
+- anything that is not a regular file.
+
+Symlinks are never followed, and an unreadable directory fails the check. The same check catches a test that writes into the workspace.
 
 The environment is the pinned `requirements-root.txt` plus `experiments/pit/requirements-synthetic.txt` (`jsonschema`). The suites run through the same `unittest` loader as their documented commands. The `frontend-build` job checks out only `frontend/` and writes the bundle outside the workspace.
 
@@ -86,10 +97,13 @@ PYTHONDONTWRITEBYTECODE=1 python -B .github/scripts/ci_test_gate.py run-unittest
 python -B .github/scripts/ci_test_gate.py compare --suite pit-synthetic --suite research-core-synthetic --counts "$TMPDIR/test-gate/counts"
 ```
 
+The self-test runs real pytest, through the ledger plugin, on invented suites in temporary directories. That covers non-strict and strict XPASS, XFAIL, 580 collected with one ungoverned deselection and 579 passed, `-k` and conftest deselection, silent drops and governed deselection. It also covers malformed reports and symlinked or special files in the workspace. It needs `pytest` installed and reads no repository data.
+
 The PIT suite needs `jsonschema` and `pandas` installed.
 
 ## Limits
 
 - GitHub-hosted runners keep network access. The boundary is enforced by what is checked out, not by network isolation.
 - The hosted run of these new jobs has not been observed. This change was verified locally only: the self-test, both synthetic suites through the checker in a simulated sparse workspace, and the frontend build from a scratch copy of the committed tree.
+- The ledger plugin and the stricter XPASS, deselection and symlink rules (2026-10-29, lane CI-ACCEPTANCE-BLOCKERS) were verified locally on synthetic suites only. The root and backend suites were not run under the plugin, and hosted CI is **NOT RUN** for this change.
 - The root and backend gates still run on a full checkout that includes tracked raw data. This lane does not change that.
