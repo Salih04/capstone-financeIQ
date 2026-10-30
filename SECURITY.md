@@ -54,9 +54,16 @@ by env:
   validated, already-public BIST research data; never mutates state. Preserves the
   current deployment and local dev.
 - **Private (`PUBLIC_DEMO_MODE=false`)** — requires a verified authenticated user.
-  Anonymous → 401, unapproved → 403. With `REQUIRE_APPROVED_USER=true` the
-  verified email must be in `APPROVED_EMAILS` (case-insensitive); an empty
-  allowlist denies everyone (**fail closed**). Verification uses token signatures
+  Anonymous or disabled account → 401, unapproved → 403. With
+  `REQUIRE_APPROVED_USER=true` the email must be **proven** and in
+  `APPROVED_EMAILS` (case-insensitive); an empty allowlist denies everyone
+  (**fail closed**). A token signature proves who issued the token, not who owns
+  the inbox, so: legacy `/auth/register` accounts never satisfy the allowlist
+  (self-registration has no email check), and a Supabase email counts only when
+  the deployment sets `SUPABASE_EMAIL_CONFIRMATION_ENFORCED=true` after
+  confirming the project issues sessions solely for confirmed emails. The
+  user-writable `user_metadata.email_verified` claim and anonymous sessions are
+  never trusted. Verification uses token signatures
   only: Supabase **JWT Signing Keys** (RS256/ES256) are verified against the
   project JWKS derived from `SUPABASE_URL` (cached in memory), and legacy HS256
   tokens via `SUPABASE_JWT_SECRET`. The JWKS path never accepts HS256 (no
@@ -64,7 +71,44 @@ by env:
   (fail closed). Email/claims are read only after the signature verifies; error
   responses never leak the allowlist or token claims.
 
-DB-backed, admin, upload, and auth endpoints always require `get_current_user`.
+DB-backed, admin, upload, and auth endpoints always require `get_current_user`,
+which rejects disabled accounts (`is_active=false`, also refused at
+`/auth/login`) with 403. Writes that replace shared financial records
+(`/financials/import-csv`, `/ingestion/import/csv`, `/fundamentals/upload-csv`,
+`/upload-data`, `/train-model`) additionally require the `admin` role; public
+demo mode never relaxes them. For an existing user the stored FinanceIQ role is
+authoritative: a Supabase `app_metadata.role` claim may lower it but never raise
+it, so a stale or out-of-sync token cannot restore a revoked role. Implicit
+Supabase account provisioning is disabled; no signed claim bootstraps an admin.
+
+DB forecasting parameter reads never train or replace shared rankings.
+`/get-parameters` returns an empty parameter list when none have been trained;
+`/get-stocks`, `/predict` and `/get-portfolio-analysis` then return 422 and
+require an explicit admin `/train-model` action first. `/predict/evaluate`
+also requires admin because it intentionally retrains shared parameters.
+The training, preset-import and time-CV services independently require a caller
+and re-read the current active local admin role, including for direct callers.
+Offline scripts without that principal now fail closed; this is not permission
+to run them or to open protected study data. Forecast detail, explanation and
+history sharing remains an unresolved owner policy; see the
+[technical remediation record](docs/SECURITY_REMEDIATION_2026-10-29.md).
+
+Supabase principals resolve exclusively through an explicit
+`SUPABASE_IDENTITY_BINDINGS` subject-to-local-id map scoped to the verified
+`SUPABASE_URL` issuer. Email equality never links accounts. Missing bindings,
+missing local accounts, anonymous subjects, or missing subject/expiry deny
+access; even `SUPABASE_AUTO_CREATE_USERS=true` cannot provision a user or admin.
+The mapping defaults empty. Its rollout requires owner-approved identity proof;
+see the [security candidate runbook](docs/SECURITY_REMEDIATION_2026-10-28.md).
+Changing a token email never changes its local account; allowlist admission
+additionally requires that its proven email still matches the local contact.
+
+Persisted `/score-runs/{id}` reads and CSV/JSON/PDF exports require the owner or
+an active admin. Shared service checks re-read the local account's current role
+and active status; direct export calls without a caller are refused. The
+`/users/me/score-runs` list remains owner-scoped. Demo mode does not open these
+owned records; the established public research gate remains open in demo mode.
+
 `/health` is always public. The frontend (`ProtectedRoute` + `isApproved`) mirrors
 this for UX, but is **not** the security boundary — the backend is.
 

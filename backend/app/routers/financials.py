@@ -4,7 +4,8 @@ import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user
+from app.core.dependencies import require_shared_data_writer
+from app.core.numeric import finite_or_none
 from app.database import get_db
 from app.models.company import Company
 from app.models.financial import FinancialStatement, ComputedMetric
@@ -24,7 +25,7 @@ FLOAT_COLUMNS = [
 async def import_csv(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_shared_data_writer),
 ):
     """
     CSV format expected columns:
@@ -67,7 +68,7 @@ async def import_csv(
         data: dict[str, Any] = {}
         for col in FLOAT_COLUMNS:
             val = row.get(col)
-            data[col] = float(val) if pd.notna(val) else None
+            data[col] = finite_or_none(val) if pd.notna(val) else None
 
         if existing:
             for k, v in data.items():

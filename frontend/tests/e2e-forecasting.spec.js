@@ -1,30 +1,24 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './synthetic-session'
 
-const BASE = process.env.E2E_BASE_URL || 'http://localhost:3000'
-
-test('login -> upload template trigger -> train -> predict -> detail navigation', async ({ page }) => {
-  await page.goto(`${BASE}/login`)
-
-  const email = `e2e_${Date.now()}@test.com`
-  const password = 'Passw0rd!'
-
-  await page.getByRole('button', { name: /kayıt ol/i }).click()
-  await page.getByPlaceholder(/email/i).fill(email)
-  await page.getByPlaceholder(/password/i).fill(password)
-  await page.getByRole('button', { name: /hesap oluştur/i }).click()
-
-  await page.waitForURL(/dashboard|forecasting|companies|compare|reports/)
-
-  await page.goto(`${BASE}/forecasting`)
-
-  await expect(page.getByText(/Success DNA Forecasting/i)).toBeVisible()
-
-  await page.getByRole('button', { name: /Train Parameters/i }).click()
-  await page.getByRole('button', { name: /Run Forecast/i }).click()
-
-  const detailBtn = page.getByRole('button', { name: /Open Detail Charts/i })
-  if (await detailBtn.count()) {
-    await detailBtn.first().click()
-    await expect(page).toHaveURL(/forecasting\/detail/)
-  }
+test('synthetic session -> current forecasting API flow -> ranked field', async ({ page }) => {
+  const calls = []
+  await page.route('**/api/forecasting/**', async (route) => {
+    const request = route.request()
+    const path = new URL(request.url()).pathname
+    calls.push({ path, body: request.postDataJSON() })
+    let json
+    if (path.endsWith('/options')) json = { trainable_years: [2020, 2021], all_years: [2021], inference_years: [], ticker_count: 1 }
+    else if (path.endsWith('/inference')) json = { items: [] }
+    else if (path.endsWith('/train')) json = { top_parameters: [{ name: 'Synthetic ROE', weight: 1, rank: 1 }] }
+    else if (path.endsWith('/run')) json = { year: 2021, items: [{ ticker: 'SYN', score: 1, rank: 1, confidence: 'low' }] }
+    else throw new Error(`Unexpected forecasting request: ${path}`)
+    await route.fulfill({ json })
+  })
+  await page.goto('/forecasting')
+  await expect(page.getByText('FINANCEIQ · FORECASTING SIGNAL TUNER', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'TRAIN PARAMETERS', exact: true }).click()
+  await page.getByRole('button', { name: 'RUN FORECAST', exact: true }).click()
+  await expect(page.locator('.ft-row-ticker')).toHaveText('SYN')
+  expect(calls.find((c) => c.path.endsWith('/train')).body).toMatchObject({ train_year_from: 2020, train_year_to: 2021, target_mode: 'finalized_only' })
+  expect(calls.find((c) => c.path.endsWith('/run')).body).toMatchObject({ year: 2021, trained_weights: { 'Synthetic ROE': 1 } })
 })

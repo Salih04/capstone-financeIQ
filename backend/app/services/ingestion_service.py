@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from app.models.company import Company
 from app.models.financial import FinancialStatement, ComputedMetric
 from app.models.ingestion import IngestionJob, DataQualityIssue
+from app.core.numeric import finite_or_none
 from app.services.ratio_service import compute_ratios, upsert_computed_metrics
 from app.services.transition_service import compute_transitions_for_company
 from app.services.sector_service import recompute_sector_benchmarks, recompute_sector_normalized
@@ -109,9 +110,9 @@ def process_csv_import(
 
             # 3. Parse floats
             def _f(key):
-                v = row.get(key, "").strip()
+                v = (row.get(key) or "").strip()
                 try:
-                    return float(v) if v else None
+                    return finite_or_none(v) if v else None
                 except ValueError:
                     return None
 
@@ -168,9 +169,13 @@ def process_csv_import(
         all_periods = sorted(affected_periods)
         for cid in affected_companies:
             compute_transitions_for_company(db, cid)
-        recompute_sector_benchmarks(db, all_periods)
+        # Both sector helpers take one period; passing the list crashed every
+        # import that had at least one successful row.
+        for p in all_periods:
+            recompute_sector_benchmarks(db, p)
         for cid in affected_companies:
-            recompute_sector_normalized(db, cid, all_periods)
+            for p in all_periods:
+                recompute_sector_normalized(db, cid, p)
 
         job.job_status = "success" if job.items_failed == 0 else "partial"
         job.finished_at = datetime.now(timezone.utc)

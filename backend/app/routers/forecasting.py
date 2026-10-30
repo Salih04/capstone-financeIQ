@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 logger = logging.getLogger("forecasting")
 
-from app.core.dependencies import get_current_user, require_access
+from app.core.dependencies import get_current_user, require_access, require_shared_data_writer
 from app.core.rate_limit import rate_limit
 from app.database import get_db
 from app.models.user import User
@@ -55,10 +55,10 @@ router = APIRouter(tags=["forecasting"])
 def upload_data(
     body: UploadPresetRequest,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(require_shared_data_writer),
 ):
     try:
-        return import_winner_excel_preset(db, body.file_name)
+        return import_winner_excel_preset(db, body.file_name, current_user=current_user)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
     except ValueError as exc:
@@ -69,7 +69,7 @@ def upload_data(
 def train_model(
     body: TrainModelRequest,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(require_shared_data_writer),
 ):
     try:
         return train_sector_success_model(
@@ -77,9 +77,12 @@ def train_model(
             year=body.year,
             sector=body.sector,
             top_n_parameters=body.top_n_parameters,
+            current_user=current_user,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+    except HTTPException:
+        raise
     except Exception as exc:  # noqa - never raw 500 for the train action
         logger.exception("train-model failed")
         raise HTTPException(status_code=400,
@@ -143,7 +146,7 @@ def predict(
 def evaluate_predict_family(
     body: EvaluationRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_shared_data_writer),
 ):
     try:
         return run_time_cv_evaluation(
@@ -152,9 +155,12 @@ def evaluate_predict_family(
             model_type=body.model_type,
             window_size=body.window_size,
             created_by_user_id=current_user.id,
+            current_user=current_user,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+    except HTTPException:
+        raise
     except Exception as exc:  # noqa - never raw 500 for time-CV
         logger.exception("predict/evaluate failed")
         raise HTTPException(status_code=400,

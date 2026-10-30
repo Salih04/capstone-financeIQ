@@ -76,7 +76,7 @@ cd frontend && npm run e2e                    # Playwright
 docker compose up --build                     # db + backend + frontend (:3000/:8000)
 ```
 
-Python 3.12 (backend Docker image); frontend is Node/Vite (React 18, Vite 5).
+Python 3.12 (backend Docker image); frontend is Node/Vite (React 18, Vite 6).
 
 ### Current verification baseline
 

@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.models.analytics import SectorBenchmark, SectorNormalizedFeature
 from app.models.company import Company
 from app.models.financial import ComputedMetric
+from app.core.numeric import finite_or_none
 
 ALL_METRICS = [
     "roa", "roe", "operating_margin", "net_margin",
@@ -34,9 +35,14 @@ def _stats(values: list[float]) -> dict:
     if n == 0:
         return dict(mean_value=None, std_value=None, median_value=None, p25=None, p75=None)
     sorted_v = sorted(values)
-    mean = sum(values) / n
-    std = math.sqrt(sum((v - mean) ** 2 for v in values) / n) if n > 1 else 0.0
-    median = sorted_v[n // 2] if n % 2 == 1 else (sorted_v[n // 2 - 1] + sorted_v[n // 2]) / 2
+    mean = finite_or_none(sum(values) / n)
+    std = 0.0 if n == 1 else None
+    if mean is not None and n > 1:
+        try:
+            std = finite_or_none(math.sqrt(sum((v - mean) ** 2 for v in values) / n))
+        except OverflowError:
+            std = None
+    median = finite_or_none(sorted_v[n // 2] if n % 2 == 1 else (sorted_v[n // 2 - 1] + sorted_v[n // 2]) / 2)
     p25 = sorted_v[max(0, int(0.25 * n))]
     p75 = sorted_v[min(n - 1, int(0.75 * n))]
     return dict(mean_value=mean, std_value=std, median_value=median, p25=p25, p75=p75)
@@ -61,7 +67,7 @@ def recompute_sector_benchmarks(db: Session, period: str) -> int:
         if sc not in sector_data:
             sector_data[sc] = {k: [] for k in ALL_METRICS}
         for metric in ALL_METRICS:
-            v = getattr(m, metric, None)
+            v = finite_or_none(getattr(m, metric, None))
             if v is not None:
                 sector_data[sc][metric].append(v)
 
@@ -125,13 +131,13 @@ def recompute_sector_normalized(db: Session, company_id: int, period: str) -> in
     peer_values: dict[str, list[float]] = {k: [] for k in ALL_METRICS}
     for p in peer_rows:
         for m in ALL_METRICS:
-            v = getattr(p, m, None)
+            v = finite_or_none(getattr(p, m, None))
             if v is not None:
                 peer_values[m].append(v)
 
     count = 0
     for feature_name in ALL_METRICS:
-        raw = getattr(metric, feature_name, None)
+        raw = finite_or_none(getattr(metric, feature_name, None))
         peers = peer_values[feature_name]
 
         z_score = None
@@ -139,8 +145,8 @@ def recompute_sector_normalized(db: Session, company_id: int, period: str) -> in
 
         if raw is not None and len(peers) >= MIN_PEERS:
             st = _stats(peers)
-            if st["std_value"] and st["std_value"] > 0:
-                z_score = round((raw - st["mean_value"]) / st["std_value"], 4)
+            if st["mean_value"] is not None and st["std_value"] and st["std_value"] > 0:
+                z_score = finite_or_none(round((raw - st["mean_value"]) / st["std_value"], 4))
             percentile = _percentile_rank(peers, raw)
 
         existing = (

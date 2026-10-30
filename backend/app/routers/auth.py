@@ -57,6 +57,9 @@ def login(body: UserLogin, db: Session = Depends(get_db)):
         db.commit()
         raise HTTPException(status_code=401, detail="Invalid credentials.")
 
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Account is disabled.")
+
     # Success — reset counters
     if hasattr(user, "failed_login_count"):
         user.failed_login_count = 0
