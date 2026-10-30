@@ -19,11 +19,9 @@ export default function ForecastingDetailPage() {
   const stockCode = (params.get('stock') || '').toUpperCase()
   const sector = params.get('sector') || undefined
   const year = params.get('year') ? parseInt(params.get('year'), 10) : undefined
-
   const [trend, setTrend] = useState({ series: [] })
   const [heatmap, setHeatmap] = useState({ heatmap: [] })
   const [paramRanks, setParamRanks] = useState([])
-
   useEffect(() => {
     if (!stockCode) return
     api.get('/predict/trends', { params: { stock_code: stockCode, sector } }).then(({ data }) => setTrend(data)).catch(() => setTrend({ series: [] }))

@@ -148,13 +148,13 @@
       },
       {
         "path": "frontend/src/pages/ForecastingDetailPage.jsx",
-        "line": 29,
+        "line": 27,
         "text": "api.get('/predict/trends', { params: { stock_code: stockCode, sector } }).then(({ data }) => setTrend(data)).catch(() => setTrend({ series: [] }))",
         "reason": "Legacy API route name, not user-facing claim copy."
       },
       {
         "path": "frontend/src/pages/ForecastingDetailPage.jsx",
-        "line": 34,
+        "line": 32,
         "text": "api.get('/predict/heatmap', { params: { year } }).then(({ data }) => setHeatmap(data)).catch(() => setHeatmap({ heatmap: [] }))",
         "reason": "Legacy API route name, not user-facing claim copy."
       },
