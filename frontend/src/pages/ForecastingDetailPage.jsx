@@ -4,12 +4,14 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import { BrainCircuit, Sparkles } from 'lucide-react'
 import api from '../api/client'
 import { Card, EmptyState } from '../components/ui'
+import { heatCell, observationLabel } from '../utils/heatmapCell'
 
 function HeatColor({ value }) {
-  const v = Math.max(-1, Math.min(1, value / 100))
-  const pos = v >= 0
-  const alpha = Math.min(0.9, Math.abs(v))
-  return <span style={{ color: pos ? '#22c55e' : '#ef4444', opacity: 0.35 + alpha }}>{value.toFixed(2)}</span>
+  const cell = heatCell(value)
+  if (cell.missing) {
+    return <span title="No observed value" style={{ color: 'var(--text-3)' }}>{cell.text}</span>
+  }
+  return <span style={{ color: cell.positive ? '#22c55e' : '#ef4444', opacity: cell.opacity }}>{cell.text}</span>
 }
 
 export default function ForecastingDetailPage() {
@@ -110,6 +112,7 @@ export default function ForecastingDetailPage() {
                   <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Sector</th>
                   <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Feature</th>
                   <th style={{ textAlign: 'right', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Value</th>
+                  <th style={{ textAlign: 'right', borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>Observed</th>
                 </tr>
               </thead>
               <tbody>
@@ -118,6 +121,7 @@ export default function ForecastingDetailPage() {
                     <td style={{ borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>{c.sector}</td>
                     <td style={{ borderBottom: '1px solid var(--border)', padding: '8px 10px' }}>{c.feature}</td>
                     <td style={{ borderBottom: '1px solid var(--border)', padding: '8px 10px', textAlign: 'right' }}><HeatColor value={c.value} /></td>
+                    <td style={{ borderBottom: '1px solid var(--border)', padding: '8px 10px', textAlign: 'right', color: 'var(--text-3)' }}>{observationLabel(c)}</td>
                   </tr>
                 ))}
               </tbody>

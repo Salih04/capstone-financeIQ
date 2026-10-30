@@ -68,7 +68,7 @@ LLM (optional): OpenRouter / LM Studio / Ollama, explanation-only, deterministic
 - `docker-compose.yml`: services `db` (postgres:16-alpine, :5432), `backend` (:8000), `frontend` (host :3000 → container :80 via nginx).
 - Render: Docker runtime, `dockerfilePath: ./backend/Dockerfile`, `dockerContext: .` (repo root) — do NOT set Render's Root Directory to `backend`. Services: `financeiq-backend` (web) + `financeiq-db`.
 - Vercel: build runs from the **repo root**, not `frontend/` — root `vercel.json` sets `installCommand`/`buildCommand` with `--prefix frontend` and `outputDirectory: frontend/dist`, plus SPA rewrites and security headers. `frontend/vercel.json` holds rewrites only.
-- Backend deps: `backend/requirements.txt` (FastAPI 0.111, SQLAlchemy 2.0, pydantic 2.7; Python 3.12 per `backend/Dockerfile`); frontend: `frontend/package.json` (React 18, Vite 5, Playwright e2e; scripts `dev`/`build`/`preview`/`e2e`).
+- Backend deps: `backend/requirements.txt` (FastAPI 0.136 + Starlette 1.7, SQLAlchemy 2.0, pydantic 2.9, PyJWT; Python 3.12 per `backend/Dockerfile`); frontend: `frontend/package.json` (React 18, React Router 7, Vite 6, Playwright e2e; scripts `dev`/`build`/`preview`/`e2e`).
 
 ## Common Edit Targets
 

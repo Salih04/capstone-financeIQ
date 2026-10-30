@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "purpose": "Expected collected/executed/skipped/deselected counts for every test gate in .github/workflows/verify.yml. Documented in docs/CI_TEST_GATES.md. Root and backend expectations are read from docs/VERIFICATION_BASELINE.md at run time and are never copied here.",
+  "suites": {
+    "root-portable": {
+      "job": "verify",
+      "runner": "pytest",
+      "command": "PYTHONPATH=. python -m pytest tests/ with every id in .github/ci-deselect.txt deselected",
+      "expected": {
+        "from_baseline": "PYTHONPATH=. python -m pytest tests/"
+      },
+      "deselect_list": ".github/ci-deselect.txt"
+    },
+    "backend": {
+      "job": "verify",
+      "runner": "pytest",
+      "command": "PYTHONPATH=backend python -m pytest backend/tests",
+      "expected": {
+        "from_baseline": "PYTHONPATH=backend python -m pytest backend/tests"
+      }
+    },
+    "pit-synthetic": {
+      "job": "synthetic-boundary",
+      "runner": "unittest",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python -m unittest experiments.pit.test_kernel_snapshot -v",
+      "expected": {
+        "approved_collected": 16,
+        "source": "experiments/pit/KERNEL_CONSUMER_STATUS.md (focused verification) and PR #52, merged as f7b1e4f9"
+      }
+    },
+    "research-core-synthetic": {
+      "job": "synthetic-boundary",
+      "runner": "unittest",
+      "command": "python3 -B -m unittest discover -s experiments/research_core/tests -p 'test_*.py' -v",
+      "expected": {
+        "approved_collected": 21,
+        "source": "PR #53 description, merged as 4b029ef4"
+      }
+    }
+  },
+  "synthetic_workspace": [
+    ".github/",
+    "docs/VERIFICATION_BASELINE.md",
+    "experiments/pit/",
+    "experiments/research_core/",
+    "tests/fixtures/kernel/",
+    "requirements-root.txt",
+    "backend/requirements.txt"
+  ],
+  "builds": {
+    "frontend-build": {
+      "job": "frontend-build",
+      "command": "npm ci && npm run build (frontend/, output written outside the workspace)"
+    }
+  },
+  "not_run_in_ci": [
+    {
+      "gate": "native full root suite, including every id in .github/ci-deselect.txt",
+      "reason": "Byte-identity and inode-recycling checks are environment-qualified to the machine of record (docs/VERIFICATION_BASELINE.md). CI deselects them and never reports them as passed.",
+      "where": "machine of record, before any baseline refresh"
+    },
+    {
+      "gate": "frontend end-to-end (npm run e2e, Playwright)",
+      "reason": "Needs browser binaries, a running backend and a Supabase session; none is provided to CI.",
+      "where": "local runbook only"
+    },
+    {
+      "gate": "experiment and outcome pipelines (make research, make full-research, scientific studies)",
+      "reason": "They read or regenerate protected outcomes; CI must never run them.",
+      "where": "never in CI"
+    }
+  ]
+}

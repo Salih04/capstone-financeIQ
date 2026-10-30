@@ -1,17 +1,21 @@
+from app.core.numeric import finite_or_none
 from app.models.financial import FinancialStatement, ComputedMetric
 
 
 def _safe_div(n, d):
+    """n / d, or None when either side is missing/non-finite, d is zero, or it overflows."""
+    n, d = finite_or_none(n), finite_or_none(d)
     if n is None or d is None or d == 0:
         return None
-    return n / d
+    return finite_or_none(n / d)
 
 
 def compute_ratios(stmt: FinancialStatement) -> dict:
     """Compute all 12 ratios from a FinancialStatement row."""
+    # Missing inventory is unknown, not zero: the quick ratio stays null.
     quick_assets = (
-        (stmt.current_assets or 0) - (stmt.inventory or 0)
-        if stmt.current_assets is not None else None
+        stmt.current_assets - stmt.inventory
+        if stmt.current_assets is not None and stmt.inventory is not None else None
     )
 
     return {
@@ -41,6 +45,7 @@ def compute_ratios(stmt: FinancialStatement) -> dict:
 
 def upsert_computed_metrics(db, company_id: int, period: str, ratios: dict) -> ComputedMetric:
     from sqlalchemy import select
+    ratios = {k: finite_or_none(v) for k, v in ratios.items() if hasattr(ComputedMetric, k)}
     existing = db.execute(
         select(ComputedMetric).where(
             ComputedMetric.company_id == company_id,
