@@ -330,6 +330,9 @@ Task FIQ-10. Build a point-in-time feature store from Kernel snapshots in experi
    Kernel's derivatives): size, liquidity, past-window volatility and momentum computed only
    from bars before the as-of time.
 4) Macro features with their release times (policy rate, FX, CPI, weekly non-resident flows).
+   A macro surprise (e.g. the residual of an ARMA model of CPI) is estimated recursively: at
+   each as-of time, only from the vintage known then (Kernel macro_vintage_as_of), with the
+   model order chosen inside that window. A full-sample fit is look-ahead.
 5) API: features_as_of(entity_ids, as_of) returning only values with known_at <= as_of.
 6) Tests: inject a fact published one day after as_of and assert it is invisible; a restated
    comparative does not overwrite the original; a missing input yields null, never a fill.
@@ -563,7 +566,8 @@ kalır, her deneme deftere girer, holdout'a yalnız ön kayıtlı doğrulayıcı
 Dalga 5 · Ön koşul: FIQ-07, FIQ-10, FIQ-12
 
 Bitti ölçütü: keşif raporu deneme sayısıyla birlikte; holdout'a hiç dokunulmamış (defter bunu
-gösteriyor); doğrulayıcı aşamaya taşınacak en fazla birkaç hipotez gerekçesiyle seçilmiş.
+gösteriyor); her model zorunlu benchmark'larla (tarihsel ortalama, AR) karşılaştırılmış;
+doğrulayıcı aşamaya taşınacak en fazla birkaç hipotez gerekçesiyle seçilmiş.
 
 ```text
 Task FIQ-23. Exploratory modeling on the U1 point-in-time panel inside the development window
@@ -571,7 +575,11 @@ only (docs/research/PROTOCOL.md). Any target, model family, feature set, trainin
 filter is allowed if declared in the run config before it is evaluated. Every evaluated
 configuration goes through the experiment ledger as "exploratory". Suggested breadth: linear
 and regularised baselines, gradient-boosted trees, a neural model, a panel model; targets at
-more than one horizon; purged and embargoed validation. Write docs/study3/EXPLORATION_REPORT.md:
+more than one horizon; purged and embargoed validation. Required benchmarks for every target
+and horizon, fitted in the same validation scheme: the expanding historical mean and an AR(p)
+model on the target's own past (p <= 4, chosen by BIC inside each training fold; any other
+order tried by hand is a separate ledger trial). Report every model's Campbell-Thompson out-of-sample R² against the
+historical mean. Write docs/study3/EXPLORATION_REPORT.md:
 what was tried (from the ledger, with the total trial count), what was learned, and at most
 three candidate hypotheses for confirmation, each with the exact configuration that would be
 frozen. Report the multiplicity-adjusted view, not only the best run. Never read holdout
