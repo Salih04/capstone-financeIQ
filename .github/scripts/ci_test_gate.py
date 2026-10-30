@@ -92,10 +92,29 @@ def read_junit_cases(junit: Path) -> dict[tuple[str, str], bool]:
     if root.tag not in ("testsuite", "testsuites") or not suites:
         raise GateError(f"malformed JUnit report {junit.name}: no <testsuite> element")
     cases: dict[tuple[str, str], bool] = {}
+    for suite in suites:
+        declared = suite.get("tests")
+        if declared is not None:
+            try:
+                expected = int(declared)
+            except ValueError as exc:
+                raise GateError(
+                    f"JUnit test count is invalid: {declared!r}"
+                ) from exc
+            actual = sum(1 for _ in suite.iter("testcase"))
+            if expected != actual:
+                raise GateError(
+                    f"JUnit test count mismatch: declared {expected}, "
+                    f"found {actual}"
+                )
     for case in (case for suite in suites for case in suite.iter("testcase")):
         key = (case.get("classname", ""), case.get("name", ""))
         passed = not any(child.tag in ("failure", "error", "skipped") for child in case)
-        cases[key] = cases.get(key, True) and passed
+        if key in cases:
+            raise GateError(
+                f"duplicate JUnit testcase address {key!r} in {junit.name}"
+            )
+        cases[key] = passed
     return cases
 
 
@@ -160,7 +179,20 @@ def _counts_from_pytest(
     doc = read_ledger(ledger)
     cases = read_junit_cases(junit)
     outcomes: dict[str, str] = doc["outcomes"]
-    reported = {junit_address(node_id): outcome in PASSING for node_id, outcome in outcomes.items()}
+    # Every selected pytest node must have a distinct JUnit identity.
+    selected_addresses: dict[tuple[str, str], str] = {}
+    for node_id in doc["selected"]:
+        address = junit_address(node_id)
+        if address in selected_addresses:
+            raise GateError(
+                f"colliding ledger JUnit address {address!r}: "
+                f"{selected_addresses[address]!r} and {node_id!r}"
+            )
+        selected_addresses[address] = node_id
+    reported = {
+        junit_address(node_id): outcome in PASSING
+        for node_id, outcome in outcomes.items()
+    }
     if reported != cases:
         differ = sorted(f"{c}::{n}" for c, n in set(reported) ^ set(cases))
         differ += sorted(f"{c}::{n}" for (c, n), ok in reported.items() if (c, n) in cases and cases[(c, n)] != ok)

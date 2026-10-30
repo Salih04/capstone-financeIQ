@@ -412,5 +412,44 @@ class WorkspaceTest(GateCase):
         self.assertEqual(gate.check_workspace(root, self.ALLOWED), ["data/", "data/raw/"])
 
 
+
+class JUnitIdentityRegressionTest(GateCase):
+    """Fail closed on duplicate JUnit records and non-injective addresses."""
+
+    def test_duplicate_junit_cases_are_rejected(self):
+        import re
+        node = "backend/tests/test_x.py::test_a"
+        ledger = ledger_doc([node])
+        xml = junit_xml(ledger["outcomes"])
+        case = re.search(r"<testcase[^>]*>.*?</testcase>", xml)
+        self.assertIsNotNone(case)
+        xml = xml.replace("</testsuite>", case.group(0) + "</testsuite>", 1)
+        counts = self.counts("backend", ledger, xml)
+        self.assertIn("duplicate JUnit", counts.get("malformed", ""))
+
+    def test_two_node_ids_with_same_junit_address_are_rejected(self):
+        ids = [
+            "backend/tests/test_x.py::C::test_a",
+            "backend/tests/test_x/C.py::test_a",
+        ]
+        self.assertEqual(gate.junit_address(ids[0]), gate.junit_address(ids[1]))
+        ledger = ledger_doc(ids)
+        xml = junit_xml({ids[0]: "passed"})
+        counts = self.counts("backend", ledger, xml)
+        self.assertIn("colliding ledger", counts.get("malformed", ""))
+
+    def test_inconsistent_junit_test_count_is_rejected(self):
+        node = "backend/tests/test_x.py::test_a"
+        ledger = ledger_doc([node])
+        xml = junit_xml(ledger["outcomes"])
+        xml = xml.replace(
+            '<testsuite name="pytest">',
+            '<testsuite name="pytest" tests="2">',
+            1,
+        )
+        counts = self.counts("backend", ledger, xml)
+        self.assertIn("JUnit test count", counts.get("malformed", ""))
+
+
 if __name__ == "__main__":
     unittest.main()
