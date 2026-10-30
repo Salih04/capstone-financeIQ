@@ -198,3 +198,25 @@ def test_large_finite_mean_stays_finite(values, expected):
     assert math.isfinite(cell["value"])
     assert cell["n_observed"] == len(values)
     assert cell["n_missing"] == 0
+
+MAX_FLOAT = float.fromhex("0x1.fffffffffffffp+1023")
+
+
+@pytest.mark.parametrize(
+    "values,expected",
+    [
+        ([MAX_FLOAT] * 3, MAX_FLOAT),
+        ([-MAX_FLOAT] * 3, -MAX_FLOAT),
+        ([MAX_FLOAT] * 7, MAX_FLOAT),
+        ([MAX_FLOAT] * 3 + [-MAX_FLOAT] * 3, 0.0),
+    ],
+)
+def test_maximum_finite_mean_does_not_overflow(values, expected):
+    rows = [_row("MaxFiniteSynthetic", period_return=v) for v in values]
+    result = forecasting_service.get_sector_heatmap_data(
+        _fake_db(rows), year=YEAR
+    )
+    cell = _cells(result, "MaxFiniteSynthetic")["period_return"]
+    assert cell["value"] == expected
+    assert math.isfinite(cell["value"])
+    assert (cell["n_observed"], cell["n_missing"]) == (len(values), 0)

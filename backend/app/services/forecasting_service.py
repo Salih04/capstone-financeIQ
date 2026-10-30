@@ -1122,7 +1122,19 @@ def get_sector_heatmap_data(db: Session, year: int) -> dict[str, Any]:
             # A06: null, NaN and +/-Infinity are missing. They are not averaged,
             # and a cell with no finite value is null, never 0.0.
             vals = [v for v in (finite_or_none(getattr(i, f)) for i in items) if v is not None]
-            avg = round(math.fsum(v / len(vals) for v in vals), 4) if vals else None
+            if vals:
+                try:
+                    # Accurate for ordinary values and small cancellations.
+                    mean = math.fsum(vals) / len(vals)
+                except OverflowError:
+                    # The mathematical mean is still finite: normalize first.
+                    scale = max(abs(v) for v in vals)
+                    mean = (
+                        math.fsum(v / scale for v in vals) / len(vals)
+                    ) * scale
+                avg = round(mean, 4)
+            else:
+                avg = None
             heatmap.append({
                 "sector": sector,
                 "feature": f,
