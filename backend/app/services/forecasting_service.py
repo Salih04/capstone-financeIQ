@@ -6,6 +6,7 @@ import unicodedata
 from pathlib import Path
 from typing import Any
 
+import math
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -1121,7 +1122,7 @@ def get_sector_heatmap_data(db: Session, year: int) -> dict[str, Any]:
             # A06: null, NaN and +/-Infinity are missing. They are not averaged,
             # and a cell with no finite value is null, never 0.0.
             vals = [v for v in (finite_or_none(getattr(i, f)) for i in items) if v is not None]
-            avg = round(float(np.mean(vals)), 4) if vals else None
+            avg = round(math.fsum(v / len(vals) for v in vals), 4) if vals else None
             heatmap.append({
                 "sector": sector,
                 "feature": f,

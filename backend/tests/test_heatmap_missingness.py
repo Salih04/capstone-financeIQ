@@ -177,3 +177,24 @@ def test_api_returns_null_for_all_missing_and_zero_for_real_zero(client, user_he
     assert cells["return_3m"]["value"] == 1.0
     assert (cells["return_3m"]["n_observed"], cells["return_3m"]["n_missing"]) == (1, 1)
     assert cells["return_1m"]["value"] is None
+
+
+@pytest.mark.parametrize(
+    "values,expected",
+    [
+        ([1e308, 1e308], 1e308),
+        ([-1e308, -1e308], -1e308),
+        ([1e308, -1e308], 0.0),
+        ([1e308, 1e308, -1e308, -1e308], 0.0),
+    ],
+)
+def test_large_finite_mean_stays_finite(values, expected):
+    rows = [_row("OverflowSynthetic", period_return=v) for v in values]
+    result = forecasting_service.get_sector_heatmap_data(
+        _fake_db(rows), year=YEAR
+    )
+    cell = _cells(result, "OverflowSynthetic")["period_return"]
+    assert cell["value"] == expected
+    assert math.isfinite(cell["value"])
+    assert cell["n_observed"] == len(values)
+    assert cell["n_missing"] == 0
