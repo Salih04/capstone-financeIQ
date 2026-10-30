@@ -107,6 +107,33 @@ def read_junit_cases(junit: Path) -> dict[tuple[str, str], bool]:
                     f"JUnit test count mismatch: declared {expected}, "
                     f"found {actual}"
                 )
+    # JUnit aggregate outcome counts must agree with testcase elements.
+    for suite in suites:
+        for field, tag in (
+            ("failures", "failure"),
+            ("errors", "error"),
+            ("skipped", "skipped"),
+        ):
+            raw = suite.get(field)
+            if raw is None:
+                continue
+            try:
+                declared = int(raw)
+            except ValueError as exc:
+                raise GateError(
+                    f"JUnit {field} count is invalid: {raw!r}"
+                ) from exc
+            actual = sum(
+                1
+                for case in suite.iter("testcase")
+                for child in case
+                if child.tag == tag
+            )
+            if declared != actual:
+                raise GateError(
+                    f"JUnit {field} count mismatch: declared "
+                    f"{declared}, found {actual}"
+                )
     for case in (case for suite in suites for case in suite.iter("testcase")):
         key = (case.get("classname", ""), case.get("name", ""))
         passed = not any(child.tag in ("failure", "error", "skipped") for child in case)

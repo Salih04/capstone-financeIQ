@@ -451,5 +451,25 @@ class JUnitIdentityRegressionTest(GateCase):
         self.assertIn("JUnit test count", counts.get("malformed", ""))
 
 
+
+class JUnitMetadataRegressionTest(GateCase):
+    def test_all_declared_outcome_counts_must_match_cases(self):
+        node = "backend/tests/test_meta.py::test_a"
+        ledger = ledger_doc([node])
+        for field in ("failures", "errors", "skipped"):
+            with self.subTest(field=field):
+                xml = junit_xml(ledger["outcomes"])
+                xml = xml.replace(
+                    '<testsuite name="pytest">',
+                    f'<testsuite name="pytest" tests="1" {field}="1">',
+                    1,
+                )
+                counts = self.counts("backend", ledger, xml)
+                self.assertIn(
+                    f"JUnit {field} count",
+                    counts.get("malformed", ""),
+                )
+
+
 if __name__ == "__main__":
     unittest.main()
