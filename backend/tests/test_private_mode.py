@@ -91,7 +91,7 @@ class PrivateModeTests(unittest.TestCase):
         settings.SUPABASE_EMAIL_CONFIRMATION_ENFORCED = True
         settings.SUPABASE_URL = "https://private-test.supabase.co"
         with SessionLocal() as db:
-            user = db.query(User).filter(User.email == "Owner@Test.com").one()
+            user = db.query(User).filter(User.email.ilike("owner@test.com")).one()
             settings.SUPABASE_IDENTITY_BINDINGS = {"uid-owner": user.id}
         auth = {"Authorization": f"Bearer {_supabase_token('Owner@Test.com')}"}
         r = self.client.get("/research/summary", headers=auth)

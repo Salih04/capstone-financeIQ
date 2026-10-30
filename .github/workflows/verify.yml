@@ -18,6 +18,20 @@ jobs:
     name: pipeline + backend verification
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: financeiq_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d financeiq_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - uses: actions/checkout@v7
@@ -42,8 +56,14 @@ jobs:
           python --version
           pip freeze
 
-      # No Postgres service: the backend suite runs on sqlite and no committed
-      # .env exists in CI, so app/config.py defaults apply.
+      - name: Migrate disposable PostgreSQL test schema
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/financeiq_ci
+        run: python -m alembic upgrade head
+
+      # Main backend tests use disposable SQLite; PostgreSQL-specific synthetic
+      # integrity tests use the migrated ephemeral service below.
       # The two test steps are the documented baseline commands plus coverage
       # and JUnit reporting flags. Coverage is measured and archived, never enforced:
       # no threshold gates a run.
@@ -99,6 +119,7 @@ jobs:
       - name: Backend tests
         env:
           CI_TEST_GATE_LEDGER: ${{ runner.temp }}/test-gate/backend.ledger.json
+          FIQ_TEST_POSTGRES_URL: postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/financeiq_ci
         run: >
           PYTHONPATH=backend:.github/scripts python -m pytest backend/tests -q -p ci_pytest_ledger
           --cov=backend/app --cov-report=xml:coverage-backend.xml
