@@ -1,0 +1,2 @@
+# Unified-diff context lines for blank lines are a single space by format.
+*.patch -whitespace

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 # Models below carry fields named model_* (model_type/model_version) which collide
 # with Pydantic v2's protected "model_" namespace. Opt out without renaming.
@@ -176,7 +176,10 @@ class TrendSeriesOut(BaseModel):
 class HeatmapCell(BaseModel):
     sector: str
     feature: str
-    value: float
+    # Mean of the finite values; null when the cell has none (never 0.0).
+    value: float | None = Field(allow_inf_nan=False)
+    n_observed: int = Field(ge=0)
+    n_missing: int = Field(ge=0)
 
 
 class SectorHeatmapOut(BaseModel):

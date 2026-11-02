@@ -12,7 +12,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user
+from app.core.dependencies import get_current_user, require_shared_data_writer
 from app.database import get_db
 from app.models.ingestion import IngestionJob, DataQualityIssue
 from app.models.user import User
@@ -26,7 +26,7 @@ router = APIRouter(prefix="/ingestion", tags=["ingestion"])
 async def import_csv(
     file: UploadFile = File(..., description="CSV with ticker, period, financials"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_shared_data_writer),
 ):
     """
     Full V3 ingestion: validates, upserts financials, computes ratios,

@@ -1,6 +1,6 @@
 # Paper 2 — KAP disclosure event study
 
-**FIQ-19 · preparation v0.2 · 2026-10-26 · LIMITED OWNER DECISIONS APPLIED; NOT REGISTERED**
+**FIQ-19 · preparation v0.3 · 2026-10-29 · ADOPTED OWNER DISPOSITIONS RECONCILED; NOT REGISTERED**
 
 Research support only; not investment advice. No study is adopted, registered or
 run by this document. The owner-approved 2026-10-26 D3/D5/D9 decisions and
@@ -8,6 +8,11 @@ narrow D2/D4/D8 amendments are recorded below. All remaining choices are
 **PROPOSED / UNRESOLVED**; these limited approvals do not authorize execution.
 The remaining decisions and evidence gates must be resolved before registration.
 The [OSF draft](OSF_PREREGISTRATION_DRAFT.md) supplies the study-record fields.
+v0.3 (2026-10-29) only reconciles this text with the already adopted
+[owner decision addendum](../research/OWNER_DECISION_ADDENDUM.md) (PR #55,
+`efe3ed32`, committed after v0.2); it makes no new scientific choice. Gate
+matrix, stale-text findings and unmade decisions:
+[REGISTRATION_READINESS_AUDIT.md](REGISTRATION_READINESS_AUDIT.md).
 
 ## 1. Authority, scope and questions
 
@@ -23,18 +28,31 @@ owner decisions and commit”, dated 2026-10-26; no approval is backdated.
 This task merges or adopts no separate governance or implementation lane.
 PR #52 is already on the verified base; its synthetic consumer does not establish
 research-data readiness or scientific adoption.
+v0.2 landed on main as `b2b31536` (PR #54), whose parent is `4b029ef4` (PR #53),
+not the preparation base named above. v0.3 is edited on main `efe3ed32` (PR #55).
+
 FIQ-06 R14 (`8093ec0f54d80df31c50e3a806b06b0fb2f2a096`,
 `docs/research/UNIVERSE_RULE.md`) and FIQ-11 R7
 (`1463425ae1c4ea592a9e6efc3a1a26ca6810137b`,
-`docs/research/PROTOCOL.md`) remain **unadopted draft dependencies** for this study.
-Their proposed versions, exemptions, classifications and opening policies
-are not silently incorporated.
+`docs/research/PROTOCOL.md`) remain **unadopted as whole drafts**, and neither file
+is on main (v0.2 called both unadopted draft dependencies, correct before PR #55).
+Since 2026-10-26 the addendum adopts only: the FIQ-06 scoped v1.0.0 rules B2,
+6(c)-A, 20(a)1 + (b)ii, 21-A, 22-B and 23-B, "approved as rules, operationally
+blocked" where definitions or evidence are missing; and the FIQ-11 dispositions
+OD-1 = B, OD-2 = B, OD-3 = B, OD-4 = A, OD-5 = B, OD-6 (a)(b)(c), OD-7 = B,
+OD-8 = A plus the itemised I-1..I-16 states. Their binding effect on this study is
+in the OSF draft's boundaries section. All other proposed versions, exemptions,
+classifications and opening policies are not silently incorporated. UNIVERSE_RULE
+22-B governs membership-announcement copies; it is not transferred to D2 event timing.
 
 Target population: quarterly U1 formation samples under Charter §4; primary
 stratum non-financial firms, holdings flagged. Financial firms remain a separate,
 descriptive stratum. Retain index leavers, suspensions, mergers and delistings
 through the event window. No capstone cohort or survivor filter. Operational U1 version and study period
 remain unset pending adoption and authorized outcome-free feasibility checks.
+FIQ-06 is not completed: its feasible window (U OD-4/14/15) and stratum mapping
+(U OD-8(a) with evidence EV-3) are OPEN/BLOCKED, so strata stay UNKNOWN and the
+primary non-financial stratum cannot yet be populated.
 
 | Question | Proposed estimand, one row per issuer/report event |
 |---|---|
@@ -205,6 +223,15 @@ PROPOSED / UNRESOLVED and must be disposed of before the threshold is frozen;
 do not infer its approval from this eligibility rule. No returns or outcomes may
 be inspected. This task authorizes no such counts. If count access itself is not
 authorized, fail closed: eligibility is UNVERIFIED and passage cannot be inferred.
+Adopted FIQ-11 OD-1 = B (2026-10-26) permits only four protected-period aggregates
+(U1 member count per formation date; identity coverage; eligible KAP filing-event
+count; distinct event-date count per quarter), and the addendum states that it does
+not authorize every RQ3 feasibility output, including issuer/session-cluster
+outputs. Basis-label counts are not among the four. Under adopted text this count
+rule is therefore unauthorized and eligibility is UNVERIFIED. Whether the owner
+grants an exact further count authorization or decides how UNVERIFIED eligibility
+is treated before the D9 family is frozen is UNSET (audit gate G09); this
+document chooses neither.
 If the threshold fails, remove RQ3 from the registered confirmatory family before
 registration and label it **NOT ESTIMABLE / forward-holdout-only candidate**.
 Future forward-holdout RQ3 confirmation needs its own authorized registration
@@ -275,7 +302,7 @@ below; it neither adopts the whole study nor resolves other D decisions.
 
 | ID | Status and remaining disposition before freeze |
 |---|---|
-| D1 | PROPOSED / UNRESOLVED: Paper 2 scope, operational U1 version, strata, permitted windows, fixed observation end, FIQ-11 boundary/exposure authority |
+| D1 | PROPOSED / UNRESOLVED: Paper 2 scope, operational U1 version, strata, which protected window the single confirmatory opening uses (FIQ-11 OD-2 = B), event-publication start/end, fixed observation end. FIQ-11 OD-1..OD-8 dispositions now bind (OSF draft boundaries); per-target `D_i` content under OD-6 and the unresolved I-items remain open |
 | D2 | LIMITED AMENDMENT APPROVED: CAR[-1,+1] is a wider-window sensitivity and does not remove timing confounding. Other timing/cutoff/primary-window choices remain PROPOSED / UNRESOLVED |
 | D3 | OWNER-APPROVED: CPI seasonal expectation and fiscal-quarter-end MV primary exactly as §2; comparable-history drift/SUE diagnostic candidates only. Source IDs and operational evidence remain gated |
 | D4 | LIMITED AMENDMENT APPROVED: verified two-year TRY sovereign yield → verified EVDS benchmark yield → verified policy-rate changes; outcome-blind PIT feasibility selection before registration, consistent across observations, with economic-meaning disclosure. Remaining factor/estimation/source choices PROPOSED / UNRESOLVED |
@@ -284,7 +311,7 @@ below; it neither adopts the whole study nor resolves other D decisions.
 | D7 | PROPOSED / UNRESOLVED: bundling, co-announcement taxonomy, blind coding, missing handling and full-sample sensitivity |
 | D8 | LIMITED AMENDMENT APPROVED: common session shift per replication, event-level collision dropping, discarded-event counts/clustering effect, no outcome-driven shift selection. Seed, repetition count and remaining controls PROPOSED / UNRESOLVED |
 | D9 | OWNER-APPROVED: RQ1 beta plus eligible RQ3 delta, two-sided Holm; RQ1 alone if RQ3 excluded before registration; UNAVAILABLE tests; diagnostics separate from confirmation; prior trials/exposure retained separately and unknown counts never zero. Alpha, stopping details and governing selection/exposure reconciliation remain PROPOSED / UNRESOLVED |
-| D10 | PROPOSED / UNRESOLVED: immutable source manifest, rights/vintages, exposure assessment and exact execution gates; no access authorized here |
+| D10 | PROPOSED / UNRESOLVED: immutable source manifest, rights/vintages, exposure assessment and exact execution gates; no access authorized here. Adopted OD-2 = B adds binding to an immutable study identity and a cross-study exposure ledger, whose location and schema are UNSET |
 
 **D9 implementation.** Freeze the eligible family before registration, after the
 separately authorized RQ3 eligibility gate: RQ1 beta and eligible RQ3 delta, or
@@ -334,7 +361,16 @@ rechecked in this owner-decision amendment. No study data was acquired.
 - **VERIFIED bibliography and related formula:** Livnat & Mendenhall (2006), *JAR* 44(1), 177–205, [publisher](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1475-679X.2006.00196.x). The [author's 9 April 2004 working draft, §3.2, Eq.(1), p.16](https://pages.stern.nyu.edu/~jlivnat/jar%20resubmit.pdf) uses seasonal EPS change / quarter-end share price, with split adjustments. It is not the final published text and does not validate total earnings / fiscal-quarter-end capitalization, IAS29 conversions or a 2025Q1 start.
 - **VERIFIED platform only:** [CBRT 26 January 2026 EVDS announcement](https://www.tcmb.gov.tr/wps/wcm/connect/EN/TCMB%2BEN/Main%2BMenu/Announcements/Press%2BReleases/2026/ANO2026-03) describes metadata and release-calendar features. No series values queried. Two-year yield access, indicative-series identity, historical policy/CPI vintages and PIT completeness are **UNVERIFIED**; do not treat the platform announcement as evidence of a historical series.
 
+**v0.3 source recheck, 2026-10-29 (text extracted from the official PDFs; no
+study data):** [SPK bulletin 2024/6, dated 25/01/2024, p.16 item 2](https://spk.gov.tr/data/65b2beba8f95db1f44c2b15a/2024-6.pdf)
+VERIFIED: decision 81/1820 of 28.12.2023 applies TMS 29 from annual reports for
+periods ending 31.12.2023 and grants 10 extra weeks for annual and 6 for the first
+two interim reports. [KGK announcement](https://www.kgk.gov.tr/Portalv2Uploads/files/Duyurular/v2/Diger/Enf_%20Muh_%20Duyuru_ESEB.pdf)
+points 1–2 VERIFIED as summarized above; the PDF body prints no date, so
+23 November 2023 rests on file metadata plus the REPORTED KGK 2024-32 corroboration.
+
 Only the owner decisions itemized above are approved. Remaining D decisions,
-FIQ-06 R14/FIQ-11 R7 disposition,
+remaining FIQ-06 decisions (operational U1 version, window, strata) and the
+unresolved FIQ-11 I-items, per-target `D_i` content under OD-6,
 rights/PIT lineage, FIQ-07/08/12, KER-07/09 and relevant return/calendar transport,
 then separately authorized FIQ-20/21 and FO-7 registration remain dependencies.

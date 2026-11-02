@@ -3,7 +3,8 @@ import time
 import urllib.request
 from datetime import datetime, timedelta
 
-from jose import JWTError, jwt
+import jwt
+from jwt import InvalidTokenError, PyJWK
 from passlib.context import CryptContext
 
 from app.config import settings
@@ -59,7 +60,7 @@ def _verify_kwargs() -> dict:
     """Common claim-validation options. exp/nbf/iat always verified; aud/iss only
     when configured (so local/test tokens without an issuer still work)."""
     kwargs: dict = {}
-    options = {"verify_aud": False}
+    options = {"verify_aud": False, "require": ["sub", "exp"]}
     if settings.SUPABASE_JWT_AUDIENCE:
         kwargs["audience"] = settings.SUPABASE_JWT_AUDIENCE
         options["verify_aud"] = True
@@ -73,7 +74,7 @@ def _verify_kwargs() -> dict:
 def _decode_with_jwks(token: str, kid: str | None, alg: str) -> dict:
     url = settings.supabase_jwks_url()
     if not url:
-        raise JWTError("Supabase JWKS not configured (set SUPABASE_URL or SUPABASE_JWKS_URL)")
+        raise InvalidTokenError("Supabase JWKS not configured (set SUPABASE_URL or SUPABASE_JWKS_URL)")
     jwks = _get_jwks(url)
     key = _select_jwk(jwks, kid)
     if key is None:
@@ -81,8 +82,8 @@ def _decode_with_jwks(token: str, kid: str | None, alg: str) -> dict:
         jwks = _get_jwks(url, force=True)
         key = _select_jwk(jwks, kid)
     if key is None:
-        raise JWTError("No matching JWKS key for token kid")
-    return jwt.decode(token, key, algorithms=[alg], **_verify_kwargs())
+        raise InvalidTokenError("No matching JWKS key for token kid")
+    return jwt.decode(token, PyJWK(key, algorithm=alg).key, algorithms=[alg], **_verify_kwargs())
 
 
 def _select_jwk(jwks: dict, kid: str | None) -> dict | None:
@@ -101,11 +102,11 @@ def decode_supabase_token(token: str) -> dict:
     - Asymmetric (RS256/ES256, new "JWT Signing Keys") → verified via JWKS.
     - HS256 (legacy shared secret) → verified with SUPABASE_JWT_SECRET.
 
-    Raises JWTError if no correct verifier is configured or verification fails —
+    Raises jwt.PyJWTError if no correct verifier is configured or verification fails —
     callers translate this to a safe 401 (never leaks why). Email/claims are only
     returned after the signature verifies.
     """
-    header = jwt.get_unverified_header(token)  # raises JWTError on malformed token
+    header = jwt.get_unverified_header(token)  # raises jwt.DecodeError on malformed token
     alg = header.get("alg")
     kid = header.get("kid")
 
@@ -114,7 +115,7 @@ def decode_supabase_token(token: str) -> dict:
 
     if alg == "HS256":
         if not settings.SUPABASE_JWT_SECRET:
-            raise JWTError("SUPABASE_JWT_SECRET is not configured")
+            raise InvalidTokenError("SUPABASE_JWT_SECRET is not configured")
         return jwt.decode(
             token,
             settings.SUPABASE_JWT_SECRET,
@@ -122,4 +123,4 @@ def decode_supabase_token(token: str) -> dict:
             **_verify_kwargs(),
         )
 
-    raise JWTError(f"Unsupported token alg: {alg!r}")
+    raise InvalidTokenError(f"Unsupported token alg: {alg!r}")

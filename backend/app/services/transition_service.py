@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.models.analytics import MetricTransition
 from app.models.financial import ComputedMetric
+from app.core.numeric import finite_or_none
 
 ALL_METRICS = [
     "roa", "roe", "operating_margin", "net_margin",
@@ -25,9 +26,11 @@ ALL_METRICS = [
 
 
 def _safe_pct(new_val, old_val):
+    new_val, old_val = finite_or_none(new_val), finite_or_none(old_val)
     if new_val is None or old_val is None or old_val == 0:
         return None
-    return (new_val - old_val) / abs(old_val)
+    delta = finite_or_none(new_val - old_val)
+    return finite_or_none(delta / abs(old_val)) if delta is not None else None
 
 
 def compute_transitions_for_company(db: Session, company_id: int) -> int:
@@ -52,11 +55,11 @@ def compute_transitions_for_company(db: Session, company_id: int) -> int:
         curr = rows[i]
 
         for metric in ALL_METRICS:
-            old_val = getattr(prev, metric, None)
-            new_val = getattr(curr, metric, None)
+            old_val = finite_or_none(getattr(prev, metric, None))
+            new_val = finite_or_none(getattr(curr, metric, None))
 
             abs_change = (
-                (new_val - old_val)
+                finite_or_none(new_val - old_val)
                 if (new_val is not None and old_val is not None)
                 else None
             )

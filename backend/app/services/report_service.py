@@ -18,16 +18,11 @@ from sqlalchemy.orm import Session
 
 from app.models.company import Company
 from app.models.scoring import ScoreRun
+from app.models.user import User
+from app.services.score_run_access import get_owned_score_run
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
-
-def _get_run_or_404(db: Session, run_id: int) -> ScoreRun:
-    run = db.get(ScoreRun, run_id)
-    if not run:
-        raise ValueError(f"ScoreRun {run_id} not found.")
-    return run
-
 
 def _run_to_dict(run: ScoreRun, db: Session | None = None) -> dict:
     ticker = None
@@ -128,13 +123,13 @@ def _generate_ai_commentary(data: dict) -> str:
 
 # ── CSV ───────────────────────────────────────────────────────────────────────
 
-def generate_csv(db: Session, run_id: int) -> bytes:
+def generate_csv(db: Session, run_id: int, *, current_user: User | None = None) -> bytes:
     """
     Return the score run's detail rows as well-structured CSV bytes.
 
     utf-8-sig is used so Excel opens Turkish characters correctly.
     """
-    run = _get_run_or_404(db, run_id)
+    run = get_owned_score_run(db, run_id, current_user=current_user)
     data = _run_to_dict(run, db)
 
     output = io.StringIO()
@@ -192,9 +187,9 @@ def generate_csv(db: Session, run_id: int) -> bytes:
 
 # ── JSON ──────────────────────────────────────────────────────────────────────
 
-def generate_json(db: Session, run_id: int) -> bytes:
+def generate_json(db: Session, run_id: int, *, current_user: User | None = None) -> bytes:
     """Return the full score run as pretty-printed JSON bytes."""
-    run = _get_run_or_404(db, run_id)
+    run = get_owned_score_run(db, run_id, current_user=current_user)
     data = _run_to_dict(run, db)
     data["ai_commentary"] = _generate_ai_commentary(data)
     return json.dumps(data, ensure_ascii=False, indent=2).encode("utf-8")
@@ -207,8 +202,9 @@ _FONT_NORMAL = "Helvetica"
 _FONT_BOLD   = "Helvetica-Bold"
 
 
-def generate_pdf(db: Session, run_id: int) -> bytes:
+def generate_pdf(db: Session, run_id: int, *, current_user: User | None = None) -> bytes:
     """Return a styled PDF report as bytes (uses reportlab)."""
+    run = get_owned_score_run(db, run_id, current_user=current_user)
     try:
         from reportlab.lib import colors
         from reportlab.lib.pagesizes import A4
@@ -220,7 +216,6 @@ def generate_pdf(db: Session, run_id: int) -> bytes:
     except ImportError as exc:
         raise RuntimeError("reportlab is not installed. Add it to requirements.txt.") from exc
 
-    run = _get_run_or_404(db, run_id)
     data = _run_to_dict(run, db)
 
     buffer = io.BytesIO()

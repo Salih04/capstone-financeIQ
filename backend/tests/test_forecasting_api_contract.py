@@ -9,7 +9,10 @@ from fastapi.testclient import TestClient
 os.environ.setdefault("DATABASE_URL", "sqlite+pysqlite:///:memory:")
 os.environ.setdefault("SECRET_KEY", "test-secret-key")
 
+from app.core.security import create_access_token, hash_password  # noqa: E402
+from app.database import SessionLocal  # noqa: E402
 from app.main import app  # noqa: E402
+from app.models.user import User  # noqa: E402
 
 
 def _register_and_login(client: TestClient) -> str:
@@ -21,12 +24,27 @@ def _register_and_login(client: TestClient) -> str:
     return data["access_token"]
 
 
+def _admin_token() -> str:
+    # Quarterly fundamentals are shared records: only an admin may upload them.
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.email == "contract-admin@test.com").first()
+        if user is None:
+            user = User(email="contract-admin@test.com", password_hash=hash_password("Passw0rd!"), role="admin")
+            db.add(user)
+            db.commit()
+        return create_access_token({"sub": str(user.id)})
+    finally:
+        db.close()
+
+
 class ForecastingApiContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = TestClient(app)
         token = _register_and_login(cls.client)
         cls.headers = {"Authorization": f"Bearer {token}"}
+        cls.admin_headers = {"Authorization": f"Bearer {_admin_token()}"}
 
     def test_catalog_contract(self):
         r = self.client.get("/parameters/catalog", headers=self.headers)
@@ -40,7 +58,7 @@ class ForecastingApiContractTests(unittest.TestCase):
     def test_fundamentals_upload_validation_contract(self):
         bad_csv = b"stock_code,sector,period\nASELS,Savunma,2023Q1\n"
         files = {"file": ("bad.csv", io.BytesIO(bad_csv), "text/csv")}
-        r = self.client.post("/fundamentals/upload-csv", headers=self.headers, files=files)
+        r = self.client.post("/fundamentals/upload-csv", headers=self.admin_headers, files=files)
         self.assertEqual(r.status_code, 422)
         detail = r.json().get("detail")
         self.assertTrue("Missing required columns" in str(detail))
@@ -60,7 +78,7 @@ class ForecastingApiContractTests(unittest.TestCase):
                 "operating_cash_flow,operating_income,gross_profit,inventory")
         row = "ASELS,Savunma,2025Q4,100,10,500,200,300,150,80,30,40,25,15,20"
         csv = (cols + "\n" + row + "\n").encode()
-        up = self.client.post("/fundamentals/upload-csv", headers=self.headers,
+        up = self.client.post("/fundamentals/upload-csv", headers=self.admin_headers,
                               files={"file": ("quarterly_fundamentals_2025.csv", io.BytesIO(csv), "text/csv")})
         self.assertNotEqual(up.status_code, 500)
         self.assertEqual(up.status_code, 200)

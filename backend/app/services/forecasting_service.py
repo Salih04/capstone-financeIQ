@@ -6,6 +6,7 @@ import unicodedata
 from pathlib import Path
 from typing import Any
 
+import math
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -25,7 +26,10 @@ from app.models.forecasting import (
     WinnerCohortRow,
     QuarterlyFundamental,
 )
+from app.core.numeric import finite_or_none
 from app.core.paths import resolve_repo_root
+from app.models.user import User
+from app.services.shared_data_access import require_shared_writer
 
 
 _ALLOWED_PRESET_PREFIXES = ("2020", "2021", "2022", "2023", "2024", "2025")
@@ -81,7 +85,7 @@ def _to_float(v: Any) -> float | None:
     if v is None:
         return None
     if isinstance(v, (int, float)):
-        return float(v)
+        return finite_or_none(v)
 
     s = _normalize_text(v)
     if not s:
@@ -106,7 +110,7 @@ def _to_float(v: Any) -> float | None:
         return None
 
     try:
-        return float(s)
+        return finite_or_none(s)
     except ValueError:
         return None
 
@@ -180,7 +184,8 @@ def _col_map(df: pd.DataFrame, year: int) -> dict[str, str | None]:
     }
 
 
-def import_winner_excel_preset(db: Session, file_name: str) -> dict[str, Any]:
+def import_winner_excel_preset(db: Session, file_name: str, *, current_user: User | None = None) -> dict[str, Any]:
+    require_shared_writer(db, current_user)
     file_path = _resolve_preset_file(file_name)
     year = _infer_year_from_file_name(file_name)
 
@@ -190,13 +195,7 @@ def import_winner_excel_preset(db: Session, file_name: str) -> dict[str, Any]:
     if not cmap["stock_code"] or not cmap["sector"]:
         raise ValueError("File must include company code and sector columns.")
 
-    # Apply median imputation per numeric feature column across the whole dataset
-    feature_cols = {src_key: cmap.get(src_key) for src_key in _FEATURE_COLUMNS if cmap.get(src_key)}
-    for col in feature_cols.values():
-        if col in df.columns:
-            numeric = pd.to_numeric(df[col], errors="coerce")
-            col_median = numeric.median()
-            df[col] = numeric.fillna(col_median)
+    # Missing cells stay null in WinnerCohortRow: stored data is never imputed.
 
     imported = 0
     skipped = 0
@@ -305,8 +304,11 @@ def _build_sector_dataframe(rows: list[WinnerCohortRow], sector: str) -> pd.Data
 
 
 def _safe_div(a: pd.Series, b: pd.Series) -> pd.Series:
-    b2 = b.replace(0, np.nan)
-    return a / b2
+    a = pd.to_numeric(a, errors="coerce")
+    b = pd.to_numeric(b, errors="coerce")
+    a2 = a.where(np.isfinite(a), np.nan)
+    b2 = b.where(np.isfinite(b) & (b != 0), np.nan)
+    return (a2 / b2).replace([np.inf, -np.inf], np.nan)
 
 def _fundamentals_to_exact_ratios(fdf: pd.DataFrame) -> pd.DataFrame:
     df = fdf.copy()
@@ -324,8 +326,11 @@ def _fundamentals_to_exact_ratios(fdf: pd.DataFrame) -> pd.DataFrame:
     df["OCF"] = df["ocf"]
     df["OCF Marji"] = _safe_div(df["ocf"], df["revenue"])
 
-    df["Net Kar Buyumesi"] = df.groupby("stock_code")["net_income"].pct_change()
-    df["Ciro Buyumesi"] = df.groupby("stock_code")["revenue"].pct_change()
+    # Growth from a zero base is undefined (missing), not infinite.
+    for source, growth in (("net_income", "Net Kar Buyumesi"), ("revenue", "Ciro Buyumesi")):
+        values = pd.to_numeric(df[source], errors="coerce")
+        values = values.where(np.isfinite(values), np.nan)
+        df[growth] = values.groupby(df["stock_code"]).pct_change(fill_method=None).replace([np.inf, -np.inf], np.nan)
 
     df["Borc / Ozsermaye"] = _safe_div(df["total_debt"], df["equity"])
     df["Borc / Varlik"] = _safe_div(df["total_debt"], df["total_assets"])
@@ -639,7 +644,10 @@ def train_sector_success_model(
     year: int,
     sector: str,
     top_n_parameters: int = 8,
+    *,
+    current_user: User | None = None,
 ) -> dict[str, Any]:
+    require_shared_writer(db, current_user)
     ranked = _parameter_scores(db, year=year, sector=sector)
     top = ranked[:max(1, top_n_parameters)]
 
@@ -720,8 +728,7 @@ def run_forecast_for_sector(
 
     params = get_ranked_parameters(db, year=year, sector=sector)
     if not params:
-        trained = train_sector_success_model(db, year=year, sector=sector)
-        params = trained["top_parameters"]
+        raise ValueError("No trained parameters. An admin must call /train-model first.")
 
     selected_params = [p["parameter_name"] for p in params]
     weights = {p["parameter_name"]: p["score"] for p in params}
@@ -913,9 +920,6 @@ def run_forecast_for_sector(
 
 def get_parameters_for_sector(db: Session, year: int, sector: str) -> dict[str, Any]:
     params = get_ranked_parameters(db, year=year, sector=sector)
-    if not params:
-        train_sector_success_model(db, year=year, sector=sector)
-        params = get_ranked_parameters(db, year=year, sector=sector)
     return {"year": year, "sector": sector, "parameters": params}
 
 
@@ -950,7 +954,10 @@ def run_time_cv_evaluation(
     model_type: str = "scoring",
     window_size: int = 2,
     created_by_user_id: int | None = None,
+    *,
+    current_user: User | None = None,
 ) -> dict[str, Any]:
+    require_shared_writer(db, current_user)
     years = sorted({r[0] for r in db.query(WinnerCohortRow.year).filter(WinnerCohortRow.sector == sector).distinct().all()})
     years = [y for y in years if 2020 <= int(y) <= 2025]
     if len(years) < max(3, window_size + 1):
@@ -975,9 +982,13 @@ def run_time_cv_evaluation(
         test_year = years[idx]
 
         for ty in train_years:
-            train_sector_success_model(db, year=ty, sector=sector, top_n_parameters=8)
+            train_sector_success_model(db, year=ty, sector=sector, top_n_parameters=8, current_user=current_user)
 
         prev_year = years[idx - 1]
+        # Evaluation is an explicit admin write path. Preserve its previous
+        # missing-test-year training here, never inside forecast/read services.
+        if not get_ranked_parameters(db, year=test_year, sector=sector):
+            train_sector_success_model(db, year=test_year, sector=sector, current_user=current_user)
         prev_pred = run_forecast_for_sector(
             db,
             year=prev_year,
@@ -1108,9 +1119,29 @@ def get_sector_heatmap_data(db: Session, year: int) -> dict[str, Any]:
     heatmap = []
     for sector, items in sector_map.items():
         for f in feature_keys:
-            vals = [getattr(i, f) for i in items if getattr(i, f) is not None]
-            avg = float(np.mean(vals)) if vals else 0.0
-            heatmap.append({"sector": sector, "feature": f, "value": round(avg, 4)})
+            # A06: null, NaN and +/-Infinity are missing. They are not averaged,
+            # and a cell with no finite value is null, never 0.0.
+            vals = [v for v in (finite_or_none(getattr(i, f)) for i in items) if v is not None]
+            if vals:
+                try:
+                    # Accurate for ordinary values and small cancellations.
+                    mean = math.fsum(vals) / len(vals)
+                except OverflowError:
+                    # The mathematical mean is still finite: normalize first.
+                    scale = max(abs(v) for v in vals)
+                    mean = (
+                        math.fsum(v / scale for v in vals) / len(vals)
+                    ) * scale
+                avg = round(mean, 4)
+            else:
+                avg = None
+            heatmap.append({
+                "sector": sector,
+                "feature": f,
+                "value": avg,
+                "n_observed": len(vals),
+                "n_missing": len(items) - len(vals),
+            })
     return {"year": year, "heatmap": heatmap}
 
 

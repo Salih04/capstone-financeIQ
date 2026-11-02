@@ -140,3 +140,21 @@ PYTHONPATH=. python experiments/pit_lag_sensitivity.py    # audit reruns
 ```
 
 Research support only; not investment advice.
+
+### Appended limitation — owner-reported source-quality concern (2026-11-02)
+
+The owner reports that the legacy annual 2020stocks.xlsx–2025stocks.xlsx files were
+downloaded from Fintables and questions the accuracy of their financial
+statements/ratios and prices/returns. This is **REPORTED suspicion**, not a new
+demonstration of inaccuracy or a quantified error rate. It is distinct from the
+documented timing, adjustment and pre-listing defects above. The earlier §3 statement
+that annual figures match published statements is preserved as historical evidence;
+it does not establish comprehensive accuracy of all vendor fields or years.
+Later Yahoo-derived price/return inputs are not thereby attributed to Fintables.
+
+Authority and scope: [owner note](https://chatgpt.com/c/6ae096dd-14f4-83ed-85fe-8cacbd3639a2),
+explicitly reiterated in the 2026-11-02 task; see the
+[Capstone record](docs/CAPSTONE_V1_RECORD.md#owner-reported-data-accuracy-limitation--appended-2026-11-02)
+and [PROPOSED, unexecuted sample-audit card](docs/paper1/DATA_ACCURACY_AUDIT_PROPOSAL.md).
+No data or results were corrected or regenerated. Source accuracy is not FO-4:
+FO-4 reviews terms, and public redistribution of Fintables raw data remains **NO**.

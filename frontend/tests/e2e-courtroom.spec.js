@@ -1,22 +1,4 @@
-import { test, expect } from '@playwright/test'
-
-const LOCAL_SESSION = {
-  access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlbW8iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoxOTAwMDAwMDAwMH0.signature',
-  token_type: 'bearer',
-  expires_in: 3600,
-  expires_at: 1900000000,
-  refresh_token: 'local-courtroom-test-refresh-token',
-  user: {
-    id: 'local-courtroom-test-user',
-    aud: 'authenticated',
-    role: 'authenticated',
-    email: 'courtroom-test@example.com',
-    app_metadata: { provider: 'email', providers: ['email'] },
-    user_metadata: {},
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
-  },
-}
+import { test, expect } from './synthetic-session'
 
 async function openEvidenceDocket(page) {
   await page.goto('/courtroom')
@@ -44,9 +26,17 @@ async function assertSequentialPanels(page) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.addInitScript((session) => {
-    localStorage.setItem('sb-demo-auth-token', JSON.stringify(session))
-  }, LOCAL_SESSION)
+  await page.route('**/api/research/courtroom', async (route) => {
+    const { ticker, year } = route.request().postDataJSON()
+    await route.fulfill({ json: {
+      status: 'complete', ticker, year: year || 2021, evidence_budget_per_persona: 1,
+      personas: ['bull', 'bear', 'skeptic', 'risk'].map((id) => ({
+        persona_id: id, name: id[0].toUpperCase() + id.slice(1), lens: 'Synthetic layout fixture',
+        items: [{ statement: 'Synthetic evidence for browser layout only.', limitation: 'No research evidence.',
+          citation: { field: 'synthetic', value: null, source_file: 'synthetic-fixture' } }],
+      })),
+    } })
+  })
 })
 
 test('Research Courtroom keeps the Risk evidence lens after earlier lenses on desktop', async ({ page }) => {

@@ -17,6 +17,7 @@ from app.schemas.scoring import (
 )
 from app.services.comparison_service import compare_companies
 from app.services.scoring_service import ModelScoringUnavailable, run_multi_model_score, run_score
+from app.services.score_run_access import get_owned_score_run
 from app.services.explanation_service import build_rich_explanations
 from app.services.adaptive_weights_service import compute_adaptive_weights
 
@@ -307,10 +308,7 @@ def get_score_run(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    run = db.get(ScoreRun, run_id)
-    if not run:
-        raise HTTPException(status_code=404, detail="Score run not found.")
-    return run
+    return get_owned_score_run(db, run_id, current_user=current_user)
 
 
 @router.get("/users/me/score-runs")

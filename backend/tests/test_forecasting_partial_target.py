@@ -9,6 +9,8 @@ from __future__ import annotations
 import os
 import unittest
 
+import pytest
+
 import pandas as pd
 from fastapi.testclient import TestClient
 
@@ -24,21 +26,12 @@ class PartialTargetTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = TestClient(app)
-        cls.partial_path = svc.PARTIAL_2026_YTD_CSV
-        # Ensure clean baseline: no real partial file present.
-        if cls.partial_path.exists():
-            cls.partial_path.rename(cls.partial_path.with_suffix(".bak"))
 
-    @classmethod
-    def tearDownClass(cls):
-        bak = cls.partial_path.with_suffix(".bak")
-        if bak.exists():
-            bak.rename(cls.partial_path)
-
-    def tearDown(self):
-        # Remove any fixture a test wrote.
-        if self.partial_path.exists():
-            self.partial_path.unlink()
+    @pytest.fixture(autouse=True)
+    def _isolate_partial_target_csv(self, tmp_path, monkeypatch):
+        # Never rename, delete or overwrite the committed data/trusted_clean path.
+        self.partial_path = tmp_path / "partial_2026_ytd_returns.csv"
+        monkeypatch.setattr(svc, "PARTIAL_2026_YTD_CSV", self.partial_path)
 
     # ── defaults ──
     def test_default_options_exclude_2025(self):

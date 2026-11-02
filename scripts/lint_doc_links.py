@@ -436,6 +436,21 @@ def _materialize_cited_paths(fixture_root: Path, max_rounds: int = 5) -> None:
             target.write_text("", encoding="utf-8")
 
 
+def _seed_dated_archive_for_fixture(repo_root: Path, fixture_root: Path) -> None:
+    """Copy the active baseline's real archived-link target into a disposable fixture.
+
+    The full repository lint still checks the original link. Do not suppress
+    unexpected lint diagnostics: the stale fixture must have exactly one
+    deliberate DOC-TRUTH finding and the node-id fixture its expected finding.
+    """
+    relative = Path("docs/archive/verification/VERIFICATION_BASELINE_2026-10-08.md")
+    original = repo_root / relative
+    if original.is_file():
+        destination = fixture_root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(original.read_bytes())
+
+
 def run_stale_fixture(root: Path) -> int:
     """Prove that a temporary stale active assertion produces a diagnostic."""
     root = root.resolve()
@@ -451,6 +466,7 @@ def run_stale_fixture(root: Path) -> int:
         fixture_root = Path(directory)
         (fixture_root / "docs").mkdir()
         (fixture_root / BASELINE_PATH).write_text(baseline_text, encoding="utf-8")
+        _seed_dated_archive_for_fixture(root, fixture_root)
         (fixture_root / "backend" / "tests").mkdir(parents=True)
         (fixture_root / "frontend" / "src" / "pages").mkdir(parents=True)
         (fixture_root / "frontend" / "src" / "App.jsx").write_text(
@@ -495,6 +511,7 @@ def run_node_id_fixture(root: Path) -> int:
         fixture_root = Path(directory)
         (fixture_root / "docs").mkdir()
         (fixture_root / BASELINE_PATH).write_text(baseline_text, encoding="utf-8")
+        _seed_dated_archive_for_fixture(root, fixture_root)
         # Settle the copied baseline's own citations before the fixture doc exists,
         # so the materializer cannot create the file this check needs to stay absent.
         _materialize_cited_paths(fixture_root)

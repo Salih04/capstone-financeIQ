@@ -310,7 +310,9 @@ Backend environment must include:
 OPENAI_API_KEY=your-openrouter-key
 RESEARCH_LLM_PROVIDER=openrouter
 RESEARCH_LLM_MODEL=openai/gpt-oss-120b:free
-SUPABASE_JWT_SECRET=your-supabase-jwt-secret   # optional but needed for protected API calls
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_IDENTITY_BINDINGS={}  # owner-reviewed bindings required for protected Supabase calls
+# SUPABASE_JWT_SECRET=your-supabase-jwt-secret  # only for legacy HS256 tokens
 ```
 
 Quick check:
@@ -417,6 +419,8 @@ PUBLIC_DEMO_MODE=false
 REQUIRE_APPROVED_USER=true
 APPROVED_EMAILS=owner@example.com,teammate@example.com
 SUPABASE_URL=https://<project-ref>.supabase.co   # REQUIRED in private mode (JWKS verification of Supabase Signing Keys)
+SUPABASE_IDENTITY_BINDINGS={}  # replace only with owner-approved subject-to-local-id bindings
+SUPABASE_EMAIL_CONFIRMATION_ENFORCED=true  # only after confirming every enabled provider verifies email
 # SUPABASE_JWT_SECRET=<legacy HS256 secret>       # only if your project still issues HS256 tokens
 ENABLE_PUBLIC_DOCS=false
 RATE_LIMIT_ENABLED=true
@@ -432,6 +436,10 @@ VITE_APPROVED_EMAILS=owner@example.com,teammate@example.com
 Supabase dashboard (owner-managed): OAuth/Google OFF, email signup OFF, users
 created manually. The backend is the real boundary; frontend flags are UX only.
 See [`SECURITY.md`](../SECURITY.md).
+An empty binding map refuses Supabase backend authentication; matching emails
+cannot provision/link accounts. Follow the
+[candidate migration/runbook notes](SECURITY_REMEDIATION_2026-10-28.md) before
+any separately authorized rollout. No migration or live setting is changed here.
 
 ## What was removed / quarantined
 

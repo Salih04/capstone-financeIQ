@@ -1,6 +1,6 @@
 # OSF preregistration draft — Paper 2
 
-**FIQ-19 · preparation v0.2 · 2026-10-26 · LIMITED OWNER DECISIONS APPLIED; NOT REGISTERED**
+**FIQ-19 · preparation v0.3 · 2026-10-29 · ADOPTED OWNER DISPOSITIONS RECONCILED; NOT REGISTERED**
 
 Research support only; not investment advice. **NOT SUBMITTED.** Registration
 identifier, URL, DOI and effective timestamp: **UNSET**. Incomplete
@@ -14,6 +14,11 @@ or execution. Preparation uses only the two documents from source commit
 verified main `f7b1e4f9fa43e47b6cb638521f966981abd6695c` (PR #52), fetched
 2026-10-26. Authority is the owner task “FIQ-19 v0.2 — Apply explicit owner
 decisions and commit”, dated 2026-10-26; no approval is backdated.
+v0.2 landed as `b2b31536` (PR #54, parent `4b029ef4`, PR #53). v0.3, edited on
+main `efe3ed32` (PR #55) on 2026-10-29, only reconciles both files with the
+already adopted [owner decision addendum](../research/OWNER_DECISION_ADDENDUM.md),
+committed after v0.2; it makes no new scientific choice. Gates and unmade
+decisions: [REGISTRATION_READINESS_AUDIT.md](REGISTRATION_READINESS_AUDIT.md).
 [DESIGN.md](DESIGN.md) is the shared specification; freeze both files together.
 
 ## BEFORE — proposed registration fields
@@ -66,15 +71,22 @@ requirement (currently proposed: at least 30 in each dimension), both bases and
 an identified interaction. D6 remains PROPOSED / UNRESOLVED and must be disposed
 of before freezing its threshold. No returns or outcomes may be inspected; this
 task authorizes no counts. If counts themselves are not authorized, fail closed,
-record eligibility UNVERIFIED and do not infer passage. If the threshold fails,
+record eligibility UNVERIFIED and do not infer passage. Under adopted FIQ-11
+OD-1 = B these cluster and basis-label counts are not authorized, so eligibility
+is currently UNVERIFIED; the owner's route (an exact further count authorization,
+or a decision on how UNVERIFIED eligibility is treated before the family is
+frozen) is **UNSET**. If the threshold fails,
 remove RQ3 from the registered confirmatory family before registration and label
 it **NOT ESTIMABLE / forward-holdout-only candidate**. Any future forward-holdout
 RQ3 confirmation needs its own authorized registration and access conditions.
 No invented coverage, cluster counts, power or publication dates are supplied.
 No additional model family or search is registered here.
 
-**Universe and snapshots.** Charter U1 is adopted; operational rule version,
-effective date and immutable snapshot IDs/hashes are **UNSET**. Availability, sample size, power, effect size and source access are unverified.
+**Universe and snapshots.** Charter U1 is adopted; the FIQ-06 scoped v1.0.0 rule
+subset (addendum, 2026-10-26) is adopted as rules but operationally blocked, R14
+is not approved as a whole and FIQ-06 is not completed. Operational rule version,
+effective date, feasible window, stratum mapping and immutable snapshot IDs/hashes
+are **UNSET**. Availability, sample size, power, effect size and source access are unverified.
 Before registration, bind source rights decisions and immutable lineage for:
 membership evidence and cross-checks; effective issuer/security identities;
 original and amended KAP filings and accounting units; exchange calendar;
@@ -119,25 +131,61 @@ access to or evaluation of that interval. No actual registration time or forward
 start is invented. The Charter labels the
 historical holdout semi-clean; no pristine historical confirmation claim follows.
 
-FIQ-11 R7 is unadopted. D1/D10 must explicitly resolve its OD-1 (protected coverage
-checks), OD-2 (project/study opening scope), OD-3 (forward-only claim authority),
-OD-6 (boundary bands, including estimation-window information), and OD-8 (scope
-of protection), plus relevant I-4/I-5 and I-10–I-16 (classification, replacements,
-amendments, exposure, cutoff provenance, boundary trigger, snapshots and looks).
-OD-4/OD-5 require disposition if refitting on locked data or LLM features is later
-proposed; neither is in this design. OD-7 concerns FIQ-17, not Paper 2 registration
-authority. These are dependency questions, not adopted policies or permissions.
+FO-0 boundaries froze on 2026-10-09 (commit `292674c5`); no separate
+first-evaluation freeze exists. FIQ-11 R7 is not adopted as a whole. The owner's
+2026-10-26 addendum adopts these dispositions, which bind this study:
 
-Proposed conservative primary: keep estimation-window information in event
-lineage; exclude boundary-band events from development and confirmation pending
-OD-6. Sensitivity only if expressly approved: classify using the event outcome
-interval while treating the pre-event estimation window separately, because
-benchmark fitting may differ from exposure to the event outcome. Neither policy
-is approved. The quarantine interval above is explicit; remaining
-forward eligibility, outcome completion, pre-registration dependency information
-and amendment effects require an explicit owner disposition; no event becomes
-forward merely because its return window ends after registration. No exception
-for coverage checks, availability counts, new snapshots or another study is granted.
+- **OD-1 = B.** In protected periods only four aggregate metadata counts are
+  permitted (U1 member count per formation date; identity coverage; eligible KAP
+  filing-event count; distinct event-date count per quarter), from authorized
+  metadata with access checks and immutable lineage. No individual rows, joins,
+  price presence/coverage, suspension/delisting details, prices, returns or
+  outcomes. Undefined eligibility, denominator, output or aggregation fails
+  closed. FIQ-20 is development-only. The RQ3 issuer/session-cluster and
+  basis-label counts are not authorized (DESIGN §3).
+- **OD-2 = B.** One confirmatory opening for this study, bound to its immutable
+  study identity and a cross-study exposure ledger; amendment or re-registration
+  cannot reset it; no further openings or interim looks.
+- **OD-3 = B.** Charter §5 rule 4 is clarified for forward predictive claims;
+  Paper 2 makes associational claims only, so its claim scope is unchanged.
+- **OD-4 = A.** No refitting on locked-holdout outcomes. **OD-5 = B.** Any LLM
+  use (none is registered here, including D7 coding) needs a non-leakage argument
+  bound to version, target and use, or is exploratory.
+- **OD-6.** (a) Observations with `e_i <= 2022-12-31 < b*_min,i <= 2025-12-31`
+  are excluded from development and confirmatory samples; (b) they have no
+  secondary confirmatory use; (c) benchmark/expected-return estimation-window data
+  ending before the outcome interval (here sessions [-250,-31]) do not enter
+  `D_i`. PIT/as-of, training-only fitting, purge/embargo and other leakage checks
+  remain; no event becomes eligible automatically. Classification is per target,
+  so primary, wider-window and lead-window samples can differ near the boundary.
+  Access to estimation-window data dated in a protected window remains a touch.
+  Which other data enter each target's `D_i` (in-window factor realizations, the
+  flow-scaling history, surprise inputs) is **UNSET** and must be registered
+  without outcomes.
+- **OD-7 = B.** FIQ-17's protected 2023–2025 outcome work waits until both this
+  study's and Study 3's confirmatory openings exist; this is a downstream effect,
+  not a Paper 2 permission.
+- **OD-8 = A.** Project-wide protected classes are not narrowed for this study.
+- **I-items.** I-4 and I-5 are replaced only as OD-6 and OD-1/OD-8; I-14 only as
+  the FO-0 freeze. I-1 (registration-day rule), I-2, I-3 (lineage-aware
+  classification), I-6, I-7 (assistant inventory), I-8, I-9 (historical selection
+  correction), I-10 (reruns), I-11 (amendment timing), I-12 (no clean-status
+  algorithm), I-13, I-15 (snapshot contract) and I-16 (no extra opening or look)
+  are LEFT UNRESOLVED and fail closed where needed.
+
+*Superseded v0.2 text (at `b2b31536`, before PR #55):* v0.2 listed these OD items
+as unresolved and proposed a "conservative primary" keeping estimation-window
+information in event lineage, with an unapproved sensitivity. Adopted OD-6(b)/(c)
+supersede both; no band sensitivity is retained.
+
+Observations whose `D_i` contains any record originally published on or after
+2026-01-01 (for example a window ending in January 2026, or a later correction)
+depend on the quarantine interval and are not evaluated as locked holdout; their
+counting route and labelling are **UNSET** and fail closed. Remaining forward
+eligibility, outcome completion and amendment effects still require explicit owner
+disposition; no event becomes forward merely because its return window ends after
+registration. No exception for coverage checks, availability counts, new snapshots
+or another study is granted beyond OD-1 = B.
 
 **Prior trials and exposure disclosure (append-only).** The source commit's
 v0.1/v0.2 disclosures remain in git history and are retained here as historical
@@ -158,6 +206,15 @@ were inspected. No study trial, coverage count, simulation or analysis was run.
 Record this context exposure in the later owner assessment; do not erase prior
 history or call this an exposure-free preparation. No private incident record
 was accessed or amended.
+
+For the v0.3 reconciliation (2026-10-29): the owner's global workflow and
+FinanceIQ context files (the latter containing legacy aggregate capstone outcome
+summaries), the Charter, task cards, addendum, study template, FIQ-12 core
+README/guard, named sections of the R14/R7 candidates (membership-evidence
+metadata visible in search output) and two regulator PDFs (one page also listing
+issuer names) were read. `PRD.md`, `RESULTS.md`, experiment results, data files,
+Kernel snapshots, SC5 caches and issuer filings were not opened. No Paper 2
+outcome, event date, count or return was seen or computed. Not a zero-exposure claim.
 
 Before registration reconcile all prior relevant evaluated configurations and
 source/exposure records, including failures, abandoned attempts, pilots,
@@ -188,14 +245,18 @@ exposure reconciliation, selection corrections or claim limits. Before
 registration reconcile relevant prior answering configurations and specify any
 required additional selection correction or authorized fresh confirmation design.
 Two-sided Holm cannot cleanse adaptive selection or holdout exposure; unresolved
-governance compatibility blocks registration/claims. No silent inflation of the
+governance compatibility blocks registration/claims. FIQ-11 I-9 is LEFT
+UNRESOLVED (historical selection correction remains gated), so this
+reconciliation cannot yet be closed. No silent inflation of the
 registered family or invented placeholders substitutes for this reconciliation.
 A new primary/answering configuration requires prospective governance and
 registration treatment. D9 alpha, exact stopping details and governing prior-
 trial/exposure reconciliation remain PROPOSED / UNRESOLVED; proposed familywise
 alpha is 0.05, not separately approved by this amendment.
 
-**Stopping and nulls (D9) — PROPOSED / UNRESOLVED details.** One fixed terminal analysis, no interim outcome looks,
+**Stopping and nulls (D9) — PROPOSED / UNRESOLVED details.** Adopted OD-2 = B
+allows one confirmatory opening for this study; which protected window it uses
+is D1 and **UNSET**. One fixed terminal analysis, no interim outcome looks,
 no significance stopping, no sample extension after seeing estimates. Owner must
 set exact event-publication start/end, latest outcome-completion date, fixed
 forward accrual end and administrative data-lock date before submission; all are
@@ -219,21 +280,28 @@ None establishes causation or predictive ability outside Charter claim gates.
 1. Preserve the 2026-10-26 D3/D5/D9 approvals and narrow D2/D4/D8 amendments;
    owner disposes of all remaining DESIGN D choices and relevant FIQ-06/FIQ-11
    adoption/evidence dependencies, final classification,
-   exposure assessment and claim limits. Neither R14 nor R7 is merged by this task.
+   exposure assessment and claim limits. Neither R14 nor R7 is merged by this task;
+   only the addendum's scoped FIQ-06 rules and FIQ-11 dispositions are adopted.
 2. Establish adopted operational U1 and authorized PIT/source-rights lineage.
    FIQ-20 and FIQ-21 each require FIQ-19, FIQ-07, KER-07, KER-13a and KER-13c per
-   their cards. FIQ-20 is only a separately authorized timestamp/calendar/price-
-   existence pilot; FIQ-21 is separately authorized placebo power/calibration
-   work, recorded in the trial ledger. No protected-window exemption is implied.
-3. Establish separately authorized outcome-free RQ3 eligibility counts and
-   D6 safeguards for both RQ1/RQ3; fail closed without count authorization.
+   the task-file wave table (FIQ-21's own card omits KER-13a; the stricter list is
+   kept). FIQ-20 is only a separately
+   authorized timestamp/calendar/price-existence pilot and, under OD-1 = B,
+   development-only; FIQ-21 is separately authorized placebo power/calibration
+   work, recorded in the trial ledger, and no adopted text authorizes it to use
+   protected-window inputs. No protected-window exemption is implied.
+3. Establish the owner's RQ3 eligibility route (OD-1 = B does not authorize the
+   cluster or basis-label counts) and D6 safeguards for both RQ1/RQ3; fail closed
+   without count authorization.
    Reconcile pilot/calibration findings without true-date outcome inspection;
    independent review before paper analyses; complete all UNSET fields and freeze
    the two-document specification, snapshot policy, exact hypotheses, sources,
    exclusions, seed, dates, ledger cutoff/count and one-look execution manifest.
    PR #52 on the verified base supplies an approved synthetic consumer, not
-   research-data readiness. FIQ-12 candidates do not establish adopted access
-   controls; establish verified consumer/ledger/access gates before execution.
+   research-data readiness. The merged FIQ-12 inert core (PR #53) always denies
+   protected access and has no trial schema, policy or unlock; it is not an
+   operational access grant. Establish verified consumer/ledger/access gates and
+   the OD-2 cross-study exposure ledger before execution.
 4. FO-7: owner submits the finalized preregistration to OSF and records its real
    URL/timestamp and exact git binding. This draft is not an OSF submission.
 5. FIQ-22: separately authorize main analysis only after registration and the
