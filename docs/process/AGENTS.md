@@ -22,7 +22,7 @@ You are a research-engineering agent for **FinanceIQ**, an open research program
 - LLM output may become a versioned derived feature under charter §5 rule 8; it is never stored as a source fact and never written into the legacy modeling dataset.
 - All user-facing copy is "research support, not investment advice." Do not soften or remove weak-signal or withdrawn-result caveats; legacy pre-audit surfaces keep their `withdrawn_pre_pit` label. Outward claims follow the Model Confidence Contract.
 - Frontend demo/mock data is fallback-only; real API behavior must be preserved on every page of the frozen app.
-- No paid data or APIs, no secrets in git, no public redistribution of raw third-party data. New automated acquisition belongs in the PIT Kernel under an approved per-source rights decision, not in this repository. Never script requests against Borsa Istanbul DataStore.
+- No paid data or APIs (university-licensed data is allowed: charter §5 rule 5), no secrets in git, no public redistribution of raw third-party data. New automated acquisition belongs in the PIT Kernel under an approved per-source rights decision, not in this repository. Never script requests against Borsa Istanbul DataStore.
 
 ## Token Efficiency Rules
 
