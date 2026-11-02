@@ -19,6 +19,10 @@ Research support only; not investment advice.
   upstream venue, so agreement is a consistency check, not independent proof.
 - **Yahoo:** pipeline development and synthetic-twin profiling only; never a
   source for a reported result.
+- **Fallback (no new decision needed):** if no LSEG data is obtained by
+  2026-11-30, through either an individual license or the library reading-room
+  workstation, DataStore becomes primary and LSEG becomes the cross-check once
+  available.
 
 The route analysis below is kept as the evidence record.
 
