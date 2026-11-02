@@ -65,3 +65,23 @@ artifacts remain the reference for the corrected evaluation.
   integrated the charter-adoption commit `a89d386520e67978e19f141ac1c7fe246b514634`.
 - **Message:** “Mark the main integration boundary where the FinanceIQ Research Charter was adopted
   and Capstone v1 became frozen; subsequent research follows the charter.”
+
+## Owner-reported data-accuracy limitation — appended 2026-11-02
+
+**REPORTED, not independently demonstrated.** The owner identifies Fintables as the
+download platform for the legacy annual 2020stocks.xlsx–2025stocks.xlsx exports and
+expresses doubts about both financial statements/ratios and prices/returns. Authority:
+the explicit owner note in the 2026-11-02 continuation of
+[FINANCEIQ](https://chatgpt.com/c/6ae096dd-14f4-83ed-85fe-8cacbd3639a2).
+This records a quality concern, not a measured error rate or a finding that every
+input is inaccurate. It does not establish the upstream origin of every export field
+or attribute later Yahoo-derived prices/returns to Fintables. Previously documented
+defects and historical statements remain as recorded; no additional validation is
+claimed for the earlier exact-match statement in RESULTS.md §3.
+
+The [proposed Paper 1 sample-audit card](paper1/DATA_ACCURACY_AUDIT_PROPOSAL.md)
+has not been approved or executed. Frozen data, code and results are unchanged.
+Accuracy is separate from rights: FO-4 remains a Fintables/Yahoo terms review;
+Fintables public raw redistribution is **NO**, irrespective of accuracy. The owner
+states that KAP, BIST announcement and DataStore Product 3184 rights decisions are
+already closed; this note neither reopens them nor grants a new price-product right.
