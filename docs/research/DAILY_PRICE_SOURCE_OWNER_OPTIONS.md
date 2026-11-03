@@ -1,7 +1,30 @@
 # New research — official daily-price source options
 
-**NEEDS-DECISION · 2026-11-02 · no source selected or acquired.**
+**DECIDED · 2026-11-02 · no file acquired yet.**
 Research support only; not investment advice.
+
+## Owner decision (2026-11-02)
+
+- **Primary: LSEG Workspace (Datastream) through UB Basel.** University-licensed,
+  no cost to the owner (charter §5 rule 5). Daily unadjusted prices and volume,
+  corporate-action adjustment data and total-return indices for BIST equities,
+  including delisted ones, plus Turkey sovereign CDS and government bond yields.
+  Licensed data: research use, the license's export limits, no redistribution,
+  raw exports only in the vault. Access: individual license on request (owner
+  card KO-6).
+- **Second source: Borsa Istanbul DataStore**, through the academic request
+  route (C) and/or a zero-cost daily-price product (B), manual download only
+  (owner card KO-7). Use: official venue cross-check of LSEG raw closes on a
+  fixed-seed sample, and gap filling where LSEG coverage is missing. Same
+  upstream venue, so agreement is a consistency check, not independent proof.
+- **Yahoo:** pipeline development and synthetic-twin profiling only; never a
+  source for a reported result.
+- **Fallback (no new decision needed):** if no LSEG data is obtained by
+  2026-11-30, through either an individual license or the library reading-room
+  workstation, DataStore becomes primary and LSEG becomes the cross-check once
+  available.
+
+The route analysis below is kept as the evidence record.
 
 The owner has not selected a free official daily-price source for the new research
 program. These are possible access routes, **not confirmed free datasets**, and

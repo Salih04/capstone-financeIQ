@@ -141,7 +141,11 @@ Kept from the capstone:
    rather than publication dates alone.
 5. **Rights.** No paid data, no secrets in git, no public redistribution of
    raw third-party data, no bypassing authentication, CAPTCHAs, WAFs or rate
-   limits. Borsa Istanbul DataStore is manual-download only.
+   limits. Borsa Istanbul DataStore is manual-download only. "Paid" means paid
+   by the owner: data licensed by the owner's university (e.g. LSEG Workspace
+   through UB Basel) is allowed as licensed data under its terms (research use,
+   export limits, no redistribution) and its own Kernel rights record
+   (owner decision 2026-11-02).
 
 New:
 

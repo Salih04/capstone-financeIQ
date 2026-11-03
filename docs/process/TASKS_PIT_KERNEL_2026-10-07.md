@@ -45,7 +45,7 @@ append-only; paralel branch'ler aynı numarayı alıp çakışır.
 | 1 | KO-1, KO-2, KO-3, KO-5 · KER-00 · KER-11 | — |
 | 2 | KER-01 → KER-02 → KER-03 · KER-04 · KER-05 · KER-06 → KO-4 | KER-00 bitti; KER-04 için KO-1 |
 | 3 | KER-07 → KER-08 → KER-09 · KER-12 · KER-15 | KER-07 için KER-03; KER-12 için KO-2; KER-15 için KER-01 |
-| 4 | KER-10 → KER-13a, KER-13c, KER-13d, KER-13e → KER-13b → KER-13f | KER-10 için KER-09 ve KO-4; KER-13 için KO-4 ve KER-12; KER-13d için KO-3; KER-13e için KO-5 |
+| 4 | KER-10 → KER-13a, KER-13c, KER-13d, KER-13e, KER-13h → KER-13b → KER-13f | KER-10 için KER-09 ve KO-4; KER-13 için KO-4 ve KER-12; KER-13d için KO-3; KER-13e için KO-5; KER-13c ve KER-13h için KO-6 |
 | 5 | KER-14 | KER-13a/b/c/e |
 
 ---
@@ -98,6 +98,8 @@ Final report: 1) what changed, 2) verification commands and honest results,
 | KO-3 | EVDS API anahtarı al (ücretsiz kayıt). Anahtarı yalnız env'de ya da Keychain'de tut | KER-13d için gerekli | Anahtar alındı; git'te yok | 1 |
 | KO-4 | KER-06'daki rights karar taslaklarını onayla ya da düzelt | Gerçek veri ingest'inin kapısı | Her karar `APPROVED` ya da gerekçeli `DENIED` | 2 |
 | KO-5 | **DataStore kararı.** Borsa İstanbul DataStore'da hesap aç, kayıt sözleşmesini oku. Sözleşme iç araştırma kullanımına izin veriyorsa kabul et ve Product 3184'ü ("Since 2000, companies in BIST 30/50/100") pencere boyunca bütün yıllar için **elle** indir; dosyaları vault'a koy. İzin vermiyorsa yazılı gerekçeyle reddet | Çeyreklik tam üyelik listesinin tek birinci taraf kaynağı. Dosyalar ücretsiz; engel yalnız kayıt ve sözleşme. Script'li istek WAF'a takılıp oturumu kapatıyor | Karar notu (sözleşme sürümü, tarih, ilgili madde); kabul edildiyse dosyalar vault'ta, manifest satırlarıyla. İndirilecek liste: KER-11 | 1 |
+| KO-6 | **LSEG erişimi.** Hızlı yol: UB Wirtschaft okuma salonundaki LSEG Workspace istasyonu (lisans gerektirmiyor); dışa aktarım sınırını masadan sor. Paralelde kişisel lisans iste (christoph.winter[at]unibas.ch / philipp.casula[at]unibas.ch); ilk e-posta cevapsız kaldı, hatırlatma gönder. 2026-11-30'a kadar erişim yoksa DataStore birincil olur. Lisans koşullarını (araştırma kullanımı, dışa aktarım sınırı, yeniden dağıtım, yapay zekâ ile işleme) iste ve kaydet. Erişim gelince fiyat (KER-13c) ve CDS/faiz (KER-13h) dışa aktarımlarını elle yap, vault'a koy | Birincil fiyat kaynağı (owner kararı 2026-11-02); CDS boşluğunu da kapatıyor | Lisans var; koşullar notu; ilk dışa aktarım vault'ta, manifest satırıyla | 1 |
+| KO-7 | **DataStore akademik fiyat talebi.** DataStore'daki akademik başvuru dilekçe örneğiyle 2017–2025 günlük pay fiyatlarını (düzeltilmemiş kapanış, hacim) iste; ücret ve kullanım koşullarını sor. Sıfır maliyet değilse dur ve owner kararına getir | Resmî çapraz kontrol ve boşluk doldurma kaynağı | Dilekçe gönderildi; cevap ve koşullar kaydedildi | 1 |
 
 ---
 
@@ -348,12 +350,33 @@ Coverage report against the KER-10 list.
 Dalga 4
 
 ```text
-Task KER-13c. For every listing in the KER-10 coverage list, including index leavers and
-delisted listings, load raw daily bars and dividend/split events from Yahoo chart JSON under the
-approved Yahoo rights decision, with a provenance manifest (symbol, url, accessed time,
-sha256). Raw files go to the vault. known_at = session close in Europe/Istanbul. Integrity
-checks only (gaps, duplicates, non-positive prices). Report listings with no data or with
-history that starts late or ends early; never fill them. Never compute returns.
+Task KER-13c (source decided by the owner 2026-11-02). For every listing in the KER-10
+coverage list, including index leavers and delisted listings, load raw daily bars (unadjusted
+close, OHLC where present, volume) and corporate-action data from owner-exported LSEG
+Workspace/Datastream files in the vault (university license, KO-6; manual exports, no API
+automation unless the license allows it). First profile one export's structure locally and
+write a layout contract (as for DataStore 3184); build the CI synthetic twin from it. Map
+LSEG instrument codes to KER-10 identities; unmapped stays UNKNOWN. Provenance manifest per
+export (query definition, export time, sha256). Knowledge time: documented-rule adjudication,
+date-only [D 00:00, D+1 00:00) Europe/Istanbul, as in KER-16. Integrity checks only (gaps,
+duplicates, non-positive prices). Cross-check raw closes against Borsa Istanbul DataStore
+files (KO-7) on a fixed-seed sample; report agreement counts. Report listings with no data
+or with history that starts late or ends early; never fill them. Never compute returns.
+Yahoo is for pipeline development only.
+```
+
+#### KER-13h · LSEG piyasa serileri: CDS ve tahvil faizleri
+Dalga 4 · Ön koşul: KER-08, KO-6
+
+```text
+Task KER-13h. Load Turkey sovereign CDS (5-year; other tenors if exported) and Turkish
+government bond yields from owner-exported LSEG files into KER-08 series (one series_id per
+instrument, tenor and quote convention; publisher = LSEG with the underlying contributor
+named if the export states it). Profile one export and write a layout contract first.
+Market quotes are not revised: knowledge time by documented-rule adjudication, date-only
+[D 00:00, D+1 00:00) Europe/Istanbul. A value whose export cannot show it is the original
+quote stays ACQUISITION_BOUNDED (KER-08 R4). No transformations (no changes, spreads or
+interpolation). Synthetic twin in CI; raw exports only in the vault.
 ```
 
 #### KER-13d · EVDS makro serileri
