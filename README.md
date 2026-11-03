@@ -21,6 +21,17 @@ cohort, quarterly data at publication time, any model family, with every
 trial logged and confirmatory analyses pre-registered. See
 [`docs/process/RESEARCH_CHARTER.md`](docs/process/RESEARCH_CHARTER.md).
 
+New studies do not use the Capstone lists as their research universe. They use
+predeclared, rule-based, point-in-time eligibility, including survivors and
+index leavers followed through their holding or event windows (Charter §4:
+U1 primary, U2 robustness). No Capstone company-count, sector or model-family
+cap applies; study registration and evidence/access gates still apply.
+The [26 October scoped decisions](docs/research/OWNER_DECISION_ADDENDUM.md)
+do not adopt every universe/protocol choice; U2 details remain unresolved.
+The [FIQ-16 disclosure](docs/paper1/survivorship_bound.md) records structural
+Capstone survivorship bias; additional realised-return selection is unknown,
+and FIQ-17 quantification is planned, not executed.
+
 ## 1. Hypothesis
 
 Can one year's public data about a BIST company — financial statements,

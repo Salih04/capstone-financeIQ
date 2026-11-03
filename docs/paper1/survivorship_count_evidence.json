@@ -1,0 +1,28 @@
+{
+  "checked_on": "2026-10-27",
+  "base_sha": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+  "scope": "Literal code equality on existing FinanceIQ configuration and a single archived membership projection; no issuer mapping, protected-period rows, prices or outcomes. This is a bounded historical source projection, not a synthetic fixture or an admitted U1 formation.",
+  "counts": {
+    "reported_config": 40,
+    "training_config": 81,
+    "snapshot_2020_10_01": 100,
+    "snapshot_in_training": 60,
+    "snapshot_outside_training": 40,
+    "snapshot_in_reported": 30,
+    "training_outside_snapshot": 21
+  },
+  "inputs": [
+    {
+      "path": "data/config/universe_public_40.csv",
+      "sha256": "db7ffc577d7d10d34b47aaaa578226ef9d4bf19920816d250a7703dc9bbf51db"
+    },
+    {
+      "path": "data/config/universe_training_bist100.csv",
+      "sha256": "dc4046465b32d27ac71db6f6f75f4526177f89d29d0594931d1a26752dc6194b"
+    },
+    {
+      "path": "docs/evidence/bist_membership_p3184_2020_q4_rows.csv",
+      "sha256": "43106b6bfdf8738c4cc7604c436862e3b6e672662f0d1fafa08a59511b83c94c"
+    }
+  ]
+}

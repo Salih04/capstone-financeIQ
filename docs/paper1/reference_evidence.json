@@ -1,0 +1,2222 @@
+{
+  "checked_on": "2026-10-27",
+  "base_sha": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+  "dossier": {
+    "filename": "FinanceIQ_Derin_Arastirma_TR.pdf",
+    "date": "2026-10-27",
+    "pages": 14,
+    "sha256": "b83eabe56392c0b248df26f1973ff6a256455bc855c0ce2049523713307d2d7a",
+    "authority": "supporting research assertions, not repository decisions",
+    "read_scope": "all 14 pages, extracted text plus rendered visual review"
+  },
+  "verification_scope": "36 DOI registry records independently retrieved; four no-DOI entries checked against official archival/proceedings records. Primary sources supplement version/type/method checks. Identity verification is not full-text audit or replication. Entry 16 pagination unresolved. No OpenAlex data, IDs or queries independently verified.",
+  "entries": [
+    {
+      "number": 1,
+      "citation_id": "Brandt2008Surprises",
+      "authors": [
+        {
+          "family": "Brandt",
+          "given": "Michael W."
+        },
+        {
+          "family": "Kishore",
+          "given": "Runeet"
+        },
+        {
+          "family": "Santa-Clara",
+          "given": "Pedro"
+        },
+        {
+          "family": "Venkatachalam",
+          "given": "Mohan"
+        }
+      ],
+      "year": 2008,
+      "title": "Earnings Announcements are Full of Surprises",
+      "venue": "Duke University and UCLA",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "doi": "10.2139/ssrn.909563",
+      "url": "https://www.anderson.ucla.edu/documents/areas/fac/finance/santa_clara_surprises.pdf",
+      "entry_type": "techreport",
+      "status": "VERIFIED_VERSION",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.2139%2Fssrn.909563",
+      "registry_response_sha256": "bf8fc57d8553dc235c3c39eead8f9115d2f9b7d890ede8cb66f7a385d608b705",
+      "primary_sources": [
+        "https://www.anderson.ucla.edu/documents/areas/fac/finance/santa_clara_surprises.pdf"
+      ],
+      "note": "Used version: 22 January 2008 author PDF, Brandt first. SSRN DOI identifies a record initially dated 2006, with Kishore first in registry metadata; not a peer-reviewed journal article.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2006
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 2,
+      "citation_id": "Chen1986Economic",
+      "authors": [
+        {
+          "family": "Chen",
+          "given": "Nai-Fu"
+        },
+        {
+          "family": "Roll",
+          "given": "Richard"
+        },
+        {
+          "family": "Ross",
+          "given": "Stephen A."
+        }
+      ],
+      "year": 1986,
+      "title": "Economic Forces and the Stock Market",
+      "venue": "The Journal of Business",
+      "volume": "59",
+      "issue": "3",
+      "pages": "383-403",
+      "doi": "10.1086/296344",
+      "url": "https://doi.org/10.1086/296344",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1086%2F296344",
+      "registry_response_sha256": "5ab248d3aa07de75c81cfdcce6e8c1b175177468f7ca121a1c0fcc9a0a721a98",
+      "primary_sources": [
+        "https://www.anderson.ucla.edu/faculty-and-research/finance/faculty/roll"
+      ],
+      "note": "Crossref records only p.383 and a January placeholder. Author institutional publication list verifies July 1986, 59(3), 383-403.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              1986,
+              1
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              1986,
+              1
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 3,
+      "citation_id": "Coval2007FireSales",
+      "authors": [
+        {
+          "family": "Coval",
+          "given": "Joshua"
+        },
+        {
+          "family": "Stafford",
+          "given": "Erik"
+        }
+      ],
+      "year": 2007,
+      "title": "Asset fire sales (and purchases) in equity markets",
+      "venue": "Journal of Financial Economics",
+      "volume": "86",
+      "issue": "2",
+      "pages": "479-512",
+      "doi": "10.1016/j.jfineco.2006.09.007",
+      "url": "https://doi.org/10.1016/j.jfineco.2006.09.007",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1016%2Fj.jfineco.2006.09.007",
+      "registry_response_sha256": "886bb2103301b478160c6b61610afd1407b8626c9d98cdc7d8377e8826dba1ce",
+      "primary_sources": [
+        "https://www.hbs.edu/ris/download.aspx?name=Asset+Fire+Sales+in+Equity+Markets.pdf"
+      ],
+      "note": "Journal version 2007; do not substitute the 2005 NBER working paper.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2007,
+              11
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2007,
+              11
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 4,
+      "citation_id": "Fama1992CrossSection",
+      "authors": [
+        {
+          "family": "Fama",
+          "given": "Eugene F."
+        },
+        {
+          "family": "French",
+          "given": "Kenneth R."
+        }
+      ],
+      "year": 1992,
+      "title": "The Cross‐Section of Expected Stock Returns",
+      "venue": "The Journal of Finance",
+      "volume": "47",
+      "issue": "2",
+      "pages": "427-465",
+      "doi": "10.1111/j.1540-6261.1992.tb04398.x",
+      "url": "https://doi.org/10.1111/j.1540-6261.1992.tb04398.x",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1111%2Fj.1540-6261.1992.tb04398.x",
+      "registry_response_sha256": "50769950206746e936c315b67185e9257e82a4e95018e59dc8e5a816f7bea4f9",
+      "primary_sources": [
+        "https://onlinelibrary.wiley.com/doi/10.1111/j.1540-6261.1992.tb04398.x"
+      ],
+      "note": "Journal issue June 1992. Later online ingestion date is not the issue year. Section I.A explicitly uses a conservative minimum six-month accounting gap, not a universal legal release rule.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              1992,
+              6
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              1992,
+              6
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2012,
+              4,
+              30
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 5,
+      "citation_id": "Harvey2016MultipleTesting",
+      "authors": [
+        {
+          "family": "Harvey",
+          "given": "Campbell R."
+        },
+        {
+          "family": "Liu",
+          "given": "Yan"
+        },
+        {
+          "family": "Zhu",
+          "given": "Heqing"
+        }
+      ],
+      "year": 2016,
+      "title": "… and the Cross-Section of Expected Returns",
+      "venue": "Review of Financial Studies",
+      "volume": "29",
+      "issue": "1",
+      "pages": "5-68",
+      "doi": "10.1093/rfs/hhv059",
+      "url": "https://doi.org/10.1093/rfs/hhv059",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1093%2Frfs%2Fhhv059",
+      "registry_response_sha256": "480826c3f52aa2fc17a6259dccb08e9953fa0492955d52db8f9c760c482e883d",
+      "primary_sources": [
+        "https://academic.oup.com/rfs/article/29/1/5/1843824"
+      ],
+      "note": "Online 9 October 2015; issue January 2016. Cite the 2016 issue version.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2015,
+              10,
+              9
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2016,
+              1
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2015,
+              10,
+              9
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 6,
+      "citation_id": "Hernan2016TargetTrial",
+      "authors": [
+        {
+          "family": "Hernán",
+          "given": "Miguel A."
+        },
+        {
+          "family": "Robins",
+          "given": "James M."
+        }
+      ],
+      "year": 2016,
+      "title": "Using Big Data to Emulate a Target Trial When a Randomized Trial Is Not Available",
+      "venue": "American Journal of Epidemiology",
+      "volume": "183",
+      "issue": "8",
+      "pages": "758-764",
+      "doi": "10.1093/aje/kwv254",
+      "url": "https://doi.org/10.1093/aje/kwv254",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1093%2Faje%2Fkwv254",
+      "registry_response_sha256": "73b20f6109d5e7b20fcfdc44857308ae2f632119bd9e8ec63ff61383b343e542",
+      "primary_sources": [
+        "https://academic.oup.com/aje/article-pdf/183/8/758/6652570/kwv254.pdf"
+      ],
+      "note": "Publisher PDF title excludes the erroneous registry suffix Table 1. Method analogy only; does not identify a financial causal effect.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2016,
+              3,
+              18
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2016,
+              4,
+              15
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2016,
+              3,
+              18
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 7,
+      "citation_id": "Kapoor2023Leakage",
+      "authors": [
+        {
+          "family": "Kapoor",
+          "given": "Sayash"
+        },
+        {
+          "family": "Narayanan",
+          "given": "Arvind"
+        }
+      ],
+      "year": 2023,
+      "title": "Leakage and the reproducibility crisis in machine-learning-based science",
+      "venue": "Patterns",
+      "volume": "4",
+      "issue": "9",
+      "pages": "100804",
+      "doi": "10.1016/j.patter.2023.100804",
+      "url": "https://doi.org/10.1016/j.patter.2023.100804",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1016%2Fj.patter.2023.100804",
+      "registry_response_sha256": "3a1e0cba90679958c4866d3501a5bad54e08a0a06a95024554ac3a19f639aac6",
+      "primary_sources": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC10499856/"
+      ],
+      "note": "Patterns article identity checked against publisher-deposited DOI metadata and archived author full text; leakage taxonomy, not a FinanceIQ effect estimate.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2023,
+              9
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2023,
+              9
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 8,
+      "citation_id": "Kolari2010EventTesting",
+      "authors": [
+        {
+          "family": "Kolari",
+          "given": "James W."
+        },
+        {
+          "family": "Pynnönen",
+          "given": "Seppo"
+        }
+      ],
+      "year": 2010,
+      "title": "Event Study Testing with Cross-sectional Correlation of Abnormal Returns",
+      "venue": "Review of Financial Studies",
+      "volume": "23",
+      "issue": "11",
+      "pages": "3996-4025",
+      "doi": "10.1093/rfs/hhq072",
+      "url": "https://doi.org/10.1093/rfs/hhq072",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1093%2Frfs%2Fhhq072",
+      "registry_response_sha256": "17617548f845e02e473f2ee318aebd4ca6604ea1144e5b248bf936aab67c0c3f",
+      "primary_sources": [
+        "https://academic.oup.com/rfs/article-abstract/23/11/3996/1605665"
+      ],
+      "note": "Cross-sectional dependence in event studies; does not automatically validate annual IC inference.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2010,
+              9,
+              21
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2010,
+              11
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2010,
+              9,
+              21
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 9,
+      "citation_id": "MacKinlay1997Events",
+      "authors": [
+        {
+          "family": "MacKinlay",
+          "given": "A. Craig"
+        }
+      ],
+      "year": 1997,
+      "title": "Event Studies in Economics and Finance",
+      "venue": "Journal of Economic Literature",
+      "volume": "35",
+      "issue": "1",
+      "pages": "13-39",
+      "doi": null,
+      "url": "https://www.jstor.org/stable/2729691",
+      "entry_type": "article",
+      "status": "VERIFIED_ARCHIVAL_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": null,
+      "registry_response_sha256": null,
+      "primary_sources": [
+        "https://www.jstor.org/stable/2729691?initiator=recommender"
+      ],
+      "note": "JSTOR stable archival record. No independently established DOI added.",
+      "registry_dates": {}
+    },
+    {
+      "number": 10,
+      "citation_id": "Morck2000Information",
+      "authors": [
+        {
+          "family": "Morck",
+          "given": "Randall"
+        },
+        {
+          "family": "Yeung",
+          "given": "Bernard"
+        },
+        {
+          "family": "Yu",
+          "given": "Wayne"
+        }
+      ],
+      "year": 2000,
+      "title": "The information content of stock markets: why do emerging markets have synchronous stock price movements?",
+      "venue": "Journal of Financial Economics",
+      "volume": "58",
+      "issue": "1-2",
+      "pages": "215-260",
+      "doi": "10.1016/s0304-405x(00)00071-4",
+      "url": "https://doi.org/10.1016/s0304-405x(00)00071-4",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1016%2Fs0304-405x%2800%2900071-4",
+      "registry_response_sha256": "191f826dd4571fee75628b2181e69b6910412b2e135a233fd9d8532c91c640e4",
+      "primary_sources": [
+        "https://www.sciencedirect.com/science/article/pii/S0304405X00000714"
+      ],
+      "note": "Journal version 58(1-2), 215-260. Co-movement does not identify unique causal market/firm shares.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2000,
+              1
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2000,
+              1
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 11,
+      "citation_id": "Schuemie2018Calibration",
+      "authors": [
+        {
+          "family": "Schuemie",
+          "given": "Martijn J."
+        },
+        {
+          "family": "Hripcsak",
+          "given": "George"
+        },
+        {
+          "family": "Ryan",
+          "given": "Patrick B."
+        },
+        {
+          "family": "Madigan",
+          "given": "David"
+        },
+        {
+          "family": "Suchard",
+          "given": "Marc A."
+        }
+      ],
+      "year": 2018,
+      "title": "Empirical confidence interval calibration for population-level effect estimation studies in observational healthcare data",
+      "venue": "Proceedings of the National Academy of Sciences",
+      "volume": "115",
+      "issue": "11",
+      "pages": "2571-2577",
+      "doi": "10.1073/pnas.1708282114",
+      "url": "https://doi.org/10.1073/pnas.1708282114",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1073%2Fpnas.1708282114",
+      "registry_response_sha256": "c800ecb2de855e9ae13a992fdd0d3a540d1cee5a1bb039e367afe9ca6a1def52",
+      "primary_sources": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC5856503/",
+        "https://pubmed.ncbi.nlm.nih.gov/29531023/"
+      ],
+      "note": "Archived article and PMID 29531023 match. Calibration in healthcare is an analogy requiring finance-specific assumptions.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2018,
+              3,
+              12
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2018,
+              3,
+              13
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2018,
+              3,
+              12
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 12,
+      "citation_id": "Vuolteenaho2002Returns",
+      "authors": [
+        {
+          "family": "Vuolteenaho",
+          "given": "Tuomo"
+        }
+      ],
+      "year": 2002,
+      "title": "What Drives Firm‐Level Stock Returns?",
+      "venue": "The Journal of Finance",
+      "volume": "57",
+      "issue": "1",
+      "pages": "233-264",
+      "doi": "10.1111/1540-6261.00421",
+      "url": "https://doi.org/10.1111/1540-6261.00421",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1111%2F1540-6261.00421",
+      "registry_response_sha256": "98e3a66020a057dadac9302dc6e06d0df5a30d6af6c289b80dd62023b2954c4b",
+      "primary_sources": [
+        "https://onlinelibrary.wiley.com/doi/abs/10.1111/1540-6261.00421"
+      ],
+      "note": "February 2002 issue; December online date is separately recorded. VAR decomposition is not direct observation of causes.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2002,
+              2
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2002,
+              2
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2002,
+              12,
+              17
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 13,
+      "citation_id": "White2000RealityCheck",
+      "authors": [
+        {
+          "family": "White",
+          "given": "Halbert"
+        }
+      ],
+      "year": 2000,
+      "title": "A Reality Check for Data Snooping",
+      "venue": "Econometrica",
+      "volume": "68",
+      "issue": "5",
+      "pages": "1097-1126",
+      "doi": "10.1111/1468-0262.00152",
+      "url": "https://doi.org/10.1111/1468-0262.00152",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1111%2F1468-0262.00152",
+      "registry_response_sha256": "0592d3f2a7848c56baa52cf850b838307dcb32395c761289d4fde067c1485d00",
+      "primary_sources": [],
+      "note": "DOI registry identity verified; no independent reproduction of the reality-check procedure.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2000,
+              9
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2000,
+              9
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 14,
+      "citation_id": "Hansen2005SPA",
+      "authors": [
+        {
+          "family": "Hansen",
+          "given": "Peter Reinhard"
+        }
+      ],
+      "year": 2005,
+      "title": "A Test for Superior Predictive Ability",
+      "venue": "Journal of Business & Economic Statistics",
+      "volume": "23",
+      "issue": "4",
+      "pages": "365-380",
+      "doi": "10.1198/073500105000000063",
+      "url": "https://doi.org/10.1198/073500105000000063",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1198%2F073500105000000063",
+      "registry_response_sha256": "8d384159a07f0f2e8547f5840115078f8950343cf3d2e6a3126c00db2ebb2807",
+      "primary_sources": [],
+      "note": "DOI registry identity verified; SPA requires a declared loss, benchmark and candidate family.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2005,
+              10
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2005,
+              10
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 15,
+      "citation_id": "Bailey2014DeflatedSharpe",
+      "authors": [
+        {
+          "family": "Bailey",
+          "given": "David H."
+        },
+        {
+          "family": "López de Prado",
+          "given": "Marcos"
+        }
+      ],
+      "year": 2014,
+      "title": "The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality",
+      "venue": "The Journal of Portfolio Management",
+      "volume": "40",
+      "issue": "5",
+      "pages": "94-107",
+      "doi": "10.3905/jpm.2014.40.5.094",
+      "url": "https://doi.org/10.3905/jpm.2014.40.5.094",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.3905%2Fjpm.2014.40.5.094",
+      "registry_response_sha256": "d76f6342d6412a8f3b8b79067d6eb3d042a13f0b6579de616e42ea4b01bcaac8",
+      "primary_sources": [],
+      "note": "HTML italics/newlines removed from deposited title. Sharpe-specific adjustment is not an automatic correction for annual rank IC.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2014,
+              9,
+              30
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2014,
+              9,
+              30
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2014,
+              9,
+              30
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 16,
+      "citation_id": "Bailey2017PBO",
+      "authors": [
+        {
+          "family": "Bailey",
+          "given": "David H."
+        },
+        {
+          "family": "Borwein",
+          "given": "Jonathan M."
+        },
+        {
+          "family": "López de Prado",
+          "given": "Marcos"
+        },
+        {
+          "family": "Zhu",
+          "given": "Qiji Jim"
+        }
+      ],
+      "year": 2017,
+      "title": "The probability of backtest overfitting",
+      "venue": "The Journal of Computational Finance",
+      "volume": "20",
+      "issue": "4",
+      "pages": null,
+      "doi": "10.21314/jcf.2016.322",
+      "url": "https://doi.org/10.21314/jcf.2016.322",
+      "entry_type": "article",
+      "status": "VERIFIED_IDENTITY_PAGINATION_UNVERIFIED",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.21314%2Fjcf.2016.322",
+      "registry_response_sha256": "523e5ab119672dac3ad8abb96f42ac7c5c6b6b6c10847abe067df1d446593a3a",
+      "primary_sources": [
+        "https://www.risk.net/ja/node/4278011",
+        "https://www.risk.net/journal-of-computational-finance/2471206/the-probability-of-backtest-overfitting",
+        "https://www.davidhbailey.com/dhbpapers/"
+      ],
+      "note": "Identity, full author initials and April 2017 issue verified. Pagination UNVERIFIED: dossier says 39-70, author publication list says 39-69; registry omits pages and publisher download requires sign-in. Pages omitted rather than resolving by guess.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2016,
+              9
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2016,
+              9
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 17,
+      "citation_id": "Holm1979Sequential",
+      "authors": [
+        {
+          "family": "Holm",
+          "given": "Sture"
+        }
+      ],
+      "year": 1979,
+      "title": "A Simple Sequentially Rejective Multiple Test Procedure",
+      "venue": "Scandinavian Journal of Statistics",
+      "volume": "6",
+      "issue": "2",
+      "pages": "65-70",
+      "doi": null,
+      "url": "https://www.jstor.org/stable/4615733",
+      "entry_type": "article",
+      "status": "VERIFIED_ARCHIVAL_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": null,
+      "registry_response_sha256": null,
+      "primary_sources": [
+        "https://www.jstor.org/stable/i412579"
+      ],
+      "note": "JSTOR issue table verifies author/title/year/6(2)/65-70. Stable URL retained; no DOI inferred from stable identifier.",
+      "registry_dates": {}
+    },
+    {
+      "number": 18,
+      "citation_id": "Benjamini1995FDR",
+      "authors": [
+        {
+          "family": "Benjamini",
+          "given": "Yoav"
+        },
+        {
+          "family": "Hochberg",
+          "given": "Yosef"
+        }
+      ],
+      "year": 1995,
+      "title": "Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing",
+      "venue": "Journal of the Royal Statistical Society Series B: Statistical Methodology",
+      "volume": "57",
+      "issue": "1",
+      "pages": "289-300",
+      "doi": "10.1111/j.2517-6161.1995.tb02031.x",
+      "url": "https://doi.org/10.1111/j.2517-6161.1995.tb02031.x",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1111%2Fj.2517-6161.1995.tb02031.x",
+      "registry_response_sha256": "fad797e933b030fe2f22b9c0ca03f3a7d9a83f8696b6d1c8d754195a5b481280",
+      "primary_sources": [],
+      "note": "Original 1995 issue retained; later digital publication date does not change citation year.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              1995,
+              1,
+              1
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              1995,
+              1,
+              1
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2018,
+              12,
+              5
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 19,
+      "citation_id": "Benjamini2001Dependency",
+      "authors": [
+        {
+          "family": "Benjamini",
+          "given": "Yoav"
+        },
+        {
+          "family": "Yekutieli",
+          "given": "Daniel"
+        }
+      ],
+      "year": 2001,
+      "title": "The control of the false discovery rate in multiple testing under dependency",
+      "venue": "The Annals of Statistics",
+      "volume": "29",
+      "issue": "4",
+      "pages": "1165-1188",
+      "doi": "10.1214/aos/1013699998",
+      "url": "https://doi.org/10.1214/aos/1013699998",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1214%2Faos%2F1013699998",
+      "registry_response_sha256": "5dd924b310f41e6797d2876f1a4fc7a2593eb65551f67e90f74cce555d451c74",
+      "primary_sources": [],
+      "note": "DOI registry metadata checked; dependence assumptions differ from BH.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2001,
+              8,
+              1
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2001,
+              8,
+              1
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 20,
+      "citation_id": "Cawley2010Selection",
+      "authors": [
+        {
+          "family": "Cawley",
+          "given": "Gavin C."
+        },
+        {
+          "family": "Talbot",
+          "given": "Nicola L. C."
+        }
+      ],
+      "year": 2010,
+      "title": "On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation",
+      "venue": "Journal of Machine Learning Research",
+      "volume": "11",
+      "issue": "70",
+      "pages": "2079-2107",
+      "doi": null,
+      "url": "https://jmlr.org/papers/v11/cawley10a.html",
+      "entry_type": "article",
+      "status": "VERIFIED_PRIMARY_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": null,
+      "registry_response_sha256": null,
+      "primary_sources": [
+        "https://jmlr.org/papers/v11/cawley10a.html"
+      ],
+      "note": "Official JMLR entry, 11(70), 2079-2107. No DOI invented.",
+      "registry_dates": {}
+    },
+    {
+      "number": 21,
+      "citation_id": "Bergmeir2018CV",
+      "authors": [
+        {
+          "family": "Bergmeir",
+          "given": "Christoph"
+        },
+        {
+          "family": "Hyndman",
+          "given": "Rob J."
+        },
+        {
+          "family": "Koo",
+          "given": "Bonsoo"
+        }
+      ],
+      "year": 2018,
+      "title": "A note on the validity of cross-validation for evaluating autoregressive time series prediction",
+      "venue": "Computational Statistics & Data Analysis",
+      "volume": "120",
+      "issue": null,
+      "pages": "70-83",
+      "doi": "10.1016/j.csda.2017.11.003",
+      "url": "https://doi.org/10.1016/j.csda.2017.11.003",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1016%2Fj.csda.2017.11.003",
+      "registry_response_sha256": "723a2187e76a4c07c7dc2cb3df5690a9e321476424690212d8bb2799d3aada9e",
+      "primary_sources": [],
+      "note": "2018 issue version verified. Dossier online-2017 assertion not independently established from retrieved registry fields; not copied as verified.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2018,
+              4
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2018,
+              4
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 22,
+      "citation_id": "Petersen2009Panel",
+      "authors": [
+        {
+          "family": "Petersen",
+          "given": "Mitchell A."
+        }
+      ],
+      "year": 2009,
+      "title": "Estimating Standard Errors in Finance Panel Data Sets: Comparing Approaches",
+      "venue": "Review of Financial Studies",
+      "volume": "22",
+      "issue": "1",
+      "pages": "435-480",
+      "doi": "10.1093/rfs/hhn053",
+      "url": "https://doi.org/10.1093/rfs/hhn053",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1093%2Frfs%2Fhhn053",
+      "registry_response_sha256": "19a6fa75e170d8386bb872c7c4ae8e5a79fd8bd738d2e7ab8a80026564e0c7cf",
+      "primary_sources": [],
+      "note": "Online 2008; issue 2009. Does not establish that three time clusters are sufficient.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2008,
+              6,
+              3
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2009,
+              1
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2008,
+              6,
+              3
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 23,
+      "citation_id": "Cameron2008Bootstrap",
+      "authors": [
+        {
+          "family": "Cameron",
+          "given": "A. Colin"
+        },
+        {
+          "family": "Gelbach",
+          "given": "Jonah B."
+        },
+        {
+          "family": "Miller",
+          "given": "Douglas L."
+        }
+      ],
+      "year": 2008,
+      "title": "Bootstrap-Based Improvements for Inference with Clustered Errors",
+      "venue": "Review of Economics and Statistics",
+      "volume": "90",
+      "issue": "3",
+      "pages": "414-427",
+      "doi": "10.1162/rest.90.3.414",
+      "url": "https://doi.org/10.1162/rest.90.3.414",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1162%2Frest.90.3.414",
+      "registry_response_sha256": "2a2d862f998b74410477bcb8a18aaa9287c25841edb714272c85be10da900dde",
+      "primary_sources": [],
+      "note": "DOI registry bibliographic identity checked; full methods/results not independently verified.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2008,
+              8
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2008,
+              8
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 24,
+      "citation_id": "Gu2020ML",
+      "authors": [
+        {
+          "family": "Gu",
+          "given": "Shihao"
+        },
+        {
+          "family": "Kelly",
+          "given": "Bryan"
+        },
+        {
+          "family": "Xiu",
+          "given": "Dacheng"
+        }
+      ],
+      "year": 2020,
+      "title": "Empirical Asset Pricing via Machine Learning",
+      "venue": "The Review of Financial Studies",
+      "volume": "33",
+      "issue": "5",
+      "pages": "2223-2273",
+      "doi": "10.1093/rfs/hhaa009",
+      "url": "https://doi.org/10.1093/rfs/hhaa009",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1093%2Frfs%2Fhhaa009",
+      "registry_response_sha256": "9d330e7aa9df943d519c236257515b7702bd5c81c72b36b5a7c7762aa7b01734",
+      "primary_sources": [
+        "https://academic.oup.com/rfs/article/33/5/2223/5758276"
+      ],
+      "note": "Publisher identity and sections 1.7-1.8 checked: temporal train/validation/test separation and out-of-sample evaluation. No independent result reproduction; US results do not establish a BIST edge.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2020,
+              2,
+              26
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2020,
+              5,
+              1
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2020,
+              2,
+              26
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 25,
+      "citation_id": "Drobetz2021European",
+      "authors": [
+        {
+          "family": "Drobetz",
+          "given": "Wolfgang"
+        },
+        {
+          "family": "Otto",
+          "given": "Tizian"
+        }
+      ],
+      "year": 2021,
+      "title": "Empirical asset pricing via machine learning: evidence from the European stock market",
+      "venue": "Journal of Asset Management",
+      "volume": "22",
+      "issue": "7",
+      "pages": "507-538",
+      "doi": "10.1057/s41260-021-00237-x",
+      "url": "https://doi.org/10.1057/s41260-021-00237-x",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1057%2Fs41260-021-00237-x",
+      "registry_response_sha256": "740305bb30d973843779adcc89abf141dd6232dd43ae6cda28651656b3b13b2a",
+      "primary_sources": [
+        "https://link.springer.com/article/10.1057/s41260-021-00237-x"
+      ],
+      "note": "Publisher methods state a four-month assumed lag and sequential training/validation/testing. Not a BIST universal release date.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2021,
+              11,
+              12
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2021,
+              12
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2021,
+              11,
+              12
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 26,
+      "citation_id": "McLean2016Predictability",
+      "authors": [
+        {
+          "family": "McLean",
+          "given": "R. David"
+        },
+        {
+          "family": "Pontiff",
+          "given": "Jeffrey"
+        }
+      ],
+      "year": 2016,
+      "title": "Does Academic Research Destroy Stock Return Predictability?",
+      "venue": "The Journal of Finance",
+      "volume": "71",
+      "issue": "1",
+      "pages": "5-32",
+      "doi": "10.1111/jofi.12365",
+      "url": "https://doi.org/10.1111/jofi.12365",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1111%2Fjofi.12365",
+      "registry_response_sha256": "24435d255b239d0c141a083ecfc70b4d24e7fe8bd33653457122ef7bb4682f8b",
+      "primary_sources": [],
+      "note": "Use 2016 issue. Academic publication/post-publication decay is distinct from financial-statement release timing; dossier early-2015 assertion not verified here.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2016,
+              1,
+              14
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2016,
+              2
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2016,
+              1,
+              14
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 27,
+      "citation_id": "Hou2020Replication",
+      "authors": [
+        {
+          "family": "Hou",
+          "given": "Kewei"
+        },
+        {
+          "family": "Xue",
+          "given": "Chen"
+        },
+        {
+          "family": "Zhang",
+          "given": "Lu"
+        }
+      ],
+      "year": 2020,
+      "title": "Replicating Anomalies",
+      "venue": "The Review of Financial Studies",
+      "volume": "33",
+      "issue": "5",
+      "pages": "2019-2133",
+      "doi": "10.1093/rfs/hhy131",
+      "url": "https://doi.org/10.1093/rfs/hhy131",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1093%2Frfs%2Fhhy131",
+      "registry_response_sha256": "2414abe8558f85fecb4cba19488e058693163c5998f951ace33d6a44867bc90a",
+      "primary_sources": [],
+      "note": "Online 2018; issue 2020.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2018,
+              12,
+              10
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2020,
+              5,
+              1
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2018,
+              12,
+              10
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 28,
+      "citation_id": "Jensen2023Replication",
+      "authors": [
+        {
+          "family": "Jensen",
+          "given": "Theis Ingerslev"
+        },
+        {
+          "family": "Kelly",
+          "given": "Bryan"
+        },
+        {
+          "family": "Pedersen",
+          "given": "Lasse Heje"
+        }
+      ],
+      "year": 2023,
+      "title": "Is There a Replication Crisis in Finance?",
+      "venue": "The Journal of Finance",
+      "volume": "78",
+      "issue": "5",
+      "pages": "2465-2518",
+      "doi": "10.1111/jofi.13249",
+      "url": "https://doi.org/10.1111/jofi.13249",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1111%2Fjofi.13249",
+      "registry_response_sha256": "cf5eecfd8e0a5ca10e51dd67b32e324cd9e5f7458d019ee25048d26ef29b76b1",
+      "primary_sources": [],
+      "note": "Registry metadata verified; do not present all replication literature as reaching the same conclusion.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2023,
+              6,
+              9
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2023,
+              10
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2023,
+              6,
+              9
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 29,
+      "citation_id": "Chen2022OpenSource",
+      "authors": [
+        {
+          "family": "Chen",
+          "given": "Andrew Y."
+        },
+        {
+          "family": "Zimmermann",
+          "given": "Tom"
+        }
+      ],
+      "year": 2022,
+      "title": "Open Source Cross-Sectional Asset Pricing",
+      "venue": "Critical Finance Review",
+      "volume": "11",
+      "issue": "2",
+      "pages": "207-264",
+      "doi": "10.1561/104.00000112",
+      "url": "https://doi.org/10.1561/104.00000112",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1561%2F104.00000112",
+      "registry_response_sha256": "9a43178e76ae6721977dbf9a82640c2c9a1bde1ce729a5e10422ca588986fbbc",
+      "primary_sources": [
+        "https://nowpublishers.com/article/details/supplementary-info/104.00000112_app.pdf"
+      ],
+      "note": "Correct DOI 10.1561/104.00000112. Author split corrected to Chen, Andrew Y., using author names on publisher-hosted appendix; appendix dated 2020 is not the 2022 journal version.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2022
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2022
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2022
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 30,
+      "citation_id": "Levy2026Caution",
+      "authors": [
+        {
+          "family": "Levy",
+          "given": "Bradford"
+        }
+      ],
+      "year": 2026,
+      "title": "Caution Ahead: Numerical Reasoning and Look‐Ahead Bias in AI Models",
+      "venue": "Journal of Accounting Research",
+      "volume": "64",
+      "issue": "3",
+      "pages": "1139-1188",
+      "doi": "10.1111/1475-679x.70058",
+      "url": "https://doi.org/10.1111/1475-679x.70058",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1111%2F1475-679x.70058",
+      "registry_response_sha256": "412d069f2bd57c0b937787a5b94391deef8fa3173032f16f770301d2a074290a",
+      "primary_sources": [
+        "https://onlinelibrary.wiley.com/doi/10.1111/1475-679x.70058"
+      ],
+      "note": "Correct author split: Levy, Bradford. First VoR online 6 May 2026; 64(3), 1139-1188. Specific LLM experiments, not a universal claim about all models/tasks.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2026,
+              5,
+              6
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2026,
+              6
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2026,
+              5,
+              6
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 31,
+      "citation_id": "Wolff2024StockPicking",
+      "authors": [
+        {
+          "family": "Wolff",
+          "given": "Dominik"
+        },
+        {
+          "family": "Echterling",
+          "given": "Fabian"
+        }
+      ],
+      "year": 2024,
+      "title": "Stock picking with machine learning",
+      "venue": "Journal of Forecasting",
+      "volume": "43",
+      "issue": "1",
+      "pages": "81-102",
+      "doi": "10.1002/for.3021",
+      "url": "https://doi.org/10.1002/for.3021",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1002%2Ffor.3021",
+      "registry_response_sha256": "8b1dea6a8ceee20e256b26780b488c19d2c409fd0a3c93b4b6befbdc67d3f92d",
+      "primary_sources": [
+        "https://onlinelibrary.wiley.com/doi/pdf/10.1002/for.3021"
+      ],
+      "note": "Online 2023; issue 2024. Publisher PDF Section 2 uses historical constituents and a three-month fundamental lag; its carry-forward/median imputation is not adopted by FinanceIQ.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2023,
+              9,
+              8
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2024,
+              1
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2023,
+              9,
+              8
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 32,
+      "citation_id": "Brown1992Survivorship",
+      "authors": [
+        {
+          "family": "Brown",
+          "given": "Stephen J."
+        },
+        {
+          "family": "Goetzmann",
+          "given": "William"
+        },
+        {
+          "family": "Ibbotson",
+          "given": "Roger G."
+        },
+        {
+          "family": "Ross",
+          "given": "Stephen A."
+        }
+      ],
+      "year": 1992,
+      "title": "Survivorship Bias in Performance Studies",
+      "venue": "Review of Financial Studies",
+      "volume": "5",
+      "issue": "4",
+      "pages": "553-580",
+      "doi": "10.1093/rfs/5.4.553",
+      "url": "https://doi.org/10.1093/rfs/5.4.553",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1093%2Frfs%2F5.4.553",
+      "registry_response_sha256": "f3bdd5cd3d3c7669d72e282ea59677e916c8cd2243a75e81d27bb4b0fde9367c",
+      "primary_sources": [],
+      "note": "DOI registry identity verified; survivorship mechanism cannot supply a transferable FinanceIQ bias coefficient.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              1992,
+              10
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              1992,
+              10
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              1992,
+              10,
+              1
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 33,
+      "citation_id": "Shumway1997Delisting",
+      "authors": [
+        {
+          "family": "Shumway",
+          "given": "Tyler"
+        }
+      ],
+      "year": 1997,
+      "title": "The Delisting Bias in CRSP Data",
+      "venue": "The Journal of Finance",
+      "volume": "52",
+      "issue": "1",
+      "pages": "327-340",
+      "doi": "10.1111/j.1540-6261.1997.tb03818.x",
+      "url": "https://doi.org/10.1111/j.1540-6261.1997.tb03818.x",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1111%2Fj.1540-6261.1997.tb03818.x",
+      "registry_response_sha256": "c57dd555de2ddbe2476eb6b8ee41b84d4301bea2f12e6ae48d0420bb5dff7846",
+      "primary_sources": [],
+      "note": "DOI registry identity verified; missing delisting returns are a separate measurement problem from membership coverage.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              1997,
+              3
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              1997,
+              3
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2012,
+              4,
+              18
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 34,
+      "citation_id": "David2019Leakage",
+      "authors": [
+        {
+          "family": "David",
+          "given": "Zachary"
+        }
+      ],
+      "year": 2019,
+      "title": "Information leakage in financial machine learning research",
+      "venue": "Algorithmic Finance",
+      "volume": "8",
+      "issue": "1-2",
+      "pages": "1-4",
+      "doi": "10.3233/af-190900",
+      "url": "https://doi.org/10.3233/af-190900",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.3233%2Faf-190900",
+      "registry_response_sha256": "407a8824427520a16c30238dfe3ea9b404ceee60263552518ddfef71665d6d11",
+      "primary_sources": [
+        "https://journals.sagepub.com/doi/pdf/10.3233/AF-190900?download=true"
+      ],
+      "note": "Publisher PDF explicitly Editorial; not counted as peer-reviewed original research.",
+      "publication_type": "editorial",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2019,
+              12,
+              26
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2019,
+              12,
+              26
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 35,
+      "citation_id": "Sezer2020Review",
+      "authors": [
+        {
+          "family": "Sezer",
+          "given": "Omer Berat"
+        },
+        {
+          "family": "Gudelek",
+          "given": "Mehmet Ugur"
+        },
+        {
+          "family": "Ozbayoglu",
+          "given": "Ahmet Murat"
+        }
+      ],
+      "year": 2020,
+      "title": "Financial time series forecasting with deep learning : A systematic literature review: 2005–2019",
+      "venue": "Applied Soft Computing",
+      "volume": "90",
+      "issue": null,
+      "pages": "106181",
+      "doi": "10.1016/j.asoc.2020.106181",
+      "url": "https://doi.org/10.1016/j.asoc.2020.106181",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1016%2Fj.asoc.2020.106181",
+      "registry_response_sha256": "6091be83d26fbdf6f5b292d3c1ee3d1d8e44697ff0e3cf36409ff91bbe3e23d7",
+      "primary_sources": [],
+      "note": "Review article; metadata verification is not replication of its surveyed results.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2020,
+              5
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2020,
+              5
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 36,
+      "citation_id": "Miotto2016DeepPatient",
+      "authors": [
+        {
+          "family": "Miotto",
+          "given": "Riccardo"
+        },
+        {
+          "family": "Li",
+          "given": "Li"
+        },
+        {
+          "family": "Kidd",
+          "given": "Brian A."
+        },
+        {
+          "family": "Dudley",
+          "given": "Joel T."
+        }
+      ],
+      "year": 2016,
+      "title": "Deep Patient: An Unsupervised Representation to Predict the Future of Patients from the Electronic Health Records",
+      "venue": "Scientific Reports",
+      "volume": "6",
+      "issue": "1",
+      "pages": "26094",
+      "doi": "10.1038/srep26094",
+      "url": "https://doi.org/10.1038/srep26094",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1038%2Fsrep26094",
+      "registry_response_sha256": "111f4a81d37a155284d767a599bcac208dabcee5d2b97c5f764491601986ae06",
+      "primary_sources": [],
+      "note": "Adjacent biomedical representation method; bibliographic check only, not a proposed FinanceIQ model.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2016,
+              5,
+              17
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2016,
+              5,
+              17
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 37,
+      "citation_id": "Argelaguet2020MOFA",
+      "authors": [
+        {
+          "family": "Argelaguet",
+          "given": "Ricard"
+        },
+        {
+          "family": "Arnol",
+          "given": "Damien"
+        },
+        {
+          "family": "Bredikhin",
+          "given": "Danila"
+        },
+        {
+          "family": "Deloro",
+          "given": "Yonatan"
+        },
+        {
+          "family": "Velten",
+          "given": "Britta"
+        },
+        {
+          "family": "Marioni",
+          "given": "John C."
+        },
+        {
+          "family": "Stegle",
+          "given": "Oliver"
+        }
+      ],
+      "year": 2020,
+      "title": "MOFA+: a statistical framework for comprehensive integration of multi-modal single-cell data",
+      "venue": "Genome Biology",
+      "volume": "21",
+      "issue": "1",
+      "pages": "111",
+      "doi": "10.1186/s13059-020-02015-1",
+      "url": "https://doi.org/10.1186/s13059-020-02015-1",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1186%2Fs13059-020-02015-1",
+      "registry_response_sha256": "9f1d9134aa1e777d470618a4c82b62169dd65759f4355229f3f92bc867235caa",
+      "primary_sources": [],
+      "note": "Adjacent biological multi-modal method; bibliographic check only.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2020,
+              5,
+              11
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2020,
+              12
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2020,
+              5,
+              11
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 38,
+      "citation_id": "Chernozhukov2018DML",
+      "authors": [
+        {
+          "family": "Chernozhukov",
+          "given": "Victor"
+        },
+        {
+          "family": "Chetverikov",
+          "given": "Denis"
+        },
+        {
+          "family": "Demirer",
+          "given": "Mert"
+        },
+        {
+          "family": "Duflo",
+          "given": "Esther"
+        },
+        {
+          "family": "Hansen",
+          "given": "Christian"
+        },
+        {
+          "family": "Newey",
+          "given": "Whitney"
+        },
+        {
+          "family": "Robins",
+          "given": "James"
+        }
+      ],
+      "year": 2018,
+      "title": "Double/debiased machine learning for treatment and structural parameters",
+      "venue": "The Econometrics Journal",
+      "volume": "21",
+      "issue": "1",
+      "pages": "C1-C68",
+      "doi": "10.1111/ectj.12097",
+      "url": "https://doi.org/10.1111/ectj.12097",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1111%2Fectj.12097",
+      "registry_response_sha256": "37205d08a2e12626f3c72d6fbce52e6a7985132779cdb14aef127d60120bf392",
+      "primary_sources": [],
+      "note": "Adjacent causal-estimation method; does not solve unidentified financial causality.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2018,
+              1,
+              16
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2018,
+              2,
+              1
+            ]
+          ]
+        },
+        "published-online": {
+          "date-parts": [
+            [
+              2018,
+              1,
+              16
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 39,
+      "citation_id": "Brodersen2015CausalImpact",
+      "authors": [
+        {
+          "family": "Brodersen",
+          "given": "Kay H."
+        },
+        {
+          "family": "Gallusser",
+          "given": "Fabian"
+        },
+        {
+          "family": "Koehler",
+          "given": "Jim"
+        },
+        {
+          "family": "Remy",
+          "given": "Nicolas"
+        },
+        {
+          "family": "Scott",
+          "given": "Steven L."
+        }
+      ],
+      "year": 2015,
+      "title": "Inferring causal impact using Bayesian structural time-series models",
+      "venue": "The Annals of Applied Statistics",
+      "volume": "9",
+      "issue": "1",
+      "pages": "247-274",
+      "doi": "10.1214/14-aoas788",
+      "url": "https://doi.org/10.1214/14-aoas788",
+      "entry_type": "article",
+      "status": "VERIFIED_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": "https://api.crossref.org/works/10.1214%2F14-aoas788",
+      "registry_response_sha256": "e6d2224657f2afd53d8e3595cc91ea6ff8a3ea94c4deba9fa940c11b882f718d",
+      "primary_sources": [],
+      "note": "Adjacent counterfactual time-series method; assumptions not validated for FinanceIQ.",
+      "registry_dates": {
+        "published": {
+          "date-parts": [
+            [
+              2015,
+              3,
+              1
+            ]
+          ]
+        },
+        "published-print": {
+          "date-parts": [
+            [
+              2015,
+              3,
+              1
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "number": 40,
+      "citation_id": "Melnychuk2022CausalTransformer",
+      "authors": [
+        {
+          "family": "Melnychuk",
+          "given": "Valentyn"
+        },
+        {
+          "family": "Frauen",
+          "given": "Dennis"
+        },
+        {
+          "family": "Feuerriegel",
+          "given": "Stefan"
+        }
+      ],
+      "year": 2022,
+      "title": "Causal Transformer for Estimating Counterfactual Outcomes",
+      "venue": "Proceedings of the 39th International Conference on Machine Learning",
+      "volume": "162",
+      "issue": null,
+      "pages": "15293-15329",
+      "doi": null,
+      "url": "https://proceedings.mlr.press/v162/melnychuk22a.html",
+      "entry_type": "inproceedings",
+      "status": "VERIFIED_PRIMARY_METADATA",
+      "confidence": "high for bibliographic identity; methods/results not reproduced",
+      "checked_on": "2026-10-27",
+      "registry_source": null,
+      "registry_response_sha256": null,
+      "primary_sources": [
+        "https://proceedings.mlr.press/v162/melnychuk22a.html"
+      ],
+      "note": "Official ICML 2022/PMLR conference entry and BibTeX. No arXiv DOI substituted for a proceedings DOI.",
+      "registry_dates": {}
+    }
+  ]
+}
