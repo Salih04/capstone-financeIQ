@@ -1,12 +1,14 @@
 # Paper 2 — KAP disclosure event study
 
-**FIQ-19 · preparation v0.3 · 2026-10-29 · ADOPTED OWNER DISPOSITIONS RECONCILED; NOT REGISTERED**
+**FIQ-19 · preparation v0.4 · 2026-11-03 · OWNER DECISIONS RECONCILED; NOT REGISTERED**
 
-Research support only; not investment advice. No study is adopted, registered or
-run by this document. The owner-approved 2026-10-26 D3/D5/D9 decisions and
-narrow D2/D4/D8 amendments are recorded below. All remaining choices are
-**PROPOSED / UNRESOLVED**; these limited approvals do not authorize execution.
-The remaining decisions and evidence gates must be resolved before registration.
+Research support only; not investment advice. No study is registered or run by
+this document. The owner decisions recorded 2026-11-03 approve the Queue 2 design
+recommendations with the G12 and G14/G09 amendments, plus CDS-only Batch B.
+Earlier D3/D5/D9 and narrow D2/D4/D8 approvals remain in force. These design
+decisions authorize documentation synchronization and outcome-free eligibility
+counts only; they do not authorize outcome access, study execution or registration.
+All unresolved choices and evidence gates remain explicit below.
 The [OSF draft](OSF_PREREGISTRATION_DRAFT.md) supplies the study-record fields.
 v0.3 (2026-10-29) only reconciles this text with the already adopted
 [owner decision addendum](../research/OWNER_DECISION_ADDENDUM.md) (PR #55,
@@ -31,28 +33,38 @@ research-data readiness or scientific adoption.
 v0.2 landed on main as `b2b31536` (PR #54), whose parent is `4b029ef4` (PR #53),
 not the preparation base named above. v0.3 is edited on main `efe3ed32` (PR #55).
 
-FIQ-06 R14 (`8093ec0f54d80df31c50e3a806b06b0fb2f2a096`,
-`docs/research/UNIVERSE_RULE.md`) and FIQ-11 R7
-(`1463425ae1c4ea592a9e6efc3a1a26ca6810137b`,
-`docs/research/PROTOCOL.md`) remain **unadopted as whole drafts**, and neither file
-is on main (v0.2 called both unadopted draft dependencies, correct before PR #55).
-Since 2026-10-26 the addendum adopts only: the FIQ-06 scoped v1.0.0 rules B2,
-6(c)-A, 20(a)1 + (b)ii, 21-A, 22-B and 23-B, "approved as rules, operationally
-blocked" where definitions or evidence are missing; and the FIQ-11 dispositions
-OD-1 = B, OD-2 = B, OD-3 = B, OD-4 = A, OD-5 = B, OD-6 (a)(b)(c), OD-7 = B,
-OD-8 = A plus the itemised I-1..I-16 states. Their binding effect on this study is
-in the OSF draft's boundaries section. All other proposed versions, exemptions,
-classifications and opening policies are not silently incorporated. UNIVERSE_RULE
-22-B governs membership-announcement copies; it is not transferred to D2 event timing.
+FIQ-06 R14 (`8093ec0f54d80df31c50e3a806b06b0fb2f2a096`) and FIQ-11 R7
+(`1463425ae1c4ea592a9e6efc3a1a26ca6810137b`) remain **unadopted as whole drafts**.
+The 2026-10-26 addendum adopted only the scoped FIQ-06 v1.0.0 rules B2,
+6(c)-A, 20(a)1 + (b)ii, 21-A, 22-B and 23-B, approved as rules but operationally
+blocked where definitions or evidence are missing; it also adopted FIQ-11
+dispositions OD-1 = B, OD-2 = B, OD-3 = B, OD-4 = A, OD-5 = B, OD-6 (a)(b)(c),
+OD-7 = B, OD-8 = A and itemised I-1..I-16 states. On 2026-11-03, the owner
+prospectively adopted the U1-only rule v2.0.0 with the stated completeness and G03
+amendments. Its exact file is pinned by rule commit
+`45c75ac7f0a7715dfd84b210b3a42830318311a0` and SHA-256
+`3e3307ad95e2d1d9af5724ce2f3a7737ff8cf809a0b6985220fc4d8a4822b42f`; publication
+to main remains subject to the separate review and hosted CI. This version records
+the rule decision only: archive evidence, G03 mapping, source adequacy and the
+feasible window remain open, and FIQ-06 is not complete. FIQ-11 remains governed
+by its 2026-10-26 dispositions. Their binding effect on this study is in the OSF
+draft's boundaries section. UNIVERSE_RULE 22-B governs membership-announcement
+copies; it is not transferred to D2 event timing.
 
 Target population: quarterly U1 formation samples under Charter §4; primary
-stratum non-financial firms, holdings flagged. Financial firms remain a separate,
-descriptive stratum. Retain index leavers, suspensions, mergers and delistings
-through the event window. No capstone cohort or survivor filter. Operational U1 version and study period
-remain unset pending adoption and authorized outcome-free feasibility checks.
-FIQ-06 is not completed: its feasible window (U OD-4/14/15) and stratum mapping
-(U OD-8(a) with evidence EV-3) are OPEN/BLOCKED, so strata stay UNKNOWN and the
-primary non-financial stratum cannot yet be populated.
+stratum non-financial firms, holdings flagged, and financial firms descriptive
+only. Retain index leavers, suspensions, mergers and delistings through the event
+window; do not use the capstone cohort or a survivor filter. The owner approved
+one historical, explicitly semi-clean associational opening: candidate event
+publication dates 2023-01-01 through 2025-12-31, with every outcome dependency
+ending by 2025-12-31; candidate development dates 2017-01-01 through 2022-12-31
+only if an adopted U1 feasible window supports them. No later forward look is
+granted. Owner-adopted U1 rule v2.0.0 and its exact file digest are pinned above;
+publication to main is pending its separate review and hosted CI. This rule
+adoption does not establish source adequacy: G02's scoped workbook/archive evidence,
+G03's template-based strata mapping (U OD-8(a) with evidence EV-3), and the feasible
+window (U OD-4/14/15) remain OPEN/BLOCKED. Strata are UNKNOWN and the primary
+sample cannot yet be populated.
 
 | Question | Proposed estimand, one row per issuer/report event |
 |---|---|
@@ -66,7 +78,7 @@ Residuals do not isolate earnings news.
 
 ## 2. Publication time and prospective surprise
 
-**D2 — PROPOSED / UNRESOLVED except the approved wider-window amendment.** Event origin is the first public KAP financial-statement release
+**D2 — OWNER-APPROVED 2026-11-03.** CAR[0,+1] is primary; CAR[-1,+1] is the wider-window sensitivity. The first historical price-setting close strictly after evidenced KAP publication defines session 0. Use a versioned BIST calendar including half-days, auctions, closures and historical Europe/Istanbul offsets. Unknown time precision, original offset or close ties are unalignable. Operational timestamp/calendar evidence remains gated. Event origin is the first public KAP financial-statement release
 for that issuer/reporting period, including the attached statements. Preserve
 publication, ingestion and any correction times separately. Use the timestamp's
 verified original offset and historical `Europe/Istanbul` conversion, plus a
@@ -84,7 +96,7 @@ an instantaneous response. The owner-approved 2026-10-26 terminology is CAR[-1,+
 it adds pre-event exposure and does not remove confounding. Freeze historical calendar rules before
 matching; today's timetable is not evidence of past hours.
 
-**D3 — OWNER-APPROVED 2026-10-26.** The single primary surprise is
+**D3 — OWNER-APPROVED 2026-10-26; operations approved 2026-11-03.** The single primary surprise is
 
 ```text
 S_q = (E_q - expected_E_q) / MV_q
@@ -144,7 +156,7 @@ CAR[+2,+5] only, labelled a separate delayed-response diagnostic, logged and dis
 
 ## 3. Expected returns, attribution and IAS 29
 
-**D4 — PROPOSED / UNRESOLVED except the approved rate fallback amendment.** Fit each security's daily excess-return model on sessions
+**D4 — OWNER-APPROVED DESIGN 2026-11-03; source and access evidence remain gated.** Fit each security's daily excess-return model on sessions
 [-250,-31], requiring at least 160 complete observations, an identified design
 matrix and positive residual variance; no parameter selection using event returns.
 Use OLS with intercept and four fixed factors: broad BIST total-return market
@@ -153,7 +165,7 @@ and a public non-resident net equity-flow release signal. Fix the risk-free
 conversion, source series identifiers, units and yield tenor before registration.
 All coefficient estimation and scaling use only pre-event available inputs.
 
-For flows, propose the newly published weekly net equity-flow amount divided by
+For flows, use the newly published weekly net equity-flow amount divided by
 the SD of the preceding eight published amounts, assigned to the first daily
 close strictly after its release. A verified non-release day has signal zero
 (no news arrival, not imputed zero flow); an unknown release calendar/value is
@@ -176,8 +188,22 @@ historical vintage archive. Freeze the selected ID, transformation and failure
 rule in both documents. Risk-free conversion is a separate source choice. No
 approved/evidenced rate candidate, flow signal or other required factor means
 stop the four-factor specification; report RQ2 unavailable rather than silently
-reducing it. Only this hierarchy and outcome-blind selection rule are approved; the rest of
-D4 remains unresolved. This amendment authorizes no data retrieval.
+reducing it. The G07 owner decision approves the model and rate hierarchy; source IDs, rights,
+quote conversions, PIT timing and access evidence remain gated. No data retrieval
+is authorized.
+
+**Optional RQ2 extension — OWNER-APPROVED ON, CDS ONLY (2026-11-03).** Preserve
+the four-factor descriptive primary and add the daily change in the Turkey five-year
+sovereign CDS quote; reuse the existing USD/TRY FX column once. The optional
+policy-rate surprise is EXCLUDED because the minimum 20 evidenced decisions in
+`[-250,-31]` is infeasible and no immutable pre-meeting expectation archive exists.
+Do not replace it with actual rate changes or another expectations source. This
+exclusion does not change the approved D4 risk-free-rate hierarchy. LSEG CDS
+availability and rights must be established before registration. If LSEG CDS is
+unavailable before registration, the extension is UNAVAILABLE, with no fallback or
+post-hoc substitution. Contract, quote side, currency, restructuring clause,
+timestamps, units, frequency alignment, missing rules and PIT lineage remain
+evidence gates. No outcome access, data acquisition or execution is authorized.
 
 For each event, sum excess returns = 2 × fitted intercept + sum of each
 fitted-loading × factor realization + CAR residual over sessions 0 and +1.
@@ -213,55 +239,57 @@ must pass for every event. No cohort, protected coverage count or outcome was
 inspected in this amendment. A same-basis asset-scaled sensitivity remains
 PROPOSED / UNRESOLVED; ratios are not automatically basis-invariant.
 
-**RQ3 eligibility — OWNER-APPROVED 2026-10-26.** Before registration, obtain the
-eligible IAS29 event count, distinct event-session clusters and relevant issuer
-clusters, using dates and metadata only, under separately authorized outcome-free
-protected-coverage rules. Apply the predeclared D6 cluster threshold (currently
-proposed: at least 30 in each dimension), including the relevant issuer-cluster
-requirement; require both bases and an identified interaction. D6 remains
-PROPOSED / UNRESOLVED and must be disposed of before the threshold is frozen;
-do not infer its approval from this eligibility rule. No returns or outcomes may
-be inspected. This task authorizes no such counts. If count access itself is not
-authorized, fail closed: eligibility is UNVERIFIED and passage cannot be inferred.
-Adopted FIQ-11 OD-1 = B (2026-10-26) permits only four protected-period aggregates
-(U1 member count per formation date; identity coverage; eligible KAP filing-event
-count; distinct event-date count per quarter), and the addendum states that it does
-not authorize every RQ3 feasibility output, including issuer/session-cluster
-outputs. Basis-label counts are not among the four. Under adopted text this count
-rule is therefore unauthorized and eligibility is UNVERIFIED. Whether the owner
-grants an exact further count authorization or decides how UNVERIFIED eligibility
-is treated before the D9 family is frozen is UNSET (audit gate G09); this
-document chooses neither.
-If the threshold fails, remove RQ3 from the registered confirmatory family before
-registration and label it **NOT ESTIMABLE / forward-holdout-only candidate**.
-Future forward-holdout RQ3 confirmation needs its own authorized registration
-and access conditions. Do not silently defer or restore it inside this study's
-registered family, move boundaries or replace the surprise after results.
+**RQ3 eligibility — OWNER-AUTHORIZED OUTCOME-FREE COUNTS (2026-11-03).** Before
+registration, obtain only these three aggregates for candidate IAS 29-basis events
+in the owner-approved candidate event interval: (1) eligible event count, (2)
+distinct issuer count, and (3) distinct event-session count. Use only publication
+dates, filing-basis metadata and issuer/session identity facts. The authorization
+excludes event rows or identifiers in the response, returns, prices, CARs and all
+other outcomes. The scoped [KERNEL REQUEST #24](https://github.com/Salih04/financeiq-pit-kernel/issues/24)
+asks for these aggregates from existing rights-cleared evidence; no new acquisition
+or Kernel planning/edits are authorized. The request is open and no response/count
+has been received. Until evidence is returned, counts and
+RQ3 eligibility are **UNAVAILABLE**, not zero, and no cluster-threshold passage
+can be inferred.
+
+D6's approved floor is at least 30 issuer clusters and at least 30 session
+clusters for RQ1 and RQ3 inference. Both reporting bases and an identified
+interaction are required. Count authorization does not establish that source facts
+exist or that the threshold is met. **RQ3 is not dropped by default.** If an
+outcome-free source fact is unavailable or the floor is not met, preserve RQ3 as
+UNAVAILABLE / NOT ESTIMABLE under the registered rule; do not silently remove it,
+claim an interaction, or manufacture a p-value. Resolve the exact pre-registration
+treatment of an unavailable family member before freezing D9. Any later forward
+RQ3 confirmation requires its own authorized registration and access conditions.
+No returns or outcomes have been inspected, and no count has yet been computed.
 
 ## 4. Dependence, exclusions and falsification
 
-**D6 — PROPOSED / UNRESOLVED.** Use issuer and event-session two-way clustered covariance for
-RQ1/RQ3, two-sided tests and 95% intervals. Same-day disclosures are not independent
-replications. Report issuer and date cluster counts; propose at least 30 clusters
-in each dimension for confirmatory asymptotic inference, otherwise estimates only
-and no significance-based conclusion. FIQ-21 must assess calibration before
-registration; it cannot tune this threshold on true event outcomes. These
-feasibility, identification and inference safeguards apply to RQ1 as well as
-RQ3; RQ1 is not exempt when RQ3 is excluded. Unavailable tests are UNAVAILABLE. Aggregate
-mean CAR additionally receives a Kolari–Pynnönen adjusted standardized test,
-conditional on valid pre-event cross-correlation estimates; it does not test the
-surprise slope. A calendar-time equal-weight event portfolio with HAC(5) inference is
-a sensitivity to overlapping windows, not a substitute chosen by significance.
+**D6 — OWNER-APPROVED 2026-11-03; calibration NOT RUN.** Use issuer × event-session
+two-way clustered slope inference with two-sided 95% intervals. The minimum is 30
+clusters in each dimension for RQ1 and RQ3; below the floor, report estimates only
+and make no confirmatory significance claim. Use the Kolari–Pynnönen test only for
+mean CAR and only with valid pre-event correlation estimates. Report the equal-weight
+calendar-time HAC(5) diagnostic. Before FIQ-21, freeze 2,000 development-only
+null repetitions with seed 20261102 and a complete outcome-free null-scenario
+generator. Calibration passes only if, for every predeclared null scenario, the
+upper two-sided 95% binomial interval for the nominal 5% null-rejection rate is at
+most 7.5%. The scenario generator is still an evidence/technical gate; no
+simulation or true-date outcome access has occurred. These safeguards apply to RQ1
+and RQ3; unavailable tests remain UNAVAILABLE.
 
-**D7 — PROPOSED / UNRESOLVED.** Treat simultaneous first filings for the same issuer/period as
-one event; attach amendments to its lineage, not extra primary observations.
-If two distinct issuer events' [0,+1] windows overlap, exclude both from the
-isolated-event primary sample and describe bundled events separately. Exclude
-objectively timestamped material co-announcements (dividend, capital action,
-merger or trading-status change) in that window from the isolated primary sample;
-freeze the taxonomy and blind coding process before any returns are viewed.
-Retain the full eligible-event sample as a labelled sensitivity. No exclusion
-based on return magnitude, surprise sign or significance; no winsorisation.
+**D7 — OWNER-APPROVED 2026-11-03.** Treat simultaneous first filings for the same
+issuer/period as one event and retain all lineage. If two distinct issuer events'
+[0,+1] windows overlap, exclude both from the isolated-event primary sample and
+describe bundled events separately. Mechanically classify co-announcements from
+evidenced KAP disclosure-type codes using the frozen categories: dividends or
+distributions; share or rights actions; mergers or acquisitions; and trading-status
+changes. Only residual “other” items are coded by the owner while blind to returns;
+record disagreements, and exclude unresolved items with a reason. No LLM coding.
+Retain the full eligible-event sample as a labelled diagnostic. No exclusion based
+on return magnitude, surprise sign or significance; no winsorisation. KAP code
+mapping and classification evidence remain gates and must be frozen before outcome
+access.
 
 Missing stays null. Exclude only from the analysis requiring the missing item:
 surprise absence does not imply removal from factor attribution. Reject ambiguous
@@ -272,23 +300,21 @@ suspension or absent delisting price into zero return. Count these failures and
 state the resulting attrition risk; do not claim survivor-inclusive returns when
 terminal outcomes are unavailable. No stored-data imputation.
 
-**D8 — PROPOSED / UNRESOLVED except the approved common-shift amendment.** Proposed remaining specification: freeze a seed and exactly 100 session offsets
-at registration.
-In repetition r, apply **one common offset s_r to every issuer's complete event
-calendar** in the permitted development block; never draw independent issuer
-shifts. Preserve inter-issuer date clustering among retained events. Apply
-boundary, own-issuer real-disclosure/co-announcement-window and overlapping-
-placebo exclusions **event by event**, using D7 window/taxonomy rules. Drop each
-conflicting placebo event (both members of a conflicting same-issuer pair), not
-the whole common shift because one issuer collides. Count each event once in the
-attrition total; retain all reason flags to avoid double counting. Report per-shift
-retained events, exclusion counts/reasons, issuer/date clusters, the clustering
-effect of discarded events and unusable shifts. The common shift, event-level
-collision handling and outcome-blind shift rule are owner-approved 2026-10-26;
-the seed, number of offsets and other D8 choices remain unresolved.
-Do not resample offsets, redraw until valid or search for benign p-values; zero
-retained events means that repetition is unavailable. Missingness/eligibility
-rules remain fixed. Later FIQ-21 power work is separately authorized.
+**D8 — OWNER-APPROVED 2026-11-03.** Use seed 20261102 and pin the runtime and
+sampling algorithm before registration. Draw 100 distinct integer session offsets
+without replacement from [-120,-21] ∪ [21,120]. In repetition r, apply **one
+common offset s_r to every issuer's complete event calendar** in the permitted
+development block; never draw independent issuer shifts. Preserve inter-issuer
+date clustering among retained events. Apply boundary, own-issuer real-disclosure/
+co-announcement-window and overlapping-placebo exclusions **event by event**, using
+D7 rules. Drop each conflicting placebo event (both members of a conflicting
+same-issuer pair), not the whole common shift because one issuer collides. Count
+each event once in attrition; retain all reason flags. Report per-shift retained
+events, exclusion counts/reasons, issuer/date clusters, clustering effects and
+unusable shifts. Do not resample offsets, redraw until valid or search for benign
+p-values; zero retained events means that repetition is unavailable. Missingness/
+eligibility rules remain fixed. Later FIQ-21 work is separately gated and has not
+run.
 Negative control: surprise versus CAR[-20,-11], same eligibility and clustering.
 This diagnoses anticipation/confounding; passing does not establish identification.
 Placebos, controls, mean-CAR and sensitivities are diagnostic under D9, with all
@@ -297,35 +323,36 @@ abnormal returns, placebo calculation or simulation is authorized by this draft.
 
 ## 5. Owner decisions and source check
 
-The owner's explicit 2026-10-26 task is the authority for the limited approvals
-below; it neither adopts the whole study nor resolves other D decisions.
+The owner decisions recorded 2026-11-03 21:24:35 Europe/Zurich amend the
+2026-10-26 approvals as shown below. They do not adopt the whole study, close
+source/evidence gates or authorize registration or execution.
 
 | ID | Status and remaining disposition before freeze |
 |---|---|
-| D1 | PROPOSED / UNRESOLVED: Paper 2 scope, operational U1 version, strata, which protected window the single confirmatory opening uses (FIQ-11 OD-2 = B), event-publication start/end, fixed observation end. FIQ-11 OD-1..OD-8 dispositions now bind (OSF draft boundaries); per-target `D_i` content under OD-6 and the unresolved I-items remain open |
-| D2 | LIMITED AMENDMENT APPROVED: CAR[-1,+1] is a wider-window sensitivity and does not remove timing confounding. Other timing/cutoff/primary-window choices remain PROPOSED / UNRESOLVED |
-| D3 | OWNER-APPROVED: CPI seasonal expectation and fiscal-quarter-end MV primary exactly as §2; comparable-history drift/SUE diagnostic candidates only. Source IDs and operational evidence remain gated |
-| D4 | LIMITED AMENDMENT APPROVED: verified two-year TRY sovereign yield → verified EVDS benchmark yield → verified policy-rate changes; outcome-blind PIT feasibility selection before registration, consistent across observations, with economic-meaning disclosure. Remaining factor/estimation/source choices PROPOSED / UNRESOLVED |
-| D5 | OWNER-APPROVED: filing-metadata basis, incompatible transition exclusions with attrition, no CPI bridge, conditional earliest 2025Q1; RQ3 eligibility/count-access rule as §3 |
-| D6 | PROPOSED / UNRESOLVED: two-way clustering, 30-cluster floor in each dimension, KP mean test, calendar-time sensitivity and calibration criteria; feasibility/inference safeguards must cover RQ1 too |
-| D7 | PROPOSED / UNRESOLVED: bundling, co-announcement taxonomy, blind coding, missing handling and full-sample sensitivity |
-| D8 | LIMITED AMENDMENT APPROVED: common session shift per replication, event-level collision dropping, discarded-event counts/clustering effect, no outcome-driven shift selection. Seed, repetition count and remaining controls PROPOSED / UNRESOLVED |
-| D9 | OWNER-APPROVED: RQ1 beta plus eligible RQ3 delta, two-sided Holm; RQ1 alone if RQ3 excluded before registration; UNAVAILABLE tests; diagnostics separate from confirmation; prior trials/exposure retained separately and unknown counts never zero. Alpha, stopping details and governing selection/exposure reconciliation remain PROPOSED / UNRESOLVED |
+| D1 | OWNER-APPROVED 2026-11-03: one historical, explicitly semi-clean associational opening; candidate event dates 2023-01-01..2025-12-31, outcomes end by 2025-12-31; candidate development 2017-01-01..2022-12-31 conditional on U1 feasibility; non-financial U1 primary, holdings flagged, financials descriptive; no forward look. Operational U1, stratum mapping and feasibility remain gates |
+| D2 | OWNER-APPROVED 2026-11-03: CAR[0,+1] primary; CAR[-1,+1] wider-window sensitivity; first price-setting close strictly after evidenced KAP publication; versioned BIST calendar and timestamp treatment as §2. Timestamp/calendar source evidence remains gated |
+| D3 | OWNER-APPROVED 2026-10-26; operations approved 2026-11-03: CPI seasonal expectation, quarter-end MV and exact price/share rules as §2; source IDs, units and PIT evidence remain gated |
+| D4 | OWNER-APPROVED 2026-11-03: four-factor OLS design and D4 hierarchy/rules as §3; optional RQ2 extension ON for CDS daily change with existing FX once; policy-rate surprise excluded. Source IDs and rights remain gated |
+| D5 | OWNER-APPROVED: filing-metadata basis, transition exclusions with attrition, no CPI bridge, conditional earliest 2025Q1. G09 count scope amended 2026-11-03 as §3; source facts and counts remain unavailable pending evidence |
+| D6 | OWNER-APPROVED 2026-11-03: two-way clustering, 30-cluster floor in both dimensions, KP mean-CAR test, calendar-time HAC(5), and 2,000-repetition calibration rule; scenario generator and FIQ-21 results remain NOT RUN |
+| D7 | OWNER-APPROVED 2026-11-03: mechanical KAP disclosure-code classification; owner codes residual “other” blind to returns; no LLM; remaining classification evidence must be frozen |
+| D8 | OWNER-APPROVED 2026-11-03: seed 20261102, 100 offsets, common session shift, event-level collision handling, negative control and reporting as §4; no simulation/placebo run |
+| D9 | OWNER-APPROVED 2026-11-03: alpha 0.05, two-sided Holm, one terminal analysis through 2025-12-31, no equivalence test or sequential/size stopping. RQ3 remains planned, not dropped by default; exact treatment of an unavailable family member must be frozen before registration |
 | D10 | PROPOSED / UNRESOLVED: immutable source manifest, rights/vintages, exposure assessment and exact execution gates; no access authorized here. Adopted OD-2 = B adds binding to an immutable study identity and a cross-study exposure ledger, whose location and schema are UNSET |
 
-**D9 implementation.** Freeze the eligible family before registration, after the
-separately authorized RQ3 eligibility gate: RQ1 beta and eligible RQ3 delta, or
-RQ1 beta alone if RQ3 is excluded. Use two-sided Holm on that registered family.
-An unavailable test is **UNAVAILABLE**, without an artificial p-value or a
-post-outcome family change. D6 safeguards apply to both slopes. Placebo,
-lead-window negative control, mean-CAR and all sensitivity results are diagnostic;
-report all attempts, estimates, intervals and available p-values transparently
-without confirmatory claims or rescue by significance. RQ2 is descriptive.
-Historical trials/exposure remain a separate append-only disclosure; reconcile
-relevant prior evaluated configurations under Charter §5.6 before confirmation.
-Unknown prior trial count is UNSET, never zero. This approved family does not
-waive selection corrections, exposure assessment or governing Charter conditions;
-any unresolved conflict blocks registration/claims, not silent family inflation.
+**D9 — OWNER-APPROVED 2026-11-03.** Use alpha 0.05 and two-sided Holm for the
+planned RQ1 beta and eligible RQ3 delta; RQ3 is not dropped by default. No
+equivalence margin/test. Use one fixed terminal analysis after all gates, with
+observation end 2025-12-31; no sequential testing, significance stopping or sample-
+size stopping. Freeze the exact treatment of an unavailable family member before
+registration. An unavailable test is **UNAVAILABLE**, without an artificial
+p-value or post-outcome family change. D6 safeguards apply to both slopes.
+Placebo, lead-window negative control, mean-CAR and sensitivities are diagnostic;
+report all attempts without confirmatory claims or significance rescue. RQ2 is
+descriptive. Historical trials/exposure remain separate and append-only; reconcile
+prior evaluated configurations under Charter §5.6. Unknown prior trial count is
+UNSET, never zero. Selection corrections, exposure assessment and all governing
+Charter conditions remain gates; no silent family change is allowed.
 
 **2026 unregistered quarantine interval.** Records originally published from
 2026-01-01 until the actual OSF registration timestamp belong to this explicitly
@@ -370,7 +397,7 @@ points 1–2 VERIFIED as summarized above; the PDF body prints no date, so
 23 November 2023 rests on file metadata plus the REPORTED KGK 2024-32 corroboration.
 
 Only the owner decisions itemized above are approved. Remaining D decisions,
-remaining FIQ-06 decisions (operational U1 version, window, strata) and the
+remaining FIQ-06 evidence gates (source adequacy, window, strata) and the
 unresolved FIQ-11 I-items, per-target `D_i` content under OD-6,
 rights/PIT lineage, FIQ-07/08/12, KER-07/09 and relevant return/calendar transport,
 then separately authorized FIQ-20/21 and FO-7 registration remain dependencies.

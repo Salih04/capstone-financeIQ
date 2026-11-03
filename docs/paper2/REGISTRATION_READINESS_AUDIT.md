@@ -279,3 +279,34 @@ SPK page also showed issuer names in a corporate-governance list). Not opened:
 `PRD.md`, `RESULTS.md`, experiment results, data files, Kernel snapshots, SC5
 caches or issuer filings. No Paper 2 outcome, event date, count or return was seen
 or computed. This is a disclosure, not a zero-exposure claim.
+
+## 11. Owner-decision overlay — 2026-11-03 (prospective)
+
+The matrix above is a dated 2026-10-29 audit snapshot. This overlay records the
+owner decisions received at **2026-11-03 21:24:35 Europe/Zurich** and controls
+current decision status; it does not retroactively change the earlier audit.
+Queue 2 DESIGN v0.4, OSF draft v0.4, and this overlay preserve the O/E/A/G/T gate
+types. Owner choices close decision questions only where the relevant evidence,
+access, technical and review criteria are also met. The overall verdict remains
+**NOT REGISTRATION-READY**.
+
+| Gate | 2026-11-03 owner decision | Current evidence or remaining gate |
+|---|---|---|
+| G01 / D1 (O) | APPROVED: one historical, explicitly semi-clean associational opening; candidate event-publication interval 2023-01-01..2025-12-31; outcome dependencies end by 2025-12-31; candidate development interval 2017-01-01..2022-12-31 conditional on U1 feasibility; non-financial U1 primary, holdings flagged, financial firms descriptive; no forward look | Design choice recorded in both v0.4 documents; G02/G03 operational U1, stratum mapping and feasibility remain blocked |
+| G04 / D2 (O) | APPROVED: CAR[0,+1] primary; CAR[-1,+1] wider-window sensitivity; session 0 is first price-setting close strictly after evidenced KAP publication; versioned BIST calendars and timestamp rules | Owner choice recorded; timestamp semantics and calendar evidence remain G05 gates |
+| G06 / D3 (O/E) | APPROVED operational defaults for CPI series selection, quarter-end shares and price/action basis as recorded in the owner batch and DESIGN §2 | Series IDs, PIT vintages, rights and actual availability remain unverified |
+| G07 / D4 (O/E/A) | APPROVED: fixed four-factor OLS specification and outcome-blind whole-study rate hierarchy | Source IDs, rights, quote conversions, release vintages and authorized feasibility remain open |
+| G09 / RQ3 eligibility (O/A) | APPROVED exact outcome-free aggregates only: IAS 29-basis event count, distinct issuer count, distinct event-session count; RQ3 is not dropped by default | [Kernel request #24](https://github.com/Salih04/financeiq-pit-kernel/issues/24) is open; no counts received or computed. Eligibility is UNAVAILABLE pending existing rights-cleared facts; no returns, prices, CARs or event rows authorized |
+| G10 / D6 (O) | APPROVED: issuer × session two-way clustered inference; at least 30 clusters in each dimension; KP test only for mean CAR with valid pre-event correlation; calendar-time HAC(5); 2,000 development-only null repetitions, seed 20261102, upper two-sided 95% rejection-rate interval ≤7.5% in every predeclared null scenario | Null-scenario generator and FIQ-21 calibration remain NOT RUN; G11 remains open |
+| G12 / D7 (O/E) | APPROVED with amendment: mechanically classify co-announcements from evidenced KAP disclosure-type codes; only residual “other” items owner-coded blind to returns; no LLM | Code mapping and classification evidence remain to be pinned before outcomes; OD-5 protections remain in force |
+| G13 / D8 (O/T) | APPROVED: seed 20261102; 100 offsets; common shift across issuers; event-level collision rules; CAR[-20,-11] negative control | Runtime, algorithm and remaining registration details must be frozen; no simulation/placebo run |
+| G14 / D9 (O/G) | APPROVED with amendment: alpha 0.05, two-sided Holm, one terminal analysis through 2025-12-31, no equivalence test or sequential/sample-size stopping; RQ3 not dropped by default | Exact outcome-blind handling of an unavailable family member, prior-trial inventory and exposure/selection reconciliation remain registration gates |
+| G16 / OD-6 (O/G) | APPROVED per-target dependency rule, including in-window return/factor inputs and surprise/flow lineage distinction as recorded in DESIGN §5 | PIT lineage, target-specific source evidence and protected-access checks still apply |
+| G17 / straddles (O/G) | APPROVED fail-closed treatment of boundary-straddling observations and later corrections; no movement into development or forward confirmation | No G17 straddle/quarantine count is authorized; registration-day disposition remains separately gated |
+| Batch B | APPROVED ON, CDS only: Turkey five-year sovereign CDS daily change plus the existing FX column once; policy-rate surprise excluded because the 20-decision minimum in `[-250,-31]` is infeasible and no immutable expectation archive exists | If LSEG CDS is unavailable before registration, extension is UNAVAILABLE with no fallback; contract, quote and rights evidence remain open |
+| Batch C | APPROVED: synchronize DESIGN and OSF draft in one freeze commit | Documentation freeze only; no OSF submission or experiment |
+
+G21 independent review remains NOT DONE; G22 owner FO-7 submission remains NOT
+DONE. G02/G03/G05–G08/G11/G15/G18–G20/G23/G25 and other evidence, governance,
+technical and access gates remain as stated in §5. No count, simulation, price,
+return, CAR or other outcome has been inspected or computed for this overlay.
