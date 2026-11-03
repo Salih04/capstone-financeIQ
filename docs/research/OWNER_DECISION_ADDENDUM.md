@@ -92,3 +92,34 @@ FIQ-12's merged inert core is not an operational access grant. This documentatio
 performs no counts, protected reads, outcome work, model/simulation, OSF action
 or Kernel change/transfer. Required context contained legacy aggregate summaries;
 no zero-prior-exposure claim is made.
+
+## FIQ-06: U1 rule 2.0.0 adoption — 2026-11-03 (prospective)
+
+**Owner decision provenance:** explicit owner message recorded 2026-11-03
+21:24:35 Europe/Zurich. The owner adopted U1 rule version 2.0.0 with two
+amendments: Step 1 completeness is scoped to the 3184 workbook and a recorded
+BIST announcement-archive search (date, exact query, result count, and applicable
+pagination/caps), with no universal absence-of-copy claim; G03 strata use KAP
+financial-statement template evidence through KER-13b (bank, insurance, standard
+TFRS), with holdings status from the same route or UNKNOWN. No mapping is guessed.
+
+**Git adoption record:** the exact accepted rule bytes are the contents of
+[`docs/research/UNIVERSE_RULE.md`](UNIVERSE_RULE.md) at rule commit
+`45c75ac7f0a7715dfd84b210b3a42830318311a0`, committed at
+**2026-11-03 22:19:45 Europe/Zurich**. Git blob SHA:
+`6c274d364a7431d9a5e821c89d8c0c1800899b58`. SHA-256 of the complete file bytes:
+`3e3307ad95e2d1d9af5724ce2f3a7737ff8cf809a0b6985220fc4d8a4822b42f`.
+The owner decision timestamp and actual Git commit timestamp are distinct; no
+timestamp was backdated. The rule commit was based on main
+`90d10f7c388c45bf41b7a9e5e5f5204a9de51b6d`. Publication to main remains subject
+to the authorized independent review, governing gates and hosted CI.
+
+This adopts the U1 rule only. It does not establish that the workbook or BIST
+archive evidence is complete, that any archive search occurred, that KER-13b has
+the required template facts, that G03 is evidenced, or that any formation is
+feasible. No source was acquired or inspected; no membership, identity or
+coverage count was computed. G02 remains operationally gated by review/merge,
+source adequacy and the reviewed consumer; G03, U2, feasible window, rights,
+immutable source binding and study-specific registration/access gates remain
+open. The historical v1.0.0 scoped adoption and prior evaluation/exposure history
+above remain unchanged.
