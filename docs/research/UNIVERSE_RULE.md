@@ -1,18 +1,19 @@
-# FIQ-06 — operational U1 adoption candidate
+# FIQ-06 — operational U1 rule
 
-Prepared **2026-11-03**, Europe/Zurich. Queue 3 / Paper 2 G02.
-Version **2.0.0-candidate · NOT ADOPTED · NO EXECUTION AUTHORITY**.
+Owner decision: **2026-11-03 21:24:35 Europe/Zurich**. Queue 3 / Paper 2 G02.
+Version **2.0.0 · OWNER-ADOPTED U1 RULE · NO EXECUTION AUTHORITY**.
 Research support only; not investment advice.
 
 ## 1. Authority and adoption boundary
 
-Read against live main `a8f190491ad466c2f92a21b9c3f938f7a5f89be3`:
+Read against live main `90d10f7c388c45bf41b7a9e5e5f5204a9de51b6d`:
 [Charter §4–5](../process/RESEARCH_CHARTER.md),
 [2026-10-26 scoped v1.0.0 adoption](OWNER_DECISION_ADDENDUM.md), and
 [FIQ-06 card](../process/TASKS_FINANCEIQ_2026-10-07.md#fiq-06--u1u2-evren-kuralı-tasarımı).
-The latest owner Work Mode message (2026-11-02) fixes the 3184 tier semantics
-and quarterly 30/20/50 validation below. These facts are controlling authority;
-no new workbook inspection or empirical count is claimed.
+The owner decision recorded 2026-11-03 21:24:35 Europe/Zurich adopts this exact
+U1-only rule version 2.0.0 with the completeness and G03 amendments below. The
+owner-fixed 3184 tier semantics and quarterly 30/20/50 validation are retained;
+no new workbook inspection, BIST archive search or empirical count is claimed.
 
 Historical R14 `8093ec0f54d80df31c50e3a806b06b0fb2f2a096` is evidence,
 not adopted wholesale. Its source/admission machinery is not imported by
@@ -21,14 +22,15 @@ U1 only, preserving the adopted safeguards below. A major candidate version
 distinguishes its material operational choices from the scoped v1.0.0 record.
 No earlier rule, decision, formation or exposure record is rewritten.
 
-Adoption proposal: accept this exact U1-only specification while leaving U2,
-strata mapping (G03) and joint KAP/price feasibility as separate gated decisions.
-This explicit scope amendment is **UNSET** until owner acceptance. Adoption
-does not complete all FIQ-06/U2 work or close G02 until adopted text reaches
-main with effective date and exact Git/content binding. Research use also
-requires lawful immutable inputs, reviewed consumer implementation and study
-registration/access gates. Missing source evidence blocks a formation, rather
-than being represented as an unspecified algorithm or presumed complete source.
+The owner adopts this exact U1-only specification with the stated amendments,
+while leaving U2, G03 mapping evidence and joint KAP/price feasibility as separate
+gates. This rule adoption does not complete FIQ-06/U2, establish underlying data
+adequacy, or authorize source access, formation, analysis or execution. The
+append-only owner addendum records the actual Git adoption commit and exact rule
+blob/content digests. Research use also requires lawful immutable inputs, a
+reviewed consumer implementation, and study-specific registration/access gates.
+Missing source evidence blocks a formation; it is not represented as an
+unspecified algorithm or presumed complete source.
 
 ## 2. Formation, state and time
 
@@ -101,11 +103,17 @@ every cause, rather than stopping at the first unread one.
 For a candidate (P,F), perform these ordered tests; retain all evaluated flags
 and distinguish NOT EVALUATED from evaluated failures:
 
-1. Establish source identity, period ranges, all-copy register and publication
-   bounds. For copy absence require BOTH scoped first-party completeness/
-   retention evidence AND auditable negative search (adopted 6(c)-A), including
-   pagination/caps, channels and found-copy reconciliation. Neither a zero-hit
-   search nor an incomplete archive proves absence. Unknown completeness fails.
+1. Scope source completeness to the two first-party channels used by U1:
+   (a) record 3184 workbook completeness/retention evidence for the required
+   quarter blocks, including the scope and limitations of the workbook channel;
+   (b) record each BIST announcement-archive search date, exact query, result
+   count, pagination/caps and found-copy reconciliation. Preserve source identity,
+   period ranges, copy register and publication bounds. This is not universal
+   proof that no other copy exists and must not be described as such. Do not infer
+   absence from a zero-hit query or an unsearched/unretained channel. Unknown
+   in-scope completeness fails closed. This U1-specific scope applies the adopted
+   6(c)-A rule only to the two channels used; it does not establish that either
+   channel was searched or complete.
 2. Bind workbook/announcement labels and identities under §§2–3. Reject
    incompatible copy ranges/tables or unexplained revisions. Under B2, an
    admissible formation reading is static across copies or evolves only by
@@ -156,12 +164,14 @@ An unknown terminal value is null with a reason, never zero or a fabricated
 continuing price. Missing outcomes can make an analysis unavailable without
 retroactively changing membership.
 
-Keep non-financial primary and financial separate; holdings flagged. Official
-effective-dated statement-template/sector mapping must be versioned and adopted
-at G03 (EV-3). Until then, stratum and holding status remain UNKNOWN/null, so a
-non-financial research sample cannot be declared ready. No mapping from a
-company name, current sector or capstone stratum is permitted. This candidate
-does not settle financial-subclass or holding-company vocabulary.
+Keep non-financial primary and financial separate; holdings flagged. At G03,
+derive the financial/non-financial stratum only from the KAP financial-statement
+template evidenced through the KER-13b route: bank, insurance, or standard TFRS.
+Determine holdings status through that same route; if it does not resolve the
+status, preserve UNKNOWN/null. Do not infer strata or holdings from names, current
+sector labels, the capstone cohort, or other proxy fields. KER-13b template
+evidence has not been received here, so G03 and underlying stratum adequacy remain
+blocked; this rule does not claim otherwise.
 
 ## 6. Output contract, window and adoption record
 
@@ -184,14 +194,15 @@ counts require the exact adopted OD-1 boundary and separate access checks;
 price coverage/lifecycle joins are not within the four permitted aggregates.
 No feasibility counts, source observations or outcomes were read here.
 
-Adoption record must name: actual owner decision timestamp; accepted candidate
-commit and SHA-256 of exact rule bytes; effective rule version/date; U1-only
-scope amendment; OD-7(b)/16/19 dispositions; the owner-fixed tier/count facts;
-preserved adopted B2/6(c)/20/21/22/23 rules; remaining G03/U2/window gates;
-prior evaluation/exposure inventory including UNKNOWN completeness. Do not
-invent an empty history. Status and signoff are currently **UNSET**.
+The append-only [owner decision addendum](OWNER_DECISION_ADDENDUM.md) records the
+owner decision timestamp and provenance separately from the actual Git adoption
+timestamp, the accepted rule commit, blob SHA, SHA-256 digest of the exact rule
+bytes, effective version, U1-only scope, amendments and remaining G03/U2/window
+gates. Preserve adopted B2/6(c)/20/21/22/23 safeguards and prior evaluation/
+exposure history, including UNKNOWN completeness; do not invent an empty history.
 
-One review and at most one fix round for this candidate; self-checks do not
+One review and at most one fix round for this rule; self-checks do not
 replace independent scientific acceptance. Adoption and running a study are
 distinct. This is a FinanceIQ rule/consumer contract only: no Kernel planning,
-implementation, source acquisition, request, result feedback or write occurred.
+implementation, source acquisition, count result feedback or Kernel write is
+authorized by this U1 rule.
