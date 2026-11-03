@@ -1,0 +1,896 @@
+{
+  "schema_version": 1,
+  "scope": "Static manuscript transcription and citation crosswalk. No research calculation.",
+  "main_base": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+  "preparation_parent": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+  "report_last_edit_commit": "ae97a9ffa38e607a26846dfd732057ab72c56be2",
+  "reported_run_commit": "079bb832b8f9466ab70ae6ef4d60c02cd3080875",
+  "records": [
+    {
+      "id": "N01",
+      "claim": "81 firms; 40 reported; selected in 2026 from then-current listings.",
+      "limits": "40 reported is an explicitly authorized FIQ-16/Charter scope fact, not a newly read outcome. Selection mechanism beyond the frame remains undocumented.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 123,
+          "end_line": 131,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "| Issue | Status |\n| --- | --- |\n| Exact filing timestamps | Not collected for the full universe; conservative statutory deadlines used instead. A company filing after its deadline would be treated as public too early; none was found in the sample |\n| Staleness of the cutoff | Statements are up to 11 weeks older than necessary in normal years; S1 (closer to publication) gives baseline IC +0.102, p = 0.12 — not detectable at this sample size |\n| Survivorship and universe | **Unresolved.** 81 companies chosen in 2026 from then-current listings; no delisted or failed company can appear; no point-in-time index membership |\n| Market value | Valid on one basis for 164 of 323 rows; the rest excluded or never available (training-only companies have no share counts) |\n| Corporate actions in returns | Yahoo `adjclose`; rights issues and misdated adjustments are not reliably handled, so rows with a one-day move beyond ±25 % are excluded (4) |\n| Sample | Three test years, ~78 companies, one high-inflation nominal-TRY regime |\n| 2026 forward pre-registration | Unchanged; frozen inside its own outcome window with in-window statement information; will be evaluated as registered and reported with that exposure |",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L123-L131",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/paper1/survivorship_bound.md",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 11,
+          "end_line": 30,
+          "sha256": "e44f39b4ec74b70cffaa458bb2c1320bd6494c34568eb6a2b4826434ff1f1711",
+          "excerpt": "| 81 training firms, 40 reported firms | VERIFIED / high, configuration only | Existing configuration counted without reading outcomes; [count record](survivorship_count_evidence.json). Not historical eligibility. |\n| Selected in 2026 from then-current listings under an undocumented rule | VERIFIED as a repository statement / high provenance | [RESULTS §6](../../RESULTS.md#6-remaining-limitations); [2026-07-12 audit](../universe_audit.md) dates the configuration's introduction. Exact selection procedure remains UNKNOWN. |\n| Structural survivorship bias | INFERRED mechanism from the documented selection frame / high | Securities already delisted before selection cannot enter a then-current-listing frame. This conditions historical coverage on survival to selection. An index exit alone does not imply delisting; this does not prove that every historical index leaver is absent. |\n| Additional selection using realised returns | UNKNOWN / unresolved FO-1 detail | [Raw-source label](../../data/raw/README.md) says “winner cohort”; neither that label nor the owner's accepted wording proves a return filter or ranking. No return-based selection rule is invented. |\n| Selection effect on performance | UNVERIFIED / no measurement | Charter §6 and FIQ-17 plan a frozen-design replication. Neither the sign nor magnitude has been measured in this pass. |\n\nOwner authority: the accepted wording in [Branch · FINANCEIQ-2](https://chatgpt.com/c/6ae096dd-14f4-83ed-85fe-8cacbd3639a2)\nand the current 2026-10-27 instruction authorize this scoped disclosure, not a claim\nthat FO-1's complete selection history or FIQ-16's full annual count is closed.\nThe July audit is a dated record: its then-absence of historical evidence must not\nbe read as absence of all later membership documents.\n\n## Text for Paper 1 (scientific prose only)\n\n> The capstone universe (81 firms, 40 reported) was selected in 2026 from\n> then-current listings under an undocumented rule. The selection frame excludes\n> firms already delisted by the selection date and therefore introduces structural\n> survivorship bias. Whether an additional filter or ranking used realised returns\n> is unknown. Quantifying the selection effect by re-running the frozen design on\n> a rule-based, survivor-inclusive point-in-time universe (U1) is planned under",
+          "url": null,
+          "local_relative_path": "survivorship_bound.md"
+        }
+      ]
+    },
+    {
+      "id": "N02",
+      "claim": "Original +0.150, p 0.017; corrected +0.031, p 0.63, 95 % CI −0.100 … +0.162.",
+      "limits": "Separate historical and corrected estimates; no subtraction or isolated causal attribution.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 39,
+          "end_line": 51,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "| Model | Kind | Pooled IC | Permutation p | Bonferroni p |\n| --- | --- | ---: | ---: | ---: |\n| Equal-weight baseline | baseline | +0.150 | 0.017 | n/a |\n| Robust rank aggregation | baseline | +0.128 | 0.046 | n/a |\n| Ridge | ML | +0.093 | 0.157 | 0.94 |\n| Lasso | ML | +0.090 | 0.170 | 1.00 |\n| OLS | ML | +0.046 | 0.480 | 1.00 |\n| Elastic net | ML | −0.020 | 0.754 | 1.00 |\n| Gradient boosting | ML | −0.105 | 0.104 | 0.63 |\n| Random forest | ML | −0.153 | 0.018 | 0.11 |\n\nAt the time this was read as a weak positive baseline signal and an ML null.\nThe baseline reading is withdrawn (§3); the numbers are not edited.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L39-L51",
+          "local_relative_path": null
+        },
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 13,
+          "end_line": 24,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "## Primary estimand\n\n| Model | Pooled IC | Permutation p | 95 % bootstrap CI |\n| --- | ---: | ---: | --- |\n| **Equal-weight baseline** | **+0.031** | **0.63** | −0.100 … +0.162 |\n\nBy test year: +0.145 (FY2022), −0.051 (FY2023), −0.000 (FY2024).\n\n**Registered interpretation (cell 1):** in this sample and design, the\ncorrected evaluation found no evidence of a large reproducible predictive\nedge; effects smaller than |IC| ≈ 0.185 (80 % power, three years of 78\ncompanies) remain outside the study's detection power.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L13-L24",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N03",
+      "claim": "No secondary ML result distinguishable after its reported family adjustment.",
+      "limits": "Post-hoc within-year-null comparison, not proof of no predictability.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 26,
+          "end_line": 35,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "## Secondary family (six ML models, Bonferroni over six)\n\n| Model | Pooled IC | p | Bonferroni p |\n| --- | ---: | ---: | ---: |\n| OLS | +0.073 | 0.27 | 1.00 |\n| Ridge | +0.001 | 0.99 | 1.00 |\n| Lasso | +0.056 | 0.39 | 1.00 |\n| Elastic net | −0.021 | 0.75 | 1.00 |\n| Random forest | −0.021 | 0.75 | 1.00 |\n| Gradient boosting | +0.028 | 0.68 | 1.00 |",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L26-L35",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N04",
+      "claim": "Minimum detectable |IC| 0.185 at 80 % power.",
+      "limits": "Analytic design sensitivity, not a confidence bound.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 108,
+          "end_line": 119,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "## 5. Power: what a null here means\n\n| Check | Result |\n| --- | --- |\n| Minimum detectable \\|IC\\| at 80 % power, PIT-v2 design (3 years × 78) | 0.185 |\n| Positive control (published harness): synthetic signal injected, 200 repetitions per level | detected 0 % at IC 0.1, 17 % at 0.2, 62 % at 0.3, 93 % at 0.4 |\n| Negative control: permuted targets / noise, 1,000 repetitions each | false-positive rate 2.8 % and 2.6 % at a 5 % level |\n| Defect injection | timing leakage was **not** detected by the original guards (as registered); the PIT guard now checks timestamps |\n\nThe harness controls false positives but can only see large effects. Typical\nannual cross-sectional equity signals are usually smaller than |IC| 0.19, so a null\nhere means \"no large edge\", not \"no edge\".",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L108-L119",
+          "local_relative_path": null
+        },
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 21,
+          "end_line": 24,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "**Registered interpretation (cell 1):** in this sample and design, the\ncorrected evaluation found no evidence of a large reproducible predictive\nedge; effects smaller than |IC| ≈ 0.185 (80 % power, three years of 78\ncompanies) remain outside the study's detection power.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L21-L24",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N05",
+      "claim": "Historical audit found timing, adjustment-basis and pre-listing defects; old interpretation withdrawn.",
+      "limits": "Qualitative synthesis of the authorized results summary.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 50,
+          "end_line": 86,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "At the time this was read as a weak positive baseline signal and an ML null.\nThe baseline reading is withdrawn (§3); the numbers are not edited.\n\n## 3. What the audit found\n\n- **Publication lag.** Year-T features are full fiscal-year-T statements\n  (they match published annual figures exactly). Listed companies file them\n  60–70 days after year-end in normal years, by 20 May 2024 for FY2023 (first\n  inflation-accounting year), and SASA by 10 May 2023 for FY2022. The target\n  window started on the first trading day of January, so 31 of 40 features\n  were used before they existed publicly.\n- **Mixed adjustment bases.** Market cap multiplied Yahoo's back-adjusted\n  close by historical share counts (AEFES 2024 understated ~10× by a 2025\n  bonus issue), contaminating P/E, P/B, EV and EV/EBITDA.\n- **Pre-listing rows.** 14 labelled rows predate the security's first quote;\n  five share the same vendor placeholder \"return\" (56.947991 %).\n- Discovered 2026-10-04 (commit `838485b1`). Exploratory reruns showed the\n  baseline IC falling to ≈ 0 under every PIT-safe specification, but could not\n  separate look-ahead from staleness.\n\n## 4. Corrected evaluation (PIT-v2)\n\nProtocol: [`docs/PIT_PROTOCOL.md`](docs/PIT_PROTOCOL.md). Every feature has a\npublic-availability timestamp in a machine-readable\n[registry](data/pit/feature_availability_registry.json); a guard refuses any\nvalue whose timestamp is after the prediction time, and tests inject\nfuture-available features to show it fails. Statements count as public from\nthe statutory filing deadline (standardized conservative cutoff mode; exact\nfiling dates exist for only 6 company-years, so that mode is not run).\nPrimary cutoff: 31 May T+1; the signal and the return start on the first\ntrading day after it. Market value uses one adjustment basis or is excluded.\nPre-listing and corporate-action-defect rows are excluded.\n\nRegistered before outcomes in\n[`docs/PREREGISTRATION_AMENDMENT_2026-10-04.md`](docs/PREREGISTRATION_AMENDMENT_2026-10-04.md).\nIt is post-hoc: designed after the contaminated result and the audit were\nknown.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L50-L86",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N06",
+      "claim": "81 firms; 2020–2025; 40 reported; 40 original features; nominal-TRY calendar-year target.",
+      "limits": "Panel scope is not historical index eligibility. Reported-cohort fact is authorized FIQ-16 evidence.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 20,
+          "end_line": 33,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "## 1. Original hypothesis and design\n\n| | |\n| --- | --- |\n| Unit | Company × year, 81 BIST companies, 2020–2025 |\n| Features | 40 columns describing year T: fiscal-year-T statements, valuation, prices and momentum to 31 Dec T, benchmark return |\n| Target | Vendor dated calendar-year T+1 return (nominal TRY) |\n| Metric | Spearman rank correlation of prediction and realised return within a test year (IC) |\n| Evaluation | Expanding-window walk-forward, test years 2023–2025, ~80 companies each |\n| Models | Three rank baselines and six ML models (OLS, ridge, lasso, elastic net, random forest, gradient boosting) |\n| Inference | Pooled IC = mean of within-year ICs; within-year permutation null; bootstrap CI; Bonferroni over the six ML models |\n\nThe original walk-forward was not pre-registered. Later pre-registrations\n(the 2026 forward test and the thesis controls) were built on its design.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L20-L33",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/paper1/survivorship_bound.md",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 11,
+          "end_line": 12,
+          "sha256": "e44f39b4ec74b70cffaa458bb2c1320bd6494c34568eb6a2b4826434ff1f1711",
+          "excerpt": "| 81 training firms, 40 reported firms | VERIFIED / high, configuration only | Existing configuration counted without reading outcomes; [count record](survivorship_count_evidence.json). Not historical eligibility. |\n| Selected in 2026 from then-current listings under an undocumented rule | VERIFIED as a repository statement / high provenance | [RESULTS §6](../../RESULTS.md#6-remaining-limitations); [2026-07-12 audit](../universe_audit.md) dates the configuration's introduction. Exact selection procedure remains UNKNOWN. |",
+          "url": null,
+          "local_relative_path": "survivorship_bound.md"
+        }
+      ]
+    },
+    {
+      "id": "N07",
+      "claim": "FY2020–2024; 323 published rows; 308 evaluated; 11 pre-listing exclusions; 4 jump exclusions; ±25 %.",
+      "limits": "Whole-panel counts, not summed test observations; exclusions are registered historical choices, not an endorsement of outcome-based filtering.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 75,
+          "end_line": 86,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "## Data handled\n\n| Item | Count (evaluable fiscal years 2020–2024, 323 published rows) |\n| --- | ---: |\n| Rows evaluated (primary) | 308 |\n| Excluded: no quote at the prediction date (pre-listing) | 11 |\n| Excluded: one-day move beyond ±25 % in the target window | 4 |\n| Market value valid on one adjustment basis | 164 |\n| Market value excluded: share record disagrees with Yahoo split history | 27 |\n| Market value excluded: unexplained close jump after year-end | 5 |\n| Market value unavailable: no share count (training-only companies) | 123 |\n| Statement values masked as not yet public (primary / S1) | 0 / 31 (SASA FY2022) |",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L75-L86",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N08",
+      "claim": "FY2022, FY2023, FY2024: 78, 78, 79 test firms.",
+      "limits": "Do not call all 308 panel rows out-of-sample tests.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 9,
+          "end_line": 11,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "Mode: `STANDARDIZED_CONSERVATIVE_CUTOFF`. Test cross-sections: fiscal years\n2022, 2023, 2024 (78, 78, 79 companies), predicted from 1 June 2023,\n3 June 2024 and 2 June 2025 respectively.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L9-L11",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N09",
+      "claim": "Market-value valid 164; exclusions 27 and 5; unavailable 123.",
+      "limits": "Feature availability categories differ from whole-row exclusions.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 77,
+          "end_line": 86,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "| Item | Count (evaluable fiscal years 2020–2024, 323 published rows) |\n| --- | ---: |\n| Rows evaluated (primary) | 308 |\n| Excluded: no quote at the prediction date (pre-listing) | 11 |\n| Excluded: one-day move beyond ±25 % in the target window | 4 |\n| Market value valid on one adjustment basis | 164 |\n| Market value excluded: share record disagrees with Yahoo split history | 27 |\n| Market value excluded: unexplained close jump after year-end | 5 |\n| Market value unavailable: no share count (training-only companies) | 123 |\n| Statement values masked as not yet public (primary / S1) | 0 / 31 (SASA FY2022) |",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L77-L86",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N10",
+      "claim": "Original calendar test years 2023–2025; three rank baselines; six named ML models.",
+      "limits": "Three/six written in words preserve source counts.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 24,
+          "end_line": 33,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "| Unit | Company × year, 81 BIST companies, 2020–2025 |\n| Features | 40 columns describing year T: fiscal-year-T statements, valuation, prices and momentum to 31 Dec T, benchmark return |\n| Target | Vendor dated calendar-year T+1 return (nominal TRY) |\n| Metric | Spearman rank correlation of prediction and realised return within a test year (IC) |\n| Evaluation | Expanding-window walk-forward, test years 2023–2025, ~80 companies each |\n| Models | Three rank baselines and six ML models (OLS, ridge, lasso, elastic net, random forest, gradient boosting) |\n| Inference | Pooled IC = mean of within-year ICs; within-year permutation null; bootstrap CI; Bonferroni over the six ML models |\n\nThe original walk-forward was not pre-registered. Later pre-registrations\n(the 2026 forward test and the thesis controls) were built on its design.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L24-L33",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N11",
+      "claim": "Within-year Spearman IC; equal-weighted year mean; permutation/bootstrap; Bonferroni over six; original unregistered.",
+      "limits": "Methods reported, not freshly reproduced.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 27,
+          "end_line": 33,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "| Metric | Spearman rank correlation of prediction and realised return within a test year (IC) |\n| Evaluation | Expanding-window walk-forward, test years 2023–2025, ~80 companies each |\n| Models | Three rank baselines and six ML models (OLS, ridge, lasso, elastic net, random forest, gradient boosting) |\n| Inference | Pooled IC = mean of within-year ICs; within-year permutation null; bootstrap CI; Bonferroni over the six ML models |\n\nThe original walk-forward was not pre-registered. Later pre-registrations\n(the 2026 forward test and the thesis controls) were built on its design.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L27-L33",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N12",
+      "claim": "Original baseline +0.150 (0.017); random forest −0.153 (0.018; adjusted 0.11); ridge +0.093 (0.157; adjusted 0.94).",
+      "limits": "Only explicitly discussed original values enter the manuscript; historical predictive interpretation withdrawn.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 39,
+          "end_line": 51,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "| Model | Kind | Pooled IC | Permutation p | Bonferroni p |\n| --- | --- | ---: | ---: | ---: |\n| Equal-weight baseline | baseline | +0.150 | 0.017 | n/a |\n| Robust rank aggregation | baseline | +0.128 | 0.046 | n/a |\n| Ridge | ML | +0.093 | 0.157 | 0.94 |\n| Lasso | ML | +0.090 | 0.170 | 1.00 |\n| OLS | ML | +0.046 | 0.480 | 1.00 |\n| Elastic net | ML | −0.020 | 0.754 | 1.00 |\n| Gradient boosting | ML | −0.105 | 0.104 | 0.63 |\n| Random forest | ML | −0.153 | 0.018 | 0.11 |\n\nAt the time this was read as a weak positive baseline signal and an ML null.\nThe baseline reading is withdrawn (§3); the numbers are not edited.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L39-L51",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N13",
+      "claim": "31 of 40 features; 60–70 days; FY2023 deadline 20 May 2024; SASA FY2022 deadline 10 May 2023.",
+      "limits": "Historical deadline assertions transcribed from RESULTS; no new legal/regulatory claim or filing census.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 53,
+          "end_line": 60,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "## 3. What the audit found\n\n- **Publication lag.** Year-T features are full fiscal-year-T statements\n  (they match published annual figures exactly). Listed companies file them\n  60–70 days after year-end in normal years, by 20 May 2024 for FY2023 (first\n  inflation-accounting year), and SASA by 10 May 2023 for FY2022. The target\n  window started on the first trading day of January, so 31 of 40 features\n  were used before they existed publicly.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L53-L60",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N14",
+      "claim": "14 pre-listing labels; five duplicate placeholder returns of 56.947991 %.",
+      "limits": "Original labelled-panel audit, distinct from PIT-v2 11 row exclusions.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 61,
+          "end_line": 68,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "- **Mixed adjustment bases.** Market cap multiplied Yahoo's back-adjusted\n  close by historical share counts (AEFES 2024 understated ~10× by a 2025\n  bonus issue), contaminating P/E, P/B, EV and EV/EBITDA.\n- **Pre-listing rows.** 14 labelled rows predate the security's first quote;\n  five share the same vendor placeholder \"return\" (56.947991 %).\n- Discovered 2026-10-04 (commit `838485b1`). Exploratory reruns showed the\n  baseline IC falling to ≈ 0 under every PIT-safe specification, but could not\n  separate look-ahead from staleness.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L61-L68",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N15",
+      "claim": "31 May following-year primary cutoff; exact dates for 6 company-years; actual mode not full-universe run.",
+      "limits": "Deadline approximation does not certify every actual publication time.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 70,
+          "end_line": 86,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "## 4. Corrected evaluation (PIT-v2)\n\nProtocol: [`docs/PIT_PROTOCOL.md`](docs/PIT_PROTOCOL.md). Every feature has a\npublic-availability timestamp in a machine-readable\n[registry](data/pit/feature_availability_registry.json); a guard refuses any\nvalue whose timestamp is after the prediction time, and tests inject\nfuture-available features to show it fails. Statements count as public from\nthe statutory filing deadline (standardized conservative cutoff mode; exact\nfiling dates exist for only 6 company-years, so that mode is not run).\nPrimary cutoff: 31 May T+1; the signal and the return start on the first\ntrading day after it. Market value uses one adjustment basis or is excluded.\nPre-listing and corporate-action-defect rows are excluded.\n\nRegistered before outcomes in\n[`docs/PREREGISTRATION_AMENDMENT_2026-10-04.md`](docs/PREREGISTRATION_AMENDMENT_2026-10-04.md).\nIt is post-hoc: designed after the contaminated result and the audit were\nknown.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L70-L86",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N16",
+      "claim": "FY2022 → 1 June 2023; FY2023 → 3 June 2024; FY2024 → 2 June 2025.",
+      "limits": "Prediction dates transcribed, no calendar recomputation.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 9,
+          "end_line": 11,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "Mode: `STANDARDIZED_CONSERVATIVE_CUTOFF`. Test cross-sections: fiscal years\n2022, 2023, 2024 (78, 78, 79 companies), predicted from 1 June 2023,\n3 June 2024 and 2 June 2025 respectively.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L9-L11",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N17",
+      "claim": "Primary +0.031; p 0.63; 95 % CI −0.100 … +0.162; yearly +0.145, −0.051, −0.000 for FY2022–FY2024.",
+      "limits": "Preserve rounded negative zero; CI is not an equivalence interval.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 13,
+          "end_line": 24,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "## Primary estimand\n\n| Model | Pooled IC | Permutation p | 95 % bootstrap CI |\n| --- | ---: | ---: | --- |\n| **Equal-weight baseline** | **+0.031** | **0.63** | −0.100 … +0.162 |\n\nBy test year: +0.145 (FY2022), −0.051 (FY2023), −0.000 (FY2024).\n\n**Registered interpretation (cell 1):** in this sample and design, the\ncorrected evaluation found no evidence of a large reproducible predictive\nedge; effects smaller than |IC| ≈ 0.185 (80 % power, three years of 78\ncompanies) remain outside the study's detection power.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L13-L24",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N18",
+      "claim": "All six secondary rows (model, IC, raw p, Bonferroni p) exactly transcribed.",
+      "limits": "No new model ranking or secondary-family recalculation.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 26,
+          "end_line": 35,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "## Secondary family (six ML models, Bonferroni over six)\n\n| Model | Pooled IC | p | Bonferroni p |\n| --- | ---: | ---: | ---: |\n| OLS | +0.073 | 0.27 | 1.00 |\n| Ridge | +0.001 | 0.99 | 1.00 |\n| Lasso | +0.056 | 0.39 | 1.00 |\n| Elastic net | −0.021 | 0.75 | 1.00 |\n| Random forest | −0.021 | 0.75 | 1.00 |\n| Gradient boosting | +0.028 | 0.68 | 1.00 |",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L26-L35",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N19",
+      "claim": "Pre-publication statements diagnostic +0.193 (0.002); PIT statement-only +0.041 (0.54).",
+      "limits": "Same accounting periods but different return window/source/rows; no causal timing estimate.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 54,
+          "end_line": 73,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "## What changed relative to the published number\n\n| Design | Equal-weight IC (p) |\n| --- | --- |\n| Published (FY-T statements scored from 1 January T+1) | +0.150 (0.017) |\n| Phase-2 audit: statements lagged one fiscal year | +0.005 (0.93) |\n| **PIT-v2 primary: FY-T statements scored after they are public** | **+0.031 (0.63)** |\n| PIT-v2 S4: FY-T statements only, scored after they are public | +0.041 (0.54) |\n| Phase-2 diagnostic, not PIT: FY-T statements only, scored from 1 January T+1 | +0.193 (0.002) |\n\nThe audit could not separate look-ahead from staleness, because lagging the\nstatements by a year also aged them. PIT-v2 uses the *same* fiscal-year-T\nstatements, only timed after publication, and the signal is gone (+0.193 →\n+0.041). That pattern is what look-ahead predicts. It is not an isolated test:\nPIT-v2 also changes the return window (June–May instead of the calendar year),\nthe return source (Yahoo `adjclose` instead of the vendor return) and the rows\nevaluated. It does not prove the\nstatements are uninformative: a window that starts at the statutory deadline\nrather than at 31 May (S1, +0.102, p = 0.12) is closer to publication, and the\nstudy cannot detect effects of that size.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L54-L73",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N20",
+      "claim": "Earlier cutoff +0.102 (0.12); no-market-value +0.044 (0.50); price-only −0.004 (0.95).",
+      "limits": "Registered descriptive sensitivities; no winning-specification selection.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 37,
+          "end_line": 45,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "## Registered sensitivities (descriptive; p unadjusted unless stated)\n\n| Specification | Features | Equal-weight IC (p) | ML IC range | Smallest ML p (Bonferroni over six) |\n| --- | ---: | --- | --- | --- |\n| Primary | 38 | +0.031 (0.63) | −0.021 … +0.073 | 0.27 (1.00) |\n| S1 cutoff at end of deadline month (31 Mar; 31 May for FY2023) | 38 | +0.102 (0.12) | −0.039 … +0.126 | 0.053 (0.32) |\n| S2 without market-value features | 33 | +0.044 (0.50) | −0.084 … +0.027 | 0.21 (1.00) |\n| S3 price features only | 6 | −0.004 (0.95) | +0.036 … +0.109 | 0.098 (0.59) |\n| S4 statement features only | 27 | +0.041 (0.54) | −0.176 … −0.003 | **0.007 (0.041), random forest, negative** |",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L37-L45",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N21",
+      "claim": "Statement-only RF −0.176; raw p 0.007; adjusted 0.041; four sensitivities, 24 ML tests.",
+      "limits": "Whole sensitivity-family non-survival is reported, not calculated here; no inverse strategy.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 37,
+          "end_line": 52,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "## Registered sensitivities (descriptive; p unadjusted unless stated)\n\n| Specification | Features | Equal-weight IC (p) | ML IC range | Smallest ML p (Bonferroni over six) |\n| --- | ---: | --- | --- | --- |\n| Primary | 38 | +0.031 (0.63) | −0.021 … +0.073 | 0.27 (1.00) |\n| S1 cutoff at end of deadline month (31 Mar; 31 May for FY2023) | 38 | +0.102 (0.12) | −0.039 … +0.126 | 0.053 (0.32) |\n| S2 without market-value features | 33 | +0.044 (0.50) | −0.084 … +0.027 | 0.21 (1.00) |\n| S3 price features only | 6 | −0.004 (0.95) | +0.036 … +0.109 | 0.098 (0.59) |\n| S4 statement features only | 27 | +0.041 (0.54) | −0.176 … −0.003 | **0.007 (0.041), random forest, negative** |\n\nRead with the registration: sensitivities make no claim on their own. Across\nthe four sensitivities there are 24 ML tests; the S4 random-forest result\nwould not survive a correction over all of them (24 × 0.0069 ≈ 0.17). It is\nnegative in every test year (−0.27, −0.20, −0.05) and mirrors the published\nrandom forest (−0.153). Per the pre-written grid it is a statistical\nobservation only, not a contrarian signal.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L37-L52",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N22",
+      "claim": "2020-10-01: 100 snapshot codes; 60 in training list; 40 outside.",
+      "limits": "Explicit owner-authorized count exception to outcome-only sources: existing FIQ-16 literal-code snapshot. Not annual/issuer-equivalent/U1 admission, not 40 delistings, not an effect size.",
+      "sources": [
+        {
+          "path": "docs/paper1/survivorship_bound.md",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 38,
+          "end_line": 64,
+          "sha256": "e44f39b4ec74b70cffaa458bb2c1320bd6494c34568eb6a2b4826434ff1f1711",
+          "excerpt": "şirketleri yapısı gereği dışlar; bu, yapısal hayatta kalma yanlılığıdır. Gerçekleşmiş\ngetirilerle ek seçim yapılıp yapılmadığı bilinmiyor. Aynı dondurulmuş tasarımın,\nçıkanları da izleyen kurala bağlı PIT U1 evreninde yeniden çalıştırılması FIQ-17\nkapsamında planlanmıştır; henüz yürütülmemiştir. Etkinin yönü ve büyüklüğü bilinmiyor.\n\n## Bounded 2020-10-01 coverage comparison\n\nThis is **literal security-code overlap at one date**, independently recounted\non 2026-10-27 from existing FinanceIQ files. It is not a synthetic exercise,\nan issuer-equivalence comparison, a complete year, or a performance bound.\nThe dossier's numbers are supported only in this bounded sense.\n\n| Date / scope | Existing XU100 codes | In Capstone 81 | Outside Capstone 81 | In reported 40 | Capstone 81 outside snapshot |\n| --- | ---: | ---: | ---: | ---: | ---: |\n| 2020-10-01 projection | 100 | 60 | 40 | 30 | 21 |\n\nSource: [archived Q4 projection](../evidence/bist_membership_p3184_2020_q4_rows.csv),\n`source_id=P3184-2020-Q4-01`, using `is_xu100=TRUE`; config sources and SHA-256\nidentities are in the [count record](survivorship_count_evidence.json).\nXU030 and XU050 are nested within XU100: filtering only the literal XU100 cell\nwould omit constituents. No new source acquisition or alias inference occurred.\n\nThe [2026-08-25 reconciliation, §16.3 and §19-20](../BIST_MEMBERSHIP_P3184_2020_RECONCILIATION.md)\nreports exact-set corroboration against existing first-party event evidence.\nIts row-content reconciliation does not close provider revision semantics,\nprove canonical source designation, admit a U1 formation, or promote 2020 to a\ncomplete eligible year. The CSV's older row-status labels are not silently",
+          "url": null,
+          "local_relative_path": "survivorship_bound.md"
+        },
+        {
+          "path": "docs/paper1/survivorship_count_evidence.json",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 1,
+          "end_line": 28,
+          "sha256": "632c39648d42411c6dd289e4621837115fd3ae932016c41c6307a188c6d7c5e9",
+          "excerpt": "{\n  \"checked_on\": \"2026-10-27\",\n  \"base_sha\": \"efe3ed32ca958074c01ee9488f1f768a9d812c61\",\n  \"scope\": \"Literal code equality on existing FinanceIQ configuration and a single archived membership projection; no issuer mapping, protected-period rows, prices or outcomes. This is a bounded historical source projection, not a synthetic fixture or an admitted U1 formation.\",\n  \"counts\": {\n    \"reported_config\": 40,\n    \"training_config\": 81,\n    \"snapshot_2020_10_01\": 100,\n    \"snapshot_in_training\": 60,\n    \"snapshot_outside_training\": 40,\n    \"snapshot_in_reported\": 30,\n    \"training_outside_snapshot\": 21\n  },\n  \"inputs\": [\n    {\n      \"path\": \"data/config/universe_public_40.csv\",\n      \"sha256\": \"db7ffc577d7d10d34b47aaaa578226ef9d4bf19920816d250a7703dc9bbf51db\"\n    },\n    {\n      \"path\": \"data/config/universe_training_bist100.csv\",\n      \"sha256\": \"dc4046465b32d27ac71db6f6f75f4526177f89d29d0594931d1a26752dc6194b\"\n    },\n    {\n      \"path\": \"docs/evidence/bist_membership_p3184_2020_q4_rows.csv\",\n      \"sha256\": \"43106b6bfdf8738c4cc7604c436862e3b6e672662f0d1fafa08a59511b83c94c\"\n    }\n  ]\n}",
+          "url": null,
+          "local_relative_path": "survivorship_count_evidence.json"
+        }
+      ]
+    },
+    {
+      "id": "N23",
+      "claim": "0.185 at 80 % power; design summary three years × 78.",
+      "limits": "Design approximation retained alongside actual 78,78,79 cross-sections; no analytic recalculation.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 108,
+          "end_line": 119,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "## 5. Power: what a null here means\n\n| Check | Result |\n| --- | --- |\n| Minimum detectable \\|IC\\| at 80 % power, PIT-v2 design (3 years × 78) | 0.185 |\n| Positive control (published harness): synthetic signal injected, 200 repetitions per level | detected 0 % at IC 0.1, 17 % at 0.2, 62 % at 0.3, 93 % at 0.4 |\n| Negative control: permuted targets / noise, 1,000 repetitions each | false-positive rate 2.8 % and 2.6 % at a 5 % level |\n| Defect injection | timing leakage was **not** detected by the original guards (as registered); the PIT guard now checks timestamps |\n\nThe harness controls false positives but can only see large effects. Typical\nannual cross-sectional equity signals are usually smaller than |IC| 0.19, so a null\nhere means \"no large edge\", not \"no edge\".",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L108-L119",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N24",
+      "claim": "200 positive repetitions; detection 0 %,17 %,62 %,93 % at IC 0.1,0.2,0.3,0.4; 1,000 negative repetitions each; FPR 2.8 %,2.6 % at 5 %.",
+      "limits": "Historical published-harness controls, not newly run PIT-v2 simulations or independently verified calibration.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 108,
+          "end_line": 119,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "## 5. Power: what a null here means\n\n| Check | Result |\n| --- | --- |\n| Minimum detectable \\|IC\\| at 80 % power, PIT-v2 design (3 years × 78) | 0.185 |\n| Positive control (published harness): synthetic signal injected, 200 repetitions per level | detected 0 % at IC 0.1, 17 % at 0.2, 62 % at 0.3, 93 % at 0.4 |\n| Negative control: permuted targets / noise, 1,000 repetitions each | false-positive rate 2.8 % and 2.6 % at a 5 % level |\n| Defect injection | timing leakage was **not** detected by the original guards (as registered); the PIT guard now checks timestamps |\n\nThe harness controls false positives but can only see large effects. Typical\nannual cross-sectional equity signals are usually smaller than |IC| 0.19, so a null\nhere means \"no large edge\", not \"no edge\".",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L108-L119",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N25",
+      "claim": "Original timing guard did not detect leakage; PIT guard checks timestamps.",
+      "limits": "A reported defect-control distinction; no fresh test success claimed.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 110,
+          "end_line": 115,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "| Check | Result |\n| --- | --- |\n| Minimum detectable \\|IC\\| at 80 % power, PIT-v2 design (3 years × 78) | 0.185 |\n| Positive control (published harness): synthetic signal injected, 200 repetitions per level | detected 0 % at IC 0.1, 17 % at 0.2, 62 % at 0.3, 93 % at 0.4 |\n| Negative control: permuted targets / noise, 1,000 repetitions each | false-positive rate 2.8 % and 2.6 % at a 5 % level |\n| Defect injection | timing leakage was **not** detected by the original guards (as registered); the PIT guard now checks timestamps |",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L110-L115",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "N26",
+      "claim": "Deadline approximation, market-value coverage, high-inflation nominal-TRY sample, exposed forward registration.",
+      "limits": "Limitations are inherited or explicitly methodological reasoning, not new estimated effects.",
+      "sources": [
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 121,
+          "end_line": 131,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "## 6. Remaining limitations\n\n| Issue | Status |\n| --- | --- |\n| Exact filing timestamps | Not collected for the full universe; conservative statutory deadlines used instead. A company filing after its deadline would be treated as public too early; none was found in the sample |\n| Staleness of the cutoff | Statements are up to 11 weeks older than necessary in normal years; S1 (closer to publication) gives baseline IC +0.102, p = 0.12 — not detectable at this sample size |\n| Survivorship and universe | **Unresolved.** 81 companies chosen in 2026 from then-current listings; no delisted or failed company can appear; no point-in-time index membership |\n| Market value | Valid on one basis for 164 of 323 rows; the rest excluded or never available (training-only companies have no share counts) |\n| Corporate actions in returns | Yahoo `adjclose`; rights issues and misdated adjustments are not reliably handled, so rows with a one-day move beyond ±25 % are excluded (4) |\n| Sample | Three test years, ~78 companies, one high-inflation nominal-TRY regime |\n| 2026 forward pre-registration | Unchanged; frozen inside its own outcome window with in-window statement information; will be evaluated as registered and reported with that exposure |",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L121-L131",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "P01",
+      "claim": "Feature registry, timestamp/label guards, target window, adjustment-basis handling, null policy.",
+      "limits": "Methods only. No numeric outcome borrowed from protocol; methods described rather than rerun. Legacy protocol §7 overbroad suspension wording is not imported.",
+      "sources": [
+        {
+          "path": "docs/PIT_PROTOCOL.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 10,
+          "end_line": 16,
+          "sha256": "05a79f037d6bfcd2f76c5612b56ee1884181837d4c0d3eca78241ef918742bcc",
+          "excerpt": "## 1. Principle\n\nA feature's timestamp is the moment the underlying information became public,\nnot the end of the period it describes. A value may score a company only if it\nwas public before the prediction time, and the return it is scored against\nstarts after that. Availability is computed from recorded timestamps and\nchecked by code; names such as `lagged_` carry no weight.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/PIT_PROTOCOL.md#L10-L16",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/PIT_PROTOCOL.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 69,
+          "end_line": 102,
+          "sha256": "05a79f037d6bfcd2f76c5612b56ee1884181837d4c0d3eca78241ef918742bcc",
+          "excerpt": "              statements public  price features   signal formed, entry at     label realised\n                                 as of last close  the close of P(T)\n                                 <= C(T)\n```\n\n- `prediction_time` = 18:00 Istanbul on P(T). Price features use closes on or\n  before C(T) (`available_at` = 18:10 on the quote date).\n- Target: `adjclose(exit) / adjclose(entry) − 1`, in percent.\n- Consecutive windows do not overlap: the exit of window T (≤ C(T+1)) precedes\n  the entry of window T+1 (> C(T+1)). Training labels used to score year T end\n  before P(T); the runner asserts this for every split.\n\n## 5. Canonical target\n\n| Item | Definition |\n| --- | --- |\n| Instrument | Ordinary share, Yahoo symbol `TICKER.IS`, Borsa Istanbul, TRY |\n| Price series | Yahoo Chart API daily `adjclose` (split- and dividend-adjusted) |\n| Dividends | Included: `adjclose` reinvests cash dividends on the ex-date (total return, gross of tax) |\n| Splits, bonus issues | Included through Yahoo's split adjustment |\n| Rights issues, misdated or missing adjustments | Not reliably adjusted by Yahoo. Any one-day move beyond ±25 % inside the window (BIST daily limits are ±10 %) quarantines the row |\n| Dates | Entry: close of the first trading day after C(T). Exit: close of the last trading day on or before C(T+1). Quotes older than 7 days at either end make the row unusable |\n| Currency, inflation | Nominal TRY, not benchmark- or CPI-adjusted |\n| Missing | Not imputed. A security without a quote at entry is not evaluated |\n\nThe two published targets are kept as evidence, not reused: the vendor's dated\ncalendar-year return (training target of the published experiment) and the\nYahoo year-end-to-year-end `adjclose` return (2026 pre-registration). They\nagree in rank (ρ = 0.994) but differ by more than 10 points in 28 of 307 rows\n([`alternative_targets_report.md`](../data/trusted_clean/alternative_targets_report.md)).\nNeither can be re-windowed to start after publication, so PIT-v2 defines its\nown target from daily prices.\n\n## 6. Features",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/PIT_PROTOCOL.md#L69-L102",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/PIT_PROTOCOL.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 104,
+          "end_line": 144,
+          "sha256": "05a79f037d6bfcd2f76c5612b56ee1884181837d4c0d3eca78241ef918742bcc",
+          "excerpt": "Every model feature has an entry in the machine-readable\n[`feature_availability_registry.json`](../data/pit/feature_availability_registry.json)\nrecording source, observation period, availability rule, transformation,\nadjustment basis and earliest usable prediction date.\n\n| Class | Features | Availability |\n| --- | ---: | --- |\n| Statement levels, ratios, growth (FY T, growth also FY T−1) | 27 | statement `available_at` |\n| PIT market value | `market_cap` | reference close |\n| Valuation ratios | `pe_ratio`, `pb_ratio`, `enterprise_value`, `ev_ebitda` | later of statements and reference close |\n| Price | 1- and 2-year momentum, 3-year drawdown, return vs XU100, listing age, data flag | reference close |\n| Excluded | `price_adjclose_t` (level of a back-adjusted series), `benchmark_same_year_return_pct` (identical across a cross-section) | never |\n\n### Market value and corporate actions\n\nThe published `market_cap` multiplied Yahoo's back-adjusted close by the\nhistorical share count, two incompatible bases. PIT-v2 uses one basis:\n\n```\nmarket_cap(asof) = quoted close(asof) × shares(asof)\n                 = Yahoo close(asof) × F(31 Dec T) × shares(31 Dec T)\n```\n\nwhere `F(d)` is the product of Yahoo split ratios dated after `d`. Undoing a\nvendor's retroactive adjustment reconstructs the price as quoted; it adds no\nlater information. The identity holds only if every share change after\n31 December is a split or bonus issue Yahoo recorded, so a row is **excluded**\n(not repaired) when the year-end share record disagrees with Yahoo's split\nratios in year T or T+1 by more than 2 %, or the close series has an\nunexplained one-day jump after 31 December T. P/E, P/B, EV and EV/EBITDA are\nrecomputed from the PIT market value where the published dataset had a value,\ninheriting its rejection rules (positive denominators, absurd-value caps,\nunverified 2024 balance sheets).\n\nAccounting assumption: net income, equity, net debt and EBITDA are the\nreported consolidated figures in the vendor files; minority interests are not\nseparated, so P/E and P/B mix group earnings with the parent's market value.\n\n### Pre-listing rows\n\nA company-year is evaluated only if the security had a Yahoo quote on or",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/PIT_PROTOCOL.md#L104-L144",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/PIT_PROTOCOL.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 158,
+          "end_line": 167,
+          "sha256": "05a79f037d6bfcd2f76c5612b56ee1884181837d4c0d3eca78241ef918742bcc",
+          "excerpt": "## 8. Evaluation\n\nIdentical to the published harness except for the panel: within-cross-section\npercentile ranks; the same nine models with the same hyperparameters and\nseeds; expanding-window walk-forward with test fiscal years 2022, 2023 and\n2024, training on all earlier fiscal years. Inference: equal-weighted mean of\nwithin-year Spearman ICs; within-year permutation null (10,000, seed\n20261004); bootstrap of tickers within year (10,000); Bonferroni over the six\nML models; analytic minimum detectable |IC| at 80 % power for the realised\ndesign. The decision rules are fixed in the amendment.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/PIT_PROTOCOL.md#L158-L167",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/process/RESEARCH_CHARTER.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 120,
+          "end_line": 127,
+          "sha256": "5282d56ee726f3e14341538e51523910c7f06a1e651827a328c4a0cc5f9b4a48",
+          "excerpt": "## 5. Discipline that replaces the limits\n\nKept from the capstone:\n\n1. **No fabricated data.** Stored data is never imputed or synthesised;\n   missing stays null. A model may handle missing inputs internally only if the\n   study record declares the method and it is fitted on training data alone.\n2. **Point in time.** Every feature value must have been public at the moment",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/process/RESEARCH_CHARTER.md#L120-L127",
+          "local_relative_path": null
+        },
+        {
+          "path": "experiments/pit/guard.py",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 1,
+          "end_line": 11,
+          "sha256": "f22882c2494b6eb0a6489d37d8a14a21d38644ebfb3a796c2a39d1d1cda3d4f5",
+          "excerpt": "\"\"\"Point-in-time guard: availability is checked from timestamps, never from names.\n\nThree checks, all fail closed:\n\n1. ``assert_registered`` — every model feature exists in the registry and is\n   ``admitted``. Unknown or excluded features are refused.\n2. ``assert_point_in_time`` — for every (row, feature) with a value, the\n   recorded ``available_at`` is not later than the row's ``prediction_time``.\n   A value without an ``available_at`` is itself a violation.\n3. ``assert_labels_realized`` — every training label was fully realised (its\n   window ended) before the prediction time of the rows it is used to score.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/pit/guard.py#L1-L11",
+          "local_relative_path": null
+        },
+        {
+          "path": "tests/test_pit_guard.py",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 1,
+          "end_line": 6,
+          "sha256": "24ad6a37c7a814a657dfdc706011c84ebf9fa63fcfe5d12f675eb6edf3967557",
+          "excerpt": "\"\"\"The point-in-time guard rejects features by timestamp, not by name.\n\nEach test injects a defect the guard must catch: a future-available value, a\nfeature that only *looks* lagged, an unregistered or excluded feature, a\ntraining label realised after the prediction time, and the published\nT -> T+1 design itself.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/tests/test_pit_guard.py#L1-L6",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "P02",
+      "claim": "Post-hoc chronology and registration commit 079bb832b8f9466ab70ae6ef4d60c02cd3080875; prior forward exposure.",
+      "limits": "Report attributes its run to that clean commit. Git object resolves; no new run or claim of independent blinded confirmation.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 1,
+          "end_line": 7,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "# PIT-v2 results (2026-10-04)\n\nPost-hoc stage, registered before outcomes in\n[`docs/PREREGISTRATION_AMENDMENT_2026-10-04.md`](../../docs/PREREGISTRATION_AMENDMENT_2026-10-04.md)\n(commit `079bb832`); run from that clean commit. Protocol:\n[`docs/PIT_PROTOCOL.md`](../../docs/PIT_PROTOCOL.md). Machine-readable output:\n[`report.json`](report.json) (input hashes, environment, every statistic).",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L1-L7",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/PREREGISTRATION_AMENDMENT_2026-10-04.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 1,
+          "end_line": 17,
+          "sha256": "1fbec1c06beab25a3b05b40f21bf98f37b92d805faf99c5a76b578c0cee04468",
+          "excerpt": "# Amendment 2026-10-04: information timing (post-hoc)\n\n**Dated:** 2026-10-04. **Kind:** post-hoc amendment and registration of a\ncorrected evaluation. It does not edit, replace or reinterpret any earlier\npre-registration; those documents are byte-identical to their committed\nversions (hashes in §5). Everything below the line \"registered before\noutcomes\" in §6 was committed before any PIT-v2 outcome statistic was\ncomputed; the commit order in Git is the evidence.\n\n## 1. What the earlier documents assumed\n\n| Document | Date | Timing premise |\n| --- | --- | --- |\n| Published walk-forward evaluation (`experiments/run_experiments.py`, `experiments/results/`) | June–July 2026 | Year-T features predict the calendar-year T+1 return starting on the first trading day of January T+1. Not a pre-registration; the result most often quoted from it (equal-weight baseline IC +0.150, p = 0.017) was reported as a weak positive signal. |\n| [`MANUAL_FINANCIALS.md`](../MANUAL_FINANCIALS.md) | 2026 | \"Values must reflect year-end of `year` — information available at year T\" |\n| [`PREREGISTERED_2026_EVALUATION.md`](PREREGISTERED_2026_EVALUATION.md) (`PREREG-2026-FORWARD-v1`) | 2026-07-18 | Written \"before any 2026 outcome data exists\". Frozen ranking (2026-07-15) built from FY2025 statements; outcome window 31 Dec 2025 → 31 Dec 2026 |\n| [`thesis/PRE_EXPERIMENT_PROTOCOL.md`](thesis/PRE_EXPERIMENT_PROTOCOL.md) and stage registrations | 2026-08/09 | Controls run on the same T→T+1 panel; Stage 3 already registered \"T/T+1 misalignment\" and \"future-year feature leakage\" as defect classes the guards do not detect |",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/PREREGISTRATION_AMENDMENT_2026-10-04.md#L1-L17",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/PREREGISTRATION_AMENDMENT_2026-10-04.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 68,
+          "end_line": 106,
+          "sha256": "1fbec1c06beab25a3b05b40f21bf98f37b92d805faf99c5a76b578c0cee04468",
+          "excerpt": "\n## 6. Decisions made after seeing the audit\n\nThese choices were made by people who had already seen the audit's\nsensitivity numbers (baseline IC +0.150 under the published timing, +0.005\nwith statements lagged a year, +0.193 for FY-T statements alone under the\npublished timing). PIT-v2 is therefore **post-hoc**: it is registered before\nits own outcomes were computed, but it is not blind to the question it\nanswers. Before registration the daily price data was inspected for listing\ndates, split events, one-day jumps and share-count consistency; no\nfeature–return association was computed.\n\n1. Canonical methodology becomes availability-aware PIT evaluation\n   ([`PIT_PROTOCOL.md`](PIT_PROTOCOL.md)); lagging statements by a fiscal year\n   is **not** adopted as the canonical fix.\n2. Actual-filing-date mode is implemented but covers 6 company-years; the\n   full-universe run uses the standardized conservative cutoff mode. The two\n   are never mixed.\n3. Primary cutoff: 31 May of T+1 for every fiscal year. End of March was\n   rejected because it precedes the FY2023 and SASA FY2022 deadlines.\n4. Target: Yahoo `adjclose` from the close of the first trading day after the\n   cutoff to the last close on or before the next cutoff (protocol §5).\n5. Market value rebuilt on one adjustment basis; rows where that cannot be\n   shown are excluded (protocol §6).\n6. Rows without a quote at the prediction date, and rows with a one-day move\n   beyond ±25 % inside the target window, are excluded.\n7. Universe unchanged (81 companies); survivorship stays unresolved.\n\n### Registered before outcomes\n\n**Primary estimand.** Pooled IC (equal-weighted mean of the three within-year\nSpearman ICs, test fiscal years 2022–2024) of `baseline_equal_weight` under\nthe primary specification (`uniform_05_31`, all 38 admitted features,\nquarantined rows excluded). Two-sided within-year permutation p-value, 10,000\npermutations, seed 20261004, α = 0.05.\n\n**Secondary family.** The six ML models under the primary specification,\nBonferroni-adjusted over six. The other two rank baselines are reported\nwithout a test claim.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/PREREGISTRATION_AMENDMENT_2026-10-04.md#L68-L106",
+          "local_relative_path": null
+        },
+        {
+          "path": "RESULTS.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 131,
+          "end_line": 131,
+          "sha256": "9356b09bc3afd5448372d4a252708699656f0cde7fa6594167569b65b039d75e",
+          "excerpt": "| 2026 forward pre-registration | Unchanged; frozen inside its own outcome window with in-window statement information; will be evaluated as registered and reported with that exposure |",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/RESULTS.md#L131-L131",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "P03",
+      "claim": "Manifests referenced but not opened; frozen input requirement and fresh-fetch instability.",
+      "limits": "Only authorized RESULTS and exact PIT-v2 REPORT were read as outcome evidence. No report.json or other result file inspection.",
+      "sources": [
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 3,
+          "end_line": 7,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "Post-hoc stage, registered before outcomes in\n[`docs/PREREGISTRATION_AMENDMENT_2026-10-04.md`](../../docs/PREREGISTRATION_AMENDMENT_2026-10-04.md)\n(commit `079bb832`); run from that clean commit. Protocol:\n[`docs/PIT_PROTOCOL.md`](../../docs/PIT_PROTOCOL.md). Machine-readable output:\n[`report.json`](report.json) (input hashes, environment, every statistic).",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L3-L7",
+          "local_relative_path": null
+        },
+        {
+          "path": "experiments/results_pit_v2/REPORT.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 92,
+          "end_line": 102,
+          "sha256": "8cf85956b3bf71e14407b01e7313ba8c004de7cc172bc30049194cc5068f63df",
+          "excerpt": "## Reproduce\n\n```bash\npip install -r requirements-root.txt\nPYTHONPATH=. python -m pytest tests/test_pit_guard.py tests/test_pit_prices.py -q\nPYTHONPATH=. python experiments/pit_v2_evaluation.py\n```\n\nThe derived price panels in `data/pit/derived/` are the registered inputs;\nrebuilding them from a fresh Yahoo fetch can change `adjclose` slightly\n(see `data/pit/README.md`).",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/experiments/results_pit_v2/REPORT.md#L92-L102",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "C01",
+      "claim": "Structural survivorship; extra return selection UNKNOWN; annual values null; no equivalence or selection-effect inference from overlap.",
+      "limits": "Owner-approved FIQ-16 disclosure is incorporated as a local prerequisite, not assumed merged.",
+      "sources": [
+        {
+          "path": "docs/paper1/survivorship_bound.md",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 7,
+          "end_line": 35,
+          "sha256": "e44f39b4ec74b70cffaa458bb2c1320bd6494c34568eb6a2b4826434ff1f1711",
+          "excerpt": "## What is established\n\n| Claim | Status / confidence | Evidence and limit |\n| --- | --- | --- |\n| 81 training firms, 40 reported firms | VERIFIED / high, configuration only | Existing configuration counted without reading outcomes; [count record](survivorship_count_evidence.json). Not historical eligibility. |\n| Selected in 2026 from then-current listings under an undocumented rule | VERIFIED as a repository statement / high provenance | [RESULTS §6](../../RESULTS.md#6-remaining-limitations); [2026-07-12 audit](../universe_audit.md) dates the configuration's introduction. Exact selection procedure remains UNKNOWN. |\n| Structural survivorship bias | INFERRED mechanism from the documented selection frame / high | Securities already delisted before selection cannot enter a then-current-listing frame. This conditions historical coverage on survival to selection. An index exit alone does not imply delisting; this does not prove that every historical index leaver is absent. |\n| Additional selection using realised returns | UNKNOWN / unresolved FO-1 detail | [Raw-source label](../../data/raw/README.md) says “winner cohort”; neither that label nor the owner's accepted wording proves a return filter or ranking. No return-based selection rule is invented. |\n| Selection effect on performance | UNVERIFIED / no measurement | Charter §6 and FIQ-17 plan a frozen-design replication. Neither the sign nor magnitude has been measured in this pass. |\n\nOwner authority: the accepted wording in [Branch · FINANCEIQ-2](https://chatgpt.com/c/6ae096dd-14f4-83ed-85fe-8cacbd3639a2)\nand the current 2026-10-27 instruction authorize this scoped disclosure, not a claim\nthat FO-1's complete selection history or FIQ-16's full annual count is closed.\nThe July audit is a dated record: its then-absence of historical evidence must not\nbe read as absence of all later membership documents.\n\n## Text for Paper 1 (scientific prose only)\n\n> The capstone universe (81 firms, 40 reported) was selected in 2026 from\n> then-current listings under an undocumented rule. The selection frame excludes\n> firms already delisted by the selection date and therefore introduces structural\n> survivorship bias. Whether an additional filter or ranking used realised returns\n> is unknown. Quantifying the selection effect by re-running the frozen design on\n> a rule-based, survivor-inclusive point-in-time universe (U1) is planned under\n> FIQ-17; it has not been executed. Its magnitude and direction remain unknown.\n> Future work will use predeclared point-in-time eligibility and follow firms\n> through their holding or event windows after index exit or delisting.\n\nİç metin: Paper 1, tamamlanmış Capstone v1 değerlendirmesini denetler: raporlanan",
+          "url": null,
+          "local_relative_path": "survivorship_bound.md"
+        },
+        {
+          "path": "docs/paper1/survivorship_bound.md",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 38,
+          "end_line": 86,
+          "sha256": "e44f39b4ec74b70cffaa458bb2c1320bd6494c34568eb6a2b4826434ff1f1711",
+          "excerpt": "şirketleri yapısı gereği dışlar; bu, yapısal hayatta kalma yanlılığıdır. Gerçekleşmiş\ngetirilerle ek seçim yapılıp yapılmadığı bilinmiyor. Aynı dondurulmuş tasarımın,\nçıkanları da izleyen kurala bağlı PIT U1 evreninde yeniden çalıştırılması FIQ-17\nkapsamında planlanmıştır; henüz yürütülmemiştir. Etkinin yönü ve büyüklüğü bilinmiyor.\n\n## Bounded 2020-10-01 coverage comparison\n\nThis is **literal security-code overlap at one date**, independently recounted\non 2026-10-27 from existing FinanceIQ files. It is not a synthetic exercise,\nan issuer-equivalence comparison, a complete year, or a performance bound.\nThe dossier's numbers are supported only in this bounded sense.\n\n| Date / scope | Existing XU100 codes | In Capstone 81 | Outside Capstone 81 | In reported 40 | Capstone 81 outside snapshot |\n| --- | ---: | ---: | ---: | ---: | ---: |\n| 2020-10-01 projection | 100 | 60 | 40 | 30 | 21 |\n\nSource: [archived Q4 projection](../evidence/bist_membership_p3184_2020_q4_rows.csv),\n`source_id=P3184-2020-Q4-01`, using `is_xu100=TRUE`; config sources and SHA-256\nidentities are in the [count record](survivorship_count_evidence.json).\nXU030 and XU050 are nested within XU100: filtering only the literal XU100 cell\nwould omit constituents. No new source acquisition or alias inference occurred.\n\nThe [2026-08-25 reconciliation, §16.3 and §19-20](../BIST_MEMBERSHIP_P3184_2020_RECONCILIATION.md)\nreports exact-set corroboration against existing first-party event evidence.\nIts row-content reconciliation does not close provider revision semantics,\nprove canonical source designation, admit a U1 formation, or promote 2020 to a\ncomplete eligible year. The CSV's older row-status labels are not silently\nupdated here. The 40 codes absent from the 81 list are **not 40 delistings**.\n\n## Annual table: unknown is not zero\n\nAnnual denominator: **UNRESOLVED**. A year-start snapshot, annual union and four\nseparate quarterly formations are different quantities. No annual aggregation\nrule is adopted here. A single Q4 projection cannot fill 2020, let alone 2021-25.\n\n| Year | Evidenced full-year denominator | In 81 | Outside 81 | Evidenced delisted outside 81 | Evidenced merged outside 81 | Unresolved identity/event count | Status |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| 2020 | null | null | null | null | null | null | Single Q4 projection only; full-year rule/evidence incomplete |\n| 2021 | null | null | null | null | null | null | Not established in this bounded pass |\n| 2022 | null | null | null | null | null | null | Not established in this bounded pass |\n| 2023 | null | null | null | null | null | null | Protected metadata/output gates; no new inspection |\n| 2024 | null | null | null | null | null | null | Protected metadata/output gates; no new inspection |\n| 2025 | null | null | null | null | null | null | Protected metadata/output gates; no new inspection |\n\nNo historical membership was reconstructed from present membership or the\nCapstone list. Missing counts and event classifications remain null. Even a\ncomplete membership table would not establish delisting returns or the\nperformance effect of selection. “Bound” here denotes an evidence boundary,\nnot a numerical upper/lower bound on performance.",
+          "url": null,
+          "local_relative_path": "survivorship_bound.md"
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "claim": "FIQ-17 comparison planned, NOT RUN; source/selection contrast definitions; own gates remain.",
+      "limits": "No study specification or outcome execution is added here; protected replication waits for both confirmatory openings and its own gates.",
+      "sources": [
+        {
+          "path": "docs/process/TASKS_FINANCEIQ_2026-10-07.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 465,
+          "end_line": 484,
+          "sha256": "bd7ac576588ac3b80f5ff8665e5bab05ce108367faa65b142c862189ea5c2439",
+          "excerpt": "#### FIQ-17 · Seçim etkisinin ölçümü (Capstone tasarımı U1 üzerinde)\nDalga 5 · Ön koşul: FIQ-07, FIQ-10, FIQ-12 · Önce şartname commit'lenir, sonra çalıştırılır\n\nBitti ölçütü: şartname çalıştırmadan önce commit'lenmiş; sonuç kaynak etkisi ve seçim etkisi\nolarak ayrı ayrı raporlanmış; deftere yazılmış.\n\n```text\nTask FIQ-17. Step 1 — before any run, write and commit docs/paper1/SELECTION_REPLICATION_SPEC.md:\nre-run the frozen Capstone v1 design (same features as far as Kernel data allows, same target\ndefinition, same models and hyperparameters, same walk-forward folds, point-in-time mode) on\nU1 for the years that overlap the capstone. Two contrasts, both fixed in advance:\n(a) source effect — the capstone cohort with Kernel (KAP) data versus the same cohort with the\noriginal vendor data; (b) selection effect — U1 versus the capstone cohort, both with Kernel\ndata. List every feature that cannot be rebuilt from Kernel data and how it is handled\n(dropped, never imputed). State the metrics, tests and how results enter Paper 1.\nStep 2 — run from the spec commit through the experiment ledger (study id\npaper1-selection-replication). Step 3 — write the results with the ledger trial count; report\nthem whatever they show. These years overlap the capstone evaluation, which is why this is a\nreplication of a frozen design, not a new model search.\n```",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/process/TASKS_FINANCEIQ_2026-10-07.md#L465-L484",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/research/OWNER_DECISION_ADDENDUM.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 54,
+          "end_line": 63,
+          "sha256": "2ad19181008079d200fa84be3beb55b4285126f34f5406cb5fb14fcef7ac3de0",
+          "excerpt": "| OD-1 = B | Only aggregate metadata counts in protected periods: U1 member count per formation date; identity coverage; eligible KAP filing-event count; distinct event-date count per quarter. Use only authorized membership/identity/filing metadata with access checks and immutable lineage. No exposed individual rows, joins or indirect leakage; no price presence/coverage, suspension/delisting details, prices, returns or outcomes. Undefined eligibility, coverage denominator, output or safe aggregation means fail closed. This is no unlocked protected-data read. FIQ-20 price pilot is development-only. |\n| OD-2 = B | One confirmatory opening per study, bound to immutable study identity and a cross-study exposure ledger; amendment/re-registration cannot reset it. No authorization of multiple window openings or interim looks. |\n| OD-3 = B | A properly preregistered **clean forward holdout**, with explicit exposure/claim status, can sustain predictive claims despite contaminated or blocked historical locked holdout; Charter §5 rule 4 receives one clarifying sentence. Forward dates alone never prove cleanliness. Paper 2 concerns association; this claim option chiefly affects Study 3. |\n| OD-4 = A | Locked-outcome refitting remains disallowed; reconsider at FIQ-24, with no permission granted now. |\n| OD-5 = B | Bind a demonstrated non-leakage argument to the LLM version, target and use, or label exploratory; UNKNOWN cutoff never auto-passes. |\n| OD-6 | (a) Exclude boundary-band observations (`e_i <= 2022-12-31 < b*_min,i <= 2025-12-31`); (b) no secondary confirmatory use; (c) benchmark/expected-return estimation-window data ending **before** the outcome interval do **not** enter event outcome dependency `D_i`. Retain PIT/as-of, prediction-time, training-only fitting, purge/embargo and other leakage checks; no automatic event eligibility. |\n| OD-7 = B | FIQ-17 protected 2023-2025 U1 outcome calculations only **after BOTH Paper 2 AND Study 3 confirmatory openings**, and only with FIQ-17's own applicable OSF record, committed spec, ledger and access gates. Development work is otherwise permitted under its prerequisites; this task authorizes no execution. |\n| OD-8 = A | No narrowing of project-wide protected classes. |\n\n**I-item dispositions (P §10.2).** L = **LEFT UNRESOLVED**, no wholesale",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/research/OWNER_DECISION_ADDENDUM.md#L54-L63",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/paper1/survivorship_bound.md",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 97,
+          "end_line": 101,
+          "sha256": "e44f39b4ec74b70cffaa458bb2c1320bd6494c34568eb6a2b4826434ff1f1711",
+          "excerpt": "FIQ-17 remains planned with its own prerequisites, committed specification,\napplicable registration, ledger and access gates. The owner addendum requires\nboth Paper 2 and Study 3 confirmatory openings before protected 2023-25 U1\noutcome calculations. This pass performs no study execution and changes no\nfrozen Capstone data, code, application or results.",
+          "url": null,
+          "local_relative_path": "survivorship_bound.md"
+        }
+      ]
+    },
+    {
+      "id": "G01",
+      "claim": "Development through 2022-12-31; locked 2023-01-01..2025-12-31; historical semi-clean exposure; forward exposure checks.",
+      "limits": "A source of governance dates only, not an outcome source or access grant.",
+      "sources": [
+        {
+          "path": "docs/process/RESEARCH_CHARTER.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 130,
+          "end_line": 143,
+          "sha256": "5282d56ee726f3e14341538e51523910c7f06a1e651827a328c4a0cc5f9b4a48",
+          "excerpt": "3. **Kernel blinding.** The PIT Kernel never sees outcomes\n   (`NO_NEW_OUTCOME_INSPECTION=true`); data flows one way, Kernel → FinanceIQ.\n4. **Claims.** All outward copy is research support, not investment advice.\n   The Model Confidence Contract (`model_confidence_contract.json`) governs\n   outward claims. A claim that a model has predictive ability needs a\n   confirmatory, pre-registered result on the locked holdout (rule 7).\n   Owner clarification (2026-10-26, [decision addendum](../research/OWNER_DECISION_ADDENDUM.md)):\n   a properly pre-registered confirmatory result on a forward holdout under\n   rule 7 may also support a predictive-ability claim despite historical\n   locked-holdout contamination, provided its explicitly documented status\n   establishes cleanliness through prior-exposure and cross-study checks\n   rather than publication dates alone.\n5. **Rights.** No paid data, no secrets in git, no public redistribution of\n   raw third-party data, no bypassing authentication, CAPTCHAs, WAFs or rate",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/process/RESEARCH_CHARTER.md#L130-L143",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/process/RESEARCH_CHARTER.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 154,
+          "end_line": 165,
+          "sha256": "5282d56ee726f3e14341538e51523910c7f06a1e651827a328c4a0cc5f9b4a48",
+          "excerpt": "7. **Exploration and confirmation are separate.** The development window is\n   open to any exploration. The locked holdout is touched only by a\n   pre-registered confirmatory analysis, once. Default boundaries:\n   development up to 2022-12-31; locked holdout 2023-01-01 to 2025-12-31;\n   forward holdout = everything published after the OSF registration date.\n   The 2023–2025 holdout is semi-clean — capstone results on the 40-company\n   cohort for those years have been seen — and papers say so; only the forward\n   holdout is fully clean. IAS 29 restatement starts with fiscal 2023, so a\n   model trained on the development window meets a new measurement basis in\n   the holdout; the research protocol must address this (e.g. unit-invariant\n   ratios, basis-aware features). The boundaries may move only before any\n   model is evaluated on the U1 universe.",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/process/RESEARCH_CHARTER.md#L154-L165",
+          "local_relative_path": null
+        },
+        {
+          "path": "docs/research/OWNER_DECISION_ADDENDUM.md",
+          "commit": "efe3ed32ca958074c01ee9488f1f768a9d812c61",
+          "start_line": 54,
+          "end_line": 63,
+          "sha256": "2ad19181008079d200fa84be3beb55b4285126f34f5406cb5fb14fcef7ac3de0",
+          "excerpt": "| OD-1 = B | Only aggregate metadata counts in protected periods: U1 member count per formation date; identity coverage; eligible KAP filing-event count; distinct event-date count per quarter. Use only authorized membership/identity/filing metadata with access checks and immutable lineage. No exposed individual rows, joins or indirect leakage; no price presence/coverage, suspension/delisting details, prices, returns or outcomes. Undefined eligibility, coverage denominator, output or safe aggregation means fail closed. This is no unlocked protected-data read. FIQ-20 price pilot is development-only. |\n| OD-2 = B | One confirmatory opening per study, bound to immutable study identity and a cross-study exposure ledger; amendment/re-registration cannot reset it. No authorization of multiple window openings or interim looks. |\n| OD-3 = B | A properly preregistered **clean forward holdout**, with explicit exposure/claim status, can sustain predictive claims despite contaminated or blocked historical locked holdout; Charter §5 rule 4 receives one clarifying sentence. Forward dates alone never prove cleanliness. Paper 2 concerns association; this claim option chiefly affects Study 3. |\n| OD-4 = A | Locked-outcome refitting remains disallowed; reconsider at FIQ-24, with no permission granted now. |\n| OD-5 = B | Bind a demonstrated non-leakage argument to the LLM version, target and use, or label exploratory; UNKNOWN cutoff never auto-passes. |\n| OD-6 | (a) Exclude boundary-band observations (`e_i <= 2022-12-31 < b*_min,i <= 2025-12-31`); (b) no secondary confirmatory use; (c) benchmark/expected-return estimation-window data ending **before** the outcome interval do **not** enter event outcome dependency `D_i`. Retain PIT/as-of, prediction-time, training-only fitting, purge/embargo and other leakage checks; no automatic event eligibility. |\n| OD-7 = B | FIQ-17 protected 2023-2025 U1 outcome calculations only **after BOTH Paper 2 AND Study 3 confirmatory openings**, and only with FIQ-17's own applicable OSF record, committed spec, ledger and access gates. Development work is otherwise permitted under its prerequisites; this task authorizes no execution. |\n| OD-8 = A | No narrowing of project-wide protected classes. |\n\n**I-item dispositions (P §10.2).** L = **LEFT UNRESOLVED**, no wholesale",
+          "url": "https://github.com/Salih04/capstone-financeIQ/blob/efe3ed32ca958074c01ee9488f1f768a9d812c61/docs/research/OWNER_DECISION_ADDENDUM.md#L54-L63",
+          "local_relative_path": null
+        }
+      ]
+    },
+    {
+      "id": "L01",
+      "claim": "Fama–French 1992 and conservative minimum six-month gap.",
+      "limits": "Publisher Section I.A, Data, accounting-to-return matching paragraph. Not a universal statutory rule.",
+      "sources": [
+        {
+          "path": "docs/paper1/references.bib",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 43,
+          "end_line": 54,
+          "sha256": "ff87b52e091127e0c8008aa6f5b742708434e53164b95faa45d578b125eb6240",
+          "excerpt": "@article{Fama1992CrossSection,\n  author = {Fama, Eugene F. and French, Kenneth R.},\n  title = {{The Cross‐Section of Expected Stock Returns}},\n  year = {1992},\n  journal = {The Journal of Finance},\n  volume = {47},\n  number = {2},\n  pages = {427--465},\n  doi = {10.1111/j.1540-6261.1992.tb04398.x},\n  url = {https://doi.org/10.1111/j.1540-6261.1992.tb04398.x},\n  urldate = {2026-10-27},\n}",
+          "url": null,
+          "local_relative_path": "references.bib"
+        }
+      ]
+    },
+    {
+      "id": "L02",
+      "claim": "Drobetz–Otto 2021; lagged fundamentals and temporal training/validation/testing.",
+      "limits": "Publisher Data/Methodology sections; own financial results not transferred.",
+      "sources": [
+        {
+          "path": "docs/paper1/references.bib",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 312,
+          "end_line": 323,
+          "sha256": "ff87b52e091127e0c8008aa6f5b742708434e53164b95faa45d578b125eb6240",
+          "excerpt": "@article{Drobetz2021European,\n  author = {Drobetz, Wolfgang and Otto, Tizian},\n  title = {{Empirical asset pricing via machine learning: evidence from the European stock market}},\n  year = {2021},\n  journal = {Journal of Asset Management},\n  volume = {22},\n  number = {7},\n  pages = {507--538},\n  doi = {10.1057/s41260-021-00237-x},\n  url = {https://doi.org/10.1057/s41260-021-00237-x},\n  urldate = {2026-10-27},\n}",
+          "url": null,
+          "local_relative_path": "references.bib"
+        }
+      ]
+    },
+    {
+      "id": "L03",
+      "claim": "Kapoor–Narayanan 2023; leakage taxonomy and scientific reproducibility.",
+      "limits": "Published identity from FIQ-13; author preprint abstract read for taxonomy, no survey counts imported.",
+      "sources": [
+        {
+          "path": "docs/paper1/references.bib",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 82,
+          "end_line": 93,
+          "sha256": "ff87b52e091127e0c8008aa6f5b742708434e53164b95faa45d578b125eb6240",
+          "excerpt": "@article{Kapoor2023Leakage,\n  author = {Kapoor, Sayash and Narayanan, Arvind},\n  title = {{Leakage and the reproducibility crisis in machine-learning-based science}},\n  year = {2023},\n  journal = {Patterns},\n  volume = {4},\n  number = {9},\n  pages = {100804},\n  doi = {10.1016/j.patter.2023.100804},\n  url = {https://doi.org/10.1016/j.patter.2023.100804},\n  urldate = {2026-10-27},\n}",
+          "url": null,
+          "local_relative_path": "references.bib"
+        }
+      ]
+    },
+    {
+      "id": "L04",
+      "claim": "Hernán–Robins 2016; time-zero alignment as a clinical analogy.",
+      "limits": "Primary article Defining time zero section. No finance causal identification claimed.",
+      "sources": [
+        {
+          "path": "docs/paper1/references.bib",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 69,
+          "end_line": 80,
+          "sha256": "ff87b52e091127e0c8008aa6f5b742708434e53164b95faa45d578b125eb6240",
+          "excerpt": "@article{Hernan2016TargetTrial,\n  author = {Hernán, Miguel A. and Robins, James M.},\n  title = {{Using Big Data to Emulate a Target Trial When a Randomized Trial Is Not Available}},\n  year = {2016},\n  journal = {American Journal of Epidemiology},\n  volume = {183},\n  number = {8},\n  pages = {758--764},\n  doi = {10.1093/aje/kwv254},\n  url = {https://doi.org/10.1093/aje/kwv254},\n  urldate = {2026-10-27},\n}",
+          "url": null,
+          "local_relative_path": "references.bib"
+        }
+      ]
+    },
+    {
+      "id": "L05",
+      "claim": "Brown et al. 1992 survivor truncation; Shumway 1997 delisting-return bias.",
+      "limits": "Primary article abstracts/introduction; no portable bias coefficient, no new financial estimate.",
+      "sources": [
+        {
+          "path": "docs/paper1/references.bib",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 403,
+          "end_line": 414,
+          "sha256": "ff87b52e091127e0c8008aa6f5b742708434e53164b95faa45d578b125eb6240",
+          "excerpt": "@article{Brown1992Survivorship,\n  author = {Brown, Stephen J. and Goetzmann, William and Ibbotson, Roger G. and Ross, Stephen A.},\n  title = {{Survivorship Bias in Performance Studies}},\n  year = {1992},\n  journal = {Review of Financial Studies},\n  volume = {5},\n  number = {4},\n  pages = {553--580},\n  doi = {10.1093/rfs/5.4.553},\n  url = {https://doi.org/10.1093/rfs/5.4.553},\n  urldate = {2026-10-27},\n}",
+          "url": null,
+          "local_relative_path": "references.bib"
+        },
+        {
+          "path": "docs/paper1/references.bib",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 416,
+          "end_line": 427,
+          "sha256": "ff87b52e091127e0c8008aa6f5b742708434e53164b95faa45d578b125eb6240",
+          "excerpt": "@article{Shumway1997Delisting,\n  author = {Shumway, Tyler},\n  title = {{The Delisting Bias in CRSP Data}},\n  year = {1997},\n  journal = {The Journal of Finance},\n  volume = {52},\n  number = {1},\n  pages = {327--340},\n  doi = {10.1111/j.1540-6261.1997.tb03818.x},\n  url = {https://doi.org/10.1111/j.1540-6261.1997.tb03818.x},\n  urldate = {2026-10-27},\n}",
+          "url": null,
+          "local_relative_path": "references.bib"
+        }
+      ]
+    },
+    {
+      "id": "L06",
+      "claim": "White 2000; Hansen 2005; Harvey–Liu–Zhu 2016; Bailey–López de Prado 2014.",
+      "limits": "General data-snooping/selection context only. Hansen publisher text inaccessible in this pass; identity and test title rely on verified FIQ-13 metadata. No implementation or result from any of these tests claimed.",
+      "sources": [
+        {
+          "path": "docs/paper1/references.bib",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 159,
+          "end_line": 170,
+          "sha256": "ff87b52e091127e0c8008aa6f5b742708434e53164b95faa45d578b125eb6240",
+          "excerpt": "@article{White2000RealityCheck,\n  author = {White, Halbert},\n  title = {{A Reality Check for Data Snooping}},\n  year = {2000},\n  journal = {Econometrica},\n  volume = {68},\n  number = {5},\n  pages = {1097--1126},\n  doi = {10.1111/1468-0262.00152},\n  url = {https://doi.org/10.1111/1468-0262.00152},\n  urldate = {2026-10-27},\n}",
+          "url": null,
+          "local_relative_path": "references.bib"
+        },
+        {
+          "path": "docs/paper1/references.bib",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 172,
+          "end_line": 183,
+          "sha256": "ff87b52e091127e0c8008aa6f5b742708434e53164b95faa45d578b125eb6240",
+          "excerpt": "@article{Hansen2005SPA,\n  author = {Hansen, Peter Reinhard},\n  title = {{A Test for Superior Predictive Ability}},\n  year = {2005},\n  journal = {Journal of Business \\& Economic Statistics},\n  volume = {23},\n  number = {4},\n  pages = {365--380},\n  doi = {10.1198/073500105000000063},\n  url = {https://doi.org/10.1198/073500105000000063},\n  urldate = {2026-10-27},\n}",
+          "url": null,
+          "local_relative_path": "references.bib"
+        },
+        {
+          "path": "docs/paper1/references.bib",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 56,
+          "end_line": 67,
+          "sha256": "ff87b52e091127e0c8008aa6f5b742708434e53164b95faa45d578b125eb6240",
+          "excerpt": "@article{Harvey2016MultipleTesting,\n  author = {Harvey, Campbell R. and Liu, Yan and Zhu, Heqing},\n  title = {{… and the Cross-Section of Expected Returns}},\n  year = {2016},\n  journal = {Review of Financial Studies},\n  volume = {29},\n  number = {1},\n  pages = {5--68},\n  doi = {10.1093/rfs/hhv059},\n  url = {https://doi.org/10.1093/rfs/hhv059},\n  urldate = {2026-10-27},\n}",
+          "url": null,
+          "local_relative_path": "references.bib"
+        },
+        {
+          "path": "docs/paper1/references.bib",
+          "commit": "7b444a35298f7b04012d818ff70fcbc57b85d6b3",
+          "start_line": 185,
+          "end_line": 196,
+          "sha256": "ff87b52e091127e0c8008aa6f5b742708434e53164b95faa45d578b125eb6240",
+          "excerpt": "@article{Bailey2014DeflatedSharpe,\n  author = {Bailey, David H. and López de Prado, Marcos},\n  title = {{The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality}},\n  year = {2014},\n  journal = {The Journal of Portfolio Management},\n  volume = {40},\n  number = {5},\n  pages = {94--107},\n  doi = {10.3905/jpm.2014.40.5.094},\n  url = {https://doi.org/10.3905/jpm.2014.40.5.094},\n  urldate = {2026-10-27},\n}",
+          "url": null,
+          "local_relative_path": "references.bib"
+        }
+      ]
+    }
+  ]
+}
